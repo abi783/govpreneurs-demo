@@ -48,7 +48,17 @@ import { withGrantFor } from "../lib/ava/grant";
 import { grantFacts } from "../demo/ava/grantFacts";
 import type { Flag } from "../lib/ava/status";
 import { useLiveSlice } from "../lib/eventBus";
-import { getAvaStory, STORY_BIDS } from "../demo/ava/story";
+import { getAvaStory, STORY_BIDS, valueLine } from "../demo/ava/story";
+import { findOpportunity } from "../demo/ava/opportunity";
+import { getOpportunity } from "../demo/story/opportunities";
+import { useDemoState } from "../demo/runtime/store";
+import {
+  HANDOFF_SEEN_KEY,
+  HANDOFF_STATE_KEY,
+  NO_HANDOFF,
+  type HandoffState,
+} from "../demo/ava/handoffSeen";
+import { theirs } from "../components/Ava/HandoffView";
 import { getReviewByOpportunity, MENTOR_REPLY_DAYS } from "../demo/ava/mentorReviews";
 
 export const Route = createFileRoute("/ava/")({
@@ -315,6 +325,80 @@ function BidCard({ id, onOpen }: { id: string; onOpen: (id: string) => void }) {
   );
 }
 
+
+// ─── One bid Ava has been handed but has not read ───
+
+/** A bid whose handoff page the visitor opened. Ava has not read it, so the card
+ *  shows no due date of her own: only what the listing says. */
+function HandoffCard({ id, onOpen }: { id: string; onOpen: (id: string) => void }) {
+  const [all] = useDemoState<Record<string, HandoffState>>(HANDOFF_STATE_KEY, {});
+  const opp = findOpportunity(id);
+  const story = getOpportunity(id);
+  if (!opp || !story) return null;
+  const mine = all[id] ?? NO_HANDOFF;
+  const waiting = opp.scope === "sled" && mine.files.length === 0;
+  const value = valueLine(story);
+  const label = waiting
+    ? `Ava needs ${theirs(opp)} files`
+    : opp.scope === "sled"
+      ? `Ava is reading ${mine.files.length} ${mine.files.length === 1 ? "file" : "files"}`
+      : "Ava is reading the notice and its files";
+  const listing = leftText(opp.closesInDays);
+  const open = (e: { currentTarget: HTMLElement }) => {
+    e.currentTarget.blur();
+    onOpen(id);
+  };
+  return (
+    <article
+      className="ava-idx__card is-clickable-card"
+      role="link"
+      tabIndex={0}
+      aria-label={[opp.title, "Due date not read yet", label, ...(waiting ? ["Needs you"] : [])].join(
+        ". ",
+      )}
+      onClick={open}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open(e);
+        }
+      }}
+    >
+      <div className="ava-idx__top">
+        <div className="ava-idx__what">
+          <p className="ava-idx__eyebrow">
+            <span className="ava-kind">{opp.noticeType}</span>
+            <span className="ava-idx__num mono">{id}</span>
+          </p>
+          <h2 className="ava-idx__name">{opp.title}</h2>
+          <p className="ava-idx__buyer">
+            {opp.agency}
+            {value ? ` · ${value}` : ""}
+          </p>
+        </div>
+        <div className="ava-idx__when">
+          <p className="ava-idx__due">Due date not read yet</p>
+          <p className="ava-idx__left">The listing says {listing.toLowerCase()}</p>
+        </div>
+      </div>
+      <div className="ava-idx__foot">
+        <div className="ava-idx__state">
+          <PhaseMark tone={waiting ? "quiet" : "active"} label={label} />
+          {waiting ? (
+            <span className={`ava-flagchip ${FLAG_LOOK["needs-you"].cls}`}>
+              {FLAG_LOOK["needs-you"].icon}
+              Needs you
+            </span>
+          ) : null}
+        </div>
+        <span className="ava-idx__go" aria-hidden>
+          Open the bid <ArrowRight size={14} strokeWidth={2} />
+        </span>
+      </div>
+    </article>
+  );
+}
+
 // ─── The page ───
 
 function AvaIndexPage() {
@@ -323,6 +407,9 @@ function AvaIndexPage() {
 
   // The four bids in the story, soonest due first (the story sorts them).
   const ids = STORY_BIDS.map((b) => b.id);
+  // Then the bids she was handed and Ava has not read, in the order she opened them.
+  const [seen] = useDemoState<string[]>(HANDOFF_SEEN_KEY, []);
+  const handed = seen.filter((id) => !ids.includes(id));
 
   const openBid = (id: string) => {
     void navigate({ to: "/ava/$noticeId", params: { noticeId: id } });
@@ -358,6 +445,11 @@ function AvaIndexPage() {
         {ids.map((id) => (
           <li key={id}>
             <BidCard id={id} onOpen={openBid} />
+          </li>
+        ))}
+        {handed.map((id) => (
+          <li key={id}>
+            <HandoffCard id={id} onOpen={openBid} />
           </li>
         ))}
       </ul>

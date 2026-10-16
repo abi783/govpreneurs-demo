@@ -12,7 +12,7 @@
 // works and keeps its result in the demo store (key "ava.handoff"): the files
 // she adds, and whether Ava should tell her when she has a first question.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Bell, BellOff, Check, FileUp } from "lucide-react";
 import { AgentAvatar } from "../Companion/AgentAvatar";
@@ -28,6 +28,12 @@ import {
 import { FoldedSide, FoldRail, ShowPanel, SideFold } from "../ds/AgentWorkspace";
 import { useDemoState } from "../../demo/runtime/store";
 import { currentMember } from "../../demo/ava/member";
+import {
+  HANDOFF_STATE_KEY,
+  NO_HANDOFF,
+  noteHandoff,
+  type HandoffState,
+} from "../../demo/ava/handoffSeen";
 import type { AvaOpportunity } from "../../demo/ava/opportunity";
 import { grantHandoff } from "../../lib/ava/handoff";
 import { avaFace, TALK_LINE } from "./Asking";
@@ -35,15 +41,8 @@ import { AvaBadge, AvaSteps, useRailOpen, useSideOpen } from "./Frame2";
 import { RefChip } from "./GrantPrimitives";
 import { ReqMark } from "./primitives";
 
-interface HandoffState {
-  files: string[];
-  notify: boolean;
-}
-
-const NONE: HandoffState = { files: [], notify: false };
-
 /** Ava's own word for the buyer in a sentence: "the Army's files". */
-function theirs(opp: AvaOpportunity): string {
+export function theirs(opp: AvaOpportunity): string {
   if (/county/i.test(opp.agency)) return "the county's";
   if (/school|district|\bisd\b/i.test(opp.agency)) return "the district's";
   if (/^city\b/i.test(opp.agency)) return "the city's";
@@ -63,10 +62,12 @@ export function HandoffView({ opp }: { opp: AvaOpportunity }) {
   const h = grantHandoff(opp);
   const w = theirs(opp);
   const needsFiles = opp.scope === "sled";
-  const [all, setAll] = useDemoState<Record<string, HandoffState>>("ava.handoff", {});
-  const mine = all[opp.noticeId] ?? NONE;
+  const [all, setAll] = useDemoState<Record<string, HandoffState>>(HANDOFF_STATE_KEY, {});
+  const mine = all[opp.noticeId] ?? NO_HANDOFF;
   const patch = (p: Partial<HandoffState>) =>
-    setAll((prev) => ({ ...prev, [opp.noticeId]: { ...(prev[opp.noticeId] ?? NONE), ...p } }));
+    setAll((prev) => ({ ...prev, [opp.noticeId]: { ...(prev[opp.noticeId] ?? NO_HANDOFF), ...p } }));
+  // The bid joins "Bids Ava is building" once its handoff page is open.
+  useEffect(() => noteHandoff(opp.noticeId), [opp.noticeId]);
   const [talk, setTalk] = useState<Exchange[]>([]);
   const [dueOpen, setDueOpen] = useState(false);
   const [railOpen, toggleRail] = useRailOpen();
@@ -81,6 +82,10 @@ export function HandoffView({ opp }: { opp: AvaOpportunity }) {
   const answerTyped = (text: string): string => {
     const t = text.toLowerCase();
     if (/grant|call|should i|bid or|worth/.test(t)) return grantWords;
+    if (/\bdue\b|deadline|clos(e|es|ing)\b|days? left|last day/.test(t))
+      return `The listing says this closes in ${opp.closesInDays} ${opp.closesInDays === 1 ? "day" : "days"}. I show the exact day and time after I have read ${w} files, because the date on a listing can be wrong.`;
+    if (/price|cost|how much|quote|\$/.test(t))
+      return `I cannot work out a price before I have read ${w} files. After that I ask you for your own costs, one at a time.`;
     if (/how long|when|ready|soon|time/.test(t))
       return "About an hour after I have the files. I tell you here the moment I have my first question.";
     if (/file|upload|add|send/.test(t))
