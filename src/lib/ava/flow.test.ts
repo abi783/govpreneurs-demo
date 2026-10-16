@@ -779,6 +779,11 @@ describe("the mentor", () => {
       rationale: "",
       note: "Opp",
     });
+    // The shared list names a review by the millisecond it was sent. A person
+    // cannot send two in one millisecond; this test can.
+    for (const t = Date.now(); Date.now() === t; ) {
+      /* wait for the next millisecond */
+    }
     createReview({
       opportunityId: id,
       opportunityTitle: "T",
