@@ -1,0 +1,108 @@
+/* DEMO: styles for the profile surfaces that production did not have. */
+
+.bp-modal-problem {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--neg-6, #b42318);
+}
+
+.dfy-dialog { max-width: 520px; }
+.dfy-price { display: flex; align-items: baseline; gap: 8px; margin: 12px 0 8px; }
+.dfy-price-amt { font-size: 28px; font-weight: 600; color: var(--text); }
+.dfy-price-cadence { font-size: 13px; color: var(--text-2); }
+.dfy-list { margin: 0 0 12px; padding-left: 18px; font-size: 14px; color: var(--text); display: grid; gap: 4px; }
+.dfy-steps { margin: 0 0 12px; padding-left: 20px; font-size: 13px; color: var(--text-2); display: grid; gap: 4px; }
+.dfy-steps--progress li[data-state="done"] { color: var(--text); }
+.dfy-steps--progress li[data-state="done"]::marker { content: "✓  "; }
+.dfy-steps--progress li[data-state="now"] { color: var(--text); font-weight: 600; }
+.dfy-note { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); margin: 0 0 4px; }
+.dfy-success { display: grid; gap: 8px; justify-items: start; }
+.dfy-success-icon {
+  width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center;
+  background: color-mix(in oklab, var(--pos-6, #067647) 14%, transparent); color: var(--pos-6, #067647);
+}
+
+.fr-busy { opacity: 0.7; pointer-events: none; }
+.fr-note { font-size: 12px; color: var(--text-2); }
+.fr-btn-link { text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+
+.bp-edit-mode-label { font-size: 13px; color: var(--text-2); }
+.bp-view-note { font-size: 12px; color: var(--text-2); margin: 0 0 8px; }
+
+.pp-import-note { font-size: 13px; color: var(--text-2); margin: 0; }
+.pp-import-result { font-size: 13px; margin: 8px 0 0; }
+.pp-import-result[data-ok="false"] { color: var(--neg-6, #b42318); }
+.pp-card-ref-detail { font-size: 12px; color: var(--text-2); margin-left: 6px; }
+
+.mh-session-title { font-size: 13px; color: var(--text-2); margin: 0 0 6px; }
+.mh-session-edit { display: grid; gap: 8px; margin-top: 8px; }
+.mh-session-edit textarea {
+  width: 100%; min-height: 72px; padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 8px; font: inherit; font-size: 14px; background: var(--bg-card, #fff); color: var(--text);
+}
+.mh-session-edit-actions { display: flex; gap: 8px; }
+
+.sled-dialog-steps { margin: 0 0 12px; padding-left: 20px; font-size: 14px; display: grid; gap: 6px; }
+.sled-vendor-input { display: grid; gap: 4px; margin-top: 8px; }
+
+.kh-file-open { background: none; border: 0; padding: 0; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.kh-file-open:hover { text-decoration: underline; }
+.kh-file-row.is-flash { animation: kh-flash 1.6s ease-out; }
+@keyframes kh-flash { from { background: color-mix(in oklab, var(--ai-7, #d97706) 22%, transparent); } to { background: transparent; } }
+.kh-learned-list { list-style: none; margin: 0; padding: 4px 14px 8px; display: grid; gap: 0; }
+.kh-learned-row { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); }
+.kh-learned-row:last-child { border-bottom: none; }
+.kh-learned-src { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.kh-learned-src-btn {
+  display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0;
+  font: inherit; font-size: 12px; color: var(--blue-7, #2457d6); cursor: pointer;
+}
+.kh-learned-src-btn:hover { text-decoration: underline; }
+.kh-learned-foot { display: flex; align-items: flex-start; gap: 6px; padding: 0 14px 12px; font-size: 12px; color: var(--text-3); margin: 0; }
+.kh-learned-foot svg { flex: 0 0 auto; margin-top: 2px; }
+.kh-learned > .kh-empty { text-align: left; }
+
+.sr-gov-btn {
+  display: inline-flex; align-items: center; gap: 6px; background: none; border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; color: var(--text); cursor: pointer;
+}
+.sr-gov-btn:hover { background: var(--bg-element, #f4f4f5); }
+.sr-upload-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; }
+.sr-proof { font-size: 13px; color: var(--text-2); }
+
+.cs-doc-logo-fallback { font-weight: 700; }
+
+/* The capability statement actions. Production had no rule for the main one. */
+.bp-capstmt-build {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 12px;
+  background: var(--surface, #fff); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--r-md, 8px);
+  font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;
+}
+.bp-capstmt-build:hover { background: var(--bg-subtle, #f4f4f5); }
+a.pp-btn-primary, a.pp-btn-secondary { text-decoration: none; }
+.bp-capstmt-row .bp-capstmt-actions { padding: 0 var(--s-4, 16px) var(--s-3, 12px); }
+
+.pp-card-more-btn { display: inline-block; margin-right: 10px; }
+
+/* Stay Ready was written against token names (--fg, --muted-fg, --radius) that this app
+   does not define, so its main button showed as white on white. Map them here. */
+.sr-overview,
+.sr-page,
+.sr-home-strip,
+.sr-dfy-modal {
+  --fg: var(--text);
+  --muted-fg: var(--text-2);
+  --radius: var(--r-md, 8px);
+}
+
+/* The app's reset removes list markers. Put them back in the dialogs. */
+.dfy-list { list-style: disc; }
+.dfy-steps, .sled-dialog-steps { list-style: decimal; }
+.dfy-steps--progress { list-style: none; padding-left: 0; }
+.dfy-steps--progress li { padding-left: 22px; position: relative; }
+.dfy-steps--progress li::before { content: "○"; position: absolute; left: 0; color: var(--text-3); }
+.dfy-steps--progress li[data-state="done"]::before { content: "✓"; color: var(--pos-6, #067647); }
+.dfy-steps--progress li[data-state="now"]::before { content: "●"; color: var(--blue-7, #2457d6); }
+.dfy-steps--progress li[data-state="done"]::marker { content: none; }

@@ -3,74 +3,39 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui";
+import { DFY_SERVICES, invoiceLine, useDfyOrders, type DfyOrderTarget, type DfyService } from "../../demo/profile/dfy";
+import { orderService, sledServiceFor } from "../../demo/profile/actions";
+import { FIELD_DEFS, effectiveField } from "../../demo/profile/fields";
+import { useFieldOverrides } from "../../demo/profile/store";
+import { useSledRegistrations } from "../../demo/profile/sled";
+import { fmtUsd } from "../../demo/profile/dates";
 
-type Cadence = "one-time" | "subscription" | "per state";
-
-interface ServiceRow {
-  id: string;
-  name: string;
-  price: number;
-  cadence: Cadence;
-  impacts: string[];
+interface Candidate {
+  service: DfyService;
+  target: DfyOrderTarget;
 }
 
-// Marcus's applicable services, in impact-sort order per the prompt.
-const SERVICES: ServiceRow[] = [
-  {
-    id: "sbs-visibility",
-    name: "SBS Visibility Setup",
-    price: 997,
-    cadence: "one-time",
-    impacts: ["Builds your DSBS profile so federal buyers can find you"],
-  },
-  {
-    id: "capability-statement",
-    name: "Capability Statement",
-    price: 2000,
-    cadence: "one-time",
-    impacts: [
-      "Improves Hunter's match quality across the board",
-      "Also extracts your past performance entries",
-    ],
-  },
-  {
-    id: "govcompliant-digital",
-    name: "GovCompliant Digital Setup",
-    price: 2997,
-    cadence: "subscription",
-    impacts: ["Website + email domain + business phone in one"],
-  },
-  {
-    id: "sled-va",
-    name: "SLED Enrollment — Virginia",
-    price: 2497,
-    cadence: "per state",
-    impacts: ["Unlocks state and local opportunities in VA"],
-  },
-  {
-    id: "sled-sc",
-    name: "SLED Enrollment — South Carolina",
-    price: 2497,
-    cadence: "per state",
-    impacts: ["Unlocks state and local opportunities in SC"],
-  },
-  {
-    id: "sled-ga",
-    name: "SLED Enrollment — Georgia",
-    price: 2497,
-    cadence: "per state",
-    impacts: ["Unlocks state and local opportunities in GA"],
-  },
-  {
-    id: "profile-maintenance",
-    name: "Profile Maintenance & Compliance Alerts",
-    price: 290,
-    cadence: "subscription",
-    impacts: ["Keeps your SAM, SOS, and other registrations from going stale"],
-  },
-];
-
-const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
+// DEMO: the services that fit the gaps in Amira's profile. A service leaves the list
+// once it is ordered or the gap is closed.
+export function useDfyCandidates(): Candidate[] {
+  const overrides = useFieldOverrides();
+  const sled = useSledRegistrations();
+  const orders = useDfyOrders();
+  return useMemo(() => {
+    const list: Candidate[] = [];
+    if (effectiveField(FIELD_DEFS["dsbs"], overrides).state === "missing") {
+      list.push({ service: DFY_SERVICES["sbs-visibility"], target: { kind: "field", fieldId: "dsbs" } });
+    }
+    for (const r of sled) {
+      const id = sledServiceFor(r.state);
+      if (r.status === "missing" && id) list.push({ service: DFY_SERVICES[id], target: { kind: "sled", state: r.state } });
+    }
+    if (!orders.some((o) => o.serviceId === "profile-maintenance")) {
+      list.push({ service: DFY_SERVICES["profile-maintenance"], target: { kind: "none" } });
+    }
+    return list;
+  }, [overrides, sled, orders]);
+}
 
 interface Props {
   open: boolean;
@@ -78,15 +43,13 @@ interface Props {
 }
 
 export function AggregatedDfyModal({ open, onOpenChange }: Props) {
+  const candidates = useDfyCandidates();
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [placed, setPlaced] = useState<{ count: number; total: number } | null>(null);
 
   const total = useMemo(
-    () =>
-      SERVICES.reduce(
-        (sum, svc) => (selected[svc.id] ? sum + svc.price : sum),
-        0,
-      ),
-    [selected],
+    () => candidates.reduce((sum, c) => (selected[c.service.id] ? sum + c.service.price : sum), 0),
+    [candidates, selected],
   );
 
   function toggle(id: string) {
@@ -94,76 +57,98 @@ export function AggregatedDfyModal({ open, onOpenChange }: Props) {
   }
 
   function handleEnroll() {
-    const picks = SERVICES.filter((s) => selected[s.id]).map((s) => s.id);
-    console.log("[aggregated-dfy] enroll selected:", picks, "total:", total);
-    onOpenChange(false);
+    const picks = candidates.filter((c) => selected[c.service.id]);
+    picks.forEach((c) => orderService(c.service.id, c.target));
+    setPlaced({ count: picks.length, total });
+    setSelected({});
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(o) => {
+        if (!o) setPlaced(null);
+        onOpenChange(o);
+      }}
+    >
       <Dialog.Portal>
         <Dialog.Overlay className="ky-modal-overlay" />
         <Dialog.Content className="bp-modal-content bp-modal-content-lg adfy-modal">
           <Dialog.Title className="adfy-title">
-            Resolve your gaps with our services
+            {placed ? "Orders placed" : "Resolve your gaps with our services"}
           </Dialog.Title>
           <Dialog.Description className="adfy-subtitle">
-            Pick what you want done for you. Sorted by what unlocks the most for
-            you right now.
+            {placed
+              ? `${placed.count} ${placed.count === 1 ? "service" : "services"}, ${fmtUsd(placed.total)} in all. ${invoiceLine()}`
+              : "Pick what you want done for you. Sorted by what unlocks the most for you right now."}
           </Dialog.Description>
 
-          <ul className="adfy-list">
-            {SERVICES.map((svc) => {
-              const checked = !!selected[svc.id];
-              return (
-                <li key={svc.id} className="adfy-row" data-checked={checked}>
-                  <Checkbox.Root
-                    id={`adfy-${svc.id}`}
-                    checked={checked}
-                    onCheckedChange={() => toggle(svc.id)}
-                    className="adfy-checkbox"
-                    aria-label={svc.name}
-                  >
-                    <Checkbox.Indicator className="adfy-checkbox-indicator">
-                      <Check size={14} strokeWidth={3} />
-                    </Checkbox.Indicator>
-                  </Checkbox.Root>
+          {!placed && (
+            <>
+              <ul className="adfy-list">
+                {candidates.map(({ service: svc }) => {
+                  const checked = !!selected[svc.id];
+                  return (
+                    <li key={svc.id} className="adfy-row" data-checked={checked}>
+                      <Checkbox.Root
+                        id={`adfy-${svc.id}`}
+                        checked={checked}
+                        onCheckedChange={() => toggle(svc.id)}
+                        className="adfy-checkbox"
+                        aria-label={svc.name}
+                      >
+                        <Checkbox.Indicator className="adfy-checkbox-indicator">
+                          <Check size={14} strokeWidth={3} />
+                        </Checkbox.Indicator>
+                      </Checkbox.Root>
 
-                  <label htmlFor={`adfy-${svc.id}`} className="adfy-middle">
-                    <div className="adfy-name">{svc.name}</div>
-                    {svc.impacts.map((line) => (
-                      <div key={line} className="adfy-impact">
-                        → {line}
+                      <label htmlFor={`adfy-${svc.id}`} className="adfy-middle">
+                        <div className="adfy-name">{svc.name}</div>
+                        {svc.impacts.map((line) => (
+                          <div key={line} className="adfy-impact">
+                            → {line}
+                          </div>
+                        ))}
+                      </label>
+
+                      <div className="adfy-right">
+                        <div className="adfy-price">{fmtUsd(svc.price)}</div>
+                        <div className="adfy-cadence">{svc.cadence}</div>
                       </div>
-                    ))}
-                  </label>
+                    </li>
+                  );
+                })}
+                {candidates.length === 0 && <li className="adfy-row">Nothing left to order. Your profile is covered.</li>}
+              </ul>
 
-                  <div className="adfy-right">
-                    <div className="adfy-price">{fmt(svc.price)}</div>
-                    <div className="adfy-cadence">{svc.cadence}</div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+              <div className="adfy-footer">
+                <div className="adfy-total" aria-live="polite">
+                  Total: <span className="adfy-total-value">{fmtUsd(total)}</span>
+                </div>
+                <Button
+                  variant="primary"
+                  className="adfy-enroll"
+                  disabled={total === 0}
+                  onClick={handleEnroll}
+                >
+                  Enroll selected
+                </Button>
+              </div>
+              <p className="adfy-disclaimer">
+                Subscription services bill monthly until cancelled. One-time
+                services are charged at enrollment.
+              </p>
+            </>
+          )}
 
-          <div className="adfy-footer">
-            <div className="adfy-total" aria-live="polite">
-              Total: <span className="adfy-total-value">{fmt(total)}</span>
+          {placed && (
+            <div className="adfy-footer">
+              <div className="adfy-total">Follow each order on the field it fixes.</div>
+              <Button variant="primary" className="adfy-enroll" onClick={() => onOpenChange(false)}>
+                Done
+              </Button>
             </div>
-            <Button
-              variant="primary"
-              className="adfy-enroll"
-              disabled={total === 0}
-              onClick={handleEnroll}
-            >
-              Enroll selected
-            </Button>
-          </div>
-          <p className="adfy-disclaimer">
-            Subscription services bill monthly until cancelled. One-time
-            services are charged at enrollment.
-          </p>
+          )}
 
           <Dialog.Close asChild>
             <button

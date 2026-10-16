@@ -10,6 +10,7 @@ import {
   ArrowRight,
   Check,
   ExternalLink,
+  Paperclip,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -19,11 +20,18 @@ import {
   completeRenewal,
   formatDueLine,
   getItem,
+  isSnoozed,
+  setProofFile,
   startRenewal,
   statusChip,
   toggleWorkflowStep,
   useStayReady,
 } from "../lib/stayReady";
+// DEMO: the sites a renewal is filed on are not opened. The visitor gets a notice.
+import { showDemoNotice } from "../demo/ui/notice";
+import { StayReadyDFYConsent } from "../components/StayReady/StayReadyDFYConsent";
+import { StayReadySnoozeMenu } from "../components/StayReady/StayReadySnoozeMenu";
+import { useFileChooser } from "../demo/profile/useFileChooser";
 
 interface SRSearch {
   mode?: "self" | "dfy";
@@ -54,7 +62,10 @@ function StayReadyItemPage() {
   const items = useStayReady();
   const item = useMemo(() => items.find((i) => i.id === itemId) ?? getItem(itemId), [items, itemId]);
   const [confirmationNumber, setConfirmationNumber] = useState("");
-  const [done, setDone] = useState(false);
+  const [dfyOpen, setDfyOpen] = useState(false);
+  const proofChooser = useFileChooser(([f]) => {
+    if (f && item) setProofFile(item.id, f.name);
+  });
 
   // If a `mode` is in the URL and no workflow yet, start it.
   useEffect(() => {
@@ -76,11 +87,12 @@ function StayReadyItemPage() {
   const chip = statusChip(status);
   const wf = item.workflow;
   const allStepsDone = wf?.steps.every((s) => s.done) ?? false;
+  // DEMO: "renewed" comes from the saved item, so it is still true after a reload.
+  const done = Boolean(wf?.completedAt);
 
   function handleComplete() {
     if (!confirmationNumber.trim()) return;
     completeRenewal(item!.id, confirmationNumber.trim());
-    setDone(true);
   }
 
   return (
@@ -158,16 +170,39 @@ function StayReadyItemPage() {
               type="button"
               className="sr-btn-ghost"
               onClick={() => {
-                // Demo: mark every step done, then prompt for confirmation
+                // DEMO: a presenter shortcut. It marks every step done and files the renewal.
                 wf.steps.forEach((s, i) => { if (!s.done) toggleWorkflowStep(item.id, i); });
                 window.setTimeout(() => {
                   completeRenewal(item.id, `GP-${Date.now().toString().slice(-6)}`);
-                  setDone(true);
                 }, 400);
               }}
             >
-              Demo · mark complete
+              Skip ahead: mark this filed
             </button>
+          </div>
+        </section>
+      ) : !wf ? (
+        // DEMO: an item with no renewal started shows its details and the ways to renew.
+        <section className="sr-workflow-panel">
+          <header className="sr-workflow-head">
+            <div>
+              <h2>Renew when you are ready</h2>
+              <p>
+                We will remind you well before it lapses. You can start the renewal
+                now, ask us to do it, or be reminded later.
+              </p>
+            </div>
+          </header>
+          <div className="sr-confirm-block">
+            <button type="button" className="sr-btn-primary" onClick={() => startRenewal(item.id, "self")}>
+              Renew it myself <ArrowRight size={12} />
+            </button>
+            {item.dfyAvailable && (
+              <button type="button" className="sr-btn-secondary" onClick={() => setDfyOpen(true)}>
+                Have us do it — ${item.dfyPriceUSD}
+              </button>
+            )}
+            {!isSnoozed(item) && <StayReadySnoozeMenu itemId={item.id} />}
           </div>
         </section>
       ) : (
@@ -182,14 +217,18 @@ function StayReadyItemPage() {
               </p>
             </div>
             {item.govLink && (
-              <a
-                href={item.govLink}
-                target="_blank"
-                rel="noreferrer"
-                className="sr-gov-link"
+              <button
+                type="button"
+                className="sr-gov-btn"
+                onClick={() =>
+                  showDemoNotice({
+                    title: `Open ${new URL(item.govLink!).hostname}`,
+                    message: `In the live product this opens ${new URL(item.govLink!).hostname} so you can file the renewal. Follow the steps below, then enter your confirmation number here.`,
+                  })
+                }
               >
                 Open {new URL(item.govLink).hostname} <ExternalLink size={12} />
-              </a>
+              </button>
             )}
           </header>
           <ol className="sr-steps">
@@ -210,6 +249,15 @@ function StayReadyItemPage() {
             ))}
           </ol>
 
+          <div className="sr-upload-row">
+            <button type="button" className="sr-gov-btn" onClick={proofChooser.open}>
+              <Paperclip size={12} /> {wf.proofFileName ? "Replace proof of renewal" : "Upload proof of renewal"}
+            </button>
+            {proofChooser.input}
+            {proofChooser.choosing && <span className="sr-proof">Choose a file in the window that opened.</span>}
+            {wf.proofFileName && <span className="sr-proof">Attached: {wf.proofFileName}</span>}
+          </div>
+
           <div className="sr-confirm-block">
             <label htmlFor="sr-conf" className="sr-confirm-label">
               Confirmation number
@@ -218,7 +266,7 @@ function StayReadyItemPage() {
               id="sr-conf"
               className="sr-confirm-input"
               type="text"
-              placeholder="e.g. SAM-2026-04-15-A8F2"
+              placeholder="e.g. A8F2-2041-77"
               value={confirmationNumber}
               onChange={(e) => setConfirmationNumber(e.target.value)}
               disabled={!allStepsDone}
@@ -239,6 +287,8 @@ function StayReadyItemPage() {
           </div>
         </section>
       )}
+      {/* DEMO: outside the branches, so the success message stays when the renewal starts. */}
+      <StayReadyDFYConsent item={dfyOpen ? item : null} open={dfyOpen} onOpenChange={setDfyOpen} />
     </div>
   );
 }

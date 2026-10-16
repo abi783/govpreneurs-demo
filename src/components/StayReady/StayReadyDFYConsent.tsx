@@ -2,14 +2,22 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Check, ShieldCheck, Wallet as WalletIcon, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import {
-  getWallet,
-  setWallet as commitWallet,
-  formatUSD,
-} from "../../lib/wallet";
-import { bus } from "../../lib/eventBus";
-import { startRenewal, type TrackedItem } from "../../lib/stayReady";
-import { sendMockSMS, MOCK_PHONE } from "../../lib/mockSMS";
+import { startRenewal, sendReminderText, MASKED_PHONE, type TrackedItem } from "../../lib/stayReady";
+// DEMO: the wallet is the shared demo wallet, so the charge shows on the Wallet page.
+import { chargeWallet, getWalletBalance } from "../../demo/state/wallet";
+import { subscribeDemoState } from "../../demo/runtime/store";
+import { PERSONA } from "../../demo/story/persona";
+
+const formatUSD = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0 });
+
+function useWalletBalance(): number {
+  return useSyncExternalStore(
+    (cb) => subscribeDemoState("wallet.entries", cb),
+    () => getWalletBalance(),
+    () => getWalletBalance(),
+  );
+}
 
 export function StayReadyDFYConsent({
   item,
@@ -20,11 +28,7 @@ export function StayReadyDFYConsent({
   open: boolean;
   onOpenChange: (o: boolean) => void;
 }) {
-  const wallet = useSyncExternalStore(
-    (cb) => bus.subscribe("wallet", cb),
-    () => getWallet(),
-    () => getWallet(),
-  );
+  const balance = useWalletBalance();
   const [sms, setSms] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -35,37 +39,21 @@ export function StayReadyDFYConsent({
   if (!item) return null;
 
   const price = item.dfyPriceUSD;
-  const enough = wallet.balanceUSD >= price;
+  const enough = balance >= price;
 
   function handleConfirm() {
     if (!item || !enough) return;
-    const w = getWallet();
-    commitWallet({
-      ...w,
-      balanceUSD: Math.round((w.balanceUSD - price) * 100) / 100,
-      transactions: [
-        ...w.transactions,
-        {
-          id: `tx_${Date.now()}`,
-          date: new Date().toISOString(),
-          description: `${item.name} renewal — DFY`,
-          type: "debit",
-          amountUSD: price,
-          relatedTo: { label: "View renewal", href: `/stay-ready/${item.id}` },
-        },
-      ],
-    });
+    chargeWallet(`${item.name} renewal — done for you`, price);
     startRenewal(item.id, "dfy");
     if (sms) {
-      sendMockSMS(
-        `[Govpreneurs] Got it Marcus — we'll handle your ${item.shortName} renewal. You'll hear back within 2 business days.`,
+      sendReminderText(
+        `[GovPreneurs] Got it ${PERSONA.ownerFirstName} — we'll handle your ${item.shortName} renewal. You'll hear back within 2 business days.`,
         item.id,
       );
     }
     setConfirmed(true);
     window.setTimeout(() => onOpenChange(false), 1400);
   }
-
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -75,8 +63,10 @@ export function StayReadyDFYConsent({
           {confirmed ? (
             <div className="sr-dfy-success">
               <div className="sr-dfy-success-icon"><Check size={20} strokeWidth={2.5} /></div>
-              <h3>We've got it from here.</h3>
-              <p>Your renewal is in progress. We'll text you when it's done.</p>
+              <Dialog.Title className="ky-modal-title">We've got it from here.</Dialog.Title>
+              <Dialog.Description className="ky-modal-body">
+                Your renewal is in progress. We'll text you when it's done.
+              </Dialog.Description>
             </div>
           ) : (
             <>
@@ -92,13 +82,13 @@ export function StayReadyDFYConsent({
               <div className="sr-dfy-price">
                 <div className="sr-dfy-price-amt">{formatUSD(price)}</div>
                 <div className="sr-dfy-price-meta">
-                  <WalletIcon size={12} /> drawn from your Wallet ({formatUSD(wallet.balanceUSD)})
+                  <WalletIcon size={12} /> drawn from your Wallet ({formatUSD(balance)})
                 </div>
               </div>
 
               {!enough && (
                 <div className="sr-dfy-low">
-                  Your Wallet is short {formatUSD(price - wallet.balanceUSD)}.
+                  Your Wallet is short {formatUSD(price - balance)}.
                   <Link
                     to="/wallet"
                     className="sr-dfy-topup"
@@ -115,7 +105,7 @@ export function StayReadyDFYConsent({
                   checked={sms}
                   onChange={(e) => setSms(e.target.checked)}
                 />
-                <span>Also text me at {MOCK_PHONE} when it's done.</span>
+                <span>Also text me at {MASKED_PHONE} when it's done.</span>
               </label>
 
               <div className="ky-modal-actions">

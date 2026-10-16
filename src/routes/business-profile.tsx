@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import * as Switch from "@radix-ui/react-switch";
 import { usePageMeta } from "../components/Layout/page-meta";
@@ -18,7 +17,13 @@ import { KnowledgeTab } from "../components/profile/tabs/KnowledgeTab";
 import { StayReadyOverview } from "../components/StayReady/StayReadyOverview";
 
 
-import { BusinessProfileModeContext, type ProfileMode } from "../components/profile/BusinessProfileMode";
+import {
+  BusinessProfileModeContext,
+  EditModeContext,
+  type ProfileMode,
+} from "../components/profile/BusinessProfileMode";
+// DEMO: the Edit mode switch is saved in the demo store.
+import { useEditModeState } from "../demo/profile/store";
 
 interface BusinessProfileSearch {
   tab: TabSlug;
@@ -53,18 +58,19 @@ export const Route = createFileRoute("/business-profile")({
 
 function BusinessProfilePage() {
   usePageMeta({ layout: "wide" });
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useEditModeState();
   const { tab, onboarding } = useSearch({ from: "/business-profile" });
   const mode: ProfileMode = onboarding ? "onboarding" : "default";
 
   return (
     <BusinessProfileModeContext.Provider value={mode}>
+      <EditModeContext.Provider value={editMode}>
       <div className="bp-shell">
         <div className="bp-shell-inner">
           <header className="bp-header">
             <h1 className="bp-title">Business Profile</h1>
             <label className="bp-edit-mode">
-              
+              <span className="bp-edit-mode-label">Edit mode</span>
               <Switch.Root
                 checked={editMode}
                 onCheckedChange={setEditMode}
@@ -78,6 +84,12 @@ function BusinessProfilePage() {
 
           <ReadinessHeader />
 
+          {!editMode && (
+            <p className="bp-view-note" role="status">
+              Edit mode is off. You are looking at a read-only view. Turn it on to change anything.
+            </p>
+          )}
+
           <div className="bp-two-pane">
             <TabNavigation />
             <div className="bp-section-select-row">
@@ -89,6 +101,7 @@ function BusinessProfilePage() {
           </div>
         </div>
       </div>
+      </EditModeContext.Provider>
     </BusinessProfileModeContext.Provider>
   );
 }

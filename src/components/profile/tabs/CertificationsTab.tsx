@@ -1,66 +1,52 @@
-import { Section } from "../Section";
+import { ProfileTabSection } from "../ProfileTabSection";
 import { FieldRow } from "../FieldRow";
+import { FOOD_HANDLER_DEF, effectiveField, essentialsFor } from "../../../demo/profile/fields";
+import { patchField, useFieldOverrides } from "../../../demo/profile/store";
+import { fmtShort } from "../../../demo/profile/dates";
+import { PERSONA } from "../../../demo/story/persona";
 
+// DEMO: the fields come from the story (src/demo/profile/fields.tsx). The
+// food-handler row is a count, so it is built here: it says how many staff are
+// certified and how many still need a certificate.
 export function CertificationsTab() {
+  const overrides = useFieldOverrides();
+  const f = effectiveField(FOOD_HANDLER_DEF, overrides);
+  const have = Math.max(0, Number(f.value ?? 0)) || 0;
+  const staff = Math.max(PERSONA.employeesW2, have);
+  const left = Math.max(0, staff - have);
+
+  const foodRow = (
+    <FieldRow
+      key="food-handlers"
+      tier="T2"
+      label={FOOD_HANDLER_DEF.label}
+      state={f.state}
+      helperMicrocopy={FOOD_HANDLER_DEF.helper}
+      whyItMatters={FOOD_HANDLER_DEF.whyItMatters}
+      value={`${have} of ${staff} staff hold a current food-handler certificate.${left > 0 ? ` ${left} still ${left === 1 ? "needs" : "need"} one.` : " Everyone is certified."}`}
+      source={f.source}
+      fieldId={FOOD_HANDLER_DEF.id}
+      editType="number"
+      editValue={String(have)}
+      validate={FOOD_HANDLER_DEF.edit?.validate}
+      onSave={(v) =>
+        patchField(FOOD_HANDLER_DEF.id, {
+          state: "attested",
+          value: String(Math.min(staff, Math.max(0, Number(v)))),
+          source: `You updated this on ${fmtShort(new Date())}`,
+          at: new Date().toISOString(),
+        })
+      }
+    />
+  );
+
+  const { done, total } = essentialsFor("certifications", overrides);
   return (
-    <Section
-      t1Fields={[
-        <FieldRow
-          key="sba-set-aside"
-          tier="T1"
-          label="SBA Set-Aside Eligibility (from SAM)"
-          state="verified"
-          value="Small Business · SDVOSB eligible"
-          source="SAM.gov on 2026-04-15"
-          whyItMatters="These flags determine which set-aside contracts you can bid on. They come from your SAM.gov registration."
-        />,
-        <FieldRow
-          key="small-business"
-          tier="T1"
-          label="Small Business Status (per NAICS 238160)"
-          state="verified"
-          value="Small (per NAICS 238160 size standard)"
-          source="SAM.gov on 2026-04-15"
-        />,
-      ]}
-      t2Fields={[
-        <FieldRow
-          key="dsbs"
-          tier="T2"
-          label="DSBS Profile"
-          state="missing"
-          helperMicrocopy="Your visibility on the Dynamic Small Business Search — where federal buyers find small business contractors."
-          whyItMatters="Without a DSBS profile, federal buyers searching for small businesses in your NAICS can't find you proactively."
-          dfy={{ service: "SBS Visibility Setup", price: 997 }}
-        />,
-      ]}
-      t3Fields={[
-        <FieldRow key="8a" tier="T3" label="8(a) Certification Document" state="missing" />,
-        <FieldRow key="hubzone" tier="T3" label="HUBZone Certification" state="missing" />,
-        <FieldRow
-          key="sdvosb-doc"
-          tier="T3"
-          label="SDVOSB Certification Document (DD-214)"
-          state="missing"
-        />,
-        <FieldRow
-          key="wosb"
-          tier="T3"
-          label="WOSB/EDWOSB Certification"
-          state="missing"
-        />,
-        <FieldRow key="cmmc" tier="T3" label="CMMC Level" state="missing" />,
-        <FieldRow key="iso" tier="T3" label="ISO Certifications" state="missing" />,
-        <FieldRow key="soc2" tier="T3" label="SOC 2 Report" state="missing" />,
-        <FieldRow
-          key="state-diversity"
-          tier="T3"
-          label="State Diversity Certifications (DBE/MBE/WBE/MWBE)"
-          state="missing"
-        />,
-      ]}
-      footerProgressText="2 of 3 essentials complete"
-      footerUnlocksText="This section unlocks: set-aside opportunities you qualify for and DSBS-driven inbound interest"
+    <ProfileTabSection
+      tab="certifications"
+      unlocks="This section unlocks: set-aside opportunities you qualify for and DSBS-driven inbound interest"
+      replace={{ "food-handlers": foodRow }}
+      progress={`${done} of ${total} essentials complete`}
     />
   );
 }

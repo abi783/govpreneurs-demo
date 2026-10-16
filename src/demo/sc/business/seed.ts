@@ -15,7 +15,8 @@
 //     state diversity programs are not answered yet;
 //   - two food-handler certificates are missing (3 of 5 cooks are certified);
 //   - three suggestions wait for a yes or a no;
-//   - one insurance certificate runs out soon.
+//   - the health permit (21 days) and the woman-owned certification (48 days) run out
+//     soon, on the same dates as the Stay Ready page.
 
 import { PAST_PERFORMANCE, PERSONA, MENTOR } from "../../story/persona";
 import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
@@ -56,11 +57,9 @@ import { MEDIA_LOGO_URL } from "./media";
 
 // ── small helpers ──────────────────────────────────────────────────────────
 
-/** `2027-04-15` minus one year: when SAM last checked her registration. */
+/** When SAM last checked her registration. */
 function samCheckedOn(): string {
-  const d = new Date(`${PERSONA.samActiveUntil}T12:00:00Z`);
-  d.setUTCFullYear(d.getUTCFullYear() - 1);
-  return d.toISOString();
+  return isoDaysFromNow(-SAM_CHECKED_DAYS_AGO);
 }
 
 function samCheckedLabel(): string {
@@ -68,7 +67,6 @@ function samCheckedLabel(): string {
     month: "long",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
   });
 }
 
@@ -105,10 +103,12 @@ export const CAPABILITY_STATEMENT_BYTES = 2960;
 
 // ── timeline ───────────────────────────────────────────────────────────────
 
-/** She joined about five months ago. Dates below are "days ago". */
-const JOINED_DAYS_AGO = 160;
-const INTAKE_SENT_DAYS_AGO = 152;
-const POSITIONING_CALL_DAYS_AGO = 150;
+/** She joined about four months ago (the profile page tells the same story). "Days ago". */
+const JOINED_DAYS_AGO = 115;
+const INTAKE_SENT_DAYS_AGO = 107;
+const POSITIONING_CALL_DAYS_AGO = 105;
+/** SAM.gov was last checked this long ago. The profile page uses the same number. */
+const SAM_CHECKED_DAYS_AGO = 150;
 
 // ── provenance ─────────────────────────────────────────────────────────────
 
@@ -223,6 +223,15 @@ function rowsFor(fieldKey: string, mb: MbValue, opts: RowOptions = {}): DemoFiel
 }
 
 // ── the answers ────────────────────────────────────────────────────────────
+
+/** Her top three services. The profile page lists the same ones (and a fourth). The
+ *  capability statement names them: "Cooks and delivers ... from one kitchen",
+ *  "Therapeutic diets ...", "Event and ceremony catering ...". */
+const CORE_SERVICES = [
+  "Contract meal service from one commercial kitchen",
+  "Therapeutic diets (renal, diabetic, pureed)",
+  "Event and ceremony catering",
+] as const;
 
 /** Several options, each with the wording the member read on the form. */
 function pick(fieldKey: string, ...values: string[]): MbValue {
@@ -389,8 +398,9 @@ function buildRows(): DemoFieldRow[] {
         kind: "certification",
         name: "Woman-owned (WOSB)",
         issuer: "U.S. Small Business Administration",
-        issuedAt: dateDaysFromNow(-420),
-        expiresAt: dateDaysFromNow(675),
+        issuedAt: dateDaysFromNow(-1047),
+        // The same date as the Stay Ready page: 48 days from now.
+        expiresAt: dateDaysFromNow(48),
       },
     ),
     sam("Woman-Owned Small Business (WOSB)", "Business types: Small Business,", "Active until " + samActiveLabel()),
@@ -399,11 +409,7 @@ function buildRows(): DemoFieldRow[] {
   // ── What you sell ──
   add(
     "primary_services",
-    list(
-      "Contract dining and meal service",
-      "Therapeutic diet meals (renal, diabetic, pureed)",
-      "Event and ceremony catering",
-    ),
+    list(...CORE_SERVICES),
     typed(JOINED_DAYS_AGO - 3),
   );
   add(
@@ -434,7 +440,7 @@ function buildRows(): DemoFieldRow[] {
   add("sectors_served", pick("sectors_served", "commercial", "government", "nonprofit"), typed(JOINED_DAYS_AGO - 7));
   add(
     "service_to_sell_to_government",
-    choice("Contract dining and meal service"),
+    choice(CORE_SERVICES[0]),
     typed(JOINED_DAYS_AGO - 3),
   );
   add(
@@ -467,7 +473,7 @@ function buildRows(): DemoFieldRow[] {
     },
     typed(JOINED_DAYS_AGO - 3),
   );
-  add("concurrent_contract_capacity", count(3, "jobs at once"), typed(JOINED_DAYS_AGO - 8));
+  add("concurrent_contract_capacity", count(Math.max(1, Math.floor(PERSONA.employeesW2 / 2)), "jobs at once"), typed(JOINED_DAYS_AGO - 8));
   add("facilities", list(`Commercial kitchen at ${PERSONA.physicalAddress}`), typed(JOINED_DAYS_AGO - 8));
   add("payment_terms_tolerance", count(30, "days"), typed(JOINED_DAYS_AGO - 8));
   add("working_capital", money(75_000), typed(JOINED_DAYS_AGO - 8));
@@ -519,9 +525,9 @@ function buildRows(): DemoFieldRow[] {
         id: "ins-gl",
         kind: "insurance",
         name: "General liability insurance",
-        issuedAt: dateDaysFromNow(-327),
-        // This one runs out soon, so the rail shows a renewal to check.
-        expiresAt: dateDaysFromNow(38),
+        issuedAt: dateDaysFromNow(-245),
+        // The same date as the Stay Ready page: 120 days from now.
+        expiresAt: dateDaysFromNow(120),
         limits: [{ label: "Per occurrence", amountUSD: 1_000_000 }],
       },
       {
@@ -542,8 +548,9 @@ function buildRows(): DemoFieldRow[] {
       name: "Food service establishment permit",
       issuer: "Cumberland County Department of Public Health",
       jurisdiction: "Cumberland County, NC",
-      issuedAt: dateDaysFromNow(-205),
-      expiresAt: dateDaysFromNow(160),
+      issuedAt: dateDaysFromNow(-344),
+      // The same date as the Stay Ready page: 21 days from now, so the rail shows a renewal.
+      expiresAt: dateDaysFromNow(21),
     }),
     typed(JOINED_DAYS_AGO - 12),
   );

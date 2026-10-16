@@ -17,7 +17,7 @@ export function CapStatementDocument({ draft }: { draft: CapStatementDraft }) {
     <article className="cs-doc">
       <header className="cs-doc-head">
         <div className="cs-doc-logo" aria-hidden>
-          WC
+          {draft.initials}
         </div>
         <div className="cs-doc-title-wrap">
           <h1 className="cs-doc-title">{draft.companyName}</h1>
@@ -37,7 +37,6 @@ export function CapStatementDocument({ draft }: { draft: CapStatementDraft }) {
         </span>
         <span>
           <strong>SAM</strong> {draft.codes.samStatus}
-          {draft.codes.samVerifiedAt ? ` · verified ${draft.codes.samVerifiedAt}` : ""}
         </span>
       </div>
 
