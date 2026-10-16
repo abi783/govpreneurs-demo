@@ -23,22 +23,8 @@ export function calendarDay(days: number, hour = 0): Date {
   );
 }
 
-/** The response deadline: midnight at the start of day N, so the card reads N days. */
-export function deadlineIso(closesInDays: number): string {
-  return calendarDay(closesInDays, 0).toISOString();
-}
-
-/**
- * The posted date. A notice posted 7 days ago or less must count as "new this
- * week" for the feed's own check (`postedAt >= now - 7 days`), at any hour of
- * the day. For those notices the time moves up if it would fall just outside.
- */
-export function postedIso(postedDaysAgo: number): string {
-  const noon = calendarDay(-postedDaysAgo, 12);
-  if (postedDaysAgo > 7) return noon.toISOString();
-  const floor = Date.now() - 7 * DAY_MS + 6 * 3_600_000;
-  return new Date(Math.max(noon.getTime(), floor)).toISOString();
-}
+// deadlineIso and postedIso moved to src/demo/story/clock.ts so every page uses them.
+export { deadlineIso, postedIso } from "../story/clock";
 
 /** "Nov 11" for the deadline of a notice that closes in N days. */
 export function shortDate(daysFromToday: number): string {

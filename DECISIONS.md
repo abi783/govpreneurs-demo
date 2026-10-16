@@ -67,3 +67,6 @@ name its number.
 - D43. **Sample prices for two done-for-you services: CMMC $497, Prime Registration $197.** The coupon `DEMO10` gives 10% off. The other prices come from the prototype's catalog.
 - D44. **One calendar for every page.** A call booked on the Roadmap or from Tasks appears on Success Center home too. The home progress card shows the Roadmap's own phases.
 - D45. **Shared Success Center calls (wallet balance, time zone, uploads) are answered in one place** (`src/demo/api/scShared.ts`). A test fails if two pages answer the same call.
+- D46. **Every deadline is midnight at the start of its day, counted in calendar days.** All pages then read the same "Closes in N days" at any hour, including after the 1 November clock change.
+- D47. **Value filters hide the Fort Bragg sources sought**, which states no value. Production would keep it. This way a filter such as "Under $25K" never shows a card with no value.
+- D48. **Hunter's chat may move Tim to the All tab** when a question matches nothing on For You (for example "work in Virginia"), and says so.

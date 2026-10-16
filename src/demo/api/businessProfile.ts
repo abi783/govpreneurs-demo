@@ -27,7 +27,7 @@ function buildProfile(): BusinessProfile {
     naicsLabels,
     stateCodes: [...PERSONA.serviceStates].map((s) => s.toLowerCase()),
     cities: [PERSONA.hqCity.toLowerCase()],
-    socioEconomicCerts: ["SB", "WOSB"],
+    socioEconomicCerts: ["WOSB"],
     isSmall: true,
     certifications: ["sam"],
     certificationCategories: [],
