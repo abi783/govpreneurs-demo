@@ -86,7 +86,7 @@ for (const o of OPPORTUNITIES) {
     if (old) errors.push(`old sample-member text "${old[0]}"`);
 
     expect(snap.h1, "the page title").toBe(o.title);
-    expect(snap.call, "Grant's call").toBe(CALL_WORD[o.grant.verdict]);
+    expect(snap.call, "Grant's call").toBe(o.noticeType === "Sources Sought" ? "Reply" : CALL_WORD[o.grant.verdict]);
     expect(snap.mainText.length, "text on the page").toBeGreaterThan(1500);
     expect(snap.docs, "reference documents").toBeGreaterThan(0);
     expect(snap.sections, "detailed summary sections").toBeGreaterThanOrEqual(6);

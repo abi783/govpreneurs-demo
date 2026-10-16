@@ -11,7 +11,7 @@
 
 import { demoResponse, type DemoRouteDef } from "../runtime/router";
 import { buildDetail } from "../grant/detail";
-import { renderDocument } from "../grant/documents";
+import { renderDocument, renderGenericDocument } from "../grant/documents";
 
 export const routes: DemoRouteDef[] = [
   {
@@ -26,7 +26,11 @@ export const routes: DemoRouteDef[] = [
     path: "/opportunities/discover/v2/:oppKey/documents",
     handler: async ({ params, query }) => {
       const fileName = query.get("fileName") ?? "";
-      const file = await renderDocument(params.oppKey, fileName);
+      // A key outside the story (a small order or a forecast that shares this path)
+      // gets a sample document that says what it is, not an error.
+      const file =
+        (await renderDocument(params.oppKey, fileName)) ??
+        (fileName ? await renderGenericDocument(params.oppKey, fileName) : null);
       if (!file) return demoResponse(404, { message: "File not available" });
       const body = new Blob([file.bytes as BlobPart], { type: "application/pdf" });
       return new Response(body, {

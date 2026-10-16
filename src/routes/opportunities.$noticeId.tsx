@@ -335,7 +335,11 @@ function OpportunityDetailContent() {
   // member landed on a page with a "Ask Grant" launcher and had to discover the
   // rail before it rendered anything — read in UAT as "the chatbot doesn't load".
   // The rail IS the second zone of the surface, not an optional overlay.
-  const [grantRailOpen, setGrantRailOpen] = useState(true);
+  // DEMO: below 1200 px the rail floats over the page. It starts closed there, so a window
+  // at 1024 px opens on Grant's take and not on a panel that hides half of it.
+  const [grantRailOpen, setGrantRailOpen] = useState(
+    () => typeof window === "undefined" || window.innerWidth >= 1200,
+  );
   // Bumped when the member answers an open question — re-runs the analysis fetch
   // so the canvas + rail regenerate from the new answer (§9.6).
   const [grantAnalysisReload, setGrantAnalysisReload] = useState(0);

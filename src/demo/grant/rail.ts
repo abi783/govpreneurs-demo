@@ -55,7 +55,7 @@ const TOPICS: { topic: Topic; test: RegExp }[] = [
   { topic: "draft", test: /\b(write|draft|compose|response say|proposal say|quote say|reply say|bid say|cover letter|what should (i|my|the) (send|say|include|put))\b/ },
   { topic: "fix", test: /\b(fix|solve|close the gap|get certified|how do i (get|fix))\b/ },
   { topic: "weak", test: /\b(weak|weakness|risk|risks|worry|worried|problem|concern|gap|gaps|wrong|hole|bad)\b/ },
-  { topic: "win", test: /\b(win|chance|odds|beat|compet|likely|incumbent|who (else|is) bid|who bids)/ },
+  { topic: "win", test: /\b(win(ning|s|ner)?\b|chance|odds|beat|compet|likely|incumbent|who (else|is) bid|who bids)/ },
   { topic: "time", test: /\b(time|deadline|due|late|how many days|how long|schedule|when)\b/ },
   { topic: "bond", test: /\b(bond|surety|insurance|insured)\b/ },
   { topic: "money", test: /\b(price|pricing|cost|costs|margin|profit|profitable|money|paid|pay|rate|rates|wage|wages|worth it)\b/ },

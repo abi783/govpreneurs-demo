@@ -248,8 +248,11 @@ export function buildTake(
     },
   ];
 
+  // DEMO: a sources sought is a notice to reply to, not a bid. It has no prime or subcontract
+  // path, and its call word is "Reply".
+  const isNotice = analysis.meta.noticeType === "sources-sought";
   return {
-    callWord: CALL_WORD[verdict.value],
+    callWord: isNotice && verdict.value === "bid" ? "Reply" : CALL_WORD[verdict.value],
     tone: TONE[verdict.value],
     confidence: {
       level: verdict.confidence.level,
@@ -257,12 +260,12 @@ export function buildTake(
       filled: Math.min(5, Math.max(1, verdict.confidence.dots ?? DOTS[verdict.confidence.level])),
       of: 5,
     },
-    paths,
+    paths: isNotice ? [] : paths,
     summary: verdict.gist ?? null,
     strengths,
     limits,
     counts,
-    changes,
+    changes: isNotice ? [] : changes,
     thesis: verdict.headline ?? [],
     wouldChange: verdict.wouldChange ?? [],
     competitiveRisk: verdict.competitiveRisk ?? null,

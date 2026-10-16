@@ -499,6 +499,7 @@ export function GrantCanvas({
           </div>
         </div>
 
+        {take.paths.length > 0 ? (
         <div className="gt-paths">
           {take.paths.map((pth) => (
             <div key={pth.label} className={`gt-path gt-path--${pth.state}`}>
@@ -516,6 +517,7 @@ export function GrantCanvas({
             </div>
           ))}
         </div>
+        ) : null}
 
         {streaming ? (
           <div className="grant-stream">

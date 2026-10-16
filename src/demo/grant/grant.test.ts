@@ -4,7 +4,7 @@ import { OPPORTUNITIES, getOpportunity } from "@/demo/story/opportunities";
 import type { GrantAnalysis } from "@/lib/grant/types";
 import { buildAnalysis } from "./analysis";
 import { buildDetail, documentsFor, tierAndScore } from "./detail";
-import { renderDocument } from "./documents";
+import { renderDocument, renderGenericDocument } from "./documents";
 import { DOMAIN_OF } from "./domains";
 import { localize } from "./encode";
 import { factsFor } from "./facts";
@@ -12,6 +12,7 @@ import { AUTHORED_BRIEFS } from "./heroBriefs";
 import { HERO_EXTRAS } from "./heroAnalyses";
 import { missingBold, plain } from "./rich";
 import { railReply } from "./rail";
+import { buildOldTake } from "./takeOld";
 
 /** Words that must never reach a screen: the old sample member, and the wrong mentor. */
 const FORBIDDEN = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i;
@@ -184,6 +185,9 @@ describe("documents download as real PDFs", () => {
       }
     }
     expect(await renderDocument("SP4701-26-Q-0021", "nope.pdf")).toBeNull();
+    const generic = await renderGenericDocument("SO-12345", "Paper.docx");
+    expect(generic.fileName).toBe("Paper.pdf");
+    expect(new TextDecoder().decode(generic.bytes.slice(0, 5))).toBe("%PDF-");
   }, 30_000);
 });
 
@@ -231,5 +235,18 @@ describe("the rail", () => {
 describe("no hand-written review is a copy of the story's one-liner", () => {
   it("has a distinct gist for each brief", () => {
     for (const b of GRANT_BRIEFS) expect(getGrantBrief(b.oppId)?.gist).toBeTruthy();
+  });
+});
+
+describe("the old six-field take card", () => {
+  it("answers for every story opportunity, and for none outside it", () => {
+    for (const o of OPPORTUNITIES) {
+      const t = buildOldTake(o.id);
+      expect(t, o.id).not.toBeNull();
+      expect(Object.keys(t!.fields).sort()).toEqual(["contract_size", "eligibility", "location", "proposal_readiness", "scope_fit", "your_edge"]);
+      expect(t!.recommendation).toBe(o.grant.verdict === "bid" ? "bid" : o.grant.verdict === "review" ? "lean_bid" : "pass");
+      expect(JSON.stringify(t)).not.toMatch(FORBIDDEN);
+    }
+    expect(buildOldTake("NOT-AN-ID")).toBeNull();
   });
 });

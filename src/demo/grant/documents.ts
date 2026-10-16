@@ -365,3 +365,20 @@ export async function renderDocument(oppId: string, fileName: string): Promise<R
   const bytes = await renderPdf(blocksFor(f, spec), `${spec.title} - ${f.id}`);
   return { fileName: spec.fileName, bytes };
 }
+
+/**
+ * A sample document for a record that is not an opportunity of the story: a small order
+ * or a forecast that links to this same download path. It says what it is, so a
+ * click never ends in "File not available".
+ */
+export async function renderGenericDocument(recordKey: string, fileName: string): Promise<RenderedDocument> {
+  const base = fileName.replace(/\.[A-Za-z0-9]{2,5}$/, "") || "Document";
+  const blocks: Block[] = [
+    { kind: "h1", text: base.replace(/[_-]+/g, " ") },
+    { kind: "table", widths: [130, 374], rows: [["Record", recordKey], ["File", fileName]] },
+    { kind: "gap" },
+    { kind: "p", text: "This is a sample document. In the live product this file is the buyer's own posting for the record above: the notice, the work statement or the price form." },
+    { kind: "p", text: "The demo shows the shape of the download. Its text, names and figures are made up." },
+  ];
+  return { fileName: `${base}.pdf`, bytes: await renderPdf(blocks, base) };
+}

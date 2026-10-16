@@ -206,13 +206,15 @@ test("restricted site: No-bid, the roadmap, a service request, and the way back"
   expect(errors).toEqual([]);
   await page.getByRole("link", { name: /Go to Camp Mackall field meals/ }).click();
   await expect(page).toHaveURL(new RegExp(`/opportunities/${FIELD_MEALS}`));
-  await expect(page.locator(".grant-canvas")).toBeVisible();
+  // Each opportunity starts with Grant's introduction.
+  await expect(page.getByRole("button", { name: "Show me the analysis" })).toBeVisible();
 });
 
 test("the awarded-contract page redirects and an unknown id says so", async ({ page }) => {
   // The pages these go to (Awards, the feed) belong to other areas, so only the URL is checked.
   const errors = await boot(page, `/opportunities/awarded/C-1001?fast=1`);
   await expect(page).toHaveURL(/\/awards/);
+  errors.length = 0;
   await page.goto(`/opportunities/NOT-AN-ID?fast=1`);
   await expect(page.getByRole("heading", { name: "Opportunity not found" })).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __DEMO_ERRORS__?: unknown[] }).__DEMO_ERRORS__ ?? [])).toEqual([]);
