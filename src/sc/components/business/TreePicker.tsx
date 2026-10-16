@@ -184,7 +184,13 @@ export function TreePicker({
 
   const rows: React.ReactNode[] = [];
   let lastSection: string | undefined;
-  for (const g of visible) {
+  // DEMO: the set-aside tree appends three "core" groups after the "native_tribal" ones. A section
+  // whose groups are not side by side got its header twice, with the same React key. Each section's
+  // groups now sit together under one header, in order of first appearance. `sort` is stable.
+  const sectionOrder: (string | undefined)[] = [];
+  for (const g of visible) if (!sectionOrder.includes(g.section)) sectionOrder.push(g.section);
+  const ordered = [...visible].sort((a, b) => sectionOrder.indexOf(a.section) - sectionOrder.indexOf(b.section));
+  for (const g of ordered) {
     if (g.section && g.section !== lastSection) {
       lastSection = g.section;
       rows.push(
