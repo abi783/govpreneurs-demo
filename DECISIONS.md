@@ -59,3 +59,7 @@ name its number.
 - D35. **Small Orders shows food-service product buys** (meal components, food carriers, trays, coffee), not the auto parts in production's sample data.
 - D36. **Five more fictional mentors join Sarah Mitchell** on the Mentors page. Booking a session works end to end.
 - D37. **Roadmap progress is computed once**, from the Roadmap's own data. Success Center home shows the same numbers.
+- D38. **Success Center home has a "Recent activity" card that production lacks.** It shows Ava drafting, Sarah's reply, Grant's pass and the submitted bid, so the first screen tells the story. Everything else on the page is production's. Remove it if you want the page exactly as members see it.
+- D39. **Program specialist: "Jordan Ellis"** (fictional). Onboarding call 98 days ago; positioning call with Sarah 24 days ago.
+- D40. **Five more mentors with prices from $75 to $120 a session.** Sarah is $97, the same as a written review.
+- D41. **"Re-charge wallet" and "Add funds" open an in-app top-up** instead of GHL billing, and it succeeds.
