@@ -107,7 +107,7 @@ export interface WinRow {
 
 /** One counted figure of a take row: what it was counted over, and where it comes from. */
 export interface TakeCount {
-  /** "186 awards counted. Matched on: NAICS 238160. Award years: FY2006–FY2021." */
+  /** "186 awards counted. Matched on: NAICS 722310. Award years: FY2006–FY2021." */
   basis: string;
   /** "Source: Federal award records, checked 3 days ago." From `resolvePublic`. */
   source: string;

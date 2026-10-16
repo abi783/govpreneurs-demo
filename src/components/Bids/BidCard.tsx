@@ -145,6 +145,12 @@ export function BidCard({ bid }: { bid: Bid }) {
           ctx && <div className="bid-card__ctx">{ctx}</div>
         )}
 
+        {(bid as DemoBid).demo?.ava && (
+          <Link to={(bid as DemoBid).demo!.ava!.to as never} className="bid-card__ava">
+            <Sparkles size={11} aria-hidden /> Ava is building
+          </Link>
+        )}
+
         <div className="bid-card__actions">
           <Link
             to="/mentors/$reviewId"

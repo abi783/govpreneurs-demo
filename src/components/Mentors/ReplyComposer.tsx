@@ -216,11 +216,13 @@ export function ReplyComposer({
           <Link2 size={14} />
         </button>
         <span className="reply-composer__sep" aria-hidden />
+        {/* DEMO: this opens the browser's own file chooser, which the QA crawl cannot see. */}
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
           disabled={disabled}
           aria-label="Attach file"
+          data-qa-skip
         >
           <Paperclip size={14} />
         </button>

@@ -51,7 +51,8 @@ export function SendToMentorModal({
       }
       readLabel="I've read the scope of work"
       helpOptions={OPPORTUNITY_HELP_OPTIONS}
-      questionPlaceholder={`e.g. "I do roofing but haven't done a water plant. Does my past work count, and is the bond a problem?"`}
+      // DEMO: a food-service example (production's example was about roofing).
+      questionPlaceholder={`e.g. "I cook for county schools but have never run a dining hall. Does my past work count, and is the bond a problem?"`}
     />
   );
 }
