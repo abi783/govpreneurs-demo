@@ -22,7 +22,9 @@ if (!rootElement) {
 // PostHog analytics (mirrors the v1 app): wrap the tree in PostHogProvider when
 // a key is configured; when it isn't, render without it so usePostHog() is a
 // no-op and nothing breaks locally / in tests.
-const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+// DEMO: analytics stay off. A key in the hosting build settings must not start PostHog: it would
+// load a script from posthog.com and send events from a sales call.
+const POSTHOG_KEY = undefined as string | undefined;
 const POSTHOG_HOST =
   (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ??
   "https://app.posthog.com";

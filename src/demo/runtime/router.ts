@@ -145,10 +145,17 @@ function fastMode(): boolean {
   }
 }
 
+// DEMO: answers leave in the order the calls arrived. A random wait per call alone lets a late
+// "save" overtake an earlier "unsave" (or an old list overtake a new one), and then the screen and
+// the stored state disagree. The wait is still 150 to 400 ms, but never earlier than the answer
+// before it.
+let lastAnswerAt = 0;
+
 function latency(): Promise<void> {
   if (fastMode()) return Promise.resolve();
-  const ms = 150 + Math.random() * 250;
-  return new Promise((r) => setTimeout(r, ms));
+  const at = Math.max(lastAnswerAt, Date.now() + 150 + Math.random() * 250);
+  lastAnswerAt = at;
+  return new Promise((r) => setTimeout(r, Math.max(0, at - Date.now())));
 }
 
 function record<K extends "__DEMO_UNHANDLED__" | "__DEMO_ERRORS__">(key: K, entry: NonNullable<Window[K]>[number]): void {
@@ -222,11 +229,26 @@ async function dispatch(
   const pathSegments = routePath.split("/").filter(Boolean);
   const headers = new Headers(init?.headers ?? request?.headers ?? undefined);
 
-  await latency();
-
-  // The caller can cancel while the answer is "in flight".
+  // DEMO: the handler runs now, in the order the calls arrive. Only the answer waits (see `latency`).
   const signal = init?.signal ?? request?.signal ?? null;
   if (signal?.aborted) throw new DOMException("The operation was aborted.", "AbortError");
+  const answer = await run(method, routePath, pathSegments, headers, url, init, request, signal);
+  await latency();
+  // The caller can cancel while the answer is "in flight".
+  if (signal?.aborted) throw new DOMException("The operation was aborted.", "AbortError");
+  return answer;
+}
+
+async function run(
+  method: string,
+  routePath: string,
+  pathSegments: string[],
+  headers: Headers,
+  url: URL,
+  init: RequestInit | undefined,
+  request: Request | null,
+  signal: AbortSignal | null,
+): Promise<Response> {
 
   // The best match wins: more literal segments beat `:param`, which beats `*`.
   // When two patterns tie, the one registered last wins.

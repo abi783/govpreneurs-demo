@@ -112,6 +112,7 @@ export function ScChatHost() {
               padding: "9px 12px",
               borderRadius: 12,
               lineHeight: 1.45,
+              overflowWrap: "anywhere", // a long word wraps inside the bubble
               background: m.from === "you" ? "#0d1420" : "#eef1f8",
               color: m.from === "you" ? "#fff" : "#1a2233",
             }}

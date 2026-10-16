@@ -352,3 +352,15 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* DEMO: text that a visitor typed (a chat question, a reply, a search name) wraps inside its box.
+   A long word or a pasted address with no spaces used to run out of the bubble and off the edge. */
+.hunter-bubble,
+.hunter-bubble p,
+.grant-msg,
+.grant-msg p,
+.fc-grant-dock .grant-msg--user {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+}
