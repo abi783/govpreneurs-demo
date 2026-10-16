@@ -18,8 +18,10 @@ import "../nav/storySearch";
 
 /**
  * DEMO: Escape closes a dialog that production built by hand. Radix dialogs already close on
- * Escape and mark the key as handled, so this does nothing for them. A hand-built one (the booking
- * sheet, a drawer) has a close button, and Escape presses it. The top-most dialog goes first.
+ * Escape and mark the key as handled, so this does nothing for them. A hand-built one is either a
+ * `role="dialog"` box or a Tailwind `fixed inset-0` cover (a booking modal, a drawer). The top-most
+ * one goes first. Escape presses its close button, or its backdrop, or the cover itself, as a click
+ * outside the box would.
  */
 function useEscapeForHandBuiltDialogs() {
   useEffect(() => {
@@ -29,18 +31,39 @@ function useEscapeForHandBuiltDialogs() {
         const r = el.getBoundingClientRect();
         return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden";
       };
-      const open = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]'))
-        .filter((el) => !el.hasAttribute("data-state") && visible(el));
+      const handBuilt = (el: HTMLElement) => !el.hasAttribute("data-state") && !el.closest("[data-radix-portal], [data-state]") && visible(el);
+      const open = Array.from(
+        document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"], div.fixed.inset-0'),
+      ).filter(handBuilt);
       const top = open[open.length - 1];
       if (!top) return;
       const buttons = Array.from(top.querySelectorAll<HTMLElement>("button, [role='button']")).filter(visible);
-      const close =
-        buttons.find((b) => /^close\b/i.test(b.getAttribute("aria-label") ?? "")) ??
+      const labelled =
+        buttons.find((b) => /^(close|dismiss)\b/i.test(b.getAttribute("aria-label") ?? "")) ??
         buttons.find((b) => b.classList.contains("ui-modal-close")) ??
         buttons.find((b) => /^(close|cancel|not now|done|back)$/i.test((b.textContent ?? "").trim()));
-      if (!close) return;
-      e.preventDefault();
-      close.click();
+      if (labelled) {
+        e.preventDefault();
+        labelled.click();
+        return;
+      }
+      // No labelled button. A cover closes on a click outside its box: press the backdrop, or the cover.
+      const backdrop = top.querySelector<HTMLElement>(":scope > .absolute.inset-0, :scope > [class*='backdrop' i], :scope > [class*='overlay' i]");
+      if (backdrop) {
+        e.preventDefault();
+        backdrop.click();
+        return;
+      }
+      if (top.matches("div.fixed.inset-0")) {
+        e.preventDefault();
+        top.click();
+        // A cover that ignores that click has an icon-only close button in its header.
+        window.setTimeout(() => {
+          if (!top.isConnected) return;
+          const icon = Array.from(top.querySelectorAll<HTMLElement>("button")).filter(visible).find((b) => (b.textContent ?? "").trim() === "");
+          icon?.click();
+        }, 60);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
