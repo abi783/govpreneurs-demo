@@ -45,6 +45,12 @@ export const HUNTER_OPENERS = [
 ] as const;
 
 /** Hunter's first-meeting hero: who he is, what he cannot do, and three openers. */
+/** DEMO: "Morning", "Afternoon" or "Evening", by the hour on the visitor's clock. */
+function greeting(): string {
+  const hour = new Date().getHours();
+  return hour < 12 ? "Morning" : hour < 17 ? "Afternoon" : "Evening";
+}
+
 export function MeetHunter({
   memberName,
   count,
@@ -80,7 +86,8 @@ export function MeetHunter({
       </div>
 
       <p className="meet__say">
-        Morning, {memberName}. I read every federal and state notice published overnight
+        {/* DEMO: the greeting follows the hour, because a sales call can happen at any time of day. */}
+        {greeting()}, {memberName}. I read every federal and state notice published overnight
         {countClause} and put the ones that match how you actually work at the top. I will always
         tell you why something is here.
       </p>
