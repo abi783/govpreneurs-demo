@@ -327,6 +327,23 @@ export async function layoutProblems(page: Page): Promise<string[]> {
         }
       }
     }
+    // A strip that scrolls sideways hides some of what it holds: the tabs of the
+    // parts of the bid, the steps, a sheet.
+    for (const el of Array.from(document.querySelectorAll<HTMLElement>("#demo-main *"))) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 40 || r.height < 10) continue;
+      const cs = getComputedStyle(el);
+      if (!/(auto|scroll)/.test(cs.overflowX)) continue;
+      if (el.scrollWidth > el.clientWidth + 2) {
+        const key = `sideways ${el.tagName}.${el.className}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push(
+            `scrolls sideways inside: <${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}"> ${el.scrollWidth} > ${el.clientWidth}`,
+          );
+        }
+      }
+    }
     return out;
   });
 }

@@ -11978,3 +11978,38 @@ button.ava-p3b-m--blank {
 .ava-notfound .mono {
   overflow-wrap: anywhere;
 }
+
+/* On a laptop screen (1101 to 1599 px) the opened checklist floats over the work
+   area, as a drawer. Pushed in beside it, the work area dropped to 600 or 700 px,
+   and the steps, the tabs, the price sheet and the talk box were cut off. Wider
+   screens keep the checklist beside the work; narrower ones stack (above). */
+@media (min-width: 1101px) and (max-width: 1599px) {
+  .ava2-panes {
+    position: relative;
+  }
+  .ava2-panes.is-open {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+  .ava2-panes > .ava2-work {
+    grid-column: 2;
+  }
+  .ava2-panes > .ds-rail:not(.ds-rail--closed) {
+    position: absolute;
+    z-index: 30;
+    top: calc(-1 * var(--s-4));
+    bottom: calc(-1 * var(--s-4));
+    left: 0;
+    width: 400px;
+    margin: 0;
+    box-shadow: var(--sh-sheet);
+  }
+}
+
+/* A part with a long name (a reply's "Part B industry questionnaire") takes two
+   lines when the row is short of room, instead of scrolling out of sight. */
+.ava2-tabs .ava2-tab {
+  flex: 0 1 auto;
+  white-space: normal;
+  line-height: 1.2;
+  text-align: left;
+}

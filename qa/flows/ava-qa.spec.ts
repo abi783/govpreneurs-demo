@@ -826,3 +826,147 @@ test.describe("Word and Excel downloads", () => {
     expect(w.problems).toEqual([]);
   });
 });
+
+// ─── A reload at each step of the other bids ───
+
+test.describe("reload keeps the state, the other bids", () => {
+  test.setTimeout(120_000);
+
+  test("Cumberland: the upload, every answer, the read, the download, the send", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await open(page, BIDS.cumberland);
+    const chooser = page.waitForEvent("filechooser");
+    await page.getByRole("button", { name: /Upload the certificates/i }).click();
+    await (
+      await chooser
+    ).setFiles({ name: "c.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
+    for (let i = 0; i < 14; i++) {
+      if (
+        await page
+          .getByRole("button", { name: "Read my bid" })
+          .isVisible()
+          .catch(() => false)
+      )
+        break;
+      await answerAll(page, { max: 2 });
+      await page.waitForTimeout(250);
+      const before = await stateOf(page);
+      await page.reload();
+      await page.waitForLoadState("networkidle");
+      await page.waitForTimeout(250);
+      expect(await stateOf(page), `reload after answer ${i + 1}`).toBe(before);
+    }
+    await page.getByRole("button", { name: "Read my bid" }).click();
+    await settleHolds(page);
+    // After a reload her papers are known by name: the download still works.
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    const dl = page.getByRole("button", { name: /Download your bid/ }).first();
+    await expect(dl).toBeVisible();
+    await dl.click();
+    await expect.poll(() => w.downloads.length, { timeout: 30_000 }).toBeGreaterThan(0);
+    await page.waitForTimeout(1200);
+    expectValidFiles(await filesOf(w));
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText(/You downloaded your whole bid on/)).toBeVisible();
+    const sent = page.getByRole("button", { name: "I sent it" });
+    await sent.scrollIntoViewIfNeeded();
+    await sent.click();
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText(/You told Ava you sent it/)).toBeVisible();
+    expect(w.problems).toEqual([]);
+  });
+
+  for (const [name, id] of [
+    ["Fayetteville", BIDS.fayetteville],
+    ["the Fort Bragg reply", BIDS.reply],
+  ] as const) {
+    test(`${name}: the read, the download, the send`, async ({ page }) => {
+      const w = watch(page);
+      await open(page, id);
+      if (
+        await page
+          .getByRole("button", { name: "Read my bid" })
+          .isVisible()
+          .catch(() => false)
+      ) {
+        await page.reload();
+        await page.waitForLoadState("networkidle");
+        await page.getByRole("button", { name: "Read my bid" }).click();
+        await page.reload();
+        await page.waitForLoadState("networkidle");
+      }
+      await expect(page.locator(".ava2-tabs [role=tab]").first()).toBeVisible();
+      await page
+        .getByRole("button", { name: /Download your (bid|reply)/ })
+        .first()
+        .click();
+      await expect.poll(() => w.downloads.length, { timeout: 30_000 }).toBeGreaterThan(0);
+      await page.waitForTimeout(1200);
+      await page.reload();
+      await page.waitForLoadState("networkidle");
+      await expect(
+        page.getByText(/You downloaded your whole bid on|You downloaded your (bid|reply)/).first(),
+      ).toBeVisible();
+      const sent = page.getByRole("button", { name: "I sent it" });
+      await sent.scrollIntoViewIfNeeded();
+      await sent.click();
+      await page.reload();
+      await page.waitForLoadState("networkidle");
+      await expect(page.getByText(/You told Ava you sent it/)).toBeVisible();
+      await page.goto("/ava?fast=1");
+      await expect(page.locator(".ava-idx__card", { hasText: id })).toContainText(
+        /You sent your (bid|reply)/,
+      );
+      expect(w.problems).toEqual([]);
+    });
+  }
+});
+
+// ─── Layout with the checklist open, on every part of the bid ───
+
+for (const width of WIDTHS) {
+  test.describe(`layout with the checklist open at ${width}px`, () => {
+    test.use({ viewport: { width, height: 800 } });
+    test.setTimeout(90_000);
+
+    test("every part of the read, and the questions", async ({ page }) => {
+      const w = watch(page);
+      for (const id of [BIDS.fayetteville, BIDS.reply, BIDS.mackall, BIDS.cumberland]) {
+        await open(page, id);
+        if (id === BIDS.reply) await page.getByRole("button", { name: "Read my bid" }).click();
+        await openRail(page);
+        expect(await layoutProblems(page), `${id}, rail just opened, ${width}`).toEqual([]);
+        // Under 1600 px the opened checklist is a drawer over the work: fold it to use the tabs.
+        if (width < 1600) {
+          await page.getByRole("button", { name: /^Fold: What the / }).click();
+          await expect(page.getByRole("button", { name: /^Open: What the / })).toBeVisible();
+        }
+        const tabs = page.locator(".ava2-tabs [role=tab]");
+        const n = await tabs.count();
+        for (let i = 0; i < Math.max(n, 1); i++) {
+          if (n > 0) await tabs.nth(i).click();
+          await page.waitForTimeout(150);
+          expect(await layoutProblems(page), `${id}, part ${i + 1}, rail open, ${width}`).toEqual(
+            [],
+          );
+        }
+        if (width < 1600) await openRail(page);
+        const openAll = page.getByRole("button", { name: "Open all" });
+        if (await openAll.isVisible().catch(() => false)) {
+          await openAll.click();
+          expect(await layoutProblems(page), `${id}, all open, ${width}`).toEqual([]);
+        }
+        expect(
+          await inputReachable(page, { scroll: width < 1100 }),
+          `${id}, rail open, ${width}`,
+        ).toBeNull();
+      }
+      expect(w.problems).toEqual([]);
+    });
+  });
+}

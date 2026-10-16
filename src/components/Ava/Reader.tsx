@@ -232,6 +232,8 @@ export function Reader({
   mentorAsk?: number;
 }) {
   const { id, s, bid } = ctx;
+  // A reply to a notice is a reply, not a bid.
+  const noun = bid.kind === "reply" ? "reply" : "bid";
   const { flow } = view;
   const parts = flow.parts;
   const part = parts.find((p) => p.id === nav.tab) ?? parts[0];
@@ -370,12 +372,12 @@ export function Reader({
                   <Download size={16} aria-hidden />
                   {holes.length > 0 ? (
                     <Words
-                      long="Download your bid to finish (Word)"
+                      long={`Download your ${noun} to finish (Word)`}
                       short="Download to finish (Word)"
                       tiny="Download (Word)"
                     />
                   ) : (
-                    "Download your bid"
+                    `Download your ${noun}`
                   )}
                 </button>
               ) : null}
@@ -540,6 +542,7 @@ function ReadChat({
   mentorAsk: number;
 }) {
   const { bid, s, id } = ctx;
+  const noun = bid.kind === "reply" ? "reply" : "bid";
   const { flow } = view;
   const w = buyerWord(bid);
   const passed = daysLeft(bid) < 0;
@@ -885,8 +888,8 @@ function ReadChat({
                 <h4>The files you have are older than your bid</h4>
                 <p>
                   {flow.holds.length > 0 || missing.length > 0
-                    ? "Do not send them. Answer what is above, then download your bid again. Then I show you how to send it."
-                    : "Download your bid again before you send. Then I show you how to send it."}
+                    ? `Do not send them. Answer what is above, then download your ${noun} again. Then I show you how to send it.`
+                    : `Download your ${noun} again before you send. Then I show you how to send it.`}
                 </p>
               </ChatCard>
               {flow.holds.length === 0 && missing.length === 0 ? (
@@ -914,7 +917,9 @@ function ReadChat({
                 <QuickReplies
                   replies={[
                     {
-                      label: holesOpen ? "Download your bid to finish (Word)" : "Download your bid",
+                      label: holesOpen
+                        ? `Download your ${noun} to finish (Word)`
+                        : `Download your ${noun}`,
                       kind: "primary",
                       icon: <Download size={16} aria-hidden />,
                       onClick: onDownload,
@@ -1413,8 +1418,8 @@ function ReadChat({
                 <h4>The files you have are older than your bid</h4>
                 <p>
                   {flow.holds.length > 0 || missing.length > 0
-                    ? "Do not send them. Answer what is above, then download your bid again. Then I show you how to send it."
-                    : "Download your bid again before you send. Then I show you how to send it."}
+                    ? `Do not send them. Answer what is above, then download your ${noun} again. Then I show you how to send it.`
+                    : `Download your ${noun} again before you send. Then I show you how to send it.`}
                 </p>
               </ChatCard>
               {flow.holds.length === 0 && missing.length === 0 ? (
@@ -1442,7 +1447,9 @@ function ReadChat({
                 <QuickReplies
                   replies={[
                     {
-                      label: holesOpen ? "Download your bid to finish (Word)" : "Download your bid",
+                      label: holesOpen
+                        ? `Download your ${noun} to finish (Word)`
+                        : `Download your ${noun}`,
                       kind: "primary",
                       icon: <Download size={16} aria-hidden />,
                       onClick: onDownload,

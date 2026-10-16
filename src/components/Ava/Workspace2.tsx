@@ -10,7 +10,7 @@ import { addendumPostedDay, daysLeft, receivedAddenda } from "../../lib/ava/deri
 import { fullDate } from "../../lib/ava/dates";
 import { unseenAddenda } from "../../lib/ava/status";
 import { findOpportunity } from "../../demo/ava/opportunity";
-import { AvaHead, BidTop, Checklist, useRailOpen, useSideOpen } from "./Frame2";
+import { AvaHead, BidTop, Checklist, checklistIsDrawer, useRailOpen, useSideOpen } from "./Frame2";
 import { Reader } from "./Reader";
 import { Talk } from "./Talk";
 import { useFlow } from "./useFlow";
@@ -48,7 +48,13 @@ export function Workspace2({ ctx, nav }: { ctx: AvaContext; nav: WorkspaceNav })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase2, nav.focus, nav.sel]);
 
+  // On a laptop screen the opened checklist floats over the work (ava.css). A row
+  // she taps opens its question in the work, so the checklist folds away.
+  const foldDrawer = () => {
+    if (railOpen && checklistIsDrawer()) toggleRail();
+  };
   const openRow = (key: string) => {
+    foldDrawer();
     if (!phase2) return nav.setFocus(key);
     // Phase 2: a row opens its part of the bid, and its question in the chat.
     const f = view.flow;
