@@ -461,7 +461,7 @@ function MicroPurchasesIndex() {
       {/* ONE FOCAL MESSAGE PER STATE. On an empty board this block and the
           empty state below it stacked two different explanations of the same
           nothing, ~200px apart, pointing opposite ways: "This board only has
-          parts DLA buys. If you sell something else, it will not be here yet."
+          items DLA buys. If you sell something else, it will not be here yet."
           (your trade may not be covered at all) over "Nothing today for safety
           gear and clothing. That is normal. New orders arrive every weekday."
           (quiet day, come back tomorrow). She had picked a category the wizard
@@ -903,7 +903,7 @@ export function SortHint({
   /** Fit is coming from her matching-engine scores or her NAICS codes. */
   hasProfileFit?: boolean;
 }) {
-  const lifts = "At the top: parts you have won or said you can get";
+  const lifts = "At the top: items you have won or said you can get";
   const tail = hasCategories
     ? ", and ones that fit what you sell."
     : hasProfileFit
@@ -1061,7 +1061,7 @@ export function EmptyState({
       </p>
       <p className="mp-empty__body">That is normal. New orders arrive every weekday.</p>
       <button type="button" className="btn btn-secondary" onClick={onChangeCategory}>
-        Change the parts you picked
+        Change the kinds of items you picked
       </button>
     </div>
   );

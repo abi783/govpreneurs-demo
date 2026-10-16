@@ -91,7 +91,7 @@ export const GROUP_HEAD: Record<string, string> = {
   // is one supplier per row, not one supplier for the whole group, and the
   // shorter wording claims a single company we have no evidence for.
   "DLA is buying this commercial part from one supplier.":
-    "DLA is buying these commercial parts from one supplier each",
+    "DLA is buying these commercial items from one supplier each",
   "Only one supplier can fill this one.": "Only one supplier can fill each of these",
 };
 
@@ -129,13 +129,13 @@ export const GROUP_HEAD: Record<string, string> = {
  */
 export const GROUP_BODY: Record<string, string> = {
   "The form is called a Source Approval Request. DLA only approves sellers who have made or supplied this part before. The full drawings also work.":
-    "The form is called a Source Approval Request. DLA only approves sellers who have made or supplied these parts before. The full drawings also work.",
+    "The form is called a Source Approval Request. DLA only approves sellers who have made or supplied these items before. The full drawings also work.",
   // THE LIMITED-COMPETITION SENTENCE. Every noun goes plural and no claim
   // widens: DLA asks more than one seller PER PART, and the data and the rights
   // are missing part by part. "There is no form for them." keeps the fact that
   // tells this tier apart from the Source Approval Request tier above.
   "DLA is asking more than one seller for a price on this part. The government does not have the data or the rights another seller would need. So it cannot add a seller to this order. There is no form for this one.":
-    "DLA is asking more than one seller for a price on each of these parts. The government does not have the data or the rights another seller would need. So it cannot add a seller to these orders. There is no form for them.",
+    "DLA is asking more than one seller for a price on each of these items. The government does not have the data or the rights another seller would need. So it cannot add a seller to these orders. There is no form for them.",
   // THE QUALIFIED-PRODUCTS-LIST SENTENCE. Every noun goes plural and no claim
   // widens: DLA keeps a list PER PART, and a seller qualifies one part at a
   // time. The route survives the plural intact, because it is the same route
@@ -157,9 +157,9 @@ export const GROUP_BODY: Record<string, string> = {
   // and the rights are missing part by part. "So it cannot add new sellers." is
   // true in both numbers and is left exactly as it stands.
   "The drawing for this part names the companies that may make it. The government does not have the information to add another company. It cannot accept a different part in its place either.":
-    "The drawings for these parts name the companies that may make them. The government does not have the information to add another company. It cannot accept another part in place of any of these either.",
+    "The drawings for these items name the companies that may make them. The government does not have the information to add another company. It cannot accept another part in place of any of these either.",
   "The government cannot get the information another company would need to make this part. It cannot write a good enough description of the part either. So it cannot add new sellers.":
-    "The government cannot get the information another company would need to make these parts. It cannot write a good enough description of them either. So it cannot add new sellers.",
+    "The government cannot get the information another company would need to make these items. It cannot write a good enough description of them either. So it cannot add new sellers.",
   // ONE ENTRY FOR TWO LETTERS, because relevance.ts gives them one sentence.
   // They are two different facts about the drawings — one code says the
   // government holds the data but not the rights to it, the other says it holds
@@ -167,14 +167,14 @@ export const GROUP_BODY: Record<string, string> = {
   // sentence was right for her and one plural is too. Writing the plural twice
   // is how a shared sentence drifts apart.
   "The government does not own the rights to the drawings for this part. It cannot buy those rights at a fair price. So it cannot add new sellers.":
-    "The government does not own the rights to the drawings for these parts. It cannot buy those rights at a fair price. So it cannot add new sellers.",
+    "The government does not own the rights to the drawings for these items. It cannot buy those rights at a fair price. So it cannot add new sellers.",
   // "for each order", and "those suppliers". DLA's code says one supplier is
   // available for ONE part, so a group of thirty is thirty suppliers we cannot
   // name — not one company selling every part on the list.
   "This part is sold as a commercial product. But DLA's code says one supplier is available for this order, so DLA is buying from that supplier. It is not asking other sellers for a price.":
-    "These parts are sold as commercial products. But DLA's codes say one supplier is available for each order, so DLA is buying from those suppliers. It is not asking other sellers for a price.",
+    "These items are sold as commercial products. But DLA's codes say one supplier is available for each order, so DLA is buying from those suppliers. It is not asking other sellers for a price.",
   "DLA's code says one supplier is available for this part. DLA is buying from that supplier and is not asking other sellers for a price.":
-    "DLA's codes say one supplier is available for each of these parts. DLA is buying from those suppliers and is not asking other sellers for a price.",
+    "DLA's codes say one supplier is available for each of these items. DLA is buying from those suppliers and is not asking other sellers for a price.",
 };
 
 type Group = {

@@ -1,9 +1,10 @@
-// Seven forecasts near Amira's kitchen, written for the demo story. The buyers
+// Eight forecasts near Amira's kitchen, written for the demo story. The buyers
 // are real offices; the notices are made up. Each one ties to something in the
 // story: the Fort Bragg dining recompete (the sources-sought notice Ava drafted
 // a reply to), the Pope Army Airfield catering she saved, the VA patient meals
-// she saved, the Seymour Johnson breakfast contract she lost by 4%, and her
-// 2023 Cumberland County summer meals job.
+// she saved, the Seymour Johnson breakfast contract she lost by 4%, her
+// 2023 Cumberland County summer meals job, and one Norfolk catering buy so a search
+// in Virginia, one of her three states, finds something.
 
 import type { ForecastSeed } from "./forecastSeeds";
 
@@ -216,5 +217,34 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     files: [{ fileName: "Child Nutrition committee agenda.pdf", sizeBytes: 348822 }],
     plainTitle: "Summer meals at Cumberland County schools, 2027",
     semanticFit: 0.92,
+  },
+  {
+    key: "norfolk-event-catering",
+    lane: "federal",
+    oppKey: "7cb31bbf7ff5a0ed2b0fb536274fd453",
+    hgTitle: "Command Event Catering BPA, Naval Station Norfolk",
+    hgText:
+      "Blanket purchase agreement for catering at command events, change-of-command ceremonies and retirement luncheons at Naval Station Norfolk. Buffet and boxed service for 40 to 300 guests, with setup and clean-up.",
+    sourceId: "N00189-FY27-0140",
+    postedDaysAgo: 26,
+    expectedInDays: 150,
+    agencyName: "Naval Supply Systems Command, Fleet Logistics Center Norfolk",
+    agencyAbbr: "NAVSUP",
+    naicsCode: "722320",
+    pscCode: "M1FD",
+    oppType: "New",
+    setAsideCode: "TBD",
+    valLow: 150_000,
+    valHigh: 300_000,
+    popState: "VA",
+    popCity: "Norfolk",
+    contactName: null,
+    contactRole: null,
+    sourceName: "Department of the Navy",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Event catering for Naval Station Norfolk commands",
+    semanticFit: 0.88,
   },
 ];

@@ -9,9 +9,9 @@ const BAD_WORDS = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160
 const REAL_FIRMS = /sodexo|aramark|compass group|eurest/i;
 
 describe("the demo forecasts", () => {
-  it("holds 47 forecasts with unique keys, and the id is the key", () => {
-    expect(FORECAST_RECORDS).toHaveLength(47);
-    expect(new Set(FORECAST_RECORDS.map((r) => r.oppKey)).size).toBe(47);
+  it("holds 48 forecasts with unique keys, and the id is the key", () => {
+    expect(FORECAST_RECORDS).toHaveLength(48);
+    expect(new Set(FORECAST_RECORDS.map((r) => r.oppKey)).size).toBe(48);
     for (const r of FORECAST_RECORDS) expect(r.id).toBe(r.oppKey);
   });
 

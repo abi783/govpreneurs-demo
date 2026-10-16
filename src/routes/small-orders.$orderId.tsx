@@ -304,7 +304,7 @@ function OrderPage() {
     ? "Only if you hold that certificate:"
     : mayBid(o)
       ? null
-      : "Only if DLA lets you supply this part:";
+      : "Only if DLA lets you supply this item:";
   // `repeats` is `boolean | null`, and live DIBBS returns true ~95%, null ~5%
   // and FALSE NEVER (22-order corpus: 11 true, 0 false, 11 null). So
   // `!o.repeats` — the spelling that gated the cash question and captioned the
@@ -670,7 +670,7 @@ function OrderPage() {
                   {[
                     setAside?.headline,
                     setAside?.needsCertificate ? setAside.body : null,
-                    "No acquisition code available at source. That code says who may supply the part.",
+                    "No acquisition code available at source. That code says who may supply the item.",
                     "Read the order paper before you spend time on it.",
                   ]
                     .filter(Boolean)
@@ -1008,7 +1008,7 @@ function OrderPage() {
                 label="Stock number"
                 value={o.nsn}
                 mono
-                hint="The government's number for this part. Every seller quotes against the same number."
+                hint="The government's number for this item. Every seller quotes against the same number."
               />
               {/* THE ACQUISITION CODE IS BACK, AS EVIDENCE AND NOT AS A
                   SECOND VERDICT. It was a cell here until the fact strip
@@ -1041,7 +1041,7 @@ function OrderPage() {
                 hint={
                   o.amc == null && o.amsc == null
                     ? "This code says who may supply the part. No acquisition code available at source."
-                    : "DLA's code for who may supply the part. Hunter reads it at the top of this page."
+                    : "DLA's code for who may supply the item. Hunter reads it at the top of this page."
                 }
               />
             </dl>
@@ -1127,7 +1127,7 @@ function OrderPage() {
 
           {cashAsked && (
             <section className="mp-cash">
-              <p className="mp-cash__head">You would pay for the parts first.</p>
+              <p className="mp-cash__head">You would pay for the items first.</p>
               {/* The order's own value — a record fact. We do NOT show a cost
           estimate here, because we do not know what it costs her to buy
           and will not invent a margin to look helpful. */}
@@ -1140,7 +1140,7 @@ function OrderPage() {
                       ? "What this is worth at DLA's list price. The order paper does not say if it is a year of orders."
                       : "What this is worth at the price DLA paid last time. The order paper does not say if it is a year of orders."
                 }
-                note="You buy the parts, then DLA pays you after you deliver."
+                note="You buy the items, then DLA pays you after you deliver."
               />
               <div className="mp-cash__btns">
                 <button
@@ -1326,7 +1326,7 @@ function OrderPage() {
             packing warning below. Parking the GATE is a scope call; parking
             the WARNING would be the silent disqualification `D-C3` names. */}
             <p className="mp-traps__rest">
-              Some orders only accept parts made in the United States. The order paper says which.
+              Some orders only accept items made in the United States. The order paper says which.
             </p>
             <p className="mp-traps__rest">
               Everything else is in the order paper, including how it must be packed. Packing can

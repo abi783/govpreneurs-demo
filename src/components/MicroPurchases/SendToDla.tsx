@@ -884,7 +884,7 @@ function WonChecklist({
         You won it. Here is what happens now.
       </p>
       <ol className="mp-won__steps">
-        <li>Buy the parts.</li>
+        <li>Buy the items.</li>
         <li>Pack them the way the order paper says.</li>
         {/* The same null guard as the send block 130 lines up, and the same
             one the order page applies three times. Missing it here rendered
