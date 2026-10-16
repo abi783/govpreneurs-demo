@@ -1,3 +1,5 @@
+// DEMO: must stay the first import. It blocks every network call that is not a demo API call.
+import "./demo/runtime/boot";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";

@@ -12,6 +12,12 @@ export default defineConfig({
     host: "::",
     port: 8080,
   },
+  // DEMO: the QA harness (qa/) runs against this fixed port.
+  preview: {
+    host: "127.0.0.1",
+    port: 4318,
+    strictPort: true,
+  },
   plugins: [
     TanStackRouterVite(),
     react(),

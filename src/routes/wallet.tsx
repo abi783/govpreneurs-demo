@@ -4,7 +4,8 @@ import { Info, Plus } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { formatUSD } from "../lib/wallet";
 import { useGhlUser } from "../lib/ghlUser";
-import { fetchWalletBalance, GHL_WALLET_BILLING_URL } from "../lib/walletApi";
+import { fetchWalletBalance } from "../lib/walletApi";
+import { showDemoNotice } from "../demo/ui/notice";
 
 export const Route = createFileRoute("/wallet")({
   head: () => ({
@@ -61,13 +62,12 @@ function WalletPage() {
     balanceData.balance < balanceData.chargeAmount;
 
   function handleAddFunds() {
-    const locationId = session?.locationId;
-    if (!locationId) return;
-    window.open(
-      GHL_WALLET_BILLING_URL.replace("{locationId}", locationId),
-      "_blank",
-      "noopener,noreferrer",
-    );
+    // DEMO: production opened the GHL billing page in a new tab. The demo shows a notice.
+    showDemoNotice({
+      title: "Add funds",
+      message:
+        "In the live product, this opens the billing page where a member adds funds to the wallet. The sample wallet needs no top-up.",
+    });
   }
 
   return (

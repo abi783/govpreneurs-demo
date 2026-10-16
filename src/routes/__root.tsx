@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { usePostHog } from "posthog-js/react";
 
 import { AppShell } from "../components/Layout/AppShell";
+import { DemoShell } from "../demo/shell/DemoShell";
 import { CommandBarProvider } from "../components/CommandBar/CommandBarProvider";
 import { UIStateProvider } from "../lib/uiState";
 import { GhlUserProvider, useGhlUser } from "../lib/ghlUser";
@@ -189,9 +190,12 @@ function AuthGate() {
 
   return (
     <CommandBarProvider>
-      <AppShell>
-        <Outlet />
-      </AppShell>
+      {/* DEMO: the left menu, the sample-data strip and the scrolling main area. */}
+      <DemoShell>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </DemoShell>
     </CommandBarProvider>
   );
 }
