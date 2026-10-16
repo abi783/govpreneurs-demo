@@ -63,3 +63,7 @@ name its number.
 - D39. **Program specialist: "Jordan Ellis"** (fictional). Onboarding call 98 days ago; positioning call with Sarah 24 days ago.
 - D40. **Five more mentors with prices from $75 to $120 a session.** Sarah is $97, the same as a written review.
 - D41. **"Re-charge wallet" and "Add funds" open an in-app top-up** instead of GHL billing, and it succeeds.
+- D42. **The Roadmap has a "Quarterly Targeting Call" step** at the start of Execution. Production retired this step, but the story's next action is to book that call with Sarah. Amira starts at 82% (11 of 14 steps). Booking the call moves her to 86%.
+- D43. **Sample prices for two done-for-you services: CMMC $497, Prime Registration $197.** The coupon `DEMO10` gives 10% off. The other prices come from the prototype's catalog.
+- D44. **One calendar for every page.** A call booked on the Roadmap or from Tasks appears on Success Center home too. The home progress card shows the Roadmap's own phases.
+- D45. **Shared Success Center calls (wallet balance, time zone, uploads) are answered in one place** (`src/demo/api/scShared.ts`). A test fails if two pages answer the same call.

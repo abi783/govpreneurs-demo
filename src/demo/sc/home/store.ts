@@ -14,6 +14,7 @@
 
 import { readDemoState, updateDemoState, writeDemoState } from "@/demo/runtime/store";
 import { getRoadmapSummary } from "@/demo/sc/roadmap/summary";
+import { getBookings as getRoadmapBookings } from "@/demo/sc/roadmap/state";
 import { MENTOR } from "@/demo/story/persona";
 import { SARAH_ID, getBenchMentor, type BenchMentor } from "@/demo/sc/mentors/bench";
 import { chargeWallet } from "@/demo/state/wallet";
@@ -71,28 +72,33 @@ function initialAppointments(): GHLAppointment[] {
       address: MEETING_PLACE,
     },
   ];
-  // The roadmap's next action decides whether the targeting call is booked yet.
-  // If the Roadmap says "Book your targeting call", nothing is booked, and the
-  // visitor can book it. Any other next action means the call is on the calendar.
-  const next = getRoadmapSummary().nextAction.label.toLowerCase();
-  const stillToBook = next.includes("book") && next.includes("call");
-  if (!stillToBook) {
-    list.push({
-      id: "appt-targeting",
-      title: `Quarterly targeting call with ${MENTOR.name}`,
-      ...slot(3, 10, 30, 30),
-      calendarId: calendarIdFor(SARAH_ID),
-      calendarName: "Mentor consultation",
-      assignedUserName: MENTOR.name,
-      appointmentStatus: "confirmed",
-      address: MEETING_PLACE,
-    });
-  }
   return list;
 }
 
 export function getAppointments(): GHLAppointment[] {
-  return readDemoState<GHLAppointment[]>(APPOINTMENTS, initialAppointments);
+  const stored = readDemoState<GHLAppointment[]>(APPOINTMENTS, initialAppointments);
+  // Calls booked on the Roadmap or from Tasks are on the same calendar.
+  const fromRoadmap: GHLAppointment[] = getRoadmapBookings()
+    .filter((b) => !stored.some((a) => a.id === `roadmap-${b.id}`))
+    .map((b) => ({
+      id: `roadmap-${b.id}`,
+      title: b.kind === "delivery" ? "Service kickoff call" : roadmapCallTitle(b.stepId),
+      startTime: b.startTime,
+      endTime: b.endTime,
+      calendarId: calendarIdFor(SARAH_ID),
+      calendarName: b.kind === "delivery" ? "Service kickoff" : "Mentor consultation",
+      assignedUserName: MENTOR.name,
+      appointmentStatus: "confirmed",
+      address: MEETING_PLACE,
+    }) as GHLAppointment);
+  return [...stored, ...fromRoadmap];
+}
+
+function roadmapCallTitle(stepId: string): string {
+  const label = getRoadmapSummary()
+    .phases.flatMap((p) => p.subSteps)
+    .find((s) => s.id === stepId)?.label;
+  return label ? `${label} with ${MENTOR.name}` : `Call with ${MENTOR.name}`;
 }
 
 export function findAppointment(id: string): GHLAppointment | undefined {

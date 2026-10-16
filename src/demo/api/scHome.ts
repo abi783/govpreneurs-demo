@@ -15,7 +15,7 @@
 //
 // Keep a visitor's changes in the store (src/demo/sc/home/store.ts).
 
-import { demoResponse, type DemoRouteDef } from "../runtime/router";
+import { demoResponse, type DemoRequestContext, type DemoRouteDef } from "../runtime/router";
 import { getWalletBalance, topUpWallet } from "../state/wallet";
 import { BENCH, getBenchMentor, toPortalMentor } from "../sc/mentors/bench";
 import { MENTOR, PERSONA } from "../story/persona";
@@ -57,18 +57,9 @@ function range(query: URLSearchParams) {
 
 export const routes: DemoRouteDef[] = [
   // ── Reads that the booking modals and cards make when they open ──────────
-  {
-    method: "GET",
-    path: `${P}/wallet-balance`,
-    handler: () => {
-      const balance = getWalletBalance();
-      return { balance, paidBalance: balance, promotionalCredit: 0, currency: "USD" };
-    },
-  },
+  // (wallet-balance, contact-timezone, checkout-terms and billing-address are
+  // answered once for every page in scShared.ts)
   { method: "GET", path: `${P}/free-sessions`, handler: () => ({ left: freeSessionsLeft() }) },
-  { method: "GET", path: `${P}/contact-timezone`, handler: () => ({ timezone: CONTACT_TIMEZONE }) },
-  { method: "GET", path: `${P}/checkout-terms`, handler: () => ({ showTerms: false }) },
-  { method: "GET", path: `${P}/billing-address`, handler: () => ({ needsAddress: false }) },
 
   // ── Wallet ───────────────────────────────────────────────────────────────
   {
@@ -204,21 +195,6 @@ export const routes: DemoRouteDef[] = [
   },
 
   // ── Contact photo and company logo ───────────────────────────────────────
-  {
-    method: "POST",
-    path: `${P}/upload`,
-    handler: async ({ body }) => {
-      const form = body as FormData | null;
-      const type = form?.get?.("type");
-      const file = form?.get?.("file");
-      if (type !== "contact" && type !== "logo") return demoResponse(400, { error: "That file type is not used on this page." });
-      if (!(file instanceof Blob)) return demoResponse(400, { error: "file missing" });
-      if (!file.type.startsWith("image/")) return demoResponse(400, { error: "Choose a picture (PNG, JPG, WebP or GIF)." });
-      const url = await shrinkImage(file);
-      setProfileImage(type, url);
-      return { url };
-    },
-  },
 
   // ── Action plan ──────────────────────────────────────────────────────────
   {
@@ -283,3 +259,17 @@ export const routes: DemoRouteDef[] = [
     },
   },
 ];
+
+
+/** Contact photo and company logo uploads. Dispatched from scShared.ts. */
+export const homeUpload = async ({ body }: DemoRequestContext) => {
+      const form = body as FormData | null;
+      const type = form?.get?.("type");
+      const file = form?.get?.("file");
+      if (type !== "contact" && type !== "logo") return demoResponse(400, { error: "That file type is not used on this page." });
+      if (!(file instanceof Blob)) return demoResponse(400, { error: "file missing" });
+      if (!file.type.startsWith("image/")) return demoResponse(400, { error: "Choose a picture (PNG, JPG, WebP or GIF)." });
+      const url = await shrinkImage(file);
+      setProfileImage(type, url);
+      return { url };
+    };

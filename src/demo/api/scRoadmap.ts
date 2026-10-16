@@ -88,11 +88,6 @@ function textFile(name: string, body: string): Response {
 
 export const routes: DemoRouteDef[] = [
   // ── Small reads that every checkout and calendar makes ──────────────────────
-  { method: "GET", path: `${P}/wallet-balance`, handler: () => walletBody() },
-  { method: "GET", path: `${P}/contact-timezone`, handler: () => ({ timezone: MEMBER_TIME_ZONE }) },
-  { method: "GET", path: `${P}/checkout-terms`, handler: () => ({ showTerms: false }) },
-  { method: "GET", path: `${P}/billing-address`, handler: () => ({ needsAddress: false }) },
-  { method: "POST", path: `${P}/track`, handler: () => ({ ok: true }) },
 
   // ── Booking ────────────────────────────────────────────────────────────────
   {
@@ -346,23 +341,6 @@ export const routes: DemoRouteDef[] = [
   // ── Member-run checks ─────────────────────────────────────────────────────
   {
     method: "POST",
-    path: `${P}/upload`,
-    handler: (ctx) => {
-      const form = ctx.body as FormData | null;
-      const file = form instanceof FormData ? form.get("file") : null;
-      const type =
-        form instanceof FormData ? String(form.get("type") ?? "capability") : "capability";
-      if (!(file instanceof File)) return demoResponse(400, { error: "Choose a file first." });
-      const url = URL.createObjectURL(file);
-      liveBlobs.add(url);
-      const kind = type === "articles" ? "articles" : type === "cmmc" ? "cmmc" : "capability";
-      const saved: DemoUpload = { name: file.name, url, at: new Date().toISOString() };
-      setUpload(kind, saved);
-      return { url, name: file.name };
-    },
-  },
-  {
-    method: "POST",
     path: `${P}/verify`,
     handler: (ctx) => {
       const b = ctx.body as {
@@ -420,3 +398,19 @@ export const routes: DemoRouteDef[] = [
     },
   },
 ];
+
+
+/** Roadmap uploads (capability statement, articles, CMMC). Dispatched from scShared.ts. */
+export const roadmapUpload = (ctx: DemoRequestContext) => {
+      const form = ctx.body as FormData | null;
+      const file = form instanceof FormData ? form.get("file") : null;
+      const type =
+        form instanceof FormData ? String(form.get("type") ?? "capability") : "capability";
+      if (!(file instanceof File)) return demoResponse(400, { error: "Choose a file first." });
+      const url = URL.createObjectURL(file);
+      liveBlobs.add(url);
+      const kind = type === "articles" ? "articles" : type === "cmmc" ? "cmmc" : "capability";
+      const saved: DemoUpload = { name: file.name, url, at: new Date().toISOString() };
+      setUpload(kind, saved);
+      return { url, name: file.name };
+    };

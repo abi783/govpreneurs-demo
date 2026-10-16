@@ -18,6 +18,8 @@ export interface RoadmapSummary {
   currentPhaseLabel: string;
   /** The next thing the Roadmap asks her to do. */
   nextAction: { label: string; to: string };
+  /** Every phase and sub-step, exactly as the Roadmap page shows them. */
+  phases: { label: string; subSteps: { id: string; label: string; done: boolean }[] }[];
 }
 
 export function getRoadmapSummary(): RoadmapSummary {
@@ -45,5 +47,9 @@ export function getRoadmapSummary(): RoadmapSummary {
     stepsTotal: subs.length,
     currentPhaseLabel: roadmap.currentStepLabel,
     nextAction: { label, to },
+    phases: roadmap.steps.map((step) => ({
+      label: step.label,
+      subSteps: step.subSteps.map((sub) => ({ id: sub.id, label: sub.label, done: sub.state === "done" })),
+    })),
   };
 }
