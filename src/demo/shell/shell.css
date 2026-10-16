@@ -176,6 +176,15 @@
   background: var(--demo-red);
 }
 
+/* A short window (a laptop with a browser toolbar): tighten the menu so every item shows. */
+@media (max-height: 790px) {
+  .demo-logo { padding: 12px 18px 8px; }
+  .demo-account { margin-bottom: 8px; padding: 7px 10px; }
+  .demo-nav { padding-top: 0; }
+  .demo-nav__title { padding-top: 10px; }
+  .demo-nav__item { padding: 6px 12px; }
+}
+
 /* ─── Content column ────────────────────────────────────────── */
 .demo-content {
   flex: 1;
@@ -233,6 +242,9 @@
 .demo-main .hunter-pane {
   height: calc(100dvh - 3px - var(--demo-strip-h));
 }
+
+/* The reserve was a safe band for GoHighLevel clipping the iframe. There is no clip here. */
+.demo-main .mentors-shell { --mentors-shell-reserve: 0px; }
 
 /* ─── Dialogs (reset, notice, chat) ─────────────────────────── */
 .demo-overlay {

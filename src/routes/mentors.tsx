@@ -23,13 +23,20 @@ export const Route = createFileRoute("/mentors")({
 function useMentorsShellHeightVar() {
   useEffect(() => {
     const root = document.documentElement;
+    // DEMO: the shell's main area scrolls (not the window), so measure that area.
+    // The 3px is the brand stripe that the page header area keeps.
+    const host = document.getElementById("demo-main");
     const updateHeight = () => {
-      root.style.setProperty("--mentors-shell-h", `${root.clientHeight}px`);
+      const h = host ? host.clientHeight - 3 : root.clientHeight;
+      root.style.setProperty("--mentors-shell-h", `${h}px`);
     };
     updateHeight();
     window.addEventListener("resize", updateHeight);
+    const observer = host && typeof ResizeObserver !== "undefined" ? new ResizeObserver(updateHeight) : null;
+    if (host && observer) observer.observe(host);
     return () => {
       window.removeEventListener("resize", updateHeight);
+      observer?.disconnect();
       root.style.removeProperty("--mentors-shell-h");
     };
   }, []);

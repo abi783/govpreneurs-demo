@@ -722,3 +722,396 @@ Area file: `src/demo/api/wallet.ts`. This area owns `/wallet/*`, `GET /opportuni
 - Response: `UpgradePlanResponse` (`src/lib/billing.ts:22`): `{ link?: string }`. The modal loads `link` (or `UPGRADE_PLAN_LINK`, `src/lib/plans.ts:16`) into an `<iframe src>` (`UpgradePlanModal.tsx:149`).
 - Errors the UI handles: the modal shows the `message` of the body, or "Couldn't start the upgrade. Please try again."
 - Notes: an iframe load is not a fetch, so the demo does not block it. An outside link would load a live site in the frame. If this call is ever reached, return a link on this origin.
+
+## partners
+
+Area file: `src/demo/api/partners.ts`. This area owns `/partners*`. The page is `/partners` (`src/routes/partners.tsx`) with three tabs. `/partner-finder` and `/whos-winning` redirect to it. The `awardeeKey` is a number. It must be the same number in the ranked feed, the market events, the pipeline, the award winners (`GET /awards`) and the company lookup.
+
+### GET /partners
+- Area file: partners
+- Called from: `fetchPartners` `src/lib/partnersApi.ts:115` (apiFetch at :116). Call site `src/components/Partners/FindPartnersView.tsx:123` `fetchPartners`. It runs once when the "Find partners" tab mounts (the default tab, or `?view=find`).
+- Query: none
+- Request body: none
+- Response: `PartnersFeedResponse` (`src/lib/partnersApi.ts:103`): `{ partners: PrimeCandidate[], computedAt, pending, stale, needsProfile }`. `PrimeCandidate` is `:47`. `pending: true` shows "we're finding your partners". `needsProfile: true` makes the route switch to the market tab, but only when the URL names no view. The card shows `reasons`, `bench`, `economics`, `geography`, `trade`, `tier` and `verdict`. `score` and `scoreBreakdown` are never drawn, but the type requires them.
+- Errors the UI handles: the tab shows the error `message` in a card.
+- Notes: return `pending: false`, `stale: false`, `needsProfile: false`. Order the list: the page keeps the server order.
+
+### GET /partners/company/:awardeeKey
+- Area file: partners
+- Called from: `fetchPartnerCompany` `src/lib/partnersApi.ts:128` (apiFetch at :132). Call site `src/components/Partners/FindPartnersView.tsx:170` `fetchPartnerCompany`. It runs when the URL holds `?company=<key>` and the loaded ranked feed does not contain that key (for example a link from an award winner).
+- Query: none
+- Request body: none
+- Response: `{ company: PrimeCandidate; inMatches: boolean }`. The page reads `company`. A company that failed a gate has `isCandidate: false` and `gateFailureReasons`.
+- Errors the UI handles: 404 gives null and the panel says that the company was not found. Any other error gives the same panel. The key goes in the path without URL encoding.
+- Notes: the production backend answers 404 "No company on file for that award winner."
+
+### GET /partners/market
+- Area file: partners
+- Called from: `fetchMarket` `src/lib/partnersApi.ts:316` (apiFetch at :317). Call site `src/components/Partners/WhosWinningView.tsx:37` `fetchMarket`. It runs once when the "Who's winning" tab mounts.
+- Query: none
+- Request body: none
+- Response: `MarketSummary` (`src/lib/partnersApi.ts:302`): `{ totalAwardedUsd12mo, awardCount12mo, medianAwardUsd, events: MarketEvent[], state: "ok" | "no_trade" | "quiet_market" }`. `MarketEvent` is `:290`. `winner.awardeeKey` opens that company in Find partners.
+- Errors the UI handles: the tab shows the error `message` in a card.
+- Notes: use `state: "ok"` with events to show the populated view.
+
+### GET /partners/pipeline
+- Area file: partners
+- Called from: `fetchPipeline` `src/lib/partnersApi.ts:325` (apiFetch at :326).
+  - `src/components/Partners/MyPartnersView.tsx:35` `fetchPipeline`: the "My partners" tab mounts.
+  - `src/components/Partners/FindPartnersView.tsx:93` `fetchPipeline`: the "Find partners" tab mounts. It marks the saved companies.
+- Query: none
+- Request body: none
+- Response: `{ entries: PipelineEntry[] }` (`PipelineEntry`, `src/lib/partnersApi.ts:279`: `{ awardeeKey, companyName, stage, sourceTag, savedAt, updatedAt }`). `stage` is one of `PIPELINE_STAGES` (`:228`): `saved`, `researching`, `contacted`, `following_up`, `on_their_bench`, `teaming`, `active_partner`, `worked_together`.
+- Errors the UI handles: "My partners" shows the error `message`. "Find partners" ignores the error and starts with no saved companies.
+- Notes: an empty list shows "Your list is empty".
+
+### POST /partners/pipeline
+- Area file: partners
+- Called from: `addToPipeline` `src/lib/partnersApi.ts:335` (apiFetch at :340). Call site `src/components/Partners/FindPartnersView.tsx:110` `addToPipeline`. It runs when the member clicks the bookmark on a company card or panel.
+- Query: none
+- Request body: `{ awardeeKey: number; companyName: string; sourceTag: string }`. `sourceTag` is "from Find partners".
+- Response: ignored.
+- Errors the UI handles: the page puts the bookmark back.
+- Notes: the call is idempotent. New entries start at stage `saved`.
+
+### PATCH /partners/pipeline/:awardeeKey
+- Area file: partners
+- Called from: `setPipelineStage` `src/lib/partnersApi.ts:351` (apiFetch at :352).
+  - `src/components/Partners/MyPartnersView.tsx:53` `setPipelineStage`: the member moves a company to another stage.
+  - `src/components/Partners/MyPartnersView.tsx:66` `setPipelineStage`: the member clicks Undo (the opposite move).
+- Query: none
+- Request body: `{ stage: PipelineStage }`
+- Response: ignored.
+- Errors the UI handles: the page puts the old stage back.
+- Notes: a stage may move backward.
+
+### DELETE /partners/pipeline/:awardeeKey
+- Area file: partners
+- Called from: `removeFromPipeline` `src/lib/partnersApi.ts:363` (apiFetch at :364).
+  - `src/components/Partners/MyPartnersView.tsx:76` `removeFromPipeline`: the member removes a company.
+  - `src/components/Partners/FindPartnersView.tsx:109` `removeFromPipeline`: the member clicks a saved bookmark.
+- Query: none
+- Request body: none
+- Response: ignored.
+- Errors the UI handles: the page puts the row back.
+- Notes: the call is idempotent.
+
+### POST /partners/suppress
+- Area file: partners
+- Called from: `suppressPartner` `src/lib/partnersApi.ts:378` (apiFetch at :379). Call site `src/components/Partners/FindPartnersView.tsx:60` `suppressPartner`. It runs when the member clicks "Not right for me". The card hides at once and an Undo notice shows for 12000 ms.
+- Query: none
+- Request body: `{ awardeeKey: number }`
+- Response: ignored.
+- Errors the UI handles: the page shows the card again and removes the notice.
+- Notes: later `GET /partners` calls should leave out that company.
+
+### DELETE /partners/suppress/:awardeeKey
+- Area file: partners
+- Called from: `unsuppressPartner` `src/lib/partnersApi.ts:390` (apiFetch at :391). Call site `src/components/Partners/FindPartnersView.tsx:81` `unsuppressPartner`. It runs when the member clicks Undo on the "Not right for me" notice.
+- Query: none
+- Request body: none
+- Response: ignored.
+- Errors the UI handles: the page hides the card again.
+- Notes: the call is idempotent.
+
+## awards
+
+Area file: `src/demo/api/awards.ts`. This area owns `/awards*`. The pages are `/awards` and `/awards/$awardId`.
+
+### POST /awards
+- Area file: awards
+- Called from: `fetchAwards` `src/lib/awardsApi.ts:140` (apiFetch at :144). Call site `src/routes/awards.index.tsx:120` `fetchAwards`. It runs on page load and each time the filters, the sort, the search text or the page number in the URL change. A new run aborts the old run.
+- Query: none
+- Request body: `AwardListRequest` (`src/lib/awardsApi.ts:131`): `{ filters?: AwardFilterId[]; sort?: AwardSort; q?: string; page?: number; limit?: number }`. The page sends `filters`, `sort`, `q` and `page`, and never `limit`. A filter id is `trade`, `area`, `size`, `justAwarded` or `comingUpAgain`. A sort is `relevant`, `recent` or `largest`. The default filters are `trade` and `area` (`:43`).
+- Response: `AwardListResult` (`src/lib/awardsApi.ts:110`): `{ awards: AwardRecord[], page, limit, hasMore, appliedFilters, droppedFilters?, needsProfile? }`. `AwardRecord` is `:85`. `appliedFilters` draws the removable chips.
+- Errors the UI handles: the page shows the error `message` ("Something went wrong loading awards." by default).
+- Notes: production answers 200 for this POST. Use a page size that your list supports and set `hasMore`.
+
+### GET /awards/saved
+- Area file: awards
+- Called from: `fetchSavedAwards` `src/lib/awardsApi.ts:177` (apiFetch at :178).
+  - `src/lib/useSavedAwards.ts:18` `fetchSavedAwards`: when `/awards` or `/awards/$awardId` mounts. It fills the stars.
+  - `src/components/Awards/SavedAwardsView.tsx:42` `fetchSavedAwards`: when the Saved tab of `/awards` mounts.
+- Query: none
+- Request body: none
+- Response: `{ awards: SavedAward[] }` (`SavedAward`, `src/lib/awardsApi.ts:169`: `{ awardId, sourceTag, savedAt }`), newest first.
+- Errors the UI handles: the star hook ignores the error and shows empty stars. The Saved tab shows the error `message`.
+- Notes: the literal `saved` segment must win over `:awardId` (rule 4).
+
+### GET /awards/:awardId
+- Area file: awards
+- Called from: `fetchAward` `src/lib/awardsApi.ts:157` (apiFetch at :158).
+  - `src/routes/awards.$awardId.tsx:72` `fetchAward`: the award page loads.
+  - `src/components/Awards/SavedAwardsView.tsx:45` `fetchAward`: the Saved tab calls it once for each saved award, in parallel. A failure drops that row.
+- Query: none
+- Request body: none
+- Response: `AwardRecord` (`src/lib/awardsApi.ts:85`).
+- Errors the UI handles: the award page shows "That award is not in your market." with a link back. The production backend answers 404 with the same sentence.
+- Notes: every `awardId` in `GET /awards/saved` and `POST /awards` needs a record here.
+
+### POST /awards/saved
+- Area file: awards
+- Called from: `saveAward` `src/lib/awardsApi.ts:187` (apiFetch at :188). Call site `src/lib/useSavedAwards.ts:40` `saveAward`. It runs when the member clicks the star on a list row or on the award page.
+- Query: none
+- Request body: `{ awardId: string; sourceTag: string }`. `sourceTag` is "from Awards" or "from Awards · just awarded".
+- Response: ignored.
+- Errors the UI handles: the star goes back to its old state.
+- Notes: the call is idempotent.
+
+### DELETE /awards/saved/:awardId
+- Area file: awards
+- Called from: `unsaveAward` `src/lib/awardsApi.ts:199` (apiFetch at :200). Call site `src/lib/useSavedAwards.ts:39` `unsaveAward`. It runs when the member clicks a starred star.
+- Query: none
+- Request body: none
+- Response: ignored.
+- Errors the UI handles: the star goes back to its old state.
+- Notes: the call is idempotent. The production backend does not check that the id exists.
+
+## buyers
+
+Area file: `src/demo/api/buyers.ts`. Both endpoints have a wrapper in `src/lib/buyers.ts` and no call site. The Government buyers page (`src/routes/government-buyers.tsx`) uses mock data from `src/lib/mock/governmentBuyers.ts`. A handler is optional.
+
+### GET /buyers
+- Area file: buyers
+- Called from: `fetchBuyers` `src/lib/buyers.ts:68` (apiFetch at :72). No call site.
+- Query: `q` (string, trimmed). An empty `q` never reaches the network.
+- Request body: none
+- Response: `{ buyers: OfficeSummary[] }` (`OfficeSummary`, `src/lib/buyers.ts:54`).
+- Errors the UI handles: the wrapper returns `[]` for every failure.
+- Notes: none.
+
+### GET /buyers/:agencyKey
+- Area file: buyers
+- Called from: `fetchBuyer` `src/lib/buyers.ts:90` (apiFetch at :93). No call site.
+- Query: none
+- Request body: none
+- Response: `BuyerDetail` (`src/lib/buyers.ts:62`): `{ buyer: BuyerCitation, figures: BuyerFigures }`. `BuyerCitation` is `src/lib/grant/types.ts:225`.
+- Errors the UI handles: the wrapper returns null for a non-2xx status, a throw, or a body without `buyer`.
+- Notes: the key is an integer in the path.
+
+## forecasts
+
+Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the forecast watch at `/forecast-watch*` (the production backend keeps the watch outside `/forecasts`). The pages are `/forecasts` and `/forecasts/$forecastId`. The list uses the Hunter rail too (see the hunter area).
+
+### GET /forecasts
+- Area file: forecasts
+- Called from: `fetchForecastList` `src/lib/forecastsApi.ts:118` (apiFetch at :124). It is called by `useForecastList` (`src/routes/forecasts.index.tsx:165`).
+  - `src/lib/forecasts/useForecastList.ts:224` `fetchForecastList`: page 1. It runs on page load and on every change of the query: the view tab, the buyer lane, the search text (250 ms wait), the capture tab, the sort and the drawer filters (120 ms wait). It also runs on Retry, and again (same query, rows kept) after a Track or Untrack write settles while the Saved view is open. A new run aborts the old run.
+  - `src/lib/forecasts/useForecastList.ts:255` `fetchForecastList`: the next page, when the scroll sentinel comes within 400 px of the screen.
+- Query: `view` (always sent: `for_you`, `all` or `saved`), `lane` (`federal` or `sled`; absent for all), `q` (at most 200 characters), `tab` (`act_now`, `start_capture`, `position_early` or `watch`; absent for all), `sort` (`soonest`, `newest` or `value`; absent for the view default, and `match` is never sent), `work` (comma list of `food`, `building`, `sites`, `other`), `place` (`served`), `who` (comma list of `small`, `undecided`, `program`, `not_shared`), `size` (`under_250k`, `250k_1m`, `1m_5m` or `over_5m`), `bought` (`again` or `new`), `status` (`open`), `expected` (comma list of `this_week`, `2_weeks`, `30_days`, `60_plus`), `valueMin`, `valueMax` (whole dollars), `states` (comma list of USPS codes), `cities` (comma list, at most 50, each at most 100 characters), `naics` (comma list, at most 100), `posted` (days, a positive whole number), `page` (starts at 1), `limit` (always 20, `FORECAST_PAGE_SIZE`, `src/lib/forecasts/listQuery.ts:20`). The builder is `forecastListQueryKey` (`src/lib/forecasts/listQuery.ts:88`).
+- Request body: none
+- Response: `ForecastListResponseDto` (`src/lib/forecastsApi.ts:87`): `{ member: ForecastMemberDto, forecasts: ForecastListRowDto[], page, limit, hasMore, total?, captureCounts?, viewCounts?, facets? }`. The last four come on page 1 only. `captureCounts` fills the capture tab counts, `viewCounts` fills the three view tab counts, `facets` fills the drawer lists. `member` is `:27`. A row is `ForecastListRowDto` (`:63`): `ForecastRecordDto` (`:22`, which extends `HigherGovForecast`, `src/lib/forecasts/records.ts:28`) plus `match` (`{ tier, finalScore }` or null). The record needs `id`, `oppKey` and `lane`. The page scores each row again on the client for the card words (`scoreLive`), but it keeps the server order and the server rows.
+- Errors the UI handles: a failed page 1 shows a notice with a Retry button. A failed next page keeps the rows and shows a notice with Retry. A 501 or 500 behaves the same.
+- Notes: the `saved` view must list the records that `GET /workspace` holds as saved. Set `hasMore: false` on the last page. The production backend answers 400 for a value outside the bounds above.
+
+### GET /forecasts/:oppKey
+- Area file: forecasts
+- Called from: `fetchForecast` `src/lib/forecastsApi.ts:130` (apiFetch at :131). Call site `src/lib/forecasts/useForecasts.ts:47` `fetchForecast`, in `useForecast`, used at `src/routes/forecasts.$forecastId.tsx:87`. It runs when the forecast page loads and on Retry. If the list already loaded the row in this session, the page draws that row first and still calls this endpoint, because only this response carries the forecast's files.
+- Query: none
+- Request body: none
+- Response: `ForecastResponseDto` (`src/lib/forecastsApi.ts:41`): `{ member: ForecastMemberDto, forecast: ForecastRecordDto }`. The forecast needs `files`, `checkedOn` and `publisherSite` only if the page should show them (`files` is `[{ fileName, sizeBytes }]` and is drawn as text with no link).
+- Errors the UI handles: 404 shows the "not found" page (`ForecastNotFoundError`). Another failure shows a notice with a Retry button. When a loaded row is on screen, a failure only costs the files.
+- Notes: none.
+
+### GET /forecasts/:oppKey/grant/take
+- Area file: forecasts
+- Called from: `requestTake` `src/lib/forecasts/grantTakeApi.ts:209` (apiFetch at :212), through `fetchForecastTake` (`:228`). Call site `src/lib/forecasts/useForecastTake.ts:14` `fetchForecastTake`, used at `src/routes/forecasts.$forecastId.tsx:134`. It runs once for each forecast in a browser session when the forecast page mounts. A failed result is cached too.
+- Query: none
+- Request body: none
+- Response: `ForecastTakeResponse` (`src/lib/forecasts/grantTakeApi.ts:76`). The client checks the body and treats a body that fails any check as a failed call (`toTake`, `:185`). The checks: `oppKey` equals the requested key; `noticeType` is `"forecast"`; `analyzedAt` is a string; `reads` is an array; `counted` holds all six keys (`comparableAwards`, `fieldSize`, `marketWinners`, `buyer`, `upcoming`, `subUse`), each either `{ state: "notChecked" }` or a counted fact with `figure`, `basis` (`countedOver` at least 1, a non-empty `matchedOn`, `yearsCovered` string or null, `atLeast` boolean), a `source` pin with `provenance: { type: "public", ref }` and `label`, and `asOf` (string or null); `memberSources` holds all four keys (`profile`, `capabilityStatement`, `learnedFacts`, `match`) with a state of `used`, `empty` or `notChecked`.
+- Errors the UI handles: none shown. 404 or any failure makes the page read as if there were no take.
+- Notes: a take adds counted rows to "How to win it". `notChecked` hides that fact.
+
+### POST /forecasts/:oppKey/grant/reply
+- Area file: forecasts
+- Called from: `sendForecastGrantMessage` `src/lib/forecasts/grantChatApi.ts:77` (apiFetch at :84; URL from `grantUrl`, `:62`). Call site `src/components/Forecast/ForecastGrantRail.tsx:298` `sendForecastGrantMessage`, in `sendChat`. It runs when the member sends a chat message in the forecast rail.
+- Query: none
+- Request body: `{ message: string; read: ForecastGrantReadSummary }`. The message is at most 2000 characters (`MESSAGE_MAX`). `read` is `{ call, summary, unknowns }` (`:20`): the summary is at most 600 characters, with at most 12 unknowns of at most 160 characters each.
+- Response: `{ reply: string }`. The reply must be a non-empty string.
+- Errors the UI handles: status 502 gives `unavailable`. Another failure gives `failed`. For both, the rail removes the member's bubble, keeps the text in the box and shows its failure line.
+- Notes: store the pair of messages so that the session call returns them.
+
+### GET /forecasts/:oppKey/grant/session
+- Area file: forecasts
+- Called from: `fetchForecastGrantSession` `src/lib/forecasts/grantChatApi.ts:111` (apiFetch at :116). Call site `src/components/Forecast/ForecastGrantRail.tsx:285` `fetchForecastGrantSession`. It runs the first time the member opens the rail on a forecast.
+- Query: none
+- Request body: none
+- Response: `{ messages: ForecastGrantMessage[] }` (`:27`): `{ role: "user" | "grant", text, at }`, oldest first. The wrapper drops a message that is not valid.
+- Errors the UI handles: a failure gives an empty thread.
+- Notes: return `{ messages: [] }` for a new forecast.
+
+### POST /forecasts/takes
+- Area file: forecasts
+- Called from: `fetchForecastTakes` `src/lib/forecasts/cardTakeApi.ts:43` (apiFetch at :47). Call site `src/lib/forecasts/useForecastCardTakes.ts:92` `fetchForecastTakes`, used at `src/routes/forecasts.index.tsx:169`. It runs on `/forecasts`, in windows of 20 cards (`TAKE_WINDOW`, `:15`), one window at a time, as the member scrolls. A failed window is asked again after 30000 ms (`RETRY_AFTER_MS`, `:17`).
+- Query: none
+- Request body: `{ oppKeys: string[] }`, at most 50 keys (`FORECAST_CARD_TAKE_MAX_KEYS`)
+- Response: `{ takes: { oppKey: string; line: string }[] }` (`ForecastCardTakesResponse`, `:23`). A line must be a non-empty string of at most 240 characters, for a key that the request named. The client drops any other row.
+- Errors the UI handles: none shown. The card keeps its own rule-built line.
+- Notes: a key with no line is not asked again in the session. The literal `takes` segment is a POST. It does not clash with `GET /forecasts/:oppKey`.
+
+### GET /forecast-watch
+- Area file: forecasts
+- Called from: `requestWatch` `src/lib/forecasts/watch.ts:319` (apiFetch at :322; the path is `WATCH_PATH = "/forecast-watch"`, `:132`). `loadForecastWatch` (`:349`) shares one read for the session. `refreshForecastWatch` (`:356`) reads again.
+  - `src/lib/forecasts/watch.ts:377` `loadForecastWatch`, in `useForecastWatch`: the first time any of these mounts: `WatchMarker` on a tracked forecast card (`src/components/Forecast/ForecastCard.tsx:87`), on a saved forecast card in the feed (`src/components/Hunter/OpportunityCard.tsx:277`) and on a forecast bid card (`src/components/Bids/BidCard.tsx:166`); `ForecastWatchChanges` on the forecast page (`src/components/Forecast/ForecastWatchChanges.tsx:119`); and the forecast page itself (`src/routes/forecasts.$forecastId.tsx:142`).
+  - `src/lib/trackedForecasts.ts:79` and `:102` `refreshForecastWatch`: after a Track or Untrack write succeeds, and after Hunter saves or unsaves a record.
+  - `src/lib/forecasts/watch.ts:370` `refreshForecastWatch`: after Mark as seen.
+- Query: none
+- Request body: none
+- Response: `ForecastWatchResponse` (`src/lib/forecasts/watch.ts:125`): `{ watching: boolean, notify: boolean, forecasts: ForecastWatchForecast[] }`. A forecast is `{ oppKey, startedAt, unseen, events }` (`:118`). An event is `ForecastWatchEvent` (`:103`). The client checks every field. One bad event drops its whole forecast. An event of an unknown `kind` is skipped. The kinds are `date_moved`, `set_aside_changed`, `value_changed`, `code_changed`, `place_changed`, `expected_date_passed`, `no_longer_listed`, `bid_request_posted`, `republished`, `notice_suggested`.
+- Errors the UI handles: none shown. A failed read shows no marker and makes no claim.
+- Notes: `watching: false` shows nothing. `watching: true, notify: false` makes the pages promise in-app changes only. `notify: true` makes them promise an email. `{ watching: true, notify: false, forecasts: [] }` is the quiet state. `unseen` must equal the number of events with `seenAt: null` that are counted (every kind except `notice_suggested`).
+
+### POST /forecast-watch/:oppKey/seen
+- Area file: forecasts
+- Called from: `markForecastSeen` `src/lib/forecasts/watch.ts:361` (apiFetch at :364). Call site `src/components/Forecast/ForecastWatchChanges.tsx:137` `markForecastSeen`. It runs when the member clicks "Mark as seen" on the watch box of a forecast page.
+- Query: none
+- Request body: none
+- Response: ignored. Return `{ ok: true }`.
+- Errors the UI handles: the wrapper returns false and the box stays as it was.
+- Notes: after a 2xx the client calls `GET /forecast-watch` again. Set `seenAt` on that forecast's events and `unseen: 0`, or the marker stays.
+
+## smallOrders
+
+Area file: `src/demo/api/smallOrders.ts`. This area owns `/small-orders*`. These are Defense Logistics Agency (DLA) parts orders from DIBBS (the DLA Internet Bid Board System). The pages are `/small-orders`, `/small-orders/$orderId` and `/small-orders/restricted`. An order id is also an `oppKey`, so the same id works in the workspace, in mentor reviews and in the feed (`category: "product_buy"`). Every wrapper in `src/lib/microPurchases/api.ts` checks the body shape and turns a bad body into a failure (null, `{}` or `unreachable`). The order type is `MicroOrder` (`src/lib/microPurchases/order.ts:65`).
+
+### GET /small-orders/feed
+- Area file: smallOrders
+- Called from: `fetchSmallOrdersFeed` `src/lib/microPurchases/api.ts:185` (apiFetch at :231).
+  - `src/lib/microPurchases/feed.ts:242` `fetchSmallOrdersFeed`: page 1 of the "All orders" walk.
+  - `src/lib/microPurchases/feed.ts:246` `fetchSmallOrdersFeed`: page 1 of the "For you" walk (it needs the code census first).
+  - `src/lib/microPurchases/feed.ts:342` `fetchSmallOrdersFeed`: the next page (`loadMoreFeed`), when the member clicks Load more.
+  - `src/routes/small-orders.restricted.tsx:294` `fetchSmallOrdersFeed`: page 1 of each "not open to you" reason group, with `codes`.
+  - `src/routes/small-orders.restricted.tsx:314` `fetchSmallOrdersFeed`: the next page of one group.
+  - The walks start on `/small-orders` page load (`src/routes/small-orders.index.tsx:196`, through `walkFeedFor`), on a change of tab or of the member's categories, and on `/small-orders/$orderId` load (`src/routes/small-orders.$orderId.tsx:89`, `loadFeed`).
+- Query: `after` (the cursor from `more.cursor`; set only for a next page), `view` (set only when it is `for-you`), `categories` (comma list of category ids, sorted, set only when not empty), `codes` (comma list of acquisition-code pairs such as `1C`, sorted, set only when not empty), `bidCodes` (comma list, sorted; set when the walk is "For you", and the value can be empty). A cursor pins `view`, `categories`, `codes` and `bidCodes` for the whole walk.
+- Request body: none
+- Response: `SmallOrdersFeed` (`src/lib/microPurchases/api.ts:34`): `{ orders: MicroOrder[], asOf: string (ISO), postedOnLabel: string, count: number, total: number, boardTotal: number | null, more: { cursor: string, loads: number, remaining: number } | null }`. `more` is null on the last page. The client checks the envelope: `orders` is an array, `asOf` and `postedOnLabel` are strings, `count` and `total` are numbers, and `more` is null or has a non-empty `cursor` string and numbers for `loads` and `remaining`. `count` should equal `orders.length`. `total` is the number of orders that matched before paging. The server page size is 50 and the server cap is 500 rows.
+- Errors the UI handles: any failure or bad body gives null. The board then says "Today's orders from DLA did not load". An empty `orders` array with a good envelope says there are no orders today.
+- Notes: the "For you" walk calls `GET /small-orders/code-census` first and sends `bidCodes`. If the census fails, the walk fails. Return a few pages (use `more`) to show Load more. The board opens on "All orders" when "For you" is empty and the URL names no view.
+
+### GET /small-orders/orders/:orderId
+- Area file: smallOrders
+- Called from: `fetchSmallOrder` `src/lib/microPurchases/api.ts:300` (apiFetch at :305). Call site `src/routes/small-orders.$orderId.tsx:1650` `fetchSmallOrder`. It runs on the order page only when the feed has loaded and does not hold this order id (`askRecordRoute`, `:1596`).
+- Query: none
+- Request body: none
+- Response: a `MicroOrder`. Its `id` must equal `:orderId`, or the page treats the answer as unreachable.
+- Errors the UI handles: 404 gives "absent" ("That order is not here any more"). Any other failure gives "unreachable" ("Today's orders from DLA did not load").
+- Notes: the literal `orders` segment with a trailing id does not clash with `GET /small-orders/orders` (a different segment count).
+
+### GET /small-orders/orders
+- Area file: smallOrders
+- Called from: `fetchSmallOrdersByIds` `src/lib/microPurchases/api.ts:569` (apiFetch at :581). Call site `src/lib/microPurchases/savedOrders.ts:138` `fetchSmallOrdersByIds`, from `loadSavedOrderRecords`. It runs when the member opens the Saved tab on `/small-orders` (`src/routes/small-orders.index.tsx:325`), each time the saved ids change, and on the Retry button (`:676`). The wrapper sends one request for every 100 ids.
+- Query: `ids` (comma-separated order ids, at most 100)
+- Request body: none
+- Response: `{ orders: MicroOrder[] }`. Leave out any id that is not a small order. Include closed orders. Keep the order of the ids.
+- Errors the UI handles: if any batch fails, the Saved tab says it could not get the orders and offers Retry.
+- Notes: none.
+
+### GET /small-orders/orders/:orderId/suppliers
+- Area file: smallOrders
+- Called from: `fetchSupplierNames` `src/lib/microPurchases/api.ts:643` (apiFetch at :645). Call site `src/components/MicroPurchases/SourcingPanel.tsx:63` `fetchSupplierNames`. It runs when the sourcing panel of an order page mounts.
+- Query: none
+- Request body: none
+- Response: `Record<string, string>`: CAGE code to company name.
+- Errors the UI handles: a failure gives `{}`. The table shows the CAGE codes only.
+- Notes: none.
+
+### GET /small-orders/state
+- Area file: smallOrders
+- Called from: `fetchMemberState` `src/lib/microPurchases/api.ts:341` (apiFetch at :343). Call site `src/lib/state/microPurchases.ts:277` `fetchMemberState`, in `hydrateMicroState`. It runs once for each page load, from `/small-orders` (`src/routes/small-orders.index.tsx:184`), `/small-orders/$orderId` (`:90`) and `/small-orders/restricted` (`:265`).
+- Query: none
+- Request body: none
+- Response: `MicroState` (`src/lib/state/microPurchases.ts:85`). It must be a keyed object, not an array. A document with fewer fields merges with the defaults.
+- Errors the UI handles: a failure gives null and the store keeps its defaults. The store holds back any write until this call ends.
+- Notes: an empty `{}` shows the first-run board (the member has not chosen categories). Return the member's real state to skip the first-run screen: `onboarded: true`, `categories`, and `registrations`.
+
+### PUT /small-orders/state
+- Area file: smallOrders
+- Called from: `saveMemberState` `src/lib/microPurchases/api.ts:619` (apiFetch at :621). Call site `src/lib/state/microPurchases.ts:223` `saveMemberState`, in `schedulePersist`. It runs 400 ms after any change of the member's state: a choice of categories, a registration tick, an attestation, a quote, a win. It waits until `GET /small-orders/state` has ended.
+- Query: none
+- Request body: the whole `MicroState` document as JSON.
+- Response: ignored. Return the saved document or `{ ok: true }`.
+- Errors the UI handles: a 4xx status shows the "refused" save notice. A 5xx status or a throw shows the "unconfirmed" notice. The notice reads from `getSaveFailure` (`src/lib/state/microPurchases.ts`).
+- Notes: store the document so that the next `GET /small-orders/state` returns it.
+
+### GET /small-orders/acquisition-codes
+- Area file: smallOrders
+- Called from: `fetchAcquisitionCodes` `src/lib/microPurchases/api.ts:434` (apiFetch at :438). Call site `src/routes/small-orders.$orderId.tsx:125` `fetchAcquisitionCodes`. It runs once when an order page mounts.
+- Query: none
+- Request body: none
+- Response: `AcquisitionCodeMeaning[]` (`src/lib/microPurchases/api.ts:414`): `[{ code, kind: "amc" | "amsc", meaning, status, citation: { document, section, effectiveDate, url } }]`. A row without a string `code` or `meaning`, or with another `kind`, is dropped. The production table has 32 rows.
+- Errors the UI handles: a failure gives null. The regulation panel does not show. The verdict above it does not depend on it.
+- Notes: `citation.url` is response data. It can become an outside link (href, not fetch).
+
+### GET /small-orders/code-census
+- Area file: smallOrders
+- Called from: `fetchCodeCensus` `src/lib/microPurchases/api.ts:480` (apiFetch at :485).
+  - `src/lib/microPurchases/feed.ts:216` `fetchCodeCensus`: `loadCodeCensus` shares one read. It runs before the "For you" walk, and when the board checks whether "Ones not open to you" has orders (`src/routes/small-orders.index.tsx:310`).
+  - `src/routes/small-orders.restricted.tsx:277` `fetchCodeCensus`: the restricted page loads.
+- Query: none
+- Request body: none
+- Response: `{ pairs: CensusRow[]; total: number }`. `CensusRow` is `src/lib/microPurchases/relevance.ts:2377`: `{ amc, amsc, hasPsc, dibbsStatus, orders }`. A row without a numeric `orders` is dropped.
+- Errors the UI handles: a failure gives null. The "For you" walk then fails ("did not load"). The restricted page shows no groups.
+- Notes: the page groups orders that the member may not bid, by these pairs.
+
+### GET /small-orders/naics-categories
+- Area file: smallOrders
+- Called from: `fetchNaicsCategories` `src/lib/microPurchases/api.ts:521` (apiFetch at :527).
+  - `src/lib/microPurchases/profileFit.ts:80` `fetchNaicsCategories`: the member's NAICS codes.
+  - `src/lib/microPurchases/profileFit.ts:85` `fetchNaicsCategories`: the related codes, only when they are more than the member's own.
+  - Both come from `loadProfileFit`, once per session, when `/small-orders` loads (`src/routes/small-orders.index.tsx:168`).
+- Query: `naics` (comma-separated NAICS codes)
+- Request body: none
+- Response: `NaicsCategoryCounts` (`src/lib/microPurchases/api.ts:511`): `{ total: number; rows: { category: MicroCategory, orders: number }[] }`. The page suggests up to 4 categories that each have at least 10% of `total`, when `total` is at least 5.
+- Errors the UI handles: a failure gives null and the sheet opens with no suggestion.
+- Notes: the production backend answers 400 when `naics` is missing.
+
+### GET /small-orders/fit
+- Area file: smallOrders
+- Called from: `fetchMatchScores` `src/lib/microPurchases/api.ts:597` (apiFetch at :603). Call site `src/lib/microPurchases/profileFit.ts:117` `fetchMatchScores`, in `loadMatchScores`, called at `src/routes/small-orders.index.tsx:288`. It runs for the order ids that have arrived and were not asked yet, 50 ids for each request.
+- Query: `ids` (comma-separated order ids)
+- Request body: none
+- Response: `{ scores: Record<string, number> }`. A non-numeric value is dropped.
+- Errors the UI handles: a failure gives `{}`. "Best first" then ranks without a fit score.
+- Notes: none.
+
+## businessProfile
+
+Area file: `src/demo/api/businessProfile.ts`. This area owns `/business-profile*`. The knowledge-base and Stay Ready modules call no backend: `src/lib/knowledgeBase.ts`, `src/lib/knowledgeHub.ts` and `src/lib/stayReady.ts` only keep state in memory and use the event bus. `src/components/profile/`, `src/components/Knowledge/`, `src/components/StayReady/` and `src/components/CapStatement/` make no call either.
+
+### GET /business-profile
+- Area file: businessProfile
+- Called from: `fetchBusinessProfile` `src/lib/businessProfile.tsx:155` (apiFetch at :157). Call site `src/lib/businessProfile.tsx:193` `fetchBusinessProfile`, inside `BusinessProfileProvider`, which `src/routes/__root.tsx` mounts above every page. It runs at boot on every page load, once for each session location. It is the one backend call that every page makes at boot. Readers: `src/components/Hunter/OppsSummaryRow.tsx:184`, `src/components/Hunter/HunterChatOverlay.tsx:310`, `src/routes/opportunities.index.tsx:445` and `src/lib/mock/currentMember.ts:146`.
+- Query: `locationId` (string). The production backend answers 400 "query parameter locationId is required" when it is missing.
+- Request body: none
+- Response: `BusinessProfile` (`src/lib/businessProfile.tsx:11`). Required keys: `ghlLocationId`, `certifications` (array), `capabilityStatementUrl` (string or null), `uei`, `cage`, `ein`, `website` (each string or null). Optional keys: `ownerName`, `legalName`, `accountName`, `primaryNaics`, `naicsCodes`, `naicsLabels` (code to title), `stateCodes`, `cities` (lowercase, the page title-cases them), `socioEconomicCerts`, `isSmall`, `certificationCategories`.
+- Errors the UI handles: the provider keeps `profile: null` and sets an error. The readers fall back to generic copy. The failure message is the `message` of the body, or "Failed to load business profile".
+- Notes: a null `capabilityStatementUrl` makes the feed's "Why these?" text say "Matches use general scope only right now. Add a capability statement ..." (`OppsSummaryRow.tsx:114`). A non-null value shows the real weighting text. Fill `naicsLabels` for every code in `naicsCodes` so that the cards show words.
+
+## misc
+
+Area file: `src/demo/api/misc.ts`. None found. Every call that the code makes fits one of the areas above.
+
+## Not an API call
+
+These are network-looking references that are not calls to the backend. The demo blocks or ignores them. A handler is not needed for any of them.
+
+- **Google Fonts**: `src/styles.css:1` imports a stylesheet from `fonts.googleapis.com`, and `index.html:11` and `:12` preconnect to `fonts.googleapis.com` and `fonts.gstatic.com`. `fetchInterceptor` lets these two hosts pass (`PASS_HOSTS`, `src/demo/runtime/fetchInterceptor.ts:23`). Without a connection, the page falls back to its default fonts.
+- **PostHog analytics**: `src/main.tsx:21` to `:43` mount `PostHogProvider` only when `VITE_POSTHOG_KEY` is set. The repo has no `.env` file, so it is not mounted. If a key is set, `posthog-js` calls `https://app.posthog.com` (the default host, `:22` to `:24`) with `fetch`, `XMLHttpRequest` and `sendBeacon`. `fetchInterceptor` blocks each call and records it in `window.__DEMO_BLOCKED__`, which fails the QA crawl. Keep the key unset.
+- **GoHighLevel wallet billing page**: `GHL_WALLET_BILLING_URL` (`src/lib/walletApi.ts:61`) is `https://app.govpreneurs.com/v2/location/{locationId}/settings/company-billing/billing?tab=wallet_transactions`. The "Add funds" button opens it with `window.open` (`src/routes/wallet.tsx:66`) and the Send to mentor dialog links to it (`src/components/Mentors/MentorSendModal.tsx:318`). `linkGuard` catches the host and shows the "Not part of this demo" notice (`src/demo/nav/linkGuard.ts`).
+- **Plan upgrade frame**: `UPGRADE_PLAN_LINK` (`src/lib/plans.ts:16`, `https://govpreneurs.com/membership`) or the `link` of `POST /opportunities/upgradePlan` loads into an `<iframe src>` (`src/components/Hunter/UpgradePlanModal.tsx:149`). A frame load is not a fetch, so nothing blocks it. The Elite member never opens it.
+- **Links to outside sites**: these are anchors, not fetches. `linkGuard` leaves them to the browser. They include `sam.gov`, `dibbs.bsm.dla.mil` and `piee.eb.mil` (`src/components/MicroPurchases/PrereqLine.tsx:61`, `:81`, `:88`), the government links in `src/lib/stayReady.ts`, `src/lib/forecasts/copy.ts:431`, the forecast `sourceLink` and `publisherSite` urls, a prior award `noticeUrl`, a partner `website` (`src/components/Partners/PrimeDetailPanel.tsx:236`), the acquisition-code `citation.url`, and a mentor attachment `url`.
+- **No other transport**: a search of `src/` (without tests) finds no `XMLHttpRequest`, `EventSource`, `WebSocket`, `new Request`, `navigator.sendBeacon` or relative-path `fetch(` in app code. The only `fetch(` is inside `apiFetch` (`src/lib/api.ts:60` and `:63`).
+- **ArcGIS and Google Maps**: nothing in `src/` calls ArcGIS, a map tile server or a geocoder. The word "Google" appears only in the Google Fonts import and in the labels "Google Drive" and "Google Docs" (`src/lib/knowledgeBase.ts:60`, `src/lib/knowledgeHub.ts:59`, `:66`).
+- **Success Center `/api/...` calls**: this repo does not contain any yet. The router accepts them when the Success Center code arrives (see the next section).
+
+## Href links
+
+Two places and one response field turn a backend path or url into an anchor. A click does not reach `fetchInterceptor`, so no handler answers it.
+- `GET /opportunities/discover/v2/:oppKey/documents` from `src/components/Opportunity/EvidenceBlock.tsx:399` (href, not fetch).
+- The same endpoint from `src/lib/microPurchases/paperHref.ts:35` (href, not fetch).
+- A mentor attachment `url` in `GET /mentor-reviews/:id` (`src/components/Mentors/ConversationView.tsx:148`). Use `url: null`.
+
+## Success Center areas: filled in later
+
+Areas `scRoadmap`, `scTasks`, `scBusiness`, `scHome` and `scMentors` will be added here by the person who lifts the Success Center code. Use the path rule in `src/demo/runtime/router.ts`: a Success Center request keeps its full `/api/portal/...` path.
