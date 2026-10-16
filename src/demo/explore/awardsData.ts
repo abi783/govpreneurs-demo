@@ -115,6 +115,7 @@ const SEEDS: Seed[] = [
     winner: CDG,
     agency: "braggMicc",
     obligated: 9_100_000,
+    ceiling: 9_400_000,
     startedOn: "2019-10-01",
     endsInDays: 135,
     city: "Fort Bragg",

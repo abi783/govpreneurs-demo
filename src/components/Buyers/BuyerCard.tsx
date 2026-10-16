@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Building2, MapPin, Users, Target, ArrowRight, HelpCircle } from "lucide-react";
 import type { GovBuyer } from "@/lib/mock/governmentBuyers";
 import { getOpenOppsForBuyer } from "@/lib/mock/governmentBuyers";

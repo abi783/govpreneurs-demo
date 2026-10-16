@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";

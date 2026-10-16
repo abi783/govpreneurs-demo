@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import * as Dialog from "@radix-ui/react-dialog";
 import { Link } from "@tanstack/react-router";
 import { X } from "lucide-react";
@@ -223,10 +224,18 @@ export function PrimeDetailPanel({
               <h3 className="prime-detail__h">How to reach them</h3>
               {/* We cannot name a person: the government publishes company records, not
             people, and a plausible-looking name would be invented. */}
-              <p className="t-body-sm">
-                We cannot tell you who to call — the government publishes company records, not
-                people. Start at their website and ask for whoever handles subcontracting.
-              </p>
+              {/* DEMO: Amira already knows a person at Carolina Dining Group (a "your_contact" flag). */}
+              {partner.flags.some((f) => f.id === "your_contact") ? (
+                <p className="t-body-sm">
+                  You already know someone here. Start with the person named under &ldquo;Worth
+                  knowing&rdquo; and mention the work you did together in 2024.
+                </p>
+              ) : (
+                <p className="t-body-sm">
+                  We cannot tell you who to call — the government publishes company records, not
+                  people. Start at their website and ask for whoever handles subcontracting.
+                </p>
+              )}
               {partner.website && (
                 <p className="t-body-sm">
                   <a

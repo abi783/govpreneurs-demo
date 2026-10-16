@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { usePageMeta } from "../components/Layout/page-meta";

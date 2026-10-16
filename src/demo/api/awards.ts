@@ -28,9 +28,12 @@ const SIZE_MAX_USD = 25_000_000;
 const MY_STATES = PERSONA.serviceStates as readonly string[];
 const MY_TRADE_CODES = new Set<string>([PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)]);
 
-/** Amira has already saved the award that tells the Fort Bragg story. */
+/** Amira has already saved the two awards that tell her story: Fort Bragg dining and her own Womack job. */
 function initialSaved(): SavedAward[] {
-  return [{ awardId: "W91247-19-C-0021", sourceTag: "from Awards", savedAt: isoDaysFromNow(-3, 14) }];
+  return [
+    { awardId: "W91247-19-C-0021", sourceTag: "from Awards", savedAt: isoDaysFromNow(-3, 14) },
+    { awardId: "W81K04-24-P-0187", sourceTag: "from Awards", savedAt: isoDaysFromNow(-6, 11) },
+  ];
 }
 
 const saved = (): SavedAward[] => readDemoState<SavedAward[]>(SAVED_KEY, initialSaved);

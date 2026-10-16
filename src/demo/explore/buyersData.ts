@@ -98,11 +98,11 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Fort Bragg", "Camp Mackall"],
     awardAgencies: ab(A.braggMicc.abbrev),
     officers: [
-      sblo("bragg-1", "Renee Calloway", "renee.calloway@army.mil.sample", "910-555-0131", "Sends small businesses to the right contracting officer."),
-      co("bragg-2", "Maj. Terrence Hale", "terrence.hale@army.mil.sample", "910-555-0132", "Signs the dining facility and field feeding awards."),
-      co("bragg-3", "Priya Venkataraman", "priya.venkataraman@army.mil.sample", "910-555-0133", "Event catering and order-as-needed contracts."),
-      spec("bragg-4", "Gregory Lindqvist", "gregory.lindqvist@army.mil.sample", "910-555-0134"),
-      fpm("bragg-5", "SFC Maria Okafor", "maria.okafor@army.mil.sample", "910-555-0135", "Oversees the dining facilities and tells the office what the meals must be like."),
+      sblo("bragg-1", "Renee Calloway", "r.calloway@army.mil.sample", "910-555-0131", "Sends small businesses to the right contracting officer."),
+      co("bragg-2", "Maj. Terrence Hale", "t.hale@army.mil.sample", "910-555-0132", "Signs the dining facility and field feeding awards."),
+      co("bragg-3", "Priya Venkataraman", "p.venkataraman@army.mil.sample", "910-555-0133", "Event catering and order-as-needed contracts."),
+      spec("bragg-4", "Gregory Lindqvist", "g.lindqvist@army.mil.sample", "910-555-0134"),
+      fpm("bragg-5", "SFC Maria Okafor", "m.okafor@army.mil.sample", "910-555-0135", "Oversees the dining facilities and tells the office what the meals must be like."),
     ],
     analysis: analysis(
       "worth-it",
@@ -133,10 +133,10 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Womack"],
     awardAgencies: ab(A.womack.abbrev),
     officers: [
-      sblo("wom-1", "Denise Tran", "denise.tran@army.mil.sample", "910-555-0141", "Small business advocate for the medical center's contracts."),
-      co("wom-2", "Capt. Dwayne Ellison", "dwayne.ellison@army.mil.sample", "910-555-0142", "Signed your 2024 patient meal job. Ask this office for a performance rating."),
-      spec("wom-3", "Harold Beckett", "harold.beckett@army.mil.sample", "910-555-0143"),
-      fpm("wom-4", "Lt. Col. Alicia Brandt", "alicia.brandt@army.mil.sample", "910-555-0144", "Runs nutrition care. She knows your trays."),
+      sblo("wom-1", "Denise Tran", "d.tran@army.mil.sample", "910-555-0141", "Small business advocate for the medical center's contracts."),
+      co("wom-2", "Capt. Dwayne Ellison", "d.ellison@army.mil.sample", "910-555-0142", "Signed your 2024 patient meal job. Ask this office for a performance rating."),
+      spec("wom-3", "Harold Beckett", "h.beckett@army.mil.sample", "910-555-0143"),
+      fpm("wom-4", "Lt. Col. Alicia Brandt", "a.brandt@army.mil.sample", "910-555-0144", "Runs nutrition care. She knows your trays."),
     ],
     analysis: analysis(
       "worth-it",
@@ -166,9 +166,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["43rd Air Mobility", "Pope Army"],
     awardAgencies: ab(A.pope.abbrev),
     officers: [
-      sblo("pope-1", "Ronda Pierce", "ronda.pierce@af.mil.sample", "910-555-0151"),
-      co("pope-2", "Maj. Elena Kowalski", "elena.kowalski@af.mil.sample", "910-555-0152", "Signs the event catering awards."),
-      spec("pope-3", "SSgt. Terrell Jacobs", "terrell.jacobs@af.mil.sample", "910-555-0153"),
+      sblo("pope-1", "Ronda Pierce", "r.pierce@af.mil.sample", "910-555-0151"),
+      co("pope-2", "Maj. Elena Kowalski", "e.kowalski@af.mil.sample", "910-555-0152", "Signs the event catering awards."),
+      spec("pope-3", "SSgt. Terrell Jacobs", "t.jacobs@af.mil.sample", "910-555-0153"),
     ],
     analysis: analysis(
       "worth-it",
@@ -197,11 +197,11 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Network Contracting Office 6"],
     awardAgencies: ab(A.vaNco6.abbrev),
     officers: [
-      sblo("va-1", "Monique Fairbanks", "monique.fairbanks@va.gov.sample", "919-555-0161", "Small business specialist for the network."),
-      co("va-2", "Walter Nakamura", "walter.nakamura@va.gov.sample", "919-555-0162"),
-      co("va-3", "Lorraine Dubois", "lorraine.dubois@va.gov.sample", "919-555-0163", "Patient meal and dietary contracts."),
-      spec("va-4", "Kevin Adeyemi", "kevin.adeyemi@va.gov.sample", "919-555-0164"),
-      fpm("va-5", "Dr. Samantha Rowe", "samantha.rowe@va.gov.sample", "910-555-0165", "Chief of nutrition and food service, Fayetteville VA Medical Center."),
+      sblo("va-1", "Monique Fairbanks", "m.fairbanks@va.gov.sample", "919-555-0161", "Small business specialist for the network."),
+      co("va-2", "Walter Nakamura", "w.nakamura@va.gov.sample", "919-555-0162"),
+      co("va-3", "Lorraine Dubois", "l.dubois@va.gov.sample", "919-555-0163", "Patient meal and dietary contracts."),
+      spec("va-4", "Kevin Adeyemi", "k.adeyemi@va.gov.sample", "919-555-0164"),
+      fpm("va-5", "Dr. Samantha Rowe", "s.rowe@va.gov.sample", "910-555-0165", "Chief of nutrition and food service, Fayetteville VA Medical Center."),
     ],
     analysis: analysis(
       "worth-it",
@@ -231,10 +231,10 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Cumberland County, NC"],
     awardAgencies: [],
     officers: [
-      sblo("cc-1", "Anita Rivers", "anita.rivers@co.cumberland.nc.us.sample", "910-555-0171", "Runs small business outreach for purchasing."),
-      co("cc-2", "Calvin Moore", "calvin.moore@co.cumberland.nc.us.sample", "910-555-0172", "Purchasing manager. Signs sealed-bid awards."),
-      spec("cc-3", "Joy Mathis", "joy.mathis@co.cumberland.nc.us.sample", "910-555-0173"),
-      fpm("cc-4", "Capt. Roberto Salinas", "roberto.salinas@co.cumberland.nc.us.sample", "910-555-0174", "Detention center food service."),
+      sblo("cc-1", "Anita Rivers", "a.rivers@co.cumberland.nc.us.sample", "910-555-0171", "Runs small business outreach for purchasing."),
+      co("cc-2", "Calvin Moore", "c.moore@co.cumberland.nc.us.sample", "910-555-0172", "Purchasing manager. Signs sealed-bid awards."),
+      spec("cc-3", "Joy Mathis", "j.mathis@co.cumberland.nc.us.sample", "910-555-0173"),
+      fpm("cc-4", "Capt. Roberto Salinas", "r.salinas@co.cumberland.nc.us.sample", "910-555-0174", "Detention center food service."),
     ],
     analysis: analysis(
       "worth-it",
@@ -264,9 +264,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Cumberland County Schools"],
     awardAgencies: [],
     officers: [
-      sblo("ccs-1", "Tamika Bell", "tamika.bell@ccs.k12.nc.us.sample", "910-555-0181", "Outreach for small and local vendors."),
-      co("ccs-2", "Gordon Yates", "gordon.yates@ccs.k12.nc.us.sample", "910-555-0182", "Purchasing director."),
-      fpm("ccs-3", "Janet Reyes", "janet.reyes@ccs.k12.nc.us.sample", "910-555-0183", "Child Nutrition Director. Your reference from the 2023 summer meals job."),
+      sblo("ccs-1", "Tamika Bell", "t.bell@ccs.k12.nc.us.sample", "910-555-0181", "Outreach for small and local vendors."),
+      co("ccs-2", "Gordon Yates", "g.yates@ccs.k12.nc.us.sample", "910-555-0182", "Purchasing director."),
+      fpm("ccs-3", "Janet Reyes", "j.reyes@ccs.k12.nc.us.sample", "910-555-0183", "Child Nutrition Director. Your reference from the 2023 summer meals job."),
     ],
     analysis: analysis(
       "worth-it",
@@ -296,9 +296,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["City of Fayetteville"],
     awardAgencies: [],
     officers: [
-      sblo("fay-1", "Lena Hargrove", "lena.hargrove@fayettevillenc.gov.sample", "910-555-0191", "Local business program."),
-      co("fay-2", "Dominic Reyes", "dominic.reyes@fayettevillenc.gov.sample", "910-555-0192"),
-      spec("fay-3", "Ayesha Khan", "ayesha.khan@fayettevillenc.gov.sample", "910-555-0193"),
+      sblo("fay-1", "Lena Hargrove", "l.hargrove@fayettevillenc.gov.sample", "910-555-0191", "Local business program."),
+      co("fay-2", "Dominic Reyes", "d.reyes@fayettevillenc.gov.sample", "910-555-0192"),
+      spec("fay-3", "Ayesha Khan", "a.khan@fayettevillenc.gov.sample", "910-555-0193"),
     ],
     analysis: analysis(
       "maybe",
@@ -327,9 +327,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["North Carolina National Guard"],
     awardAgencies: ab(A.ncng.abbrev),
     officers: [
-      sblo("ng-1", "Sgt. Maj. Curtis Lowe", "curtis.lowe@ng.army.mil.sample", "919-555-0201"),
-      co("ng-2", "Beth Anne Parrish", "bethanne.parrish@ng.army.mil.sample", "919-555-0202", "State purchasing, Joint Force Headquarters."),
-      fpm("ng-3", "CW3 Raymond Ortega", "raymond.ortega@ng.army.mil.sample", "910-555-0203", "Armory food program, Hope Mills."),
+      sblo("ng-1", "Sgt. Maj. Curtis Lowe", "c.lowe@ng.army.mil.sample", "919-555-0201"),
+      co("ng-2", "Beth Anne Parrish", "b.parrish@ng.army.mil.sample", "919-555-0202", "State purchasing, Joint Force Headquarters."),
+      fpm("ng-3", "CW3 Raymond Ortega", "r.ortega@ng.army.mil.sample", "910-555-0203", "Armory food program, Hope Mills."),
     ],
     analysis: analysis(
       "maybe",
@@ -359,11 +359,11 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Camp Lejeune", "New River"],
     awardAgencies: ab(A.lejeune.abbrev, A.newRiver.abbrev),
     officers: [
-      sblo("lej-1", "Yvette Hammond", "yvette.hammond@navy.mil.sample", "910-555-0211", "Mid-Atlantic small business deputy."),
-      co("lej-2", "LCDR Nathan Brooks", "nathan.brooks@navy.mil.sample", "910-555-0212"),
-      co("lej-3", "Colleen Pruitt", "colleen.pruitt@navy.mil.sample", "910-555-0213", "Mess attendant contracts."),
-      spec("lej-4", "Isaiah Greer", "isaiah.greer@navy.mil.sample", "910-555-0214"),
-      fpm("lej-5", "MSgt. Omar Castillo", "omar.castillo@usmc.mil.sample", "910-555-0215", "Oversees the dining halls."),
+      sblo("lej-1", "Yvette Hammond", "y.hammond@navy.mil.sample", "910-555-0211", "Mid-Atlantic small business deputy."),
+      co("lej-2", "LCDR Nathan Brooks", "n.brooks@navy.mil.sample", "910-555-0212"),
+      co("lej-3", "Colleen Pruitt", "c.pruitt@navy.mil.sample", "910-555-0213", "Mess attendant contracts."),
+      spec("lej-4", "Isaiah Greer", "i.greer@navy.mil.sample", "910-555-0214"),
+      fpm("lej-5", "MSgt. Omar Castillo", "o.castillo@usmc.mil.sample", "910-555-0215", "Oversees the dining halls."),
     ],
     analysis: analysis(
       "maybe",
@@ -393,10 +393,10 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["4th Contracting Squadron"],
     awardAgencies: ab(A.seymour.abbrev),
     officers: [
-      sblo("sj-1", "Bridget Okonkwo", "bridget.okonkwo@af.mil.sample", "919-555-0221"),
-      co("sj-2", "Capt. Jordan Meyers", "jordan.meyers@af.mil.sample", "919-555-0222", "Signed the lodging breakfast award you bid on."),
-      spec("sj-3", "MSgt. Calvin Reeves", "calvin.reeves@af.mil.sample", "919-555-0223"),
-      fpm("sj-4", "TSgt. Naomi Fletcher", "naomi.fletcher@af.mil.sample", "919-555-0224"),
+      sblo("sj-1", "Bridget Okonkwo", "b.okonkwo@af.mil.sample", "919-555-0221"),
+      co("sj-2", "Capt. Jordan Meyers", "j.meyers@af.mil.sample", "919-555-0222", "Signed the lodging breakfast award you bid on."),
+      spec("sj-3", "MSgt. Calvin Reeves", "c.reeves@af.mil.sample", "919-555-0223"),
+      fpm("sj-4", "TSgt. Naomi Fletcher", "n.fletcher@af.mil.sample", "919-555-0224"),
     ],
     analysis: analysis(
       "maybe",
@@ -426,9 +426,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Cherry Point"],
     awardAgencies: ab(A.cherryPoint.abbrev),
     officers: [
-      sblo("chp-1", "Harriet Boyd", "harriet.boyd@navy.mil.sample", "252-555-0231"),
-      co("chp-2", "LtCol Samuel Whitaker", "samuel.whitaker@usmc.mil.sample", "252-555-0232"),
-      spec("chp-3", "Tobias Sandoval", "tobias.sandoval@navy.mil.sample", "252-555-0233"),
+      sblo("chp-1", "Harriet Boyd", "h.boyd@navy.mil.sample", "252-555-0231"),
+      co("chp-2", "LtCol Samuel Whitaker", "s.whitaker@usmc.mil.sample", "252-555-0232"),
+      spec("chp-3", "Tobias Sandoval", "t.sandoval@navy.mil.sample", "252-555-0233"),
     ],
     analysis: analysis(
       "not-yet",
@@ -457,9 +457,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Robeson County"],
     awardAgencies: [],
     officers: [
-      sblo("rob-1", "Patricia Lowry", "patricia.lowry@robeson.k12.nc.us.sample", "910-555-0241"),
-      co("rob-2", "Terrence Bullard", "terrence.bullard@robeson.k12.nc.us.sample", "910-555-0242"),
-      fpm("rob-3", "Gail Henderson", "gail.henderson@robeson.k12.nc.us.sample", "910-555-0243", "Child nutrition services."),
+      sblo("rob-1", "Patricia Lowry", "p.lowry@robeson.k12.nc.us.sample", "910-555-0241"),
+      co("rob-2", "Terrence Bullard", "t.bullard@robeson.k12.nc.us.sample", "910-555-0242"),
+      fpm("rob-3", "Gail Henderson", "g.henderson@robeson.k12.nc.us.sample", "910-555-0243", "Child nutrition services."),
     ],
     analysis: analysis(
       "maybe",
@@ -487,9 +487,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Durham County"],
     awardAgencies: [],
     officers: [
-      sblo("dur-1", "Monica Alvarez", "monica.alvarez@dconc.gov.sample", "919-555-0251"),
-      co("dur-2", "Edward Kincaid", "edward.kincaid@dconc.gov.sample", "919-555-0252"),
-      fpm("dur-3", "Lakisha Monroe", "lakisha.monroe@dconc.gov.sample", "919-555-0253", "Senior nutrition program."),
+      sblo("dur-1", "Monica Alvarez", "m.alvarez@dconc.gov.sample", "919-555-0251"),
+      co("dur-2", "Edward Kincaid", "e.kincaid@dconc.gov.sample", "919-555-0252"),
+      fpm("dur-3", "Lakisha Monroe", "l.monroe@dconc.gov.sample", "919-555-0253", "Senior nutrition program."),
     ],
     analysis: analysis(
       "not-yet",
@@ -517,9 +517,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["GSA Region 4", "General Services Administration"],
     awardAgencies: ab(A.gsa4.abbrev),
     officers: [
-      sblo("gsa-1", "Veronica Pratt", "veronica.pratt@gsa.gov.sample", "336-555-0261"),
-      co("gsa-2", "Dale Harmon", "dale.harmon@gsa.gov.sample", "336-555-0262"),
-      spec("gsa-3", "Jun Tanaka", "jun.tanaka@gsa.gov.sample", "336-555-0263"),
+      sblo("gsa-1", "Veronica Pratt", "v.pratt@gsa.gov.sample", "336-555-0261"),
+      co("gsa-2", "Dale Harmon", "d.harmon@gsa.gov.sample", "336-555-0262"),
+      spec("gsa-3", "Jun Tanaka", "j.tanaka@gsa.gov.sample", "336-555-0263"),
     ],
     analysis: analysis(
       "not-yet",
@@ -547,9 +547,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Fort Jackson"],
     awardAgencies: ab(A.fortJackson.abbrev),
     officers: [
-      sblo("fj-1", "Gloria Ashby", "gloria.ashby@army.mil.sample", "803-555-0271"),
-      co("fj-2", "Maj. Peter Lindgren", "peter.lindgren@army.mil.sample", "803-555-0272"),
-      fpm("fj-3", "SFC Anthony Duval", "anthony.duval@army.mil.sample", "803-555-0273"),
+      sblo("fj-1", "Gloria Ashby", "g.ashby@army.mil.sample", "803-555-0271"),
+      co("fj-2", "Maj. Peter Lindgren", "p.lindgren@army.mil.sample", "803-555-0272"),
+      fpm("fj-3", "SFC Anthony Duval", "a.duval@army.mil.sample", "803-555-0273"),
     ],
     analysis: analysis(
       "not-yet",
@@ -577,9 +577,9 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Naval Station Norfolk"],
     awardAgencies: ab(A.norfolk.abbrev),
     officers: [
-      sblo("nor-1", "Rhonda Saunders", "rhonda.saunders@navy.mil.sample", "757-555-0281"),
-      co("nor-2", "LCDR Katherine Moyer", "katherine.moyer@navy.mil.sample", "757-555-0282"),
-      spec("nor-3", "Elliott Voss", "elliott.voss@navy.mil.sample", "757-555-0283"),
+      sblo("nor-1", "Rhonda Saunders", "r.saunders@navy.mil.sample", "757-555-0281"),
+      co("nor-2", "LCDR Katherine Moyer", "k.moyer@navy.mil.sample", "757-555-0282"),
+      spec("nor-3", "Elliott Voss", "e.voss@navy.mil.sample", "757-555-0283"),
     ],
     analysis: analysis(
       "not-yet",

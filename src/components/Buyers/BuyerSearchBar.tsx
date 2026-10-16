@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Search, MapPin, UtensilsCrossed } from "lucide-react";
 
 export function BuyerSearchBar({

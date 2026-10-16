@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 // Consolidated: "Agencies" merged into "Government Buyers" — one buyer surface.

@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { useMemo, useState } from "react";
 import { X, Mail, CheckCircle2, Copy } from "lucide-react";
 import type { GovBuyer, BuyerOfficer } from "@/lib/mock/governmentBuyers";

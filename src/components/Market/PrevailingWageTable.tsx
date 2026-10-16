@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, MapPin } from "lucide-react";
 import {

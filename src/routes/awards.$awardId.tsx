@@ -1,9 +1,11 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type MouseEvent } from "react";
 import { Bookmark, BookmarkCheck, Clock3, RotateCcw } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { isEmbeddedInGhl, requestCrossPageNav } from "../lib/ghlNav";
-import { AMIRA_FIRM } from "../demo/explore/firms";
+import { AMIRA_FIRM, CAROLINA_DINING } from "../demo/explore/firms";
+import { KEY_PARTNER } from "../demo/story/persona";
 import { useSavedAwards } from "../lib/useSavedAwards";
 import {
   atLeastSubs,
@@ -304,6 +306,8 @@ function AwardDetailPage() {
         </section>
       )}
 
+      {/* DEMO: the "Do they hire small firms?" box is about someone else's company, so it is left out of Amira's own job. */}
+      {!isMine && (
       <section className="award-block">
         <h2 className="award-block__h">Do they hire small firms?</h2>
         {award.bench ? (
@@ -341,12 +345,13 @@ function AwardDetailPage() {
           &ldquo;at least this many&rdquo;.
         </p>
       </section>
+      )}
 
       {/* The fifth PRD section (awards-prd §3), and the one that tells a member what to
           DO. Everything above says what happened; this says whether to call today or
           prepare for a date. Suppressed entirely when we know neither the rebid date nor
           the award's age — an unknown timeline gets no advice rather than a guess. */}
-      {happensNext && (
+      {happensNext && !isMine && (
         <section className="award-block">
           <h2 className="award-block__h">What happens next</h2>
           <p className="t-body-sm">{happensNext}</p>
@@ -366,6 +371,12 @@ function AwardDetailPage() {
           <p className="award-note">
             This is your own job. Ask the contracting officer for a performance rating (CPARS) so
             the next buyer can read it.
+          </p>
+        ) : award.winner.awardeeKey === CAROLINA_DINING.key ? (
+          // DEMO: Amira already knows a person at Carolina Dining Group.
+          <p className="award-note">
+            You already know {KEY_PARTNER.contact}, {KEY_PARTNER.contactTitle}, at{" "}
+            {award.winner.name}, from your 2024 subcontract. Ask him about the recompete.
           </p>
         ) : (
           <p className="award-note">

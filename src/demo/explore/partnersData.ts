@@ -63,7 +63,7 @@ const SPECS: Spec[] = [
     trade: TRADE_DIRECT,
     bench: { distinctSubs: 7, repeatSubs: 3, trend: "growing" },
     momentum: 0.18,
-    breakdown: { S1: 12, S2: 20, S3: 14, S5: 11, S7: 9, W1: 25, W2: 18 },
+    breakdown: { S1: 12, S2: 20, S3: 14, S5: 11, S7: 9, W1: 25, W2: 22 },
     storyReasons: [
       {
         signal: "W1",
