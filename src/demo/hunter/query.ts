@@ -21,8 +21,28 @@ import { savedRows, type FeedRow, type FeedTabId } from "./data";
 export type FacetName = "location" | "naics" | "setAsides" | "valueRange" | "dueWindow";
 
 const STOP_WORDS = new Set([
-  "a", "an", "the", "in", "on", "at", "of", "for", "to", "and", "or", "with", "near", "me", "my",
-  "job", "jobs", "work", "opportunity", "opportunities", "contract", "contracts",
+  "a",
+  "an",
+  "the",
+  "in",
+  "on",
+  "at",
+  "of",
+  "for",
+  "to",
+  "and",
+  "or",
+  "with",
+  "near",
+  "me",
+  "my",
+  "job",
+  "jobs",
+  "work",
+  "opportunity",
+  "opportunities",
+  "contract",
+  "contracts",
 ]);
 
 /** A word cut to its root, so "meals" finds "meal" and "catering" finds "caterers". */
@@ -66,7 +86,11 @@ const VEHICLE_TEXT: Record<string, RegExp> = {
 };
 
 /** True when the value estimate touches the range. No stated value never does. */
-export function valueFits(range: { min: number | null; max: number | null }, low: number | null, high: number | null): boolean {
+export function valueFits(
+  range: { min: number | null; max: number | null },
+  low: number | null,
+  high: number | null,
+): boolean {
   if (low === null && high === null) return false;
   return valueRangeOverlaps(range, low, high);
 }
@@ -90,18 +114,25 @@ export function rowMatches(row: FeedRow, f: ServerFilters, skip?: FacetName): bo
     const states = f.location?.states ?? [];
     const cities = f.location?.cities ?? [];
     if (states.length || cities.length) {
-      const hit = states.includes(row.state) || cities.some((c) => c.toLowerCase() === row.city.toLowerCase());
+      const hit =
+        states.includes(row.state) ||
+        cities.some((c) => c.toLowerCase() === row.city.toLowerCase());
       if (!hit) return false;
     }
   }
 
-  if (f.noticeTypes?.length && !f.noticeTypes.some((id) => row.noticeIds.includes(id))) return false;
+  if (f.noticeTypes?.length && !f.noticeTypes.some((id) => row.noticeIds.includes(id)))
+    return false;
 
   if (skip !== "dueWindow" && f.dueWindow?.length) {
     if (!inWindow(row.o.closesInDays, f.dueWindow)) return false;
   }
 
-  if (skip !== "valueRange" && f.valueRange && (f.valueRange.min !== null || f.valueRange.max !== null)) {
+  if (
+    skip !== "valueRange" &&
+    f.valueRange &&
+    (f.valueRange.min !== null || f.valueRange.max !== null)
+  ) {
     if (!valueFits(f.valueRange, row.low, row.high)) return false;
   }
 
@@ -112,7 +143,8 @@ export function rowMatches(row: FeedRow, f: ServerFilters, skip?: FacetName): bo
     if (!f.vehicles.some((id) => VEHICLE_TEXT[id]?.test(text))) return false;
   }
 
-  if (f.psc?.length && !f.psc.some((code) => row.psc.toLowerCase().startsWith(code.toLowerCase()))) return false;
+  if (f.psc?.length && !f.psc.some((code) => row.psc.toLowerCase().startsWith(code.toLowerCase())))
+    return false;
 
   if (f.popZips?.length && !(row.zip && f.popZips.includes(row.zip))) return false;
 
@@ -126,7 +158,11 @@ export function rowMatches(row: FeedRow, f: ServerFilters, skip?: FacetName): bo
   return true;
 }
 
-export function applyFilters(rows: FeedRow[], f: ServerFilters | undefined, skip?: FacetName): FeedRow[] {
+export function applyFilters(
+  rows: FeedRow[],
+  f: ServerFilters | undefined,
+  skip?: FacetName,
+): FeedRow[] {
   if (!f) return rows;
   return rows.filter((r) => rowMatches(r, f, skip));
 }
@@ -148,7 +184,8 @@ function valueKey(row: FeedRow): number | null {
 
 /** Hunter's own order for the For You tab: rank 1 first. Other rows go by score. */
 function matchKey(row: FeedRow, tab: FeedTabId): number {
-  if (tab === "for_you" && row.o.hunter.forYouRank !== undefined) return 1000 - row.o.hunter.forYouRank;
+  if (tab === "for_you" && row.o.hunter.forYouRank !== undefined)
+    return 1000 - row.o.hunter.forYouRank;
   return row.o.hunter.score;
 }
 
@@ -189,7 +226,8 @@ export function sortRows(rows: FeedRow[], sort: ServerSort | undefined, tab: Fee
   return [...rows].sort((a, b) => {
     const ka = keyOf(a);
     const kb = keyOf(b);
-    if (ka === null && kb === null) return (indexInStory.get(a.id) ?? 0) - (indexInStory.get(b.id) ?? 0);
+    if (ka === null && kb === null)
+      return (indexInStory.get(a.id) ?? 0) - (indexInStory.get(b.id) ?? 0);
     if (ka === null) return 1;
     if (kb === null) return -1;
     if (ka !== kb) return (ka - kb) * dir;
@@ -215,14 +253,26 @@ export function pageOf<T>(items: T[], page?: number, limit?: number): Page<T> {
   const totalPages = Math.max(1, Math.ceil(items.length / size));
   const at = Math.max(1, Math.floor(page ?? 1));
   const start = (at - 1) * size;
-  return { data: items.slice(start, start + size), total: items.length, page: at, limit: size, totalPages };
+  return {
+    data: items.slice(start, start + size),
+    total: items.length,
+    page: at,
+    limit: size,
+    totalPages,
+  };
 }
 
 /** Runs one request end to end: universe, filters, sort, page. */
 export function runFeed(
   tab: FeedTabId,
   rows: FeedRow[],
-  body: { filters?: ServerFilters; sort?: ServerSort; search?: string; page?: number; limit?: number },
+  body: {
+    filters?: ServerFilters;
+    sort?: ServerSort;
+    search?: string;
+    page?: number;
+    limit?: number;
+  },
 ): Page<FeedRow> {
   const filters: ServerFilters = { ...(body.filters ?? {}) };
   // The All tab puts the search text in `filters.search`. The Saved tab sends it at the top.

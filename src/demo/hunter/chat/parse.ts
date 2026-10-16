@@ -38,14 +38,20 @@ export function amountOf(num: string, unit?: string): number {
   return Math.round(n);
 }
 
-function valueDelta(norm: string): { range: { min: number | null; max: number | null }; text: string } | null {
-  if (/\b(my|right|good) (size|range)\b|in my range|my sweet spot|jobs my size|size range/.test(norm)) {
+function valueDelta(
+  norm: string,
+): { range: { min: number | null; max: number | null }; text: string } | null {
+  if (
+    /\b(my|right|good) (size|range)\b|in my range|my sweet spot|jobs my size|size range/.test(norm)
+  ) {
     return {
       range: { min: PERSONA.targetValueMin, max: PERSONA.targetValueMax },
       text: `in your ${money(PERSONA.targetValueMin)} to ${money(PERSONA.targetValueMax)} range`,
     };
   }
-  const between = norm.match(new RegExp(String.raw`\b(?:between|from)\s+${AMOUNT}\s*(?:and|to|-)\s*${AMOUNT}`));
+  const between = norm.match(
+    new RegExp(String.raw`\b(?:between|from)\s+${AMOUNT}\s*(?:and|to|-)\s*${AMOUNT}`),
+  );
   if (between) {
     const second = amountOf(between[3], between[4] ?? between[2]);
     const first = amountOf(between[1], between[2] ?? between[4]);
@@ -53,14 +59,18 @@ function valueDelta(norm: string): { range: { min: number | null; max: number | 
     return { range: { min, max }, text: `worth ${money(min)} to ${money(max)}` };
   }
   const max = norm.match(
-    new RegExp(String.raw`\b(?:under|below|less than|up to|upto|at most|no more than|max|maximum|cheaper than|smaller than|not over|lower than|capped at)\s+${AMOUNT}`),
+    new RegExp(
+      String.raw`\b(?:under|below|less than|up to|upto|at most|no more than|max|maximum|cheaper than|smaller than|not over|lower than|capped at)\s+${AMOUNT}`,
+    ),
   );
   if (max) {
     const v = amountOf(max[1], max[2]);
     return { range: { min: null, max: v }, text: `under ${money(v)}` };
   }
   const min = norm.match(
-    new RegExp(String.raw`\b(?:over|above|more than|at least|minimum|min|bigger than|larger than|greater than|starting at|exceeding)\s+${AMOUNT}`),
+    new RegExp(
+      String.raw`\b(?:over|above|more than|at least|minimum|min|bigger than|larger than|greater than|starting at|exceeding)\s+${AMOUNT}`,
+    ),
   );
   if (min) {
     const v = amountOf(min[1], min[2]);
@@ -100,7 +110,10 @@ const CITY_NAMES: { rx: RegExp; city: string }[] = [
 const INSTALLATIONS: { rx: RegExp; search: string }[] = [
   { rx: /\bfort bragg\b|\bft bragg\b|\bfort liberty\b/, search: "Fort Bragg" },
   { rx: /\bcamp mackall\b|\bmackall\b/, search: "Camp Mackall" },
-  { rx: /\bpope army airfield\b|\bpope field\b|\bpope aaf\b|\bpope\b/, search: "Pope Army Airfield" },
+  {
+    rx: /\bpope army airfield\b|\bpope field\b|\bpope aaf\b|\bpope\b/,
+    search: "Pope Army Airfield",
+  },
   { rx: /\bcamp lejeune\b|\blejeune\b/, search: "Camp Lejeune" },
   { rx: /\bseymour johnson\b/, search: "Seymour Johnson" },
   { rx: /\bcherry point\b/, search: "Cherry Point" },
@@ -132,14 +145,22 @@ function stateCodes(raw: string, norm: string): string[] {
     if (wholeName.test(norm)) {
       const west = name === "virginia" && /\bwest virginia\b/.test(norm);
       // "Virginia Beach" is a city, not the state.
-      const beachOnly = name === "virginia" && /virginia beach/.test(norm) && !/\bvirginia\b(?! beach)/.test(norm);
+      const beachOnly =
+        name === "virginia" && /virginia beach/.test(norm) && !/\bvirginia\b(?! beach)/.test(norm);
       if (!west && !beachOnly) out.add(code);
       continue;
     }
     // The code, in capitals ("NC", "VA"), or in lower case after "in", "and", "or", "to".
-    const caps = new RegExp(String.raw`(?:^|[^A-Za-z])${code}(?![A-Za-z])(?!\s+${agencyWord})`, "i");
-    const typedInCaps = new RegExp(String.raw`(?:^|[^A-Za-z])${code}(?![A-Za-z])(?!\s+${agencyWord})`).test(raw);
-    const lower = new RegExp(String.raw`\b(?:in|and|or|to|only|for|around|across|within)\s+${code.toLowerCase()}\b(?!\s+${agencyWord})`).test(norm);
+    const caps = new RegExp(
+      String.raw`(?:^|[^A-Za-z])${code}(?![A-Za-z])(?!\s+${agencyWord})`,
+      "i",
+    );
+    const typedInCaps = new RegExp(
+      String.raw`(?:^|[^A-Za-z])${code}(?![A-Za-z])(?!\s+${agencyWord})`,
+    ).test(raw);
+    const lower = new RegExp(
+      String.raw`\b(?:in|and|or|to|only|for|around|across|within)\s+${code.toLowerCase()}\b(?!\s+${agencyWord})`,
+    ).test(norm);
     void caps;
     if (typedInCaps || lower) out.add(code);
   }
@@ -149,10 +170,26 @@ function stateCodes(raw: string, norm: string): string[] {
 // ── The whole sentence ──────────────────────────────────────────────────────
 
 const WINDOWS: [RegExp, string, string][] = [
-  [/\b(this week|next week|7 days|seven days|within a week|in a week)\b/, "this_week", "closing within 7 days"],
-  [/\b(2 weeks|two weeks|14 days|fortnight|couple of weeks)\b/, "2_weeks", "closing within 2 weeks"],
-  [/\b(30 days|a month|this month|one month|4 weeks|four weeks)\b/, "30_days", "closing within 30 days"],
-  [/\b(60 days|two months|2 months|60\+|60 plus|plenty of time|lots of time|long runway)\b/, "60_plus", "closing in 60+ days"],
+  [
+    /\b(this week|next week|7 days|seven days|within a week|in a week)\b/,
+    "this_week",
+    "closing within 7 days",
+  ],
+  [
+    /\b(2 weeks|two weeks|14 days|fortnight|couple of weeks)\b/,
+    "2_weeks",
+    "closing within 2 weeks",
+  ],
+  [
+    /\b(30 days|a month|this month|one month|4 weeks|four weeks)\b/,
+    "30_days",
+    "closing within 30 days",
+  ],
+  [
+    /\b(60 days|two months|2 months|60\+|60 plus|plenty of time|lots of time|long runway)\b/,
+    "60_plus",
+    "closing in 60+ days",
+  ],
 ];
 
 /**
@@ -166,9 +203,14 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   let notHers: string | undefined;
 
   // Set-asides
-  if (/\b(sdvosb|veteran|vosb)\b/.test(norm) && !/veterans affairs/.test(norm)) notHers = "veteran-owned (SDVOSB)";
+  if (/\b(sdvosb|veteran|vosb)\b/.test(norm) && !/veterans affairs/.test(norm))
+    notHers = "veteran-owned (SDVOSB)";
   else if (/\b8\s?\(?a\)?\b|hubzone|hub zone|tribal|native american/.test(norm)) {
-    notHers = /hubzone|hub zone/.test(norm) ? "HUBZone" : /tribal|native/.test(norm) ? "tribal" : "8(a)";
+    notHers = /hubzone|hub zone/.test(norm)
+      ? "HUBZone"
+      : /tribal|native/.test(norm)
+        ? "tribal"
+        : "8(a)";
   }
   if (/\b(woman|women|wosb|edwosb)\b/.test(norm)) {
     delta.setAsides = ["WOSB"];
@@ -176,14 +218,20 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   } else if (/\bsmall business (set.?asides?|only|jobs)\b|\bsba set.?aside/.test(norm)) {
     delta.setAsides = ["SB"];
     nouns.push("small-business set-asides");
-  } else if (/\bno set.?aside|open (competition|to all|to everyone)|full and open|unrestricted/.test(norm)) {
+  } else if (
+    /\bno set.?aside|open (competition|to all|to everyone)|full and open|unrestricted/.test(norm)
+  ) {
     delta.setAsides = ["FULL_OPEN"];
     mods.push("with no set-aside");
   }
 
   // Buyer lane
   const search: string[] = [];
-  if (/\b(state and local|state & local|state or local|sled|local government|municipal|county|school district|state agenc\w+|state (jobs?|work|contracts?|opportunities|buyers?|government))\b/.test(norm)) {
+  if (
+    /\b(state and local|state & local|state or local|sled|local government|municipal|county|school district|state agenc\w+|state (jobs?|work|contracts?|opportunities|buyers?|government))\b/.test(
+      norm,
+    )
+  ) {
     delta.scope = { fed: false, sled: true };
     mods.push("from state and local buyers");
   } else if (/\b(federal|fed)\b/.test(norm) && !/\bnot federal\b/.test(norm)) {
@@ -211,10 +259,16 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   if (/\bsources? sought\b/.test(norm)) {
     delta.noticeTypes = ["sources_sought"];
     nouns.push("Sources Sought notices");
-  } else if (/\brfqs?\b|request for quotes?|\bquotes?\b(?! ?me)/.test(norm) && /\b(show|only|just|find|filter|give)\b/.test(norm)) {
+  } else if (
+    /\brfqs?\b|request for quotes?|\bquotes?\b(?! ?me)/.test(norm) &&
+    /\b(show|only|just|find|filter|give)\b/.test(norm)
+  ) {
     delta.noticeTypes = ["rfq"];
     nouns.push("requests for quote (RFQ)");
-  } else if (/\brfps?\b|request for proposals?/.test(norm) && /\b(show|only|just|find|filter|give)\b/.test(norm)) {
+  } else if (
+    /\brfps?\b|request for proposals?/.test(norm) &&
+    /\b(show|only|just|find|filter|give)\b/.test(norm)
+  ) {
     delta.noticeTypes = ["rfp"];
     nouns.push("requests for proposal (RFP)");
   }
@@ -237,10 +291,14 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
 
   // Posted date
   if (
-    /\b(what (has )?changed|any updates?|anything new|something new|what s different)\b/.test(norm) ||
+    /\b(what (has )?changed|any updates?|anything new|something new|what s different)\b/.test(
+      norm,
+    ) ||
     (/\b(new|newest|fresh|just posted|posted|brand new|latest|recent\w*)\b/.test(norm) &&
-    /\b(this week|last week|since last week|past week|7 days|seven days|week|recent\w*|new|newest|fresh|latest|today|yesterday|3 days|three days)\b/.test(norm) &&
-    !/\bnew business\b/.test(norm))
+      /\b(this week|last week|since last week|past week|7 days|seven days|week|recent\w*|new|newest|fresh|latest|today|yesterday|3 days|three days)\b/.test(
+        norm,
+      ) &&
+      !/\bnew business\b/.test(norm))
   ) {
     const days = /\btoday\b|\byesterday\b|\b1 day\b|\b24 hours\b/.test(norm)
       ? 1
@@ -250,12 +308,21 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
           ? 30
           : 7;
     delta.postedWithin = days;
-    mods.push(days === 7 ? "posted in the last 7 days" : days === 1 ? "posted in the last day" : `posted in the last ${days} days`);
+    mods.push(
+      days === 7
+        ? "posted in the last 7 days"
+        : days === 1
+          ? "posted in the last day"
+          : `posted in the last ${days} days`,
+    );
   }
 
   // Places: installations first, then cities, then states
   const within = norm.match(/\bwithin\s+(\d{1,3})\s*(?:miles|mi)\b/);
-  const near = /\b(near|nearby|close to|closest|around|local|close by|around me|near me|near my kitchen|near my place|short drive)\b/.test(norm);
+  const near =
+    /\b(near|nearby|close to|closest|around|local|close by|around me|near me|near my kitchen|near my place|short drive)\b/.test(
+      norm,
+    );
   const installation = INSTALLATIONS.find((i) => i.rx.test(norm));
   const cityHits = CITY_NAMES.filter((c) => c.rx.test(norm)).map((c) => c.city);
   if (installation && !(cityHits.includes("Fayetteville") && near)) {
@@ -271,7 +338,12 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   } else if (cityHits.length > 0) {
     delta.cities = cityHits;
     mods.push(`in ${cityHits.join(" and ")}`);
-  } else if (near && /\b(me|my kitchen|my place|my area|my town|my location|close by|nearby|home)\b|^(show|find|give).*\b(near|nearby|local|close)\b/.test(norm)) {
+  } else if (
+    near &&
+    /\b(me|my kitchen|my place|my area|my town|my location|close by|nearby|home)\b|^(show|find|give).*\b(near|nearby|local|close)\b/.test(
+      norm,
+    )
+  ) {
     delta.cities = citiesWithin(NEAR_MILES);
     mods.push(`within ${NEAR_MILES} miles of your kitchen`);
   }

@@ -34,7 +34,9 @@ function shared(row: FeedRow) {
 }
 
 /** One row of `POST /opportunities/discover/v2` (the For You tab). */
-export function toDiscoverDto(row: FeedRow): DiscoverV2OpportunityDto & { agency: { name: string; office: string } } {
+export function toDiscoverDto(
+  row: FeedRow,
+): DiscoverV2OpportunityDto & { agency: { name: string; office: string } } {
   const o = row.o;
   const inCodes = MEMBER_CODES.includes(o.naics);
   const eligible = holdsSetAside(row) && !o.clearanceRequired;

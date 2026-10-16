@@ -16,7 +16,11 @@ import { applyFilters, valueFits } from "./query";
 
 const DUE_WINDOW_IDS = ["this_week", "2_weeks", "30_days", "60_plus"] as const;
 
-function tally<T>(rows: FeedRow[], keys: (r: FeedRow) => T[], seed: Record<string, number> = {}): Record<string, number> {
+function tally<T>(
+  rows: FeedRow[],
+  keys: (r: FeedRow) => T[],
+  seed: Record<string, number> = {},
+): Record<string, number> {
   const out = { ...seed };
   for (const row of rows) {
     for (const key of keys(row)) {

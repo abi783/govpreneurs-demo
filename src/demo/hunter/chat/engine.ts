@@ -27,7 +27,12 @@ export function answer(body: MessageBody): Turn {
     text,
     norm: normalize(text),
     tab,
-    visible: visible.length > 0 ? visible : tab === "for_you" && body.surface !== "forecasts" ? forYouRows() : [],
+    visible:
+      visible.length > 0
+        ? visible
+        : tab === "for_you" && body.surface !== "forecasts"
+          ? forYouRows()
+          : [],
     feed,
     surface: body.surface === "forecasts" ? "forecasts" : "feed",
     raw: body.visibleOpps ?? [],
@@ -35,7 +40,11 @@ export function answer(body: MessageBody): Turn {
   if (!ctx.norm) {
     return {
       reply: "Ask me about your matches. For example: what's out there for me right now?",
-      chips: ["What's out there for me right now?", "What's new this week?", "How do you pick my matches?"],
+      chips: [
+        "What's out there for me right now?",
+        "What's new this week?",
+        "How do you pick my matches?",
+      ],
     };
   }
   for (const rule of ctx.surface === "forecasts" ? FORECAST_RULES : RULES) {
@@ -46,7 +55,9 @@ export function answer(body: MessageBody): Turn {
 }
 
 /** The handler for `POST /hunter-chat/message`. */
-export function handleHunterMessage(body: MessageBody): HunterTurnResponse & { suggestions?: string[] } {
+export function handleHunterMessage(
+  body: MessageBody,
+): HunterTurnResponse & { suggestions?: string[] } {
   const turn = answer(body);
   const n = readSession().turns + 1;
   updateSession((s) => ({ ...s, turns: n }));

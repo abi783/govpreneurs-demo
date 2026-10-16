@@ -1,11 +1,6 @@
 // DEMO (Hunter chat): the shapes that the scripted engine passes around.
 
-import type {
-  ActPayload,
-  FeedTab,
-  HunterTurnResponse,
-  VisibleOpp,
-} from "../../../lib/hunterChat";
+import type { ActPayload, FeedTab, HunterTurnResponse, VisibleOpp } from "../../../lib/hunterChat";
 import type { FeedContext } from "../feedContext";
 import type { FeedRow } from "../data";
 

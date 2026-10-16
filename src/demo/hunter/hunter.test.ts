@@ -18,15 +18,21 @@ import { publishFeedContext } from "./feedContext";
 import { handleHunterMessage } from "./chat/engine";
 import { CANON } from "./chat/intents";
 import type { ServerFilters } from "../../lib/discoverApi";
-import type { HunterTurnResponse } from "../../lib/hunterChat";
+import type { HunterFilterDelta, HunterTurnResponse } from "../../lib/hunterChat";
 
 const BANNED_WORDS = /\b(win|wins|winning|guarantee\w*|no-bid|lean bid)\b/i;
-const OLD_PERSONA = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|\bDEMO-[A-Z]+-\d+|HigherGov/i;
+const OLD_PERSONA =
+  /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|\bDEMO-[A-Z]+-\d+|HigherGov/i;
 
 beforeEach(() => {
   clearDemoState("workspace.savedOpps");
   clearDemoState("hunter.chat");
-  publishFeedContext({ tab: "for_you", lane: "all", filters: {}, sort: { field: "match", order: "desc" } });
+  publishFeedContext({
+    tab: "for_you",
+    lane: "all",
+    filters: {},
+    sort: { field: "match", order: "desc" },
+  });
 });
 
 describe("feed rows", () => {
@@ -41,8 +47,14 @@ describe("feed rows", () => {
   });
 
   it("lists the saved opportunities on the Saved tab", () => {
-    const saved = OPPORTUNITIES.filter((o) => o.saved).map((o) => o.id).sort();
-    expect(runFeed("saved", savedRows(), {}).data.map((r) => r.id).sort()).toEqual(saved);
+    const saved = OPPORTUNITIES.filter((o) => o.saved)
+      .map((o) => o.id)
+      .sort();
+    expect(
+      runFeed("saved", savedRows(), {})
+        .data.map((r) => r.id)
+        .sort(),
+    ).toEqual(saved);
   });
 
   it("fills every field of every row, with no undefined, NaN or old-persona text", () => {
@@ -100,13 +112,20 @@ describe("filters, sort and page", () => {
       [{ dueWindow: ["60_plus"] }, (r) => r.o.closesInDays >= 60],
       [{ postedWithin: 7 }, (r) => r.o.postedDaysAgo <= 7],
       [{ valueRange: { min: null, max: 500_000 } }, (r) => r.low !== null && r.low <= 500_000],
-      [{ valueRange: { min: 1_000_000, max: null } }, (r) => r.high !== null && r.high >= 1_000_000],
+      [
+        { valueRange: { min: 1_000_000, max: null } },
+        (r) => r.high !== null && r.high >= 1_000_000,
+      ],
       [{ agencies: ["Department of the Army"] }, (r) => r.o.agency === "Department of the Army"],
       [{ search: "mackall" }, (r) => /mackall/i.test(r.haystack)],
     ];
     for (const [filters, expected] of cases) {
       const got = applyFilters(all(), filters).map((r) => r.id);
-      expect(got, JSON.stringify(filters)).toEqual(all().filter(expected).map((r) => r.id));
+      expect(got, JSON.stringify(filters)).toEqual(
+        all()
+          .filter(expected)
+          .map((r) => r.id),
+      );
       expect(got.length, JSON.stringify(filters)).toBeGreaterThan(0);
     }
   });
@@ -124,19 +143,31 @@ describe("filters, sort and page", () => {
 
   it("sorts by deadline, value, newest and match", () => {
     const rows = all();
-    const deadlines = sortRows(rows, { field: "deadline", order: "asc" }, "all").map((r) => r.o.closesInDays);
+    const deadlines = sortRows(rows, { field: "deadline", order: "asc" }, "all").map(
+      (r) => r.o.closesInDays,
+    );
     expect(deadlines).toEqual([...deadlines].sort((a, b) => a - b));
-    const latest = sortRows(rows, { field: "deadline", order: "desc" }, "all").map((r) => r.o.closesInDays);
+    const latest = sortRows(rows, { field: "deadline", order: "desc" }, "all").map(
+      (r) => r.o.closesInDays,
+    );
     expect(latest).toEqual([...latest].sort((a, b) => b - a));
-    const newest = sortRows(rows, { field: "newest", order: "desc" }, "all").map((r) => r.o.postedDaysAgo);
+    const newest = sortRows(rows, { field: "newest", order: "desc" }, "all").map(
+      (r) => r.o.postedDaysAgo,
+    );
     expect(newest).toEqual([...newest].sort((a, b) => a - b));
     const value = sortRows(rows, { field: "value", order: "desc" }, "all");
     expect(value[value.length - 1].low).toBeNull();
     const mids = value.filter((r) => r.low !== null).map((r) => (r.low! + r.high!) / 2);
     expect(mids).toEqual([...mids].sort((a, b) => b - a));
-    const small = sortRows(rows, { field: "value", order: "asc" }, "all").filter((r) => r.low !== null);
-    expect((small[0].low! + small[0].high!) / 2).toBeLessThanOrEqual((small[1].low! + small[1].high!) / 2);
-    const byScore = sortRows(rows, { field: "match", order: "desc" }, "all").map((r) => r.o.hunter.score);
+    const small = sortRows(rows, { field: "value", order: "asc" }, "all").filter(
+      (r) => r.low !== null,
+    );
+    expect((small[0].low! + small[0].high!) / 2).toBeLessThanOrEqual(
+      (small[1].low! + small[1].high!) / 2,
+    );
+    const byScore = sortRows(rows, { field: "match", order: "desc" }, "all").map(
+      (r) => r.o.hunter.score,
+    );
     expect(byScore).toEqual([...byScore].sort((a, b) => b - a));
     // "Recently saved" puts the newest bookmark first.
     const saved = sortRows(savedRows(), { field: "saved", order: "desc" }, "saved");
@@ -243,7 +274,9 @@ describe("NAICS and PSC lookups", () => {
     expect(searchNaics("catering")[0].code).toBe("722320");
     expect(searchNaics("food")[0].code).toBe("722310");
     expect(searchNaics("mobile food")[0].code).toBe("722330");
-    expect(searchNaics("7223").map((r) => r.code)).toEqual(expect.arrayContaining(["722310", "722320", "722330"]));
+    expect(searchNaics("7223").map((r) => r.code)).toEqual(
+      expect.arrayContaining(["722310", "722320", "722330"]),
+    );
     expect(searchNaics("cafeteria").map((r) => r.code)).toContain("722514");
     expect(searchNaics("janitor").map((r) => r.code)).toContain("561720");
     expect(searchNaics("zzzz")).toEqual([]);
@@ -258,8 +291,13 @@ describe("NAICS and PSC lookups", () => {
 
 // ── Chat ────────────────────────────────────────────────────────────────────
 
-function ask(message: string, tab: "for_you" | "all" | "saved" = "for_you", visible?: string[]): HunterTurnResponse {
-  const rows = visible ?? (tab === "for_you" ? FOR_YOU.map((o) => o.id) : OPPORTUNITIES.map((o) => o.id));
+function ask(
+  message: string,
+  tab: "for_you" | "all" | "saved" = "for_you",
+  visible?: string[],
+): HunterTurnResponse {
+  const rows =
+    visible ?? (tab === "for_you" ? FOR_YOU.map((o) => o.id) : OPPORTUNITIES.map((o) => o.id));
   return handleHunterMessage({
     message,
     tab,
@@ -290,7 +328,11 @@ const STARTERS = [
 
 describe("Hunter chat on the Forecasts page", () => {
   const visibleOpps = [
-    { oppKey: "fc-1", title: "Dining facility food service at Fort Liberty", location: "Fort Liberty, NC" },
+    {
+      oppKey: "fc-1",
+      title: "Dining facility food service at Fort Liberty",
+      location: "Fort Liberty, NC",
+    },
     { oppKey: "fc-2", title: "Hospital patient meal service", location: "Durham, NC" },
     { oppKey: "fc-3", title: "School nutrition program", location: "Raleigh, NC" },
   ];
@@ -351,11 +393,20 @@ describe("Hunter chat", () => {
   it("compares ranks 1 to 3 on value, distance and set-aside, and points to Grant", () => {
     const r = ask("Compare my top 3 — which should I chase?");
     expect(r.uiPayload.kind).toBe("compare");
-    const data = r.uiPayload.data as { opps: { oppKey: string }[]; rows: { field: string; values: string[] }[] };
+    const data = r.uiPayload.data as {
+      opps: { oppKey: string }[];
+      rows: { field: string; values: string[] }[];
+    };
     expect(data.opps.map((o) => o.oppKey)).toEqual(FOR_YOU.slice(0, 3).map((o) => o.id));
     const fields = data.rows.map((x) => x.field);
-    expect(fields).toEqual(expect.arrayContaining(["Value", "Miles from your kitchen", "Who can compete"]));
-    expect(data.rows.find((x) => x.field === "Miles from your kitchen")!.values).toEqual(["45 miles", "3 miles", "3 miles"]);
+    expect(fields).toEqual(
+      expect.arrayContaining(["Value", "Miles from your kitchen", "Who can compete"]),
+    );
+    expect(data.rows.find((x) => x.field === "Miles from your kitchen")!.values).toEqual([
+      "45 miles",
+      "3 miles",
+      "3 miles",
+    ]);
     expect(r.chatReply).toMatch(/Grant/);
     expect(r.chatReply).not.toMatch(/go for/i);
   });
@@ -379,7 +430,10 @@ describe("Hunter chat", () => {
       ["only state and local", (f) => expect(f.scope).toEqual({ fed: false, sled: true })],
       ["under $500K", (f) => expect(f.valueRange).toEqual({ min: null, max: 500_000 })],
       ["over $1 million", (f) => expect(f.valueRange).toEqual({ min: 1_000_000, max: null })],
-      ["between 200k and 600k", (f) => expect(f.valueRange).toEqual({ min: 200_000, max: 600_000 })],
+      [
+        "between 200k and 600k",
+        (f) => expect(f.valueRange).toEqual({ min: 200_000, max: 600_000 }),
+      ],
       ["near Fayetteville", (f) => expect(f.cities).toContain("Fort Bragg")],
       ["what's new this week", (f) => expect(f.postedWithin).toBe(7)],
       ["show sources sought", (f) => expect(f.noticeTypes).toEqual(["sources_sought"])],
@@ -397,9 +451,15 @@ describe("Hunter chat", () => {
       // The count in the words is the count the feed returns for the same filters.
       const tab = data.tab === "all" ? "all" : "for_you";
       const server: ServerFilters = {};
-      const f = data.filters as Record<string, any>;
+      const f = data.filters as HunterFilterDelta;
       if (f.setAsides) server.setAsides = f.setAsides;
-      if (f.scope) server.scopes = f.scope.fed && !f.scope.sled ? ["fed"] : f.scope.sled && !f.scope.fed ? ["sled"] : undefined;
+      if (f.scope)
+        server.scopes =
+          f.scope.fed && !f.scope.sled
+            ? ["fed"]
+            : f.scope.sled && !f.scope.fed
+              ? ["sled"]
+              : undefined;
       if (f.valueRange) server.valueRange = f.valueRange;
       if (f.cities || f.states) server.location = { cities: f.cities, states: f.states };
       if (f.postedWithin) server.postedWithin = f.postedWithin;
@@ -408,7 +468,9 @@ describe("Hunter chat", () => {
       if (f.search) server.search = f.search;
       const rows = applyFilters(tab === "all" ? allRows() : forYouRows(), server);
       expect(rows.length, q).toBeGreaterThan(0);
-      const stated = r.chatReply.match(/(\d+) (matches|opportunities) fit|One (match|opportunity) fits/);
+      const stated = r.chatReply.match(
+        /(\d+) (matches|opportunities) fit|One (match|opportunity) fits/,
+      );
       expect(stated, `${q}: ${r.chatReply}`).toBeTruthy();
       expect(stated![1] ? Number(stated![1]) : 1, q).toBe(rows.length);
     }
@@ -439,9 +501,18 @@ describe("Hunter chat", () => {
   });
 
   it("moves between tabs, resets and saves", () => {
-    expect(ask("show my saved ones").uiPayload).toMatchObject({ kind: "switch_tab", data: { tab: "saved" } });
-    expect(ask("show all opportunities").uiPayload).toMatchObject({ kind: "switch_tab", data: { tab: "all" } });
-    expect(ask("back to my matches").uiPayload).toMatchObject({ kind: "switch_tab", data: { tab: "for_you" } });
+    expect(ask("show my saved ones").uiPayload).toMatchObject({
+      kind: "switch_tab",
+      data: { tab: "saved" },
+    });
+    expect(ask("show all opportunities").uiPayload).toMatchObject({
+      kind: "switch_tab",
+      data: { tab: "all" },
+    });
+    expect(ask("back to my matches").uiPayload).toMatchObject({
+      kind: "switch_tab",
+      data: { tab: "for_you" },
+    });
     expect(ask("start over").uiPayload.kind).toBe("reset");
     const before = savedRows().map((r) => r.id);
     const target = FOR_YOU.find((o) => !before.includes(o.id))!;
@@ -474,8 +545,12 @@ describe("Hunter chat", () => {
   it("answers about her profile, the method, one opportunity and the help question", () => {
     expect(ask("what do you know about my business").uiPayload.kind).toBe("profile");
     expect(ask("how do you pick").chatReply).toMatch(/four things/);
-    expect(ask("when does the Pope Army Airfield catering close").chatReply).toMatch(/closes in 11 days/);
-    expect(ask("how much is the Run two Fort Bragg dining halls worth").chatReply).toMatch(/\$1\.9M/);
+    expect(ask("when does the Pope Army Airfield catering close").chatReply).toMatch(
+      /closes in 11 days/,
+    );
+    expect(ask("how much is the Run two Fort Bragg dining halls worth").chatReply).toMatch(
+      /\$1\.9M/,
+    );
     expect(ask("what can you do").chatReply).toMatch(/discovery agent/);
     expect(ask("what closes first").uiPayload.kind).toBe("matches");
     expect(ask("who is Grant").chatReply).toMatch(/go or no-go/);
@@ -545,7 +620,11 @@ describe("Hunter chat", () => {
   });
 
   it("never says a verdict word, a win word, old persona text or undefined", () => {
-    const questions = [...STARTERS, ...CANON, "show only woman-owned set-asides under $500K near Fayetteville"];
+    const questions = [
+      ...STARTERS,
+      ...CANON,
+      "show only woman-owned set-asides under $500K near Fayetteville",
+    ];
     for (const q of questions) {
       const r = ask(q);
       const text = `${r.chatReply} ${JSON.stringify(r.uiPayload)} ${JSON.stringify(r.suggestions ?? [])}`;
@@ -571,7 +650,11 @@ describe("Hunter chat", () => {
 
   it("answers the first-meeting openers on every tab", () => {
     for (const tab of ["for_you", "all", "saved"] as const) {
-      for (const q of ["What's out there for me right now?", "What's new since last week?", "Which of these am I actually ready for?"]) {
+      for (const q of [
+        "What's out there for me right now?",
+        "What's new since last week?",
+        "Which of these am I actually ready for?",
+      ]) {
         const visible = tab === "saved" ? savedRows().map((r) => r.id) : undefined;
         const r = ask(q, tab, visible);
         expect(r.chatReply, `${tab} ${q}`).not.toMatch(/not sure what you mean/);

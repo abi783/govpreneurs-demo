@@ -48,7 +48,9 @@ export const titleOf = (row: FeedRow): string => row.o.plainTitle;
  */
 /** The name of an opportunity at the start of a sentence. */
 export function nameOf(row: FeedRow): string {
-  return row.o.noticeType === "Sources Sought" ? `The ${row.city} Sources Sought notice` : titleOf(row);
+  return row.o.noticeType === "Sources Sought"
+    ? `The ${row.city} Sources Sought notice`
+    : titleOf(row);
 }
 
 export function refOf(row: FeedRow): string {
@@ -97,9 +99,7 @@ export function whyMatch(row: FeedRow): Turn {
   const t = titleOf(row);
   const rank = row.o.hunter.forYouRank;
   const fit = row.o.hunter.fit;
-  const sentences = fit?.length
-    ? fit.map((f) => fitSentence(row, f))
-    : fallbackReasons(row);
+  const sentences = fit?.length ? fit.map((f) => fitSentence(row, f)) : fallbackReasons(row);
   const lead = rank
     ? `${nameOf(row)} is number ${rank} on your list. Here is why:`
     : `${nameOf(row)} is on the All opportunities tab, not on your For You list. Here is how it fits:`;
@@ -112,7 +112,11 @@ export function whyMatch(row: FeedRow): Turn {
         : `I explain the fit. ${GRANT_POINTER}`),
     kind: "matches",
     data: matchesPayload([row]),
-    chips: [chip.ready(row), chip.top3, ...(row.setAside === "WOSB" ? ["What is a WOSB set-aside?"] : [chip.how])].slice(0, 3),
+    chips: [
+      chip.ready(row),
+      chip.top3,
+      ...(row.setAside === "WOSB" ? ["What is a WOSB set-aside?"] : [chip.how]),
+    ].slice(0, 3),
   };
 }
 
@@ -125,9 +129,12 @@ function fallbackReasons(row: FeedRow): string[] {
       : "It is open to every business, so larger firms can compete too.",
   );
   const status = rangeStatus(row);
-  if (status === "in") out.push(`The value is ${aboutValue(row)}. That is inside your ${RANGE_TEXT} range.`);
-  else if (status === "above") out.push(`The value is ${aboutValue(row)}. That is above your ${RANGE_TEXT} range.`);
-  else if (status === "below") out.push(`The value is ${aboutValue(row)}. That is below your usual range.`);
+  if (status === "in")
+    out.push(`The value is ${aboutValue(row)}. That is inside your ${RANGE_TEXT} range.`);
+  else if (status === "above")
+    out.push(`The value is ${aboutValue(row)}. That is above your ${RANGE_TEXT} range.`);
+  else if (status === "below")
+    out.push(`The value is ${aboutValue(row)}. That is below your usual range.`);
   else out.push("The notice states no value yet.");
   out.push(
     row.miles > PERSONA.serviceRadiusMiles
@@ -158,7 +165,11 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
             : "You do not hold this status.",
           status: holdsSetAside(row) ? "pass" : "fail",
         }
-      : { field: "Set-aside", value: "None. Every business can compete, including large firms.", status: "pass" },
+      : {
+          field: "Set-aside",
+          value: "None. Every business can compete, including large firms.",
+          status: "pass",
+        },
   );
 
   rows.push({
@@ -169,7 +180,8 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
 
   const away = row.miles;
   rows.push(
-    away > PERSONA.serviceRadiusMiles || !(PERSONA.serviceStates as readonly string[]).includes(row.state)
+    away > PERSONA.serviceRadiusMiles ||
+      !(PERSONA.serviceStates as readonly string[]).includes(row.state)
       ? {
           field: "Place",
           value: `${row.city}, ${row.state}: ${away} miles from your kitchen. That is outside your ${PERSONA.serviceRadiusMiles}-mile area.`,
@@ -181,7 +193,11 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
             value: `${row.city}, ${row.state}: ${away} miles. That is inside your area, but a long daily haul.`,
             status: "warn",
           }
-        : { field: "Place", value: `${row.city}, ${row.state}: ${away} miles from your kitchen.`, status: "pass" },
+        : {
+            field: "Place",
+            value: `${row.city}, ${row.state}: ${away} miles from your kitchen.`,
+            status: "pass",
+          },
   );
 
   const range = rangeStatus(row);
@@ -189,14 +205,22 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
     range === "none"
       ? { field: "Contract size", value: "The notice states no value.", status: "neutral" }
       : range === "in"
-        ? { field: "Contract size", value: `${valueText(row)}. Inside your ${RANGE_TEXT} range.`, status: "pass" }
+        ? {
+            field: "Contract size",
+            value: `${valueText(row)}. Inside your ${RANGE_TEXT} range.`,
+            status: "pass",
+          }
         : range === "above"
           ? {
               field: "Contract size",
               value: `${valueText(row)}. Above your ${RANGE_TEXT} range.`,
               status: (row.low ?? 0) > PERSONA.targetValueMax * 4 ? "fail" : "warn",
             }
-          : { field: "Contract size", value: `${valueText(row)}. Below your usual range.`, status: "warn" },
+          : {
+              field: "Contract size",
+              value: `${valueText(row)}. Below your usual range.`,
+              status: "warn",
+            },
   );
 
   rows.push({
@@ -231,7 +255,8 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
   if (o.noticeType === "Sources Sought") {
     rows.push({
       field: "Notice type",
-      value: "Sources Sought. An early notice, not a bid yet. You reply to say that you can do the work.",
+      value:
+        "Sources Sought. An early notice, not a bid yet. You reply to say that you can do the work.",
       status: "neutral",
     });
   }
@@ -298,7 +323,9 @@ export function readiness(row: FeedRow): Turn {
       ` A team bid may fit better. ${KEY_PARTNER.name} holds the job now and looks for woman-owned subcontractors. ${GRANT_POINTER}`;
   } else if (warns.length > 0) {
     const care = warns.map((w) =>
-      w.field === "Time to respond" ? `only ${row.o.closesInDays} days are left to respond` : `the ${w.field.toLowerCase()} needs a look`,
+      w.field === "Time to respond"
+        ? `only ${row.o.closesInDays} days are left to respond`
+        : `the ${w.field.toLowerCase()} needs a look`,
     );
     reply = `Yes, you can compete for ${t}. ${rows.length - warns.length - fails.length} checks pass. ${cap(joinList(care))}. ${GRANT_POINTER}`;
   } else {
@@ -332,11 +359,13 @@ export function readiness(row: FeedRow): Turn {
 export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
   const picked = rows.slice(0, 4);
   const titles = picked.map(titleOf);
-  const bestIdx = <T,>(vals: T[], better: (a: T, b: T) => boolean): number | null => {
+  const bestIdx = <T>(vals: T[], better: (a: T, b: T) => boolean): number | null => {
     let best = 0;
     for (let i = 1; i < vals.length; i += 1) if (better(vals[i], vals[best])) best = i;
     // A tie has no winner.
-    return vals.filter((v) => !better(v, vals[best]) && !better(vals[best], v)).length > 1 ? null : best;
+    return vals.filter((v) => !better(v, vals[best]) && !better(vals[best], v)).length > 1
+      ? null
+      : best;
   };
   const mids = picked.map((r) => ((r.low ?? 0) + (r.high ?? r.low ?? 0)) / 2);
   const data: ComparePayload = {
@@ -355,27 +384,46 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
           (a, b) => a > b,
         ),
         notes: picked.map((r) =>
-          rangeStatus(r) === "in" ? "Inside your range" : rangeStatus(r) === "above" ? "Above your range" : null,
+          rangeStatus(r) === "in"
+            ? "Inside your range"
+            : rangeStatus(r) === "above"
+              ? "Above your range"
+              : null,
         ),
       },
       {
         field: "Miles from your kitchen",
         values: picked.map((r) => `${r.miles} miles`),
-        winner: bestIdx(picked.map((r) => r.miles), (a, b) => a < b),
+        winner: bestIdx(
+          picked.map((r) => r.miles),
+          (a, b) => a < b,
+        ),
         notes: picked.map((r) => `${r.city}, ${r.state}`),
       },
       {
         field: "Who can compete",
         values: picked.map((r) =>
-          r.setAside === "WOSB" ? "Woman-owned only" : r.setAside === "SBA" ? "Small business only" : "Every business",
+          r.setAside === "WOSB"
+            ? "Woman-owned only"
+            : r.setAside === "SBA"
+              ? "Small business only"
+              : "Every business",
         ),
-        winner: bestIdx(picked.map((r) => (r.setAside ? 1 : 0)), (a, b) => a > b),
-        notes: picked.map((r) => (r.setAside ? "Fewer firms compete" : "Large firms can compete too")),
+        winner: bestIdx(
+          picked.map((r) => (r.setAside ? 1 : 0)),
+          (a, b) => a > b,
+        ),
+        notes: picked.map((r) =>
+          r.setAside ? "Fewer firms compete" : "Large firms can compete too",
+        ),
       },
       {
         field: "Time to respond",
         values: picked.map((r) => `${r.o.closesInDays} days`),
-        winner: bestIdx(picked.map((r) => r.o.closesInDays), (a, b) => a > b),
+        winner: bestIdx(
+          picked.map((r) => r.o.closesInDays),
+          (a, b) => a > b,
+        ),
         notes: picked.map((r) => `Closes ${shortDate(r.o.closesInDays)}`),
       },
       {
@@ -386,7 +434,9 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
       {
         field: "Why it fits",
         values: picked.map((r) =>
-          r.o.hunter.fit?.length ? r.o.hunter.fit.map((f) => f.says).join(", ") : reasonList(r).join(", ").toLowerCase(),
+          r.o.hunter.fit?.length
+            ? r.o.hunter.fit.map((f) => f.says).join(", ")
+            : reasonList(r).join(", ").toLowerCase(),
         ),
         winner: null,
       },
@@ -422,11 +472,11 @@ function tradeoffText(rows: FeedRow[]): string {
 
 export function compareTop3(): Turn {
   const rows = forYouRows().slice(0, 3);
-  return compare(
-    rows,
-    "Here are your top 3 by fit.",
-    [chip.why(rows[0]), chip.ready(rows[0]), chip.closing],
-  );
+  return compare(rows, "Here are your top 3 by fit.", [
+    chip.why(rows[0]),
+    chip.ready(rows[0]),
+    chip.closing,
+  ]);
 }
 
 export function compareSaved(): Turn {
@@ -440,7 +490,11 @@ export function compareSaved(): Turn {
       chips: [chip.best, chip.top3],
     };
   }
-  return compare(rows, `You have saved ${rows.length} opportunities.`, [chip.why(rows[0]), chip.ready(rows[0]), chip.best]);
+  return compare(rows, `You have saved ${rows.length} opportunities.`, [
+    chip.why(rows[0]),
+    chip.ready(rows[0]),
+    chip.best,
+  ]);
 }
 
 // ── Lists: best matches, ready now, new, closing ────────────────────────────
@@ -470,7 +524,8 @@ export function readinessClass(row: FeedRow): Readiness {
   if (row.o.noticeType === "Sources Sought") return "early";
   const tier = row.o.hunter.tier;
   if (tier === "stretch" || tier === "low") return "stretch";
-  if (rangeStatus(row) === "above" || row.miles > PERSONA.serviceRadiusMiles || !holdsSetAside(row)) return "stretch";
+  if (rangeStatus(row) === "above" || row.miles > PERSONA.serviceRadiusMiles || !holdsSetAside(row))
+    return "stretch";
   return "ready";
 }
 
@@ -491,11 +546,17 @@ export function readyList(rows: FeedRow[]): Turn {
   if (groups.ready.length)
     parts.push(`Ready now (${groups.ready.length}): ${names(groups.ready)}.`);
   if (groups.stretch.length)
-    parts.push(`A stretch (${groups.stretch.length}): ${names(groups.stretch)}. Each has one gap, such as size or distance.`);
+    parts.push(
+      `A stretch (${groups.stretch.length}): ${names(groups.stretch)}. Each has one gap, such as size or distance.`,
+    );
   if (groups.early.length)
-    parts.push(`Early notice (${groups.early.length}): ${names(groups.early)}. You reply; you do not bid yet.`);
+    parts.push(
+      `Early notice (${groups.early.length}): ${names(groups.early)}. You reply; you do not bid yet.`,
+    );
   if (groups.blocked.length)
-    parts.push(`Not possible today (${groups.blocked.length}): ${names(groups.blocked)}. It needs cleared staff.`);
+    parts.push(
+      `Not possible today (${groups.blocked.length}): ${names(groups.blocked)}. It needs cleared staff.`,
+    );
   parts.push(GRANT_POINTER);
   const shown = [...groups.ready, ...groups.stretch, ...groups.early].sort(
     (a, b) => TIER_ORDER[a.o.hunter.tier] - TIER_ORDER[b.o.hunter.tier],
@@ -561,21 +622,52 @@ export function profileCard(): Turn {
   });
   const data: ProfilePayload = {
     rows: [
-      { label: "Business", value: `${PERSONA.businessName}, ${PERSONA.entityType} formed ${PERSONA.formedOn} in ${PERSONA.stateOfIncorporation}`, source: "profile" },
+      {
+        label: "Business",
+        value: `${PERSONA.businessName}, ${PERSONA.entityType} formed ${PERSONA.formedOn} in ${PERSONA.stateOfIncorporation}`,
+        source: "profile",
+      },
       { label: "NAICS codes", value: naics.join("; "), items: naics, source: "profile" },
-      { label: "Certifications", value: PERSONA.certifications.join(", "), items: [...PERSONA.certifications], source: "profile" },
-      { label: "SAM.gov registration", value: `Active until ${samUntil}. UEI ${PERSONA.uei}. CAGE ${PERSONA.cage}.`, source: "profile" },
-      { label: "Service area", value: `${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles from ${PERSONA.hqCity}`, source: "you_told_us" },
+      {
+        label: "Certifications",
+        value: PERSONA.certifications.join(", "),
+        items: [...PERSONA.certifications],
+        source: "profile",
+      },
+      {
+        label: "SAM.gov registration",
+        value: `Active until ${samUntil}. UEI ${PERSONA.uei}. CAGE ${PERSONA.cage}.`,
+        source: "profile",
+      },
+      {
+        label: "Service area",
+        value: `${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles from ${PERSONA.hqCity}`,
+        source: "you_told_us",
+      },
       { label: "Target contract size", value: `${RANGE_TEXT}`, source: "you_told_us" },
-      { label: "Team and kitchen", value: `${PERSONA.employeesW2} employees, ${PERSONA.foodHandlerCertified} with food-handler certificates. ${PERSONA.kitchen}.`, source: "capability_statement" },
-      { label: "What sets you apart", value: PERSONA.differentiators.join("; "), items: [...PERSONA.differentiators], source: "capability_statement" },
+      {
+        label: "Team and kitchen",
+        value: `${PERSONA.employeesW2} employees, ${PERSONA.foodHandlerCertified} with food-handler certificates. ${PERSONA.kitchen}.`,
+        source: "capability_statement",
+      },
+      {
+        label: "What sets you apart",
+        value: PERSONA.differentiators.join("; "),
+        items: [...PERSONA.differentiators],
+        source: "capability_statement",
+      },
       {
         label: "Past performance",
         value: PAST_PERFORMANCE.map((p) => p.projectTitle).join("; "),
         items: PAST_PERFORMANCE.map((p) => `${p.projectTitle}, ${money(p.totalValue)}`),
         source: "capability_statement",
       },
-      { label: "Target buyers", value: PERSONA.targetAgencies.join("; "), items: [...PERSONA.targetAgencies], source: "you_told_us" },
+      {
+        label: "Target buyers",
+        value: PERSONA.targetAgencies.join("; "),
+        items: [...PERSONA.targetAgencies],
+        source: "you_told_us",
+      },
       { label: "Largest bond", value: money(PERSONA.largestBond), source: "you_told_us" },
     ],
     hiddenCount: 0,
@@ -622,7 +714,8 @@ export function setAsideStatus(rows: FeedRow[]): Turn {
 export function savedSummary(rows: FeedRow[]): Turn {
   if (rows.length === 0) {
     return {
-      reply: "You have not saved anything yet. Tap the bookmark on any card and it waits for you in Saved.",
+      reply:
+        "You have not saved anything yet. Tap the bookmark on any card and it waits for you in Saved.",
       kind: "switch_tab",
       data: { tab: "saved" },
       chips: [chip.best, chip.top3],
@@ -632,7 +725,11 @@ export function savedSummary(rows: FeedRow[]): Turn {
     reply: `You have ${rows.length} saved: ${listNames(rows, 3)}. I opened your Saved tab. Filters do not change that list.`,
     kind: "switch_tab",
     data: { tab: "saved" },
-    chips: [rows.length > 1 ? "Compare my saved opps — which should I pursue?" : chip.why(rows[0]), chip.ready(rows[0]), chip.best],
+    chips: [
+      rows.length > 1 ? "Compare my saved opps — which should I pursue?" : chip.why(rows[0]),
+      chip.ready(rows[0]),
+      chip.best,
+    ],
   };
 }
 

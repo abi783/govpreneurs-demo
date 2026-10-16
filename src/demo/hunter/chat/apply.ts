@@ -19,14 +19,26 @@ function laneOf(filters: ServerFilters): ServerFilters {
 }
 
 /** The same merge as the page: a key in the change replaces the filter; a missing key keeps it. */
-export function mergeDelta(current: ServerFilters, delta: HunterFilterDelta, fresh: boolean): ServerFilters {
+export function mergeDelta(
+  current: ServerFilters,
+  delta: HunterFilterDelta,
+  fresh: boolean,
+): ServerFilters {
   const base: ServerFilters = fresh ? laneOf(current) : { ...current };
   const next: ServerFilters = { ...base };
 
   if (delta.states || delta.cities) {
     next.location = {
-      ...(delta.states ? { states: delta.states } : base.location?.states ? { states: base.location.states } : {}),
-      ...(delta.cities ? { cities: delta.cities } : base.location?.cities ? { cities: base.location.cities } : {}),
+      ...(delta.states
+        ? { states: delta.states }
+        : base.location?.states
+          ? { states: base.location.states }
+          : {}),
+      ...(delta.cities
+        ? { cities: delta.cities }
+        : base.location?.cities
+          ? { cities: base.location.cities }
+          : {}),
     };
   }
   if (delta.setAsides) next.setAsides = delta.setAsides;
@@ -100,7 +112,11 @@ export function applyChange(ctx: ChatCtx, delta: HunterFilterDelta, opts: ApplyO
       note = "None of your matches fit that, so I opened All opportunities. ";
     }
   }
-  if (rows.length === 0 && !fresh && Object.keys(laneOf(current)).length < Object.keys(current).length) {
+  if (
+    rows.length === 0 &&
+    !fresh &&
+    Object.keys(laneOf(current)).length < Object.keys(current).length
+  ) {
     // Her other filters, together with this change, leave nothing. Start fresh with this change alone.
     const alone = mergeDelta(current, delta, true);
     if (countFor("for_you", alone).length > 0 || countFor("all", alone).length > 0) {
@@ -122,14 +138,17 @@ export function applyChange(ctx: ChatCtx, delta: HunterFilterDelta, opts: ApplyO
       chips: [chip.best, chip.fresh, chip.how],
     };
   }
-  if (fromSaved && !note) note = "Filters do not change your Saved list, so I opened Opportunities for you. ";
+  if (fromSaved && !note)
+    note = "Filters do not change your Saved list, so I opened Opportunities for you. ";
 
   const plural = tab === "all" ? "opportunities" : "matches";
   const single = tab === "all" ? "opportunity" : "match";
   const fits = rows.length === 1 ? `One ${single} fits` : `${rows.length} ${plural} fit`;
   const extra = opts.extra?.(rows);
   const reply =
-    `${note}${opts.said} ${fits}` + (rows.length <= 4 ? `: ${nameThem(rows, 4)}.` : ".") + (extra ? ` ${extra}` : "");
+    `${note}${opts.said} ${fits}` +
+    (rows.length <= 4 ? `: ${nameThem(rows, 4)}.` : ".") +
+    (extra ? ` ${extra}` : "");
 
   const data: DiscoveryPayload & { tab?: FeedTab } = {
     filters: delta,

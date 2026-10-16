@@ -9,7 +9,10 @@ import { longDate } from "./dates";
 import type { FeedRow } from "./data";
 
 /** The member's NAICS codes, primary first. */
-export const MEMBER_CODES: string[] = [PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)];
+export const MEMBER_CODES: string[] = [
+  PERSONA.primaryNaics,
+  ...PERSONA.secondaryNaics.map((n) => n.code),
+];
 
 /** The member's value range as text: "$120K to $750K". */
 export const RANGE_TEXT = `${money(PERSONA.targetValueMin)} to ${money(PERSONA.targetValueMax)}`;
@@ -54,7 +57,10 @@ export function aboutValue(row: FeedRow): string {
 /** How far the place is from the kitchen, in words. */
 export function distanceText(row: FeedRow): string {
   if (row.miles <= 5) return "in your own town";
-  if (row.miles <= 60) return row.miles <= 20 ? `${row.miles} miles from your kitchen` : `${row.miles} miles from your kitchen, under an hour`;
+  if (row.miles <= 60)
+    return row.miles <= 20
+      ? `${row.miles} miles from your kitchen`
+      : `${row.miles} miles from your kitchen, under an hour`;
   return `${row.miles} miles from your kitchen`;
 }
 
@@ -88,7 +94,9 @@ export function pastJobFor(row: FeedRow): PastPerformance | undefined {
   if (/school|cafeteria|child nutrition|senior|detention|meal program|meals for/.test(text)) {
     return byId("pp-county-schools");
   }
-  if (/fort bragg|camp mackall|pope|dining|army|mess|barracks|airfield|flight line|lodging/.test(text)) {
+  if (
+    /fort bragg|camp mackall|pope|dining|army|mess|barracks|airfield|flight line|lodging/.test(text)
+  ) {
     return byId("pp-cdg-sub");
   }
   return byId("pp-county-schools");
@@ -144,7 +152,9 @@ export function fitSentence(row: FeedRow, f: FitFact): string {
       return `The site is ${row.miles} miles from your kitchen in ${PERSONA.hqCity}.`;
     case "pastPerformance": {
       const p = PAST_PERFORMANCE.find((x) => x.id === f.id);
-      return p ? `You did this kind of work before: ${pastJobText(p)}.` : "You did this kind of work before.";
+      return p
+        ? `You did this kind of work before: ${pastJobText(p)}.`
+        : "You did this kind of work before.";
     }
     case "targetAgency":
       return `${row.o.agency} is one of your target buyers.`;
@@ -174,7 +184,9 @@ export function reasonList(row: FeedRow): string[] {
   const fit = row.o.hunter.fit;
   if (fit && fit.length > 0) {
     // A concern goes last so that the good reasons lead.
-    const ordered = [...fit].sort((a, b) => Number(a.kind === "clearanceGap") - Number(b.kind === "clearanceGap"));
+    const ordered = [...fit].sort(
+      (a, b) => Number(a.kind === "clearanceGap") - Number(b.kind === "clearanceGap"),
+    );
     return ordered.slice(0, 3).map(reasonOf);
   }
   const out: string[] = [];
@@ -216,9 +228,12 @@ export function generatedLine(row: FeedRow): string {
   const tail: string[] = [];
   if (status === "above") tail.push(`At ${aboutValue(row)} it is above your ${RANGE_TEXT} range`);
   if (status === "below") tail.push(`At ${aboutValue(row)} it is below your usual range`);
-  if (o.clearanceRequired) tail.push("every worker needs a security clearance and your team holds none");
+  if (o.clearanceRequired)
+    tail.push("every worker needs a security clearance and your team holds none");
   if (row.miles > PERSONA.serviceRadiusMiles) {
-    tail.push(`it is ${row.miles} miles away, outside your ${PERSONA.serviceRadiusMiles}-mile area`);
+    tail.push(
+      `it is ${row.miles} miles away, outside your ${PERSONA.serviceRadiusMiles}-mile area`,
+    );
   } else if (row.miles <= 60) {
     parts.push(distanceShort(row));
   } else {

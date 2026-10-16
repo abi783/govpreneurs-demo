@@ -11,7 +11,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 test.use({ actionTimeout: 10_000 });
 
-const BAD = /something went wrong|undefined|\bNaN\b|\[object Object\]|roof|marcus|williams construction|238160/i;
+const BAD =
+  /something went wrong|undefined|\bNaN\b|\[object Object\]|roof|marcus|williams construction|238160/i;
 
 /** The count in the header. It rolls up like a ticker, so read it with `expect.poll`. */
 async function feedCount(page: Page): Promise<number> {
@@ -129,7 +130,10 @@ test("Hunter: chat, chips, filters, tabs and saves work with no error", async ({
   await expect(page.locator(".fd-active-chips__row")).toContainText("WOSB");
 
   // A chip's remove button changes the feed.
-  await page.getByRole("button", { name: /^Remove / }).first().click();
+  await page
+    .getByRole("button", { name: /^Remove / })
+    .first()
+    .click();
   await settle(page);
   await expect.poll(() => feedCount(page)).toBeGreaterThanOrEqual(drawerCount);
   await page.getByRole("button", { name: "Clear all" }).click();

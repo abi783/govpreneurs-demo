@@ -10,7 +10,12 @@
 // `src/demo/hunter/*`. The filters, the sort, the search and the page are applied
 // in `src/demo/hunter/query.ts`, so each control on the page changes the cards.
 
-import type { DiscoverV2ResponseDto, FilterDefaultsDto, ScoresResponseDto, ServerFilters } from "../../lib/discoverApi";
+import type {
+  DiscoverV2ResponseDto,
+  FilterDefaultsDto,
+  ScoresResponseDto,
+  ServerFilters,
+} from "../../lib/discoverApi";
 import { PERSONA } from "../story/persona";
 import type { DemoRouteDef } from "../runtime/router";
 import { demoResponse } from "../runtime/router";
@@ -68,7 +73,12 @@ export const routes: DemoRouteDef[] = [
     path: "/opportunities/all",
     handler: ({ body }) => {
       const page = runFeed("all", allRows(), body ?? {});
-      return { opportunities: page.data.map(toPreviewDto), page: page.page, limit: page.limit, total: page.total };
+      return {
+        opportunities: page.data.map(toPreviewDto),
+        page: page.page,
+        limit: page.limit,
+        total: page.total,
+      };
     },
   },
   {
@@ -76,7 +86,12 @@ export const routes: DemoRouteDef[] = [
     path: "/opportunities/saved",
     handler: ({ body }) => {
       const page = runFeed("saved", savedRows(), body ?? {});
-      return { opportunities: page.data.map(toPreviewDto), page: page.page, limit: page.limit, total: page.total };
+      return {
+        opportunities: page.data.map(toPreviewDto),
+        page: page.page,
+        limit: page.limit,
+        total: page.total,
+      };
     },
   },
   {
@@ -84,7 +99,10 @@ export const routes: DemoRouteDef[] = [
     path: "/opportunities/discover/v2/counts",
     handler: ({ body }) => {
       // Production nests the filters under `filters`. The page sends them bare.
-      const raw = (body && typeof body === "object" && "filters" in body ? (body as { filters: ServerFilters }).filters : body) ?? {};
+      const raw =
+        (body && typeof body === "object" && "filters" in body
+          ? (body as { filters: ServerFilters }).filters
+          : body) ?? {};
       const filters: ServerFilters = { ...(raw as ServerFilters) };
       const ctx = getFeedContext();
       if (filters.search === undefined && ctx.filters.search) filters.search = ctx.filters.search;
@@ -138,7 +156,9 @@ export const routes: DemoRouteDef[] = [
     handler: ({ query }) => {
       const state = (query.get("state") ?? "").toUpperCase();
       if (state) return [{ state, cities: citiesOf(state) }];
-      return STATES.map((s) => ({ state: s.id, cities: citiesOf(s.id) })).filter((g) => g.cities.length > 0);
+      return STATES.map((s) => ({ state: s.id, cities: citiesOf(s.id) })).filter(
+        (g) => g.cities.length > 0,
+      );
     },
   },
 
@@ -181,11 +201,17 @@ export const routes: DemoRouteDef[] = [
   {
     method: "POST",
     path: "/hunters-take/feed",
-    handler: ({ body }) => ({ takes: takesFor(Array.isArray(body?.oppKeys) ? body.oppKeys.map(String) : []) }),
+    handler: ({ body }) => ({
+      takes: takesFor(Array.isArray(body?.oppKeys) ? body.oppKeys.map(String) : []),
+    }),
   },
 
   // ── Hunter chat ───────────────────────────────────────────────────────────
-  { method: "POST", path: "/hunter-chat/message", handler: ({ body }) => handleHunterMessage(body ?? {}) },
+  {
+    method: "POST",
+    path: "/hunter-chat/message",
+    handler: ({ body }) => handleHunterMessage(body ?? {}),
+  },
   {
     method: "POST",
     path: "/hunter-chat/reset",
@@ -221,8 +247,16 @@ export const routes: DemoRouteDef[] = [
 
   // ── Profile setup: complete, so no question waits ─────────────────────────
   { method: "GET", path: "/hunter-chat/enrichment/state", handler: () => enrichmentState() },
-  { method: "POST", path: "/hunter-chat/enrichment/enter", handler: () => enrichmentState({ active: true, posture: "ENRICHMENT" }) },
-  { method: "POST", path: "/hunter-chat/enrichment/pause", handler: () => enrichmentState({ active: true, paused: true }) },
+  {
+    method: "POST",
+    path: "/hunter-chat/enrichment/enter",
+    handler: () => enrichmentState({ active: true, posture: "ENRICHMENT" }),
+  },
+  {
+    method: "POST",
+    path: "/hunter-chat/enrichment/pause",
+    handler: () => enrichmentState({ active: true, paused: true }),
+  },
   { method: "POST", path: "/hunter-chat/enrichment/back", handler: () => completePayload() },
   { method: "GET", path: "/hunter-chat/enrichment/next", handler: () => completePayload() },
   {
@@ -241,13 +275,20 @@ export const routes: DemoRouteDef[] = [
   {
     method: "POST",
     path: "/hunter-chat/enrichment/skip",
-    handler: ({ body }) => ({ kind: "skip", field: String(body?.field ?? ""), parked: true, atCheckpoint: false }),
+    handler: ({ body }) => ({
+      kind: "skip",
+      field: String(body?.field ?? ""),
+      parked: true,
+      atCheckpoint: false,
+    }),
   },
   {
     method: "POST",
     path: "/hunter-chat/enrichment/checkpoint",
     handler: ({ body }) =>
-      body?.decision === "stop" ? enrichmentState({ active: true, paused: true }) : enrichmentState(),
+      body?.decision === "stop"
+        ? enrichmentState({ active: true, paused: true })
+        : enrichmentState(),
   },
   { method: "POST", path: "/hunter-chat/enrichment/organic", handler: () => ({ offer: null }) },
 
@@ -264,7 +305,11 @@ export const routes: DemoRouteDef[] = [
           .slice(0, 100),
       ),
   },
-  { method: "GET", path: "/naics/search", handler: ({ query }) => searchNaics(query.get("q") ?? "") },
+  {
+    method: "GET",
+    path: "/naics/search",
+    handler: ({ query }) => searchNaics(query.get("q") ?? ""),
+  },
   { method: "GET", path: "/psc/search", handler: ({ query }) => searchPsc(query.get("q") ?? "") },
 ];
 

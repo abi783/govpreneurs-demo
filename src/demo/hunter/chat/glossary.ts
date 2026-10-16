@@ -209,7 +209,10 @@ export const DEFINITIONS: Definition[] = [
       reply:
         "The incumbent is the firm that holds the job now. A recompete is when the buyer opens that job to new offers.\n" +
         `${KEY_PARTNER.name} is the incumbent for Fort Bragg dining. It has held the contract since 2019 and is looking for woman-owned subcontractors for the recompete. Grant can tell you what that means for you.`,
-      chips: ["Why does the Run two Fort Bragg dining halls match me?", "What is a prime and a sub?"],
+      chips: [
+        "Why does the Run two Fort Bragg dining halls match me?",
+        "What is a prime and a sub?",
+      ],
     }),
   },
   {
@@ -229,7 +232,10 @@ export const DEFINITIONS: Definition[] = [
       reply:
         "A bond is a promise from an insurer to pay the buyer if you do not finish the job. Some large jobs require one.\n" +
         `Your largest bond so far is ${money(PERSONA.largestBond)}. The Fort Bragg dining halls need a bond of 100% of the yearly price, which is about $2M.`,
-      chips: ["Am I ready to bid the Run two Fort Bragg dining halls?", "What is a prime and a sub?"],
+      chips: [
+        "Am I ready to bid the Run two Fort Bragg dining halls?",
+        "What is a prime and a sub?",
+      ],
     }),
   },
   {
@@ -239,7 +245,10 @@ export const DEFINITIONS: Definition[] = [
       reply:
         "A security clearance is a government check that lets a person work on a restricted site. It takes months, and the buyer often will not pay for it.\n" +
         "Your team holds no clearances. So I mark any job that needs them, such as the restricted Camp Mackall site.",
-      chips: ["Am I ready to bid the Dining support at a restricted Camp Mackall site?", "What's out there for me right now?"],
+      chips: [
+        "Am I ready to bid the Dining support at a restricted Camp Mackall site?",
+        "What's out there for me right now?",
+      ],
     }),
   },
   {
@@ -267,7 +276,9 @@ export const DEFINITIONS: Definition[] = [
 /** The first definition whose words fit the question. */
 export function findDefinition(norm: string): Definition | undefined {
   // The question must ask "what is", "what's", "explain" or "mean".
-  const asks = /\b(what|whats|explain|define|meaning|mean|means|tell me about|describe)\b/.test(norm);
+  const asks = /\b(what|whats|explain|define|meaning|mean|means|tell me about|describe)\b/.test(
+    norm,
+  );
   if (!asks) return undefined;
   return DEFINITIONS.find((d) => d.test.test(norm));
 }

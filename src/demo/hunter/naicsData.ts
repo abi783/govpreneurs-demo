@@ -47,7 +47,10 @@ const NAICS: CodeRow[] = [
   { code: "424430", description: "Dairy Product (except Dried or Canned) Merchant Wholesalers" },
   { code: "424450", description: "Confectionery Merchant Wholesalers" },
   { code: "424490", description: "Other Grocery and Related Products Merchant Wholesalers" },
-  { code: "445110", description: "Supermarkets and Other Grocery Retailers (except Convenience Retailers)" },
+  {
+    code: "445110",
+    description: "Supermarkets and Other Grocery Retailers (except Convenience Retailers)",
+  },
   // Facilities and business support
   { code: "561210", description: "Facilities Support Services" },
   { code: "561110", description: "Office Administrative Services" },
@@ -84,28 +87,50 @@ const NAICS: CodeRow[] = [
   { code: "541512", description: "Computer Systems Design Services" },
   { code: "541513", description: "Computer Facilities Management Services" },
   { code: "541519", description: "Other Computer Related Services" },
-  { code: "541611", description: "Administrative Management and General Management Consulting Services" },
+  {
+    code: "541611",
+    description: "Administrative Management and General Management Consulting Services",
+  },
   { code: "541612", description: "Human Resources Consulting Services" },
-  { code: "541614", description: "Process, Physical Distribution, and Logistics Consulting Services" },
+  {
+    code: "541614",
+    description: "Process, Physical Distribution, and Logistics Consulting Services",
+  },
   { code: "541618", description: "Other Management Consulting Services" },
   { code: "541690", description: "Other Scientific and Technical Consulting Services" },
-  { code: "541715", description: "Research and Development in the Physical, Engineering, and Life Sciences" },
+  {
+    code: "541715",
+    description: "Research and Development in the Physical, Engineering, and Life Sciences",
+  },
   { code: "541810", description: "Advertising Agencies" },
   { code: "541820", description: "Public Relations Agencies" },
   { code: "541930", description: "Translation and Interpretation Services" },
   { code: "541990", description: "All Other Professional, Scientific, and Technical Services" },
-  { code: "518210", description: "Computing Infrastructure Providers, Data Processing, Web Hosting, and Related Services" },
+  {
+    code: "518210",
+    description:
+      "Computing Infrastructure Providers, Data Processing, Web Hosting, and Related Services",
+  },
   { code: "517111", description: "Wired Telecommunications Carriers" },
   { code: "517112", description: "Wireless Telecommunications Carriers (except Satellite)" },
   // Construction (building trades other than the member's)
-  { code: "236115", description: "New Single-Family Housing Construction (except For-Sale Builders)" },
-  { code: "236116", description: "New Multifamily Housing Construction (except For-Sale Builders)" },
+  {
+    code: "236115",
+    description: "New Single-Family Housing Construction (except For-Sale Builders)",
+  },
+  {
+    code: "236116",
+    description: "New Multifamily Housing Construction (except For-Sale Builders)",
+  },
   { code: "236117", description: "New Housing For-Sale Builders" },
   { code: "236118", description: "Residential Remodelers" },
   { code: "236210", description: "Industrial Building Construction" },
   { code: "236220", description: "Commercial and Institutional Building Construction" },
   { code: "237110", description: "Water and Sewer Line and Related Structures Construction" },
-  { code: "237130", description: "Power and Communication Line and Related Structures Construction" },
+  {
+    code: "237130",
+    description: "Power and Communication Line and Related Structures Construction",
+  },
   { code: "237310", description: "Highway, Street, and Bridge Construction" },
   { code: "237990", description: "Other Heavy and Civil Engineering Construction" },
   { code: "238110", description: "Poured Concrete Foundation and Structure Contractors" },
@@ -115,7 +140,10 @@ const NAICS: CodeRow[] = [
   { code: "238150", description: "Glass and Glazing Contractors" },
   { code: "238170", description: "Siding Contractors" },
   { code: "238190", description: "Other Foundation, Structure, and Building Exterior Contractors" },
-  { code: "238210", description: "Electrical Contractors and Other Wiring Installation Contractors" },
+  {
+    code: "238210",
+    description: "Electrical Contractors and Other Wiring Installation Contractors",
+  },
   { code: "238220", description: "Plumbing, Heating, and Air-Conditioning Contractors" },
   { code: "238290", description: "Other Building Equipment Contractors" },
   { code: "238310", description: "Drywall and Insulation Contractors" },
@@ -145,7 +173,11 @@ const NAICS: CodeRow[] = [
   { code: "611710", description: "Educational Support Services" },
   { code: "811111", description: "General Automotive Repair" },
   { code: "811210", description: "Electronic and Precision Equipment Repair and Maintenance" },
-  { code: "811310", description: "Commercial and Industrial Machinery and Equipment (except Automotive and Electronic) Repair and Maintenance" },
+  {
+    code: "811310",
+    description:
+      "Commercial and Industrial Machinery and Equipment (except Automotive and Electronic) Repair and Maintenance",
+  },
   { code: "339113", description: "Surgical Appliance and Supplies Manufacturing" },
   { code: "334111", description: "Electronic Computer Manufacturing" },
   { code: "332311", description: "Prefabricated Metal Building and Component Manufacturing" },
@@ -195,9 +227,16 @@ const PSC: CodeRow[] = [
   { code: "D310", description: "IT AND TELECOM- CYBER SECURITY AND DATA BACKUP" },
   { code: "D399", description: "IT AND TELECOM- OTHER IT AND TELECOMMUNICATIONS" },
   // Maintenance, lease, medical
-  { code: "J065", description: "MAINTENANCE, REPAIR, REBUILDING OF EQUIPMENT: MEDICAL, DENTAL, AND VETERINARY EQUIPMENT" },
+  {
+    code: "J065",
+    description:
+      "MAINTENANCE, REPAIR, REBUILDING OF EQUIPMENT: MEDICAL, DENTAL, AND VETERINARY EQUIPMENT",
+  },
   { code: "J099", description: "MAINTENANCE, REPAIR, REBUILDING OF EQUIPMENT: MISCELLANEOUS" },
-  { code: "W073", description: "LEASE OR RENTAL OF EQUIPMENT- FOOD PREPARATION AND SERVING EQUIPMENT" },
+  {
+    code: "W073",
+    description: "LEASE OR RENTAL OF EQUIPMENT- FOOD PREPARATION AND SERVING EQUIPMENT",
+  },
   { code: "Q201", description: "MEDICAL- GENERAL HEALTH CARE" },
   { code: "Q301", description: "MEDICAL- LABORATORY TESTING" },
   { code: "F999", description: "OTHER ENVIRONMENTAL SERVICES" },
@@ -217,7 +256,10 @@ const PSC: CodeRow[] = [
   { code: "8405", description: "OUTERWEAR, MEN'S" },
 ];
 
-const OWN_CODES = new Set<string>([PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)]);
+const OWN_CODES = new Set<string>([
+  PERSONA.primaryNaics,
+  ...PERSONA.secondaryNaics.map((n) => n.code),
+]);
 
 const NAICS_BY_CODE = new Map(NAICS.map((r) => [r.code, r.description]));
 
@@ -292,7 +334,12 @@ function scoreRow(row: CodeRow, queryTokens: string[]): number {
   return score;
 }
 
-function search(rows: CodeRow[], q: string, limit: number, boost: (r: CodeRow) => number): CodeRow[] {
+function search(
+  rows: CodeRow[],
+  q: string,
+  limit: number,
+  boost: (r: CodeRow) => number,
+): CodeRow[] {
   const query = q.trim();
   if (!query) return [];
   const lower = query.toLowerCase();
@@ -313,7 +360,9 @@ function search(rows: CodeRow[], q: string, limit: number, boost: (r: CodeRow) =
 
 /** NAICS codes that match a code prefix or words. The member's own codes come first. */
 export function searchNaics(q: string, limit = 20): CodeRow[] {
-  return search(NAICS, q, limit, (r) => (r.code === PERSONA.primaryNaics ? 6 : OWN_CODES.has(r.code) ? 4 : 0));
+  return search(NAICS, q, limit, (r) =>
+    r.code === PERSONA.primaryNaics ? 6 : OWN_CODES.has(r.code) ? 4 : 0,
+  );
 }
 
 /** PSC codes that match a code prefix or words. The food codes come first. */

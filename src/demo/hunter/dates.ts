@@ -42,7 +42,10 @@ export function postedIso(postedDaysAgo: number): string {
 
 /** "Nov 11" for the deadline of a notice that closes in N days. */
 export function shortDate(daysFromToday: number): string {
-  return calendarDay(daysFromToday, 12).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return calendarDay(daysFromToday, 12).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 /** "Wednesday, Nov 11" for chat replies. */

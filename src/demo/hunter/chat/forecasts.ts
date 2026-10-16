@@ -68,7 +68,11 @@ const whatIsForecast: Rule = {
 const whyForecast: Rule = {
   id: "forecast-why",
   run: (ctx) => {
-    if (!has(ctx, /\bwhy\b.*\b(match|fit|here|show|on my list|rank)\w*\b/) && !has(ctx, /\b(good fit|best fits?)\b/)) return null;
+    if (
+      !has(ctx, /\bwhy\b.*\b(match|fit|here|show|on my list|rank)\w*\b/) &&
+      !has(ctx, /\b(good fit|best fits?)\b/)
+    )
+      return null;
     if (has(ctx, /\bwhy (these|those)\b/)) return null;
     const v = pick(ctx);
     if (!v) return null;
@@ -87,7 +91,13 @@ const whyForecast: Rule = {
 const readyForecast: Rule = {
   id: "forecast-ready",
   run: (ctx) => {
-    if (!has(ctx, /\b(am i|can i|do i)\b.*\b(ready|eligible|qualif\w+|good fit|bid|compete)\b|\bready to bid\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\b(am i|can i|do i)\b.*\b(ready|eligible|qualif\w+|good fit|bid|compete)\b|\bready to bid\b/,
+      )
+    )
+      return null;
     const v = pick(ctx);
     if (!v) return null;
     return {
@@ -107,12 +117,18 @@ const compareForecasts: Rule = {
     const picked = ctx.raw.slice(0, 3);
     if (picked.length < 2) {
       return {
-        reply: "I need at least two forecasts on screen to compare them. Clear a filter or open the All view, then ask again.",
+        reply:
+          "I need at least two forecasts on screen to compare them. Clear a filter or open the All view, then ask again.",
         chips: [FORECAST_CHIPS.what, FORECAST_CHIPS.best, chip.how],
       };
     }
     const data: ComparePayload = {
-      opps: picked.map((v) => ({ oppKey: v.oppKey, title: v.title, agency: null, location: v.location ?? null })),
+      opps: picked.map((v) => ({
+        oppKey: v.oppKey,
+        title: v.title,
+        agency: null,
+        location: v.location ?? null,
+      })),
       rows: [
         { field: "Place", values: picked.map((v) => v.location ?? "Not stated"), winner: null },
         { field: "Status", values: picked.map(() => "Forecast: not posted yet"), winner: null },
@@ -133,10 +149,19 @@ const compareForecasts: Rule = {
 const bestForecasts: Rule = {
   id: "forecast-best",
   run: (ctx) => {
-    if (!has(ctx, /\bwhich of these\b.*\b(fit|fits|ready)\b|\bwhat out there\b|\bwhat should i (look at|focus on|start with)\b|\b(best|top) (matches|forecasts|picks)\b|\bwhat s new\b|\bwhat new\b|\bwhere (do|should) i start\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\bwhich of these\b.*\b(fit|fits|ready)\b|\bwhat out there\b|\bwhat should i (look at|focus on|start with)\b|\b(best|top) (matches|forecasts|picks)\b|\bwhat s new\b|\bwhat new\b|\bwhere (do|should) i start\b/,
+      )
+    )
+      return null;
     const first = ctx.raw.slice(0, 3);
     if (first.length === 0) {
-      return { reply: "No forecast is on screen. Clear a filter and I can list the best ones.", chips: [FORECAST_CHIPS.what, chip.how] };
+      return {
+        reply: "No forecast is on screen. Clear a filter and I can list the best ones.",
+        chips: [FORECAST_CHIPS.what, chip.how],
+      };
     }
     return {
       reply: `Your forecasts are in order of fit. These are first: ${joinList(first.map((v) => v.title))}. Open one to read the buyer's plan and the expected timing.`,

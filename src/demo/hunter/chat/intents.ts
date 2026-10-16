@@ -76,9 +76,14 @@ export const greeting: Rule = {
         chips: [chip.best, chip.fresh, chip.how],
       };
     }
-    if (/^(thanks|thank you|thx|ty|great|cool|nice|perfect|awesome|ok|okay|got it|good)\b/.test(ctx.norm)) {
+    if (
+      /^(thanks|thank you|thx|ty|great|cool|nice|perfect|awesome|ok|okay|got it|good)\b/.test(
+        ctx.norm,
+      )
+    ) {
       return {
-        reply: "You are welcome. Ask me anything about your matches, or open an opportunity to work with Grant.",
+        reply:
+          "You are welcome. Ask me anything about your matches, or open an opportunity to work with Grant.",
         chips: [chip.best, chip.top3, chip.fresh],
       };
     }
@@ -89,11 +94,17 @@ export const greeting: Rule = {
 export const help: Rule = {
   id: "help",
   run: (ctx) => {
-    if (!has(ctx, /\b(what can you do|what do you do|who are you|what are you|help me|^help$|how (do|can) i use you|what can i ask|what should i ask|capabilit\w+ of hunter)\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\b(what can you do|what do you do|who are you|what are you|help me|^help$|how (do|can) i use you|what can i ask|what should i ask|capabilit\w+ of hunter)\b/,
+      )
+    )
+      return null;
     return {
       reply:
         "I am Hunter, your discovery agent. I find government contracts that match your business and explain why each one is on your list.\n" +
-        "You can ask me to filter the feed (\"only woman-owned\", \"under $500K\", \"near Fayetteville\"), explain a match, compare opportunities, check if you are ready, or save one.\n" +
+        'You can ask me to filter the feed ("only woman-owned", "under $500K", "near Fayetteville"), explain a match, compare opportunities, check if you are ready, or save one.\n' +
         "For a deep read on one opportunity, open it and ask Grant.",
       chips: [chip.best, chip.top3, chip.how],
     };
@@ -103,7 +114,12 @@ export const help: Rule = {
 export const grantRule: Rule = {
   id: "grant",
   run: (ctx) => {
-    if (has(ctx, /\b(will i win|can i win|chance of winning|chances of winning|my chances|my odds|what are the odds|odds|guarantee|promise|sure thing|likely to win|win it|win this|actually win)\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(will i win|can i win|chance of winning|chances of winning|my chances|my odds|what are the odds|odds|guarantee|promise|sure thing|likely to win|win it|win this|actually win)\b/,
+      )
+    ) {
       return {
         reply:
           "I cannot tell you that, and nobody can promise a win. I can tell you how well an opportunity fits you and why.\n" +
@@ -119,13 +135,19 @@ export const grantRule: Rule = {
         chips: [chip.top3, chip.readyList, chip.best],
       };
     }
-    if (has(ctx, /\bshould i (bid|go for|chase|pursue|apply)\b|\bgo or no go\b|\bbid or no bid\b|\bworth (it|bidding|my time)\b/)) {
+    if (
+      has(
+        ctx,
+        /\bshould i (bid|go for|chase|pursue|apply)\b|\bgo or no go\b|\bbid or no bid\b|\bworth (it|bidding|my time)\b/,
+      )
+    ) {
       const opp = findOpp(ctx.norm, ctx.visible);
       about(opp);
       return {
-        reply:
-          `That is Grant's call, not mine.${opp ? ` I can say how ${titleOf(opp)} fits you: ask "${chip.why(opp)}"` : ""} For the go or no-go read, open the opportunity and ask Grant.`,
-        chips: opp ? [chip.why(opp), chip.ready(opp), chip.top3] : [chip.top3, chip.readyList, chip.best],
+        reply: `That is Grant's call, not mine.${opp ? ` I can say how ${titleOf(opp)} fits you: ask "${chip.why(opp)}"` : ""} For the go or no-go read, open the opportunity and ask Grant.`,
+        chips: opp
+          ? [chip.why(opp), chip.ready(opp), chip.top3]
+          : [chip.top3, chip.readyList, chip.best],
       };
     }
     return null;
@@ -137,7 +159,13 @@ export const grantRule: Rule = {
 export const startOver: Rule = {
   id: "start-over",
   run: (ctx) => {
-    if (!has(ctx, /\b(start over|start again|reset|clear (all|everything|the filters|filters|my filters|them)|remove (all )?(the )?filters|no filters|drop (all )?(the )?filters|undo (that|all))\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\b(start over|start again|reset|clear (all|everything|the filters|filters|my filters|them)|remove (all )?(the )?filters|no filters|drop (all )?(the )?filters|undo (that|all))\b/,
+      )
+    )
+      return null;
     const n = forYouRows().length;
     return {
       reply: `Done. I cleared your filters and your search. Your list shows all ${n} matches again.`,
@@ -151,11 +179,24 @@ export const startOver: Rule = {
 const tabSwitch: Rule = {
   id: "tab-switch",
   run: (ctx) => {
-    const wantsShow = has(ctx, /\b(show|open|go to|go back|back to|take me|switch|bring up|list|see|view|what (did|have) i save\w*|what s saved)\b/);
-    if (has(ctx, /\b(saved|bookmarks?|bookmarked|my saves|what i saved|favorites?)\b/) && wantsShow && !has(ctx, /\bcompare\b/)) {
+    const wantsShow = has(
+      ctx,
+      /\b(show|open|go to|go back|back to|take me|switch|bring up|list|see|view|what (did|have) i save\w*|what s saved)\b/,
+    );
+    if (
+      has(ctx, /\b(saved|bookmarks?|bookmarked|my saves|what i saved|favorites?)\b/) &&
+      wantsShow &&
+      !has(ctx, /\bcompare\b/)
+    ) {
       return savedSummary(savedRows());
     }
-    if (has(ctx, /\b(all opportunities|the whole feed|everything on the feed|everything|all of them|explore tab|every opportunity|all notices)\b/) && wantsShow) {
+    if (
+      has(
+        ctx,
+        /\b(all opportunities|the whole feed|everything on the feed|everything|all of them|explore tab|every opportunity|all notices)\b/,
+      ) &&
+      wantsShow
+    ) {
       return {
         reply: `I opened All opportunities. It holds ${allRows().length} open notices that I have not ranked for you. Your own ranked list is on the first tab.`,
         kind: "switch_tab",
@@ -163,7 +204,11 @@ const tabSwitch: Rule = {
         chips: [chip.best, chip.fresh, chip.how],
       };
     }
-    if (has(ctx, /\b(my matches|for you|back to (my )?(matches|picks|list)|top picks|my list)\b/) && wantsShow && !has(ctx, /\bcompare\b/)) {
+    if (
+      has(ctx, /\b(my matches|for you|back to (my )?(matches|picks|list)|top picks|my list)\b/) &&
+      wantsShow &&
+      !has(ctx, /\bcompare\b/)
+    ) {
       return {
         reply: `I opened Opportunities for you. It holds ${forYouRows().length} matches, ranked by fit.`,
         kind: "switch_tab",
@@ -178,13 +223,17 @@ const tabSwitch: Rule = {
 const saveRule: Rule = {
   id: "save",
   run: (ctx) => {
-    const unsave = has(ctx, /\b(unsave|un save|remove .* from (my )?saved|take .* off (my )?saved|delete .* from saved)\b/);
-    const save = has(ctx, /\b(save|bookmark)\b/) && !has(ctx, /\bsave (this )?search\b|\bsaved search\b/);
+    const unsave = has(
+      ctx,
+      /\b(unsave|un save|remove .* from (my )?saved|take .* off (my )?saved|delete .* from saved)\b/,
+    );
+    const save =
+      has(ctx, /\b(save|bookmark)\b/) && !has(ctx, /\bsave (this )?search\b|\bsaved search\b/);
     if (!unsave && !save) return null;
     const opp = findOpp(ctx.norm, ctx.visible);
     if (!opp) {
       return {
-        reply: "Which one? Name it, or say \"save the top one\".",
+        reply: 'Which one? Name it, or say "save the top one".',
         chips: [`Save the ${titleOf(topOf(ctx))}`, chip.best, chip.top3],
       };
     }
@@ -219,8 +268,13 @@ const whyRule: Rule = {
     if (!has(ctx, /\bwhy\b/)) return null;
     // "Why these?" and "why this feed" ask about the method, not one card.
     const opp = findOpp(ctx.norm, ctx.visible);
-    if (!opp || has(ctx, /\bwhy (these|those|are these|do you pick|did you pick|do you show these)\b/)) {
-      return has(ctx, /\b(these|those|pick|picks|rank|ranking|order|feed|list)\b/) ? howIPick() : null;
+    if (
+      !opp ||
+      has(ctx, /\bwhy (these|those|are these|do you pick|did you pick|do you show these)\b/)
+    ) {
+      return has(ctx, /\b(these|those|pick|picks|rank|ranking|order|feed|list)\b/)
+        ? howIPick()
+        : null;
     }
     about(opp);
     return whyMatch(opp);
@@ -231,13 +285,24 @@ const readyRule: Rule = {
   id: "ready",
   run: (ctx) => {
     const asksReady =
-      has(ctx, /\b(am i|are we|can i|could i|do i|would i|will i|is it|is this|am i actually)\b.*\b(ready|eligible|qualif\w+|good fit|fit|bid|compete|apply|respond|clear|meet)\b/) ||
-      has(ctx, /\b(is|are) (the |this |that )?.*\b(a )?good fit( for me)?\b|\bis (the |this |that )?.*\bworth (it|my time|bidding)\b/) ||
-      has(ctx, /\bready (to|for) bid\b|\bready to bid\b|\beligib\w+ for\b|\bqualif\w+ for\b|\bam i (a )?good fit\b/);
+      has(
+        ctx,
+        /\b(am i|are we|can i|could i|do i|would i|will i|is it|is this|am i actually)\b.*\b(ready|eligible|qualif\w+|good fit|fit|bid|compete|apply|respond|clear|meet)\b/,
+      ) ||
+      has(
+        ctx,
+        /\b(is|are) (the |this |that )?.*\b(a )?good fit( for me)?\b|\bis (the |this |that )?.*\bworth (it|my time|bidding)\b/,
+      ) ||
+      has(
+        ctx,
+        /\bready (to|for) bid\b|\bready to bid\b|\beligib\w+ for\b|\bqualif\w+ for\b|\bam i (a )?good fit\b/,
+      );
     if (!asksReady) return null;
     // "Which of these am I actually ready for?" and "Which of these best fits me?" ask about a list.
     if (has(ctx, /\bwhich\b.*\b(these|those|them|ones|of my|of the)\b|\bwhich of\b/)) {
-      return has(ctx, /\bbest fit|best fits|fits me best|most likely\b/) ? bestFits(ctx) : readyList(ctx.visible);
+      return has(ctx, /\bbest fit|best fits|fits me best|most likely\b/)
+        ? bestFits(ctx)
+        : readyList(ctx.visible);
     }
     if (has(ctx, /\bthese set.?asides?\b|\bthose set.?asides?\b|\bset.?asides?\b/)) {
       return setAsideStatus(universeRows(ctx));
@@ -263,15 +328,17 @@ function bestFits(ctx: ChatCtx): Turn {
   return {
     reply: `Of the ${list.length} on your screen, these ${top.length} fit you best: ${nameThem(top, 3)}. I weigh your codes, set-aside, size, distance and past jobs.`,
     kind: "matches",
-    data: { rows: top.map((r) => ({
-      oppKey: r.id,
-      title: titleOf(r),
-      tier: r.o.hunter.tier,
-      matchReasons: r.o.hunter.fit?.slice(0, 3).map((f) => cap(f.says)) ?? [],
-      dueDate: r.closesAt,
-      agency: r.o.agency,
-      sourceType: r.o.scope === "sled" ? "sled" : "sam",
-    })) },
+    data: {
+      rows: top.map((r) => ({
+        oppKey: r.id,
+        title: titleOf(r),
+        tier: r.o.hunter.tier,
+        matchReasons: r.o.hunter.fit?.slice(0, 3).map((f) => cap(f.says)) ?? [],
+        dueDate: r.closesAt,
+        agency: r.o.agency,
+        sourceType: r.o.scope === "sled" ? "sled" : "sam",
+      })),
+    },
     chips: [chip.why(top[0]), chip.ready(top[0]), chip.top3],
   };
 }
@@ -279,7 +346,12 @@ function bestFits(ctx: ChatCtx): Turn {
 const setAsideQuestion: Rule = {
   id: "set-aside-question",
   run: (ctx) => {
-    if (has(ctx, /\b(do|can) i qualify (for|to)\b.*\bset.?asides?\b|\bwhich set.?asides?\b|\bset.?asides? (do )?i (qualify|have|hold|get)\b|\bmy set.?asides?\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(do|can) i qualify (for|to)\b.*\bset.?asides?\b|\bwhich set.?asides?\b|\bset.?asides? (do )?i (qualify|have|hold|get)\b|\bmy set.?asides?\b/,
+      )
+    ) {
       return setAsideStatus(universeRows(ctx));
     }
     return null;
@@ -289,20 +361,35 @@ const setAsideQuestion: Rule = {
 const compareRule: Rule = {
   id: "compare",
   run: (ctx) => {
-    if (!has(ctx, /\bcompare\b|\bversus\b|\bvs\b|\bside by side\b|\bwhich (is|one is) better\b|\bwhich should i (chase|pursue|go for|pick)\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\bcompare\b|\bversus\b|\bvs\b|\bside by side\b|\bwhich (is|one is) better\b|\bwhich should i (chase|pursue|go for|pick)\b/,
+      )
+    )
+      return null;
     if (has(ctx, /\bsaved\b|\bbookmarks?\b/)) return compareSaved();
     if (has(ctx, /\btop (3|three)\b|\bmy top\b|\bthree best\b/)) return compareTop3();
     // Two or more named opportunities: "compare the Pope one and the Fort Bragg dining halls".
     const named: FeedRow[] = [];
-    for (const part of ctx.norm.replace(/^compare\s+/, "").split(/\s+(?:and|vs|versus|with|to|or)\s+|,\s*/)) {
+    for (const part of ctx.norm
+      .replace(/^compare\s+/, "")
+      .split(/\s+(?:and|vs|versus|with|to|or)\s+|,\s*/)) {
       const hit = part.trim() ? findOpp(part, ctx.visible) : undefined;
       if (hit && !named.some((n) => n.id === hit.id)) named.push(hit);
     }
     if (named.length >= 2) {
       about(named[0]);
-      return compare(named, `Here are the ${named.length} you named.`, [chip.why(named[0]), chip.ready(named[0]), chip.top3]);
+      return compare(named, `Here are the ${named.length} you named.`, [
+        chip.why(named[0]),
+        chip.ready(named[0]),
+        chip.top3,
+      ]);
     }
-    if (has(ctx, /\b(these|those|them|the two|the remaining|on screen|visible|here)\b/) && ctx.visible.length >= 2) {
+    if (
+      has(ctx, /\b(these|those|them|the two|the remaining|on screen|visible|here)\b/) &&
+      ctx.visible.length >= 2
+    ) {
       return compare(ctx.visible.slice(0, 3), "Here are the first three on your screen.", [
         chip.why(ctx.visible[0]),
         chip.ready(ctx.visible[0]),
@@ -316,10 +403,20 @@ const compareRule: Rule = {
 const readyListRule: Rule = {
   id: "ready-list",
   run: (ctx) => {
-    if (has(ctx, /\bwhich of these\b.*\b(ready|qualif\w+|eligible)\b|\bwhat am i ready for\b|\bwhat can i (go for|do|respond to|bid on)\b/)) {
+    if (
+      has(
+        ctx,
+        /\bwhich of these\b.*\b(ready|qualif\w+|eligible)\b|\bwhat am i ready for\b|\bwhat can i (go for|do|respond to|bid on)\b/,
+      )
+    ) {
       return readyList(ctx.visible);
     }
-    if (has(ctx, /\bwhich of these\b.*\b(fit|fits|best|suit|suits)\b|\bwhich (one )?(fits|suits) me (best|most)\b|\bbest fit for me\b/)) {
+    if (
+      has(
+        ctx,
+        /\bwhich of these\b.*\b(fit|fits|best|suit|suits)\b|\bwhich (one )?(fits|suits) me (best|most)\b|\bbest fit for me\b/,
+      )
+    ) {
       return bestFits(ctx);
     }
     return null;
@@ -340,7 +437,12 @@ export const definitions: Rule = {
 export const profileRule: Rule = {
   id: "profile",
   run: (ctx) => {
-    if (has(ctx, /\b(what do you know about (me|my)|what do you know|tell me about my (business|profile|company)|my profile|my business profile|show (me )?my (profile|business)|what.*on file|who am i)\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(what do you know about (me|my)|what do you know|tell me about my (business|profile|company)|my profile|my business profile|show (me )?my (profile|business)|what.*on file|who am i)\b/,
+      )
+    ) {
       return profileCard();
     }
     return null;
@@ -355,7 +457,12 @@ export const profileUpdateRule: Rule = {
 export const methodRule: Rule = {
   id: "method",
   run: (ctx) => {
-    if (has(ctx, /\bhow (do|does|did) (you|hunter) (pick|choose|rank|score|match|decide|sort|find|work)\b|\bhow (are|is) (these|the matches|my matches|they) (picked|chosen|ranked|scored|sorted|made)\b|\bhow does (the )?matching work\b|\bwhat do you (weigh|use|look at)\b|\bwhy these\b|\bhow (do|did) you know\b|\bhow it works\b/)) {
+    if (
+      has(
+        ctx,
+        /\bhow (do|does|did) (you|hunter) (pick|choose|rank|score|match|decide|sort|find|work)\b|\bhow (are|is) (these|the matches|my matches|they) (picked|chosen|ranked|scored|sorted|made)\b|\bhow does (the )?matching work\b|\bwhat do you (weigh|use|look at)\b|\bwhy these\b|\bhow (do|did) you know\b|\bhow it works\b/,
+      )
+    ) {
       return howIPick();
     }
     return null;
@@ -367,19 +474,39 @@ export const methodRule: Rule = {
 const listRules: Rule = {
   id: "lists",
   run: (ctx) => {
-    if (has(ctx, /\bwhat closes (first|soonest|next)\b|\bclos\w* soonest\b|\bdue (first|soonest)\b|\bsoonest (deadline|due)\b|\bmost urgent\b|\bnext deadline\b|\bwhat s due\b|\bclos(ing|es) soon\b|\bdue soon\b|\bany(thing)? (closing|due)\b|\bdeadlines? (soon|coming)\b|\burgent\b/)) {
+    if (
+      has(
+        ctx,
+        /\bwhat closes (first|soonest|next)\b|\bclos\w* soonest\b|\bdue (first|soonest)\b|\bsoonest (deadline|due)\b|\bmost urgent\b|\bnext deadline\b|\bwhat s due\b|\bclos(ing|es) soon\b|\bdue soon\b|\bany(thing)? (closing|due)\b|\bdeadlines? (soon|coming)\b|\burgent\b/,
+      )
+    ) {
       return listBy(universeRows(ctx).length > 0 ? universeRows(ctx) : forYouRows(), "closing");
     }
-    if (has(ctx, /\b(biggest|largest|highest value|most money|top dollar|worth the most|bigger jobs?)\b/) && !/\bunder|below|less/.test(ctx.norm)) {
+    if (
+      has(
+        ctx,
+        /\b(biggest|largest|highest value|most money|top dollar|worth the most|bigger jobs?)\b/,
+      ) &&
+      !/\bunder|below|less/.test(ctx.norm)
+    ) {
       return listBy(universeRows(ctx).length > 0 ? universeRows(ctx) : forYouRows(), "value");
     }
     if (has(ctx, /\b(closest|nearest)\b|\bleast driving\b|\bshortest drive\b/)) {
       return listBy(universeRows(ctx).length > 0 ? universeRows(ctx) : forYouRows(), "near");
     }
     if (
-      has(ctx, /\bwhat out there\b|\bwhat s available\b|\bwhat is available\b|\bwhat do you have for me\b|\bwhat have you got\b|\bany good (ones|matches|jobs)\b/) ||
-      has(ctx, /\bbest (one|job|match|opportunity|fit) for me\b|\bwhat s the best\b|\bwhat is the best\b|\bwhich (one )?(should i|do i) (do|go for|start|look at|pick|try|work on)( first)?\b|\bwhich first\b|\btop pick\b/) ||
-      has(ctx, /\b(best|top) (matches|opportunities|picks|jobs|ones)\b|\bshow me (my )?(matches|picks)\b|\bwhere (do|should) i start\b|\bwhat should i (look at|focus on|chase|start with|go after|do first)\b|\brecommend\w*\b|\bgive me (the )?top\b/)
+      has(
+        ctx,
+        /\bwhat out there\b|\bwhat s available\b|\bwhat is available\b|\bwhat do you have for me\b|\bwhat have you got\b|\bany good (ones|matches|jobs)\b/,
+      ) ||
+      has(
+        ctx,
+        /\bbest (one|job|match|opportunity|fit) for me\b|\bwhat s the best\b|\bwhat is the best\b|\bwhich (one )?(should i|do i) (do|go for|start|look at|pick|try|work on)( first)?\b|\bwhich first\b|\btop pick\b/,
+      ) ||
+      has(
+        ctx,
+        /\b(best|top) (matches|opportunities|picks|jobs|ones)\b|\bshow me (my )?(matches|picks)\b|\bwhere (do|should) i start\b|\bwhat should i (look at|focus on|chase|start with|go after|do first)\b|\brecommend\w*\b|\bgive me (the )?top\b/,
+      )
     ) {
       return bestMatches();
     }
@@ -394,14 +521,26 @@ function aboutRuleFor(strict: boolean): Rule {
   return {
     id: strict ? "about-named" : "about",
     run: (ctx) => {
-      const opener = has(ctx, /^(tell me about|tell me more about|more about|details (on|about|for)|what about|describe|summarize|summarise|info on|information (on|about)|who is buying|what is|when (does|is|do)|how much|where (is|are)|how far|who (is|posted|are)|what s the (deadline|value|buyer|agency))\b/);
+      const opener = has(
+        ctx,
+        /^(tell me about|tell me more about|more about|details (on|about|for)|what about|describe|summarize|summarise|info on|information (on|about)|who is buying|what is|when (does|is|do)|how much|where (is|are)|how far|who (is|posted|are)|what s the (deadline|value|buyer|agency))\b/,
+      );
       if (strict && !opener && !titleIn(ctx.norm)) return null;
       // "What about Virginia?" asks for a place, not for one opportunity.
-      if (!titleIn(ctx.norm) && !has(ctx, /\b(when|how much|how far|where|who|deadline|due|close|closes|value|worth|price)\b/)) {
+      if (
+        !titleIn(ctx.norm) &&
+        !has(
+          ctx,
+          /\b(when|how much|how far|where|who|deadline|due|close|closes|value|worth|price)\b/,
+        )
+      ) {
         const d = parseFilters(ctx.text, ctx.norm).delta;
         if (d.states || d.cities || d.search) return null;
       }
-      const asks = has(ctx, /\b(tell me about|more about|details|detail|info on|information|describe|summar\w+|what is the|what about|who is the|who posted|who s buying|buyer|agency|incumbent|when (does|is)|how much|where is|how far|worth|value|deadline|due|close|closes|miles|distance|about the)\b/);
+      const asks = has(
+        ctx,
+        /\b(tell me about|more about|details|detail|info on|information|describe|summar\w+|what is the|what about|who is the|who posted|who s buying|buyer|agency|incumbent|when (does|is)|how much|where is|how far|worth|value|deadline|due|close|closes|miles|distance|about the)\b/,
+      );
       if (!asks) return null;
       const opp = findOpp(ctx.norm, ctx.visible);
       if (!opp) return null;
@@ -459,7 +598,13 @@ function matchRowSafe(row: FeedRow) {
 const incumbentRule: Rule = {
   id: "incumbent",
   run: (ctx) => {
-    if (!has(ctx, /\bincumbent\b|\bwho (holds|has|runs|owns) (it|the|this)\b|\bcurrent contractor\b|\bwho does it now\b/)) return null;
+    if (
+      !has(
+        ctx,
+        /\bincumbent\b|\bwho (holds|has|runs|owns) (it|the|this)\b|\bcurrent contractor\b|\bwho does it now\b/,
+      )
+    )
+      return null;
     const hero = rowById(HERO_IDS.fortBraggDining)!;
     const opp = has(ctx, /\bfort bragg\b.*\b(dining|dfac)\b|\b(dining|dfac)\b.*\bfort bragg\b/)
       ? hero
@@ -509,16 +654,21 @@ const filterRule: Rule = {
         }
         if (delta.states?.some((s) => s !== "NC")) {
           const nearest = [...rows].sort((a, b) => a.miles - b.miles)[0];
-          notes.push(`The nearest is ${titleOf(nearest)}, ${nearest.miles} miles from your kitchen. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`);
+          notes.push(
+            `The nearest is ${titleOf(nearest)}, ${nearest.miles} miles from your kitchen. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`,
+          );
         }
         if (delta.setAsides?.includes("WOSB")) notes.push("You qualify for all of them.");
         if (delta.cities?.length === 1) {
           const place = Object.values(PLACES).find((p) => p.city === delta.cities![0]);
-          if (place) notes.push(`${place.city} is ${place.milesFromKitchen} miles from your kitchen.`);
+          if (place)
+            notes.push(`${place.city} is ${place.milesFromKitchen} miles from your kitchen.`);
         }
         if (delta.postedWithin) {
           const newest = [...rows].sort((a, b) => a.o.postedDaysAgo - b.o.postedDaysAgo)[0];
-          notes.push(`The newest is ${titleOf(newest)}, posted ${newest.o.postedDaysAgo} days ago (${longDate(-newest.o.postedDaysAgo)}).`);
+          notes.push(
+            `The newest is ${titleOf(newest)}, posted ${newest.o.postedDaysAgo} days ago (${longDate(-newest.o.postedDaysAgo)}).`,
+          );
         }
         return notes.length ? notes.join(" ") : null;
       },
@@ -530,11 +680,17 @@ const filterRule: Rule = {
 const searchFallback: Rule = {
   id: "search",
   run: (ctx) => {
-    const startsSearch = has(ctx, /^(show|find|search|look|look for|get|list|any|got any|do you have|are there|is there)\b/);
+    const startsSearch = has(
+      ctx,
+      /^(show|find|search|look|look for|get|list|any|got any|do you have|are there|is there)\b/,
+    );
     const endsSearch = has(ctx, /\b(jobs?|work|opportunit\w+|contracts?|notices?)$/);
     if (!startsSearch && !endsSearch) return null;
     const tokens = searchTokens(
-      ctx.norm.replace(/\b(show|find|search|look|get|list|any|got|do|you|have|are|there|is|me|for|some|all|the|only|just|please|can|u|i|want|need|see)\b/g, " "),
+      ctx.norm.replace(
+        /\b(show|find|search|look|get|list|any|got|do|you|have|are|there|is|me|for|some|all|the|only|just|please|can|u|i|want|need|see)\b/g,
+        " ",
+      ),
     );
     if (tokens.length === 0) return null;
     const phrase = tokens.join(" ");
@@ -578,7 +734,8 @@ export const CANON: string[] = [
 ];
 
 function overlap(a: string, b: string): number {
-  const stems = (t: string) => new Set(searchTokens(t).map((w) => w.replace(/(ing|ers|er|es|s)$/, "")));
+  const stems = (t: string) =>
+    new Set(searchTokens(t).map((w) => w.replace(/(ing|ers|er|es|s)$/, "")));
   const x = stems(a);
   const y = stems(b);
   let n = 0;
@@ -588,7 +745,10 @@ function overlap(a: string, b: string): number {
 
 export function nearestQuestions(text: string): string[] {
   const scored = CANON.map((q) => ({ q, s: overlap(text, q) })).sort((a, b) => b.s - a.s);
-  const hits = scored.filter((x) => x.s > 0).slice(0, 3).map((x) => x.q);
+  const hits = scored
+    .filter((x) => x.s > 0)
+    .slice(0, 3)
+    .map((x) => x.q);
   for (const d of [CANON[0], CANON[1], CANON[4], CANON[3]]) {
     if (hits.length >= 3) break;
     if (!hits.includes(d)) hits.push(d);
@@ -626,7 +786,11 @@ const countRule: Rule = {
       const a = applyFilters(forYou, f).length;
       const b = applyFilters(all, f).length;
       return {
-        reply: `${cap(joinList(parsed.nouns.length ? parsed.nouns : ["opportunities"]))} ${parsed.mods.join(" ")}: ${a} on Opportunities for you, and ${b} on All opportunities. I did not change your list.`.replace(/\s+:/, ":"),
+        reply:
+          `${cap(joinList(parsed.nouns.length ? parsed.nouns : ["opportunities"]))} ${parsed.mods.join(" ")}: ${a} on Opportunities for you, and ${b} on All opportunities. I did not change your list.`.replace(
+            /\s+:/,
+            ":",
+          ),
         chips: [chip.best, chip.wosb, chip.fresh],
       };
     }
@@ -645,7 +809,8 @@ const clearanceRule: Rule = {
     const needs = rows.filter((r) => r.o.clearanceRequired);
     if (needs.length === 0) {
       return {
-        reply: "None of the opportunities on your screen needs a security clearance. Your team holds none, so I check this on every one.",
+        reply:
+          "None of the opportunities on your screen needs a security clearance. Your team holds none, so I check this on every one.",
         chips: [chip.best, chip.readyList, chip.top3],
       };
     }
@@ -661,28 +826,46 @@ const clearanceRule: Rule = {
 const otherAgents: Rule = {
   id: "other-agents",
   run: (ctx) => {
-    if (has(ctx, /\b(write|draft|build|prepare|create|help me with|start)\b.*\b(proposal|quote|response|submission|bid)\b|\bava\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(write|draft|build|prepare|create|help me with|start)\b.*\b(proposal|quote|response|submission|bid)\b|\bava\b/,
+      )
+    ) {
       return {
         reply:
           "I find and rank opportunities. Ava writes the quote or the proposal with you. Ava is already working on the Camp Mackall field meals quote, and she has questions for you. Open Ava from the menu.",
         chips: [chip.best, chip.top3, chip.readyList],
       };
     }
-    if (has(ctx, /\bcapability statement\b/) && has(ctx, /\b(help|update|write|change|edit|fix|improve|upload|new)\b/)) {
+    if (
+      has(ctx, /\bcapability statement\b/) &&
+      has(ctx, /\b(help|update|write|change|edit|fix|improve|upload|new)\b/)
+    ) {
       return {
         reply:
           "Your capability statement is on file, and I read it when I rank matches. To change it, open My Business. If you tell me a new fact, I can propose the change for you to save.",
         chips: [chip.profile, "I can now cook 1,500 meals a day", chip.how],
       };
     }
-    if (has(ctx, /\b(get|become|how do i|how to|need)\b.*\b(certified|certification)\b|\bnew certification\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(get|become|how do i|how to|need)\b.*\b(certified|certification)\b|\bnew certification\b/,
+      )
+    ) {
       return {
         reply:
           "You already hold Small Business and Woman-Owned (WOSB) status. If you want another certification, the Roadmap lists the steps, and your mentor Sarah Mitchell can help you through them.",
         chips: ["Do I qualify for these set-asides?", chip.how, chip.best],
       };
     }
-    if (has(ctx, /\b(who s|who is|who are|what about|how many|my|the) (my |the )?(competition|competitors?)\b|\bwho else (is|will be|would be) (bidding|competing|applying)\b|\bwho am i up against\b/)) {
+    if (
+      has(
+        ctx,
+        /\b(who s|who is|who are|what about|how many|my|the) (my |the )?(competition|competitors?)\b|\bwho else (is|will be|would be) (bidding|competing|applying)\b|\bwho am i up against\b/,
+      )
+    ) {
       return {
         reply:
           "I do not track who else will answer. Grant reads the competition on each opportunity. Open one and ask him. On the Fort Bragg dining halls, for example, the firm that holds the job now is Carolina Dining Group.",

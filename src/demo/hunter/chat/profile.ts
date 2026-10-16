@@ -61,7 +61,9 @@ function readProposal(text: string, norm: string): Proposal | null {
       value: money(n),
     };
   }
-  const offer = text.match(/\b(?:i|we)\s+(?:also\s+|now\s+)?(?:offer|do|provide|cook|serve|make|run|have|can)\s+(.{4,80})$/i);
+  const offer = text.match(
+    /\b(?:i|we)\s+(?:also\s+|now\s+)?(?:offer|do|provide|cook|serve|make|run|have|can)\s+(.{4,80})$/i,
+  );
   if (offer) {
     const what = offer[1].replace(/[.?!]+$/, "").trim();
     return {
@@ -70,7 +72,9 @@ function readProposal(text: string, norm: string): Proposal | null {
       value: what,
     };
   }
-  const add = text.match(/\badd\s+(.{4,80}?)\s+(?:to|in)\s+my\s+(?:profile|capabilit\w+|business)/i);
+  const add = text.match(
+    /\badd\s+(.{4,80}?)\s+(?:to|in)\s+my\s+(?:profile|capabilit\w+|business)/i,
+  );
   if (add) {
     return { label: "Capabilities", line: { label: "Add", text: add[1] }, value: add[1] };
   }
@@ -82,8 +86,12 @@ export function proposeProfileChange(text: string, norm: string): Turn | null {
   // A fact starts with "I" or "We" ("I also offer ...", "We now have 7 employees", "I can now cook ..."),
   // or it is an order to change the profile ("update my radius to 150 miles").
   const says =
-    /^(also |btw |fyi |by the way )?(i|we) (also |now |just |recently )?(offer|provide|cook|serve|make|run|do|have|hired|added|got|specialize in|can now)\b/.test(norm) ||
-    /\b(update|change|set|correct|fix)\s+my\b|\badd\b.*\bto my (profile|capabilit\w+|business)\b|\bmy (radius|capacity|team|staff|employees|revenue|service area)\b.*\b(is|are|now)\b/.test(norm);
+    /^(also |btw |fyi |by the way )?(i|we) (also |now |just |recently )?(offer|provide|cook|serve|make|run|do|have|hired|added|got|specialize in|can now)\b/.test(
+      norm,
+    ) ||
+    /\b(update|change|set|correct|fix)\s+my\b|\badd\b.*\bto my (profile|capabilit\w+|business)\b|\bmy (radius|capacity|team|staff|employees|revenue|service area)\b.*\b(is|are|now)\b/.test(
+      norm,
+    );
   if (!says || /\b(win|chances?|bid|ready|eligible|qualify)\b/.test(norm)) return null;
   // A question about the feed ("can I see ...") is not a fact.
   if (/\?\s*$/.test(text.trim()) && !/\bcan now\b|\bnow\b/.test(norm)) return null;
@@ -93,7 +101,10 @@ export function proposeProfileChange(text: string, norm: string): Turn | null {
   const id = `prop-${readSession().turns + 1}-${Math.random().toString(36).slice(2, 6)}`;
   updateSession((s) => ({
     ...s,
-    proposals: { ...s.proposals, [id]: { label: proposal.label, heard: text.trim(), value: proposal.value } },
+    proposals: {
+      ...s.proposals,
+      [id]: { label: proposal.label, heard: text.trim(), value: proposal.value },
+    },
   }));
   const card: ProfileUpdateCard = {
     proposalId: id,
@@ -107,7 +118,11 @@ export function proposeProfileChange(text: string, norm: string): Turn | null {
     reply: `Thank you. I can add that to your My Business page under ${proposal.label}. Nothing changes until you tap Save on the card. I rank matches with what is on that page, so a true fact helps.`,
     kind: "profile_update",
     data,
-    chips: ["What do you know about my business?", "What's out there for me right now?", "How do you pick my matches?"],
+    chips: [
+      "What do you know about my business?",
+      "What's out there for me right now?",
+      "How do you pick my matches?",
+    ],
   };
 }
 
@@ -118,7 +133,11 @@ export function confirmProposal(id: string): string | null {
   updateSession((s) => {
     const { [id]: _gone, ...rest } = s.proposals;
     void _gone;
-    return { ...s, proposals: rest, savedChanges: [...s.savedChanges, { label: proposal.label, value: proposal.value }] };
+    return {
+      ...s,
+      proposals: rest,
+      savedChanges: [...s.savedChanges, { label: proposal.label, value: proposal.value }],
+    };
   });
   return proposal.label;
 }

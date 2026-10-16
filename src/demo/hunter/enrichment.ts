@@ -34,7 +34,9 @@ export function completeRail(): MilestoneRailItem[] {
   }));
 }
 
-export function enrichmentState(patch: Partial<EnrichmentStatePayload> = {}): EnrichmentStatePayload {
+export function enrichmentState(
+  patch: Partial<EnrichmentStatePayload> = {},
+): EnrichmentStatePayload {
   return {
     posture: "NORMAL",
     active: false,
