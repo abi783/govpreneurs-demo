@@ -63,6 +63,8 @@ type Msg = {
   /** The filters this turn asked for that the page's list did not apply, as one
    *  line. The page returns it from `onApplyFilters`; it shows under the reply. */
   filterNote?: string;
+  /** DEMO: follow-up questions, shown as buttons under the newest reply. */
+  suggestions?: string[];
   /** Profile facts learned this turn + any conflicts to confirm. */
   /** Server session id for the turn — attached to feedback analytics events. */
   sessionId?: string;
@@ -319,6 +321,12 @@ export function HunterChatOverlay({
     return chips.length ? chips : [...SUGGESTIONS];
   }, [profile, visibleOpps, tab]);
 
+  // DEMO: the newest reply carries the follow-up buttons.
+  const lastHunterId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) if (messages[i].from === "hunter") return messages[i].id;
+    return null;
+  }, [messages]);
+
   // Id of the just-arrived hunter reply currently animating in (typewriter).
   // Only the newest reply animates; reloaded/older messages render in full.
   const [animatingId, setAnimatingId] = useState<string | null>(null);
@@ -423,6 +431,7 @@ export function HunterChatOverlay({
           profileUpdate,
           restate,
           filterNote,
+          suggestions: res.suggestions,
           sessionId: res.sessionId,
           turnId: res.turnId ?? null,
         },
@@ -559,7 +568,8 @@ export function HunterChatOverlay({
                   </div>
                 )}
                 <div className={`hunter-msg-row from-${m.from}`}>
-                  <div className={`hunter-bubble from-${m.from}`}>
+                  {/* DEMO: replies hold short paragraphs and bullet lines, so line breaks show. */}
+                  <div className={`hunter-bubble from-${m.from}`} style={{ whiteSpace: "pre-line" }}>
                     {isAnimating ? (
                       <HunterTypewriter
                         text={m.text}
@@ -602,6 +612,25 @@ export function HunterChatOverlay({
                       onHandOff={handOffToComposer}
                     />
                   )}
+                  {/* DEMO: follow-up buttons under the newest reply. A click asks that question. */}
+                  {!isAnimating &&
+                    m.from === "hunter" &&
+                    m.id === lastHunterId &&
+                    !typing &&
+                    (m.suggestions?.length ?? 0) > 0 && (
+                      <div className="hunter-suggestion-chips" role="group" aria-label="Follow-up questions">
+                        {m.suggestions!.map((q) => (
+                          <button
+                            key={q}
+                            type="button"
+                            className="hunter-suggestion-chip"
+                            onClick={() => void submit(q)}
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   {!isAnimating && m.filterNote && (
                     <p className="hunter-msg__filter-note" role="note">
                       {m.filterNote}

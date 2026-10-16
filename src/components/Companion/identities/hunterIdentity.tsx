@@ -20,6 +20,7 @@ function delayedAgent(
   }, opts?.ms ?? 800);
 }
 
+// DEMO: unused prototype. The copy is true for the sample member, Amira Haddad.
 export function buildHunterIdentity(handlers: {
   onEnterStretches: () => void;
 }): AgentIdentity {
@@ -30,7 +31,7 @@ export function buildHunterIdentity(handlers: {
     accentVar: "--ai-7",
     avatar: <AgentAvatar agent="hunter" size={32} />,
     seedMessage:
-      "Hi Marcus — I'm Hunter, and I find government contracts that match your business. I've already pulled 247 strong matches for you. Want me to walk you through the top one?",
+      "Hi Amira — I'm Hunter, and I find government contracts that match your business. I've already pulled 14 matches for you. Want me to walk you through the top one?",
     placeholder: "Ask Hunter anything…",
     footerNote:
       "Hunter scopes fit. For deep bid analysis, open an opportunity to ask Grant.",
@@ -41,7 +42,7 @@ export function buildHunterIdentity(handlers: {
         onSelect: (api) =>
           delayedAgent(
             api,
-            "The top match is a USACE Wilmington / Fort Bragg DPW re-roof of 6 barracks — $480K, SDVOSB set-aside, closes in 18 days. Right in your lane and your past commercial roofs cover the past-performance bar. Want me to open it?",
+            "The top match is field meals for Camp Mackall training rotations — about $660K, a woman-owned set-aside, 45 miles from your kitchen. Want me to open it?",
             {
               actions: [
                 { label: "Open this opportunity", variant: "primary", onClick: () => console.log("Open top match") },
@@ -51,12 +52,12 @@ export function buildHunterIdentity(handlers: {
           ),
       },
       {
-        id: "sdvosb",
-        label: "What's an SDVOSB set-aside?",
+        id: "wosb",
+        label: "What's a WOSB set-aside?",
         onSelect: (api) =>
           delayedAgent(
             api,
-            "SDVOSB stands for Service-Disabled Veteran-Owned Small Business. Federal agencies set aside specific contracts for SDVOSB-certified firms — the competition pool is limited to certified firms only, which dramatically improves win rates. You're SDVOSB-certified, so you qualify for these. About 20% of opportunities I pull for you are SDVOSB set-asides.",
+            "WOSB stands for Women-Owned Small Business. Only woman-owned small businesses can compete for these set-asides, so the field is smaller. You are woman-owned and small, so you qualify.",
           ),
       },
       {
@@ -79,7 +80,7 @@ export function buildHunterIdentity(handlers: {
         onSelect: (api) =>
           delayedAgent(
             api,
-            "Switching to stretches mode. Showing 47 opportunities that fit your profile but need a partner, certification, or capacity stretch. Each card explains the gap.",
+            "Switching to stretches mode. Showing the opportunities that fit your profile but need a partner, a certification, or more capacity. Each card explains the gap.",
             { after: handlers.onEnterStretches },
           ),
       },

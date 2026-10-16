@@ -1,0 +1,23 @@
+/* DEMO (Hunter): fixes for the Opportunities page at narrow desktop widths.
+   At 1024 px the feed column is about 370 px wide, because the Hunter rail takes
+   360 px. The tab strip and the buyer switch must still fit on the page. */
+
+.opps-viewbar .opps-tabs {
+  flex-wrap: wrap;
+  gap: 0 var(--s-1);
+}
+.opps-viewbar .opps-tab {
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .opps-viewbar .opps-tab {
+    padding: 10px 8px;
+    gap: 4px;
+    font-size: 13px;
+  }
+  /* The icons carry no meaning that the labels lack, and they cost 18 px each. */
+  .opps-viewbar .opps-tab > svg {
+    display: none;
+  }
+}

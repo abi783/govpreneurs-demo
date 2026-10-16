@@ -324,7 +324,13 @@ const AGENCY_MATCHERS: Record<string, RegExp> = {
 // "presolicitation"; the lookbehind keeps a plain "Solicitation" distinct from
 // "Synopsis Solicitation" so the two facets stay mutually exclusive.
 const NOTICE_TYPE_RX: Record<string, RegExp> = {
-  solicitation: /(?<!synopsis[\s/])\bsolicitation\b|\brfp\b|\bifb\b/i,
+  // DEMO: the sample opportunities state their type as "Request for Quote", "Request for
+  // Proposal" or "Invitation for Bid". They are all solicitations, and RFQ and RFP are
+  // also facets of their own, so the Notice type options show real choices.
+  solicitation:
+    /(?<!synopsis[\s/])\bsolicitation\b|\brfp\b|\bifb\b|\brfq\b|request for (proposal|quote)|invitation for bid/i,
+  rfp: /\brfp\b|request for proposal/i,
+  rfq: /\brfq\b|request for quote/i,
   combined: /synopsis solicitation|combined synopsis/i,
   sources_sought: /sources sought/i,
   presol: /presol/i,

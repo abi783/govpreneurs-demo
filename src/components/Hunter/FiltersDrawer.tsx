@@ -37,10 +37,23 @@ import { sectionActiveCounts, type DrawerSectionId } from "../../lib/filterCount
 import { useFacetCounts } from "../../lib/useFacetCounts";
 import { withLane, type BuyerLane } from "../../lib/buyerLane";
 import { FACET_GLOSS } from "../../lib/filterGlosses";
-import { WORK_TYPES } from "../../lib/vocab/trades";
+import { WORK_TYPES, WORK_TYPE_TO_NAICS } from "../../lib/vocab/trades";
 import { STATES } from "../../lib/vocab/usStates";
 import type { StateCityGroup } from "../../lib/mock/govTaxonomy";
 import type { CardOpportunity } from "../../lib/mock/opportunities";
+
+// DEMO: the sample member is a caterer. The trade list puts the trades that hold one of her
+// NAICS codes first, tags them "from your profile", and leaves out the roofing trade.
+const DEMO_HIDDEN_TRADES = new Set(["roofing_and_roof_systems"]);
+function demoTrades(profileNaics: string[]) {
+  const own = (id: string) => (WORK_TYPE_TO_NAICS[id] ?? []).some((c) => profileNaics.includes(c));
+  const all = WORK_TYPES.filter((t) => !DEMO_HIDDEN_TRADES.has(t.id));
+  return [...all.filter((t) => own(t.id)), ...all.filter((t) => !own(t.id))].map((t) => ({
+    id: t.id,
+    label: t.label,
+    prefilled: own(t.id),
+  }));
+}
 
 // Temporarily hidden — kept in code for later re-enable.
 const SHOW_SAVED_LISTS = false;
@@ -226,10 +239,13 @@ export function FiltersDrawer({
 
   // Seed groups for LocationPicker — one entry per state with an empty city
   // list; LocationPicker lazily fetches each state's cities on first expand.
-  const locationGroups = useMemo<StateCityGroup[]>(
-    () => STATES.map((s) => ({ state: s.id, cities: [] })),
-    [],
-  );
+  // DEMO: the member's own states (from her profile) come first, so she does not scroll past Alabama.
+  const profileStates = prefilledValues(filters, "states").join(",");
+  const locationGroups = useMemo<StateCityGroup[]>(() => {
+    const own = new Set(profileStates.split(",").filter(Boolean));
+    const all = STATES.map((s) => ({ state: s.id, cities: [] }));
+    return [...all.filter((g) => own.has(g.state)), ...all.filter((g) => !own.has(g.state))];
+  }, [profileStates]);
 
   const jumpTo = (id: DrawerSectionId) => {
     const sec = bodyRef.current?.querySelector<HTMLElement>(`#fd-sec-${id}`);
@@ -360,11 +376,7 @@ export function FiltersDrawer({
                 </div>
                 <div className="fd-control">
                   <WorkPicker
-                    trades={WORK_TYPES.map((t) => ({
-                      id: t.id,
-                      label: t.label,
-                      prefilled: filters.prefilled.has(`workTypes:${t.id}`),
-                    }))}
+                    trades={demoTrades(prefilledValues(filters, "naics"))}
                     selected={filters.workTypes}
                     excludedNaics={filters.excludedNaics}
                     onChangeTrades={(next) =>

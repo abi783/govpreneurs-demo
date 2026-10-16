@@ -22,16 +22,17 @@ interface ChatMsg {
   actions?: ActionChip[];
 }
 
+// DEMO: unused prototype. The copy is true for the sample member, Amira Haddad.
 const SEED: ChatMsg = {
   id: "seed",
   from: "hunter",
-  text: "Hi Marcus — I'm Hunter, and I find government contracts that match your business. I've already pulled 247 strong matches for you. Want me to walk you through the top one?",
+  text: "Hi Amira — I'm Hunter, and I find government contracts that match your business. I've already pulled 14 matches for you. Want me to walk you through the top one?",
   stamp: "just now",
 };
 
 const SUGGESTIONS = [
   "Walk me through the top match",
-  "What's an SDVOSB set-aside?",
+  "What's a WOSB set-aside?",
   "Compare the top 3",
   "Show me opportunities I'd team up for",
 ] as const;
@@ -42,7 +43,7 @@ function scriptedReplyFor(prompt: string): { text: string; actions?: ActionChip[
   switch (prompt as Suggestion) {
     case "Walk me through the top match":
       return {
-        text: "The top match is a USACE Wilmington / Fort Bragg DPW re-roof of 6 barracks — $480K, SDVOSB set-aside, closes in 18 days. It's right in your lane and your past commercial roofs cover the past-performance bar. Want me to open it?",
+        text: "The top match is field meals for Camp Mackall training rotations — about $660K, a woman-owned set-aside, 45 miles from your kitchen. It uses your food-service code. Want me to open it?",
         actions: [
           {
             label: "Open this opportunity",
@@ -52,9 +53,9 @@ function scriptedReplyFor(prompt: string): { text: string; actions?: ActionChip[
           { label: "Show me #2 instead", variant: "ghost", onClick: () => console.log("Show #2") },
         ],
       };
-    case "What's an SDVOSB set-aside?":
+    case "What's a WOSB set-aside?":
       return {
-        text: "SDVOSB stands for Service-Disabled Veteran-Owned Small Business. Federal agencies set aside specific contracts for SDVOSB-certified firms — the competition pool is limited to certified firms only, which dramatically improves win rates. You're SDVOSB-certified, so you qualify for these. About 20% of opportunities I pull for you are SDVOSB set-asides.",
+        text: "SDVOSB stands for Service-Disabled Veteran-Owned Small Business. Only firms owned by a service-disabled veteran can compete for these set-asides. You are not an SDVOSB. Your set-asides are Small Business and Woman-Owned (WOSB).",
       };
     case "Compare the top 3":
       return { text: "Pulling them up side by side…" };

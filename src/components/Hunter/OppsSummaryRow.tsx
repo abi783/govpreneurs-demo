@@ -9,6 +9,7 @@ import { capabilityStatementUrl } from "../../lib/preview";
 import { useGhlUser } from "../../lib/ghlUser";
 import { CountTicker } from "./CountTicker";
 import { SaveSearchPopover } from "./SaveSearchPopover";
+import { PAST_PERFORMANCE, PERSONA } from "../../demo/story/persona";
 
 export type SortKey = "match" | "newest" | "deadline" | "timeLeft" | "value" | "smallest" | "saved";
 
@@ -132,13 +133,26 @@ function WhyReasoning({ profile, loading }: { profile: BusinessProfile | null; l
     );
   }
 
-  const { scopeFit, location, certEligibility } = weightingDimensions(profile);
+  const { scopeFit, location, certEligibility: certs } = weightingDimensions(profile);
+  // DEMO: "Small Business" and "Small Business set-aside" name one status twice. Keep the longer name.
+  const certEligibility = certs.includes("Small Business set-aside")
+    ? certs.filter((c) => c !== "Small Business")
+    : certs;
+  // DEMO: the sample member's evidence, so the panel says what the ranking rests on.
+  const samUntil = new Date(`${PERSONA.samActiveUntil}T12:00:00`).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
   return (
     <p className="opps-summary__reasoning">
       Weighted by <strong>scope fit</strong> (
       {formatDimension(scopeFit, "your business categories")}), <strong>location</strong> (
       {location ?? "your locations"}), <strong>certification eligibility</strong> (
       {formatDimension(certEligibility, "your set-asides")}), and <strong>past performance</strong>.
+      <span style={{ display: "block", marginTop: 4 }}>
+        Hunter read your capability statement, your SAM.gov registration (active until {samUntil}) and
+        your {PAST_PERFORMANCE.length} past jobs to rank these.
+      </span>
     </p>
   );
 }
