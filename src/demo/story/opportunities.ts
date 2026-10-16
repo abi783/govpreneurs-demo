@@ -1,0 +1,867 @@
+// THE STORY: every opportunity in the demo, in one place.
+//
+// Hunter's feed, the opportunity page, Grant, Ava, the Pipeline, Mentor
+// Reviews, Tasks and search all read from this list. No screen keeps its own
+// copy of a title, a value, a date or a status, so no two screens can
+// disagree.
+//
+// Rules (enforced by story.test.ts):
+// 1. Every phrase Hunter uses to justify a pick (`fit[].says`) appears in his
+//    line, and every fit fact is true of the member in persona.ts.
+// 2. Every date is relative: `postedDaysAgo` and `closesInDays` count from the
+//    day the demo opens (clock.ts). Nothing closes in 6 days or fewer, because
+//    production treats 5 days or fewer as too late to bid.
+// 3. Hunter never uses Bid / No-bid words and never promises a win. Grant's
+//    call is Grant's alone.
+// 4. No real company is named as a bidder, incumbent or partner. Government
+//    buyers are real; companies are fictional.
+
+import type { PastPerformanceId } from "./persona";
+import type { PlaceKey } from "./places";
+
+export type NoticeType =
+  | "Solicitation"
+  | "Combined Synopsis/Solicitation"
+  | "Request for Quote"
+  | "Sources Sought"
+  | "Invitation for Bid"
+  | "Request for Proposal";
+
+/** SAM set-aside codes used in the story. null = open to all. */
+export type SetAside = "WOSB" | "SBA" | null;
+
+export type HunterTier = "priority" | "strong" | "stretch" | "low";
+
+export type FitFact =
+  | { kind: "naics"; code: string; says: string }
+  | { kind: "setAside"; code: "WOSB" | "SBA"; says: string }
+  | { kind: "valueInRange"; says: string }
+  | { kind: "valueAboveRange"; says: string }
+  | { kind: "distance"; says: string }
+  | { kind: "pastPerformance"; id: PastPerformanceId; says: string }
+  | { kind: "targetAgency"; says: string }
+  | { kind: "noticeType"; says: string }
+  | { kind: "clearanceGap"; says: string };
+
+export type GrantVerdict = "bid" | "review" | "no_bid";
+
+export interface GrantCall {
+  verdict: GrantVerdict;
+  /** Go / no-go as prime contractor. */
+  prime: "go" | "no_go";
+  /** Go / no-go as a subcontractor; null when teaming is not relevant. */
+  sub: "go" | "no_go" | null;
+  /** Grant's call in one sentence, in his voice, to the member. */
+  oneLine: string;
+  /** True when the full review is written by hand (grant/authored/*). */
+  authored?: boolean;
+}
+
+/** Pipeline stages, as production's board names them (lib/mock/bids.ts). */
+export type PursuitStage =
+  | "saved"
+  | "reviewing"
+  | "with_mentor"
+  | "drafting"
+  | "submitted"
+  | "won"
+  | "not_awarded"
+  | "declined";
+
+export interface Pursuit {
+  stage: PursuitStage;
+  /** The card's context line on the Pipeline board. */
+  note: string;
+  /** The card's next move. `to` is an in-app route. */
+  next: { label: string; to: string };
+  lastActivityDaysAgo: number;
+}
+
+export type AvaKind = "short-response" | "written-proposal" | "bid-package" | "reply";
+
+export interface AvaState {
+  kind: AvaKind;
+  /** Where Ava's flow starts in the demo (prototype `flow.ts` stage names). */
+  stage:
+    | "answer my questions"
+    | "check you can bid"
+    | "read"
+    | "ready";
+  needsYou: boolean;
+  paused: boolean;
+  /** Ava's one status line on the bid list card. */
+  statusLine: string;
+}
+
+export interface StoryOpportunity {
+  id: string;
+  /** Title as the buyer posted it. */
+  title: string;
+  /** Hunter's plain-English title (production `geminiPlainEnglishTitle`). */
+  plainTitle: string;
+  agency: string;
+  office: string;
+  scope: "fed" | "sled";
+  noticeType: NoticeType;
+  setAside: SetAside;
+  naics: string;
+  valueLow: number | null;
+  valueHigh: number | null;
+  /** How the buyer states the value. Default: total over all years. */
+  valueBasis?: "total" | "per_year";
+  place: PlaceKey;
+  postedDaysAgo: number;
+  closesInDays: number;
+  /** What the buyer wants, in two plain sentences. */
+  summary: string;
+  /** Set when the work needs cleared staff. */
+  clearanceRequired?: string;
+  /** True when the agency is one of the member's target buyers. */
+  targetAgency?: boolean;
+  hunter: {
+    tier: HunterTier;
+    /** 0–100. Production tiers: priority ≥ 80, strong ≥ 60, stretch ≥ 40. */
+    score: number;
+    /** Position on the "Opportunities for you" tab. Absent = All tab only. */
+    forYouRank?: number;
+    /** "Why Hunter thinks this fits" — one sentence, you-voice, ≤ 210 chars. */
+    line?: string;
+    fit?: FitFact[];
+  };
+  grant: GrantCall;
+  saved?: boolean;
+  pursuit?: Pursuit;
+  ava?: AvaState;
+  /** Mentor review thread about this opportunity (mentorReviews.ts). */
+  mentorReviewId?: string;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// The three hero opportunities Tim walks through, then the rest of the
+// "Opportunities for you" tab, then the All tab.
+// ═════════════════════════════════════════════════════════════════════════
+
+export const HERO_IDS = {
+  /** Hunter → Grant "Bid" → Ava builds it. */
+  fieldMeals: "SP4701-26-Q-0021",
+  /** Grant: bid as a subcontractor; Partners shows the incumbent. */
+  fortBraggDining: "W912EE-26-R-0066",
+  /** Grant: No-bid, the site needs cleared staff. */
+  classifiedSite: "SP4701-26-R-0078",
+} as const;
+
+export const OPPORTUNITIES: StoryOpportunity[] = [
+  // ── HERO 1 ────────────────────────────────────────────────────────────
+  {
+    id: "SP4701-26-Q-0021",
+    title: "Field Feeding Support — Camp Mackall Training Rotations",
+    plainTitle: "Field meals for Camp Mackall training rotations",
+    agency: "Department of the Army",
+    office: "Mission and Installation Contracting Command (MICC) — Fort Bragg",
+    scope: "fed",
+    noticeType: "Request for Quote",
+    setAside: "WOSB",
+    naics: "722310",
+    valueLow: 540_000,
+    valueHigh: 780_000,
+    place: "campMackall",
+    postedDaysAgo: 3,
+    closesInDays: 26,
+    targetAgency: true,
+    summary:
+      "Cook, pack and deliver breakfast and dinner to soldiers at Camp Mackall field sites during training rotations, about 18 rotations a year. Insulated delivery to two drop points, a base year and two option years.",
+    hunter: {
+      tier: "priority",
+      score: 94,
+      forYouRank: 1,
+      line:
+        "Field meals for Camp Mackall training rotations: your food-service code, a woman-owned set-aside, about $660K, and under an hour from your kitchen.",
+      fit: [
+        { kind: "naics", code: "722310", says: "your food-service code" },
+        { kind: "setAside", code: "WOSB", says: "a woman-owned set-aside" },
+        { kind: "valueInRange", says: "about $660K" },
+        { kind: "distance", says: "under an hour from your kitchen" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Bid it as prime. It is your work, your size and your set-aside, and 26 days is enough if you fix two staffing gaps early.",
+      authored: true,
+    },
+    saved: true,
+    pursuit: {
+      stage: "drafting",
+      note: "Ava is building the quote — she needs 3 answers from you.",
+      next: { label: "Answer Ava", to: "/ava/SP4701-26-Q-0021" },
+      lastActivityDaysAgo: 0,
+    },
+    ava: {
+      kind: "short-response",
+      stage: "answer my questions",
+      needsYou: true,
+      paused: false,
+      statusLine: "Ava has 3 questions for you about delivery times and staff.",
+    },
+    mentorReviewId: "rev-mackall-pursue",
+  },
+
+  // ── HERO 2 ────────────────────────────────────────────────────────────
+  {
+    id: "W912EE-26-R-0066",
+    title: "Dining Facility Food Service — Two Facilities, Fort Bragg",
+    plainTitle: "Run two Fort Bragg dining halls",
+    agency: "Department of the Army",
+    office: "Mission and Installation Contracting Command (MICC) — Fort Bragg",
+    scope: "fed",
+    noticeType: "Request for Proposal",
+    setAside: "SBA",
+    naics: "722310",
+    valueLow: 1_900_000,
+    valueHigh: 2_100_000,
+    valueBasis: "per_year",
+    place: "fortBragg",
+    postedDaysAgo: 8,
+    closesInDays: 18,
+    targetAgency: true,
+    summary:
+      "Full food service at two on-post dining facilities: three meals a day, seven days a week, for about 1,400 soldiers. A base year and four option years, with a performance and payment bond of 100% of the annual price.",
+    hunter: {
+      tier: "priority",
+      score: 86,
+      forYouRank: 5,
+      line:
+        "Two Fort Bragg dining halls: the same work you did as Carolina Dining Group's subcontractor. At about $2M a year it is above your range, so it may be a team bid.",
+      fit: [
+        { kind: "pastPerformance", id: "pp-cdg-sub", says: "as Carolina Dining Group's subcontractor" },
+        { kind: "valueAboveRange", says: "about $2M a year it is above your range" },
+        { kind: "targetAgency", says: "Fort Bragg dining halls" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "no_go",
+      sub: "go",
+      oneLine:
+        "Bid it, but as Carolina Dining Group's subcontractor. The $2M bond is out of reach as prime today, and they have held this contract since 2019.",
+      authored: true,
+    },
+    saved: true,
+    pursuit: {
+      stage: "reviewing",
+      note: "Grant says team up. Carolina Dining Group is looking for woman-owned subcontractors.",
+      next: { label: "See the partner", to: "/partners" },
+      lastActivityDaysAgo: 1,
+    },
+  },
+
+  // ── HERO 3 ────────────────────────────────────────────────────────────
+  {
+    id: "SP4701-26-R-0078",
+    title: "Dining Support Services — Camp Mackall Restricted Training Site",
+    plainTitle: "Dining support at a restricted Camp Mackall site",
+    agency: "Department of the Army",
+    office: "Mission and Installation Contracting Command (MICC) — Fort Bragg",
+    scope: "fed",
+    noticeType: "Request for Proposal",
+    setAside: null,
+    naics: "722310",
+    valueLow: 1_800_000,
+    valueHigh: 2_600_000,
+    place: "campMackall",
+    postedDaysAgo: 5,
+    closesInDays: 41,
+    clearanceRequired: "Every on-site worker needs an active Secret clearance before day one.",
+    targetAgency: true,
+    summary:
+      "Dining support at a restricted training site inside Camp Mackall. All on-site staff must hold an active Secret clearance at contract start; the government will not sponsor new clearances.",
+    hunter: {
+      tier: "stretch",
+      score: 58,
+      forYouRank: 13,
+      line:
+        "Dining support at a Camp Mackall site: your food-service code and under an hour away, but every worker needs a security clearance and your team holds none.",
+      fit: [
+        { kind: "naics", code: "722310", says: "your food-service code" },
+        { kind: "distance", says: "under an hour away" },
+        { kind: "clearanceGap", says: "your team holds none" },
+      ],
+    },
+    grant: {
+      verdict: "no_bid",
+      prime: "no_go",
+      sub: "no_go",
+      oneLine:
+        "Don't bid. Every worker needs a Secret clearance on day one, the Army won't sponsor them, and clearances take months. Spend the time on Camp Mackall field meals instead.",
+      authored: true,
+    },
+    pursuit: {
+      stage: "declined",
+      note: "Passed on Grant's advice: cleared staff needed on day one.",
+      next: { label: "Read Grant's reasons", to: "/opportunities/SP4701-26-R-0078" },
+      lastActivityDaysAgo: 2,
+    },
+  },
+
+  // ── The rest of "Opportunities for you" ──────────────────────────────
+  {
+    id: "FAYNC-2026-R-08",
+    title: "Employee Cafe and Event Catering Services — Public Works Commission",
+    plainTitle: "Staff cafe and event catering for Fayetteville Public Works",
+    agency: "City of Fayetteville, NC",
+    office: "Purchasing Division",
+    scope: "sled",
+    noticeType: "Request for Proposal",
+    setAside: null,
+    naics: "722310",
+    valueLow: 185_000,
+    valueHigh: 235_000,
+    place: "fayetteville",
+    postedDaysAgo: 9,
+    closesInDays: 14,
+    summary:
+      "Run the staff cafe at the Public Works campus five days a week and cater about 20 city events a year. A one-year contract with two renewal years, scored on approach, experience and price.",
+    hunter: {
+      tier: "priority",
+      score: 91,
+      forYouRank: 2,
+      line:
+        "The City of Fayetteville wants a cafe and event caterer: about $210K, in your hometown, and the same public-buyer work as your county summer meals.",
+      fit: [
+        { kind: "valueInRange", says: "about $210K" },
+        { kind: "distance", says: "in your hometown" },
+        { kind: "pastPerformance", id: "pp-county-schools", says: "your county summer meals" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Bid it. It is local, it is your size, and it is scored on approach, which is where your event menus win points.",
+      authored: true,
+    },
+    saved: true,
+    pursuit: {
+      stage: "with_mentor",
+      note: "Ava finished the proposal. Sarah Mitchell replied with notes.",
+      next: { label: "Read Sarah's notes", to: "/mentors/rev-fayetteville-proposal" },
+      lastActivityDaysAgo: 0,
+    },
+    ava: {
+      kind: "written-proposal",
+      stage: "read",
+      needsYou: true,
+      paused: false,
+      statusLine: "Sarah Mitchell reviewed your proposal. Read her notes, then send it.",
+    },
+    mentorReviewId: "rev-fayetteville-proposal",
+  },
+  {
+    id: "CUMCO-2026-014",
+    title: "Inmate Meal Services — Cumberland County Detention Center Annex",
+    plainTitle: "Daily meals for the Cumberland County detention annex",
+    agency: "Cumberland County, NC",
+    office: "Finance — Purchasing",
+    scope: "sled",
+    noticeType: "Invitation for Bid",
+    setAside: null,
+    naics: "722310",
+    valueLow: 290_000,
+    valueHigh: 410_000,
+    place: "fayetteville",
+    postedDaysAgo: 6,
+    closesInDays: 20,
+    summary:
+      "Three meals a day for about 240 people at the detention annex, prepared off-site and delivered hot. A sealed bid: the lowest price from a qualified bidder wins.",
+    hunter: {
+      tier: "priority",
+      score: 89,
+      forYouRank: 3,
+      line:
+        "Cumberland County needs daily meals for its detention annex: about $350K, a county you have fed before, and a sealed price bid with no essay to write.",
+      fit: [
+        { kind: "valueInRange", says: "about $350K" },
+        { kind: "pastPerformance", id: "pp-county-schools", says: "a county you have fed before" },
+        { kind: "noticeType", says: "a sealed price bid" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Bid it. The county knows your work, and a sealed bid is decided on price, so this is about your numbers, not your writing.",
+      authored: true,
+    },
+    saved: true,
+    pursuit: {
+      stage: "drafting",
+      note: "Ava paused: the county needs food-handler certificates for every cook.",
+      next: { label: "Upload certificates", to: "/ava/CUMCO-2026-014" },
+      lastActivityDaysAgo: 1,
+    },
+    ava: {
+      kind: "bid-package",
+      stage: "check you can bid",
+      needsYou: true,
+      paused: true,
+      statusLine: "Paused: the county asks for a food-handler certificate for every cook. You have 3 of 5.",
+    },
+  },
+  {
+    id: "W912PM-26-Q-0017",
+    title: "Ceremony and Official Function Catering — Pope Army Airfield",
+    plainTitle: "Ceremony and official-function catering at Pope Army Airfield",
+    agency: "Department of the Army",
+    office: "43rd Air Mobility Operations Group — Contracting",
+    scope: "fed",
+    noticeType: "Request for Quote",
+    setAside: "WOSB",
+    naics: "722320",
+    valueLow: 310_000,
+    valueHigh: 470_000,
+    place: "popeAaf",
+    postedDaysAgo: 4,
+    closesInDays: 11,
+    targetAgency: true,
+    summary:
+      "Catering for change-of-command ceremonies, retirements and official dinners, about 40 events a year from 50 to 600 guests. Order-by-order pricing over a base year and two option years.",
+    hunter: {
+      tier: "priority",
+      score: 92,
+      forYouRank: 4,
+      line:
+        "Ceremony catering at Pope Army Airfield: a woman-owned set-aside, about $390K, 15 minutes away, and event menus like your church catering work.",
+      fit: [
+        { kind: "setAside", code: "WOSB", says: "a woman-owned set-aside" },
+        { kind: "valueInRange", says: "about $390K" },
+        { kind: "distance", says: "15 minutes away" },
+        { kind: "pastPerformance", id: "pp-church", says: "your church catering work" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Bid it. Event catering is your strongest work, and only woman-owned firms can bid. Price the 600-guest dinners carefully.",
+    },
+    saved: true,
+    pursuit: {
+      stage: "saved",
+      note: "Saved 4 days ago. Grant has a take ready.",
+      next: { label: "Review with Grant", to: "/opportunities/W912PM-26-Q-0017" },
+      lastActivityDaysAgo: 4,
+    },
+  },
+  {
+    id: "NCNG-2026-21",
+    title: "Drill Weekend Meal Service — NC National Guard Armory, Hope Mills",
+    plainTitle: "Drill-weekend meals for the NC National Guard in Hope Mills",
+    agency: "North Carolina National Guard",
+    office: "State Purchasing — Joint Force Headquarters",
+    scope: "sled",
+    noticeType: "Request for Quote",
+    setAside: null,
+    naics: "722310",
+    valueLow: 190_000,
+    valueHigh: 240_000,
+    place: "hopeMills",
+    postedDaysAgo: 2,
+    closesInDays: 12,
+    summary:
+      "Hot breakfast, lunch and dinner for about 300 Guard members on one drill weekend a month, served at the Hope Mills armory. One year with two renewal years.",
+    hunter: {
+      tier: "strong",
+      score: 84,
+      forYouRank: 6,
+      line:
+        "Drill-weekend meals for the NC National Guard: about $215K, 10 minutes from your kitchen, and the same batch-cooking as your county summer meals.",
+      fit: [
+        { kind: "valueInRange", says: "about $215K" },
+        { kind: "distance", says: "10 minutes from your kitchen" },
+        { kind: "pastPerformance", id: "pp-county-schools", says: "your county summer meals" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine: "Bid it. Weekend work fits around your weekday jobs, and the armory is ten minutes away.",
+    },
+  },
+  {
+    id: "VA247-26-R-0112",
+    title: "Patient Meal Service — Fayetteville VA Medical Center, Building 4",
+    plainTitle: "Patient meals at the Fayetteville VA Medical Center",
+    agency: "Department of Veterans Affairs",
+    office: "Network Contracting Office 6",
+    scope: "fed",
+    noticeType: "Request for Proposal",
+    setAside: "SBA",
+    naics: "722310",
+    valueLow: 620_000,
+    valueHigh: 740_000,
+    place: "fayetteville",
+    postedDaysAgo: 11,
+    closesInDays: 21,
+    targetAgency: true,
+    summary:
+      "Prepare and deliver patient trays, including renal, diabetic and texture-modified diets, for a 60-bed building during a kitchen renovation. One year with one option year.",
+    hunter: {
+      tier: "priority",
+      score: 88,
+      forYouRank: 7,
+      line:
+        "Patient meals at the Fayetteville VA: a small-business set-aside, across town, and the same therapeutic-diet trays you delivered at Womack.",
+      fit: [
+        { kind: "setAside", code: "SBA", says: "a small-business set-aside" },
+        { kind: "distance", says: "across town" },
+        { kind: "pastPerformance", id: "pp-womack", says: "you delivered at Womack" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Bid it. Womack is direct proof you can run therapeutic diets. Ask Womack for a performance rating before you submit.",
+    },
+    saved: true,
+    pursuit: {
+      stage: "saved",
+      note: "Saved 3 days ago.",
+      next: { label: "Review with Grant", to: "/opportunities/VA247-26-R-0112" },
+      lastActivityDaysAgo: 3,
+    },
+  },
+  {
+    id: "W912PM-26-Q-0033",
+    title: "Snack Bar and Grab-and-Go Operation — Fort Bragg DPW Campus",
+    plainTitle: "Grab-and-go and snack bar for the Fort Bragg public-works campus",
+    agency: "Department of the Army",
+    office: "Mission and Installation Contracting Command (MICC) — Fort Bragg",
+    scope: "fed",
+    noticeType: "Request for Quote",
+    setAside: "WOSB",
+    naics: "722310",
+    valueLow: 420_000,
+    valueHigh: 640_000,
+    place: "fortBragg",
+    postedDaysAgo: 6,
+    closesInDays: 24,
+    targetAgency: true,
+    summary:
+      "Run a snack bar and a grab-and-go counter for about 900 public-works staff, weekdays 6 AM to 2 PM. A base year and two option years.",
+    hunter: {
+      tier: "strong",
+      score: 83,
+      forYouRank: 8,
+      line:
+        "A grab-and-go counter on the Fort Bragg public-works campus: a woman-owned set-aside, about $530K, and 12 miles from your kitchen.",
+      fit: [
+        { kind: "setAside", code: "WOSB", says: "a woman-owned set-aside" },
+        { kind: "valueInRange", says: "about $530K" },
+        { kind: "distance", says: "12 miles from your kitchen" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine: "Bid it, but not at the same time as Camp Mackall unless you hire two more staff.",
+    },
+  },
+  {
+    id: "RCSC-2026-09",
+    title: "Cafeteria Food Service — Lumberton Senior High School",
+    plainTitle: "Cafeteria service at a Robeson County high school",
+    agency: "Public Schools of Robeson County, NC",
+    office: "Child Nutrition Services",
+    scope: "sled",
+    noticeType: "Request for Proposal",
+    setAside: null,
+    naics: "722310",
+    valueLow: 195_000,
+    valueHigh: 245_000,
+    place: "lumberton",
+    postedDaysAgo: 7,
+    closesInDays: 16,
+    targetAgency: true,
+    summary:
+      "Breakfast and lunch for about 1,300 students on USDA meal patterns, school days only. One school year with up to four renewals.",
+    hunter: {
+      tier: "strong",
+      score: 82,
+      forYouRank: 9,
+      line:
+        "School cafeteria service in Lumberton: about $220K, 35 miles south, and USDA meal patterns are the work your county summer meals prove.",
+      fit: [
+        { kind: "valueInRange", says: "about $220K" },
+        { kind: "distance", says: "35 miles south" },
+        { kind: "pastPerformance", id: "pp-county-schools", says: "your county summer meals" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine: "Bid it. Your USDA summer-meals record is exactly what a school nutrition director looks for.",
+    },
+  },
+  {
+    id: "W912EE-27-S-0004",
+    title: "Sources Sought — Installation Dining Services Study, Fort Bragg",
+    plainTitle: "Fort Bragg asks which small caterers could run its dining program",
+    agency: "Department of the Army",
+    office: "Mission and Installation Contracting Command (MICC) — Fort Bragg",
+    scope: "fed",
+    noticeType: "Sources Sought",
+    setAside: null,
+    naics: "722310",
+    valueLow: null,
+    valueHigh: null,
+    place: "fortBragg",
+    postedDaysAgo: 4,
+    closesInDays: 30,
+    targetAgency: true,
+    summary:
+      "Not a bid. The Army is asking small businesses whether they could run installation dining before it writes the next contract. Replies are two short parts by email, with no price.",
+    hunter: {
+      tier: "strong",
+      score: 80,
+      forYouRank: 10,
+      line:
+        "Not a bid yet: Fort Bragg dining halls are being planned, and the Army asks who could do the work. A short reply puts you on the list before the bid is written.",
+      fit: [
+        { kind: "noticeType", says: "Not a bid yet" },
+        { kind: "targetAgency", says: "Fort Bragg dining halls" },
+      ],
+    },
+    grant: {
+      verdict: "bid",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Reply. It costs an hour and no money, and a woman-owned reply can push the Army to set the next contract aside.",
+      authored: true,
+    },
+    saved: true,
+    pursuit: {
+      stage: "drafting",
+      note: "Ava drafted your two-part reply. Read it and send it.",
+      next: { label: "Read the reply", to: "/ava/W912EE-27-S-0004" },
+      lastActivityDaysAgo: 1,
+    },
+    ava: {
+      kind: "reply",
+      stage: "ready",
+      needsYou: true,
+      paused: false,
+      statusLine: "Your reply is ready. Read it, then send it by email.",
+    },
+  },
+  {
+    id: "FA4800-26-Q-0044",
+    title: "Flight-Line Boxed Meal Service — Seymour Johnson AFB",
+    plainTitle: "Boxed meals for the Seymour Johnson flight line",
+    agency: "Department of the Air Force",
+    office: "4th Contracting Squadron",
+    scope: "fed",
+    noticeType: "Request for Quote",
+    setAside: "SBA",
+    naics: "722330",
+    valueLow: 390_000,
+    valueHigh: 580_000,
+    place: "goldsboro",
+    postedDaysAgo: 10,
+    closesInDays: 13,
+    summary:
+      "Boxed breakfasts and lunches for flight-line crews, ordered the day before, delivered by 5 AM. A base year and two option years.",
+    hunter: {
+      tier: "strong",
+      score: 78,
+      forYouRank: 11,
+      line:
+        "Boxed meals for the Seymour Johnson flight line: about $485K, a small-business set-aside, and boxed meals sit in your mobile food-service code.",
+      fit: [
+        { kind: "valueInRange", says: "about $485K" },
+        { kind: "setAside", code: "SBA", says: "a small-business set-aside" },
+        { kind: "naics", code: "722330", says: "your mobile food-service code" },
+      ],
+    },
+    grant: {
+      verdict: "review",
+      prime: "go",
+      sub: null,
+      oneLine:
+        "Look closer before you commit. Goldsboro is 75 miles away, and a 5 AM delivery means a 3:30 AM start every day.",
+    },
+  },
+  {
+    id: "DUR-CO-2026-12",
+    title: "Senior Nutrition Program Meals — Two Durham County Centers",
+    plainTitle: "Senior meals at two Durham County centres",
+    agency: "Durham County, NC",
+    office: "Department of Social Services",
+    scope: "sled",
+    noticeType: "Request for Proposal",
+    setAside: null,
+    naics: "722310",
+    valueLow: 180_000,
+    valueHigh: 240_000,
+    place: "durham",
+    postedDaysAgo: 12,
+    closesInDays: 17,
+    summary:
+      "Hot lunches for about 150 older adults a day at two senior centres, plus 60 home-delivered meals. One year with two renewals.",
+    hunter: {
+      tier: "strong",
+      score: 74,
+      forYouRank: 12,
+      line:
+        "Senior lunches at two Durham County centres: about $210K, and inside your service area, though 85 miles is a long daily drive.",
+      fit: [
+        { kind: "valueInRange", says: "about $210K" },
+        { kind: "distance", says: "inside your service area" },
+      ],
+    },
+    grant: {
+      verdict: "review",
+      prime: "go",
+      sub: null,
+      oneLine: "Look closer. The work fits, but a daily 170-mile round trip eats most of the margin.",
+    },
+  },
+  {
+    id: "N40085-26-Q-0089",
+    title: "Mess Attendant Services — MCB Camp Lejeune (12 Facilities)",
+    plainTitle: "Mess-attendant staff for 12 Camp Lejeune dining facilities",
+    agency: "Department of the Navy",
+    office: "NAVFAC Mid-Atlantic — Camp Lejeune",
+    scope: "fed",
+    noticeType: "Request for Quote",
+    setAside: "SBA",
+    naics: "722310",
+    valueLow: 180_000,
+    valueHigh: 235_000,
+    place: "jacksonville",
+    postedDaysAgo: 13,
+    closesInDays: 9,
+    summary:
+      "Supply mess attendants (dish room, serving line, cleaning) for 12 Marine Corps dining facilities. No cooking. One year with two options.",
+    hunter: {
+      tier: "stretch",
+      score: 64,
+      forYouRank: 14,
+      line:
+        "Mess-attendant staffing at Camp Lejeune: about $210K and a small-business set-aside, but it is staffing rather than cooking, and 100 miles out.",
+      fit: [
+        { kind: "valueInRange", says: "about $210K" },
+        { kind: "setAside", code: "SBA", says: "a small-business set-aside" },
+        { kind: "distance", says: "100 miles out" },
+      ],
+    },
+    grant: {
+      verdict: "no_bid",
+      prime: "no_go",
+      sub: null,
+      oneLine: "Skip it. It is a staffing contract 100 miles away, and it uses none of your kitchen.",
+    },
+  },
+
+  // ── All tab only ──────────────────────────────────────────────────────
+  allOnly("N40085-26-R-0102", "Community Center Catering, Family Housing — MCAS Cherry Point", "Community-centre catering for Cherry Point family housing", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Proposal", "WOSB", "722320", 510_000, 720_000, "cherryPoint", 14, 31, "strong", 76, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. It is woman-owned and your size, but 140 miles is a long way for event catering." }),
+  allOnly("CCSC-2026-22", "School Nutrition Services — Three Elementary Schools", "Meals for three Cumberland County elementary schools", "Cumberland County Schools, NC", "Child Nutrition Services", "sled", "Request for Proposal", null, "722310", 680_000, 910_000, "fayetteville", 5, 35, "priority", 85, { verdict: "bid", prime: "go", sub: null, oneLine: "Bid it. Your best reference, Janet Reyes, runs this program." }, { saved: true }),
+  allOnly("W912PM-26-R-0058", "Full Food Service — XVIII Airborne Corps Dining Complex", "Full food service at the XVIII Airborne Corps dining complex", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Proposal", "WOSB", "722310", 1_100_000, 1_600_000, "fortBragg", 9, 40, "strong", 72, { verdict: "review", prime: "no_go", sub: "go", oneLine: "Look closer. Twice your annual revenue; better as a subcontractor this year." }),
+  allOnly("W912HN-26-Q-0014", "Cafeteria and Catering Services — Army Field Office, Charleston", "Cafeteria and catering at the Army field office in Charleston", "Department of the Army", "USACE Charleston District", "fed", "Request for Quote", "WOSB", "722310", 360_000, 520_000, "charleston", 8, 22, "strong", 66, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Charleston is just outside your 200-mile service area." }),
+  allOnly("GS04Q-26-RM-0019", "Federal Building Cafeteria Operation — Greensboro", "Cafeteria in the Greensboro federal building", "General Services Administration", "GSA Region 4", "fed", "Request for Proposal", "SBA", "722310", 620_000, 870_000, "greensboro", 15, 28, "strong", 70, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. 115 miles each way for a daily cafeteria is hard to staff." }),
+  allOnly("N62470-26-Q-0044", "Grab-and-Go and Catering, Barracks Area — MCAS New River", "Grab-and-go and catering near the New River barracks", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Quote", "WOSB", "722310", 380_000, 560_000, "jacksonville", 16, 33, "strong", 69, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Good scope and woman-owned, but 100 miles away." }),
+  allOnly("W912PM-26-R-0071", "Motor Pool Canteen and Meal Delivery — Fort Bragg DPW", "Motor-pool canteen and meal delivery at Fort Bragg", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Proposal", "SBA", "722310", 820_000, 1_150_000, "fortBragg", 18, 29, "strong", 71, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Close to home but above your range; check your capacity first." }),
+  allOnly("VA247-26-R-0166", "Multi-Site Patient and Retail Dining — VA Salisbury Health Care", "Patient and retail dining across VA Salisbury sites", "Department of Veterans Affairs", "Network Contracting Office 6", "fed", "Request for Proposal", "SBA", "722310", 1_400_000, 2_100_000, "salisbury", 20, 45, "stretch", 55, { verdict: "no_bid", prime: "no_go", sub: "go", oneLine: "Not as prime. Three times your size and 130 miles away." }),
+  allOnly("WCS-2026-R-44", "Cafeteria Service During Kitchen Refit — Wake County Middle Schools", "Cafeteria service while Wake County rebuilds school kitchens", "Wake County Public Schools, NC", "Purchasing Services", "sled", "Request for Proposal", null, "722310", 890_000, 1_200_000, "raleigh", 10, 38, "stretch", 57, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Above your range, and Raleigh is 65 miles away." }),
+  allOnly("W912PM-26-Q-0084", "Small-Event Catering IDIQ — Fort Bragg", "Order-as-needed event catering across Fort Bragg", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Quote", "WOSB", "722320", 250_000, 750_000, "fortBragg", 6, 36, "priority", 83, { verdict: "bid", prime: "go", sub: null, oneLine: "Bid it. An order-as-needed contract on your doorstep, woman-owned only." }),
+  allOnly("GCS-2026-RFP-19", "Cafeteria Service — Guilford County High School Campuses", "Cafeteria service at Guilford County high schools", "Guilford County Schools, NC", "Purchasing", "sled", "Request for Proposal", null, "722310", 480_000, 680_000, "greensboro", 13, 32, "strong", 65, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Your size, but 115 miles away." }),
+  allOnly("N62470-26-R-0078", "Two-Facility Dining Service — MCB Camp Lejeune", "Two Marine Corps dining halls at Camp Lejeune", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Proposal", "SBA", "722310", 1_100_000, 1_600_000, "jacksonville", 17, 41, "stretch", 56, { verdict: "no_bid", prime: "no_go", sub: "go", oneLine: "Not as prime. Twice your size and 100 miles away; watch for a prime who needs a subcontractor." }),
+  allOnly("NCSU-FM-26-022", "Campus Dining Hall Service — NC State Engineering Campus", "A dining hall on NC State's engineering campus", "North Carolina State University", "Facilities Procurement", "sled", "Request for Proposal", null, "722310", 1_100_000, 1_500_000, "raleigh", 19, 48, "stretch", 52, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Not this year. Twice your size, and universities score past campus work you don't have yet." }),
+  allOnly("UNC-FAC-2026-31", "Staff Cafe and Catering — UNC Chapel Hill", "Staff cafe and catering at UNC Chapel Hill", "University of North Carolina at Chapel Hill", "Procurement Services", "sled", "Request for Proposal", null, "722310", 410_000, 590_000, "chapelHill", 21, 50, "strong", 68, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Your size and scope, but 85 miles from your kitchen." }),
+  allOnly("FA4800-26-R-0091", "Phased Dining Facility Service — Three Sites, Seymour Johnson AFB", "Dining service at three Seymour Johnson sites", "Department of the Air Force", "4th Contracting Squadron", "fed", "Request for Proposal", "SBA", "722310", 1_800_000, 2_600_000, "goldsboro", 22, 55, "stretch", 50, { verdict: "no_bid", prime: "no_go", sub: "go", oneLine: "Not as prime. Three sites at once is beyond a five-person team." }),
+  allOnly("W912HN-26-Q-0048", "Lodging Breakfast Service — Joint Base Charleston", "Breakfast service for base lodging in Charleston", "Department of the Air Force", "628th Contracting Squadron", "fed", "Request for Quote", "WOSB", "722310", 200_000, 245_000, "northCharleston", 9, 15, "strong", 67, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Right size and woman-owned, but a daily breakfast 200 miles away needs a local crew." }),
+  allOnly("W912PM-26-Q-0102", "Meal Delivery to Legacy Housing — Fort Bragg", "Meal delivery to Fort Bragg legacy housing", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Quote", "SBA", "722330", 610_000, 890_000, "fortBragg", 11, 25, "strong", 77, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Close and in your code, but the top of the range is above your size." }),
+  allOnly("NCDOT-2026-FAC-09", "Crew Meal Program — Five Highway Districts", "Crew meals for five NCDOT highway districts", "North Carolina Department of Transportation", "Purchasing Section", "sled", "Request for Proposal", null, "722330", 720_000, 1_050_000, "statewideNc", 23, 43, "stretch", 54, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Five districts spread across the state is hard from one kitchen." }),
+  allOnly("VBPS-2026-RFP-14", "School Meal Service — Virginia Beach City Public Schools", "School meals for Virginia Beach City Public Schools", "Virginia Beach City Public Schools, VA", "Purchasing Services", "sled", "Request for Proposal", null, "722310", 540_000, 770_000, "virginiaBeach", 14, 37, "stretch", 48, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. 230 miles is outside your service area." }),
+  allOnly("CCS-2026-014", "Multi-School Meal Program — Charleston County School District", "Meals for Charleston County schools", "Charleston County School District, SC", "Procurement Services", "sled", "Request for Proposal", null, "722310", 1_200_000, 1_700_000, "charleston", 24, 52, "low", 38, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. Too big and too far." }),
+  allOnly("CFPUA-2026-31", "Crew Catering and Break Room Service — Pump Stations", "Crew catering and break rooms for Wilmington utility crews", "Cape Fear Public Utility Authority, NC", "Procurement", "sled", "Request for Quote", null, "722320", 190_000, 245_000, "wilmington", 8, 19, "strong", 70, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Your size, but 90 miles from your kitchen." }),
+  allOnly("ONSLOW-2026-22", "Emergency Meal Service — Onslow County Schools", "Emergency meal service for Onslow County schools", "Onslow County Schools, NC", "Child Nutrition", "sled", "Request for Quote", null, "722310", 160_000, 235_000, "jacksonville", 3, 8, "strong", 66, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Only 8 days to answer, and 100 miles away." }),
+  allOnly("W912PM-26-R-0118", "Installation-Wide Dining Program — 14 Facilities, Fort Bragg", "Installation-wide dining at 14 Fort Bragg facilities", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Proposal", "SBA", "722310", 3_800_000, 5_400_000, "fortBragg", 25, 56, "stretch", 44, { verdict: "no_bid", prime: "no_go", sub: "go", oneLine: "Not as prime. Fourteen facilities is a large-firm job; team up if a prime asks." }),
+  allOnly("N62470-26-R-0153", "Design-Build Galley Fit-Out and Service — MCB Camp Lejeune", "Build a new galley at Camp Lejeune and run it", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Proposal", null, "722310", 6_200_000, 8_500_000, "jacksonville", 26, 60, "low", 30, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. Construction plus food service at ten times your size." }),
+  allOnly("VA247-26-R-0301", "Hospital-Wide Nutrition Services — VA Durham", "Hospital-wide nutrition services at VA Durham", "Department of Veterans Affairs", "Network Contracting Office 6", "fed", "Request for Proposal", "SBA", "722310", 4_400_000, 6_100_000, "durham", 19, 50, "low", 36, { verdict: "no_bid", prime: "no_go", sub: "go", oneLine: "Not as prime. A whole hospital is eight times your size." }),
+  allOnly("CMS-CLT-2026-31", "Five-Year School Nutrition IDIQ — Charlotte-Mecklenburg Schools", "Five-year school nutrition contract for Charlotte-Mecklenburg", "Charlotte-Mecklenburg Schools, NC", "Procurement Services", "sled", "Request for Proposal", null, "722310", 10_000_000, 25_000_000, "charlotte", 27, 65, "low", 25, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. A district-wide program for large food-service firms." }),
+  allOnly("W912HN-26-R-0099", "Multi-Facility Dining Renewal — Fort Stewart", "Dining renewal across Fort Stewart facilities", "Department of the Army", "MICC — Fort Stewart", "fed", "Request for Proposal", "SBA", "722310", 2_600_000, 3_900_000, "fortStewart", 20, 58, "low", 33, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. Outside your service area and five times your size." }),
+  allOnly("W912DY-26-R-0091", "Field Feeding and Rations Support — Multi-Site", "Field feeding and rations at bases in five states", "Department of the Army", "USACE Huntsville", "fed", "Request for Proposal", null, "722310", 4_800_000, 6_900_000, "multiStateSe", 28, 45, "low", 28, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. Five states at once is beyond one kitchen." }),
+  allOnly("RCBOE-GA-2026-7", "Cafeteria Service — Richmond County School, Augusta", "Cafeteria service for a Richmond County school in Augusta", "Richmond County Board of Education, GA", "Purchasing", "sled", "Request for Proposal", null, "722310", 1_000_000, 1_450_000, "augusta", 22, 46, "low", 31, { verdict: "no_bid", prime: "no_go", sub: null, oneLine: "Skip it. Outside your service area and above your range." }),
+];
+
+/** Compact constructor for All-tab opportunities. */
+function allOnly(
+  id: string,
+  title: string,
+  plainTitle: string,
+  agency: string,
+  office: string,
+  scope: "fed" | "sled",
+  noticeType: NoticeType,
+  setAside: SetAside,
+  naics: string,
+  valueLow: number,
+  valueHigh: number,
+  place: PlaceKey,
+  postedDaysAgo: number,
+  closesInDays: number,
+  tier: HunterTier,
+  score: number,
+  grant: GrantCall,
+  extra: Partial<StoryOpportunity> = {},
+): StoryOpportunity {
+  return {
+    id,
+    title,
+    plainTitle,
+    agency,
+    office,
+    scope,
+    noticeType,
+    setAside,
+    naics,
+    valueLow,
+    valueHigh,
+    place,
+    postedDaysAgo,
+    closesInDays,
+    summary: `${plainTitle}. ${noticeType === "Request for Quote" ? "Quotes" : "Proposals"} are due in ${closesInDays} days.`,
+    hunter: { tier, score },
+    grant,
+    ...extra,
+  };
+}
+
+export const OPPORTUNITY_BY_ID: ReadonlyMap<string, StoryOpportunity> = new Map(
+  OPPORTUNITIES.map((o) => [o.id, o]),
+);
+
+export function getOpportunity(id: string): StoryOpportunity | undefined {
+  return OPPORTUNITY_BY_ID.get(id);
+}
+
+/** The "Opportunities for you" tab, in Hunter's order. */
+export const FOR_YOU: StoryOpportunity[] = OPPORTUNITIES.filter(
+  (o) => o.hunter.forYouRank !== undefined,
+).sort((a, b) => (a.hunter.forYouRank ?? 0) - (b.hunter.forYouRank ?? 0));
+
+/** Bids Ava is building, soonest due first. */
+export const AVA_BIDS: StoryOpportunity[] = OPPORTUNITIES.filter((o) => o.ava).sort(
+  (a, b) => a.closesInDays - b.closesInDays,
+);
