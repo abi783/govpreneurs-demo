@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Demo Guide for Tim</title>
+<style>
+  :root {
+    --ink: #0f1830; --text: #2b3245; --muted: #667085; --line: #e4e7ec;
+    --bg: #fafaf8; --card: #ffffff; --red: #d92d20; --navy: #0d1420;
+    --green: #067647; --amber: #b54708; --blue: #1d4ed8; --soft: #f2f4f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #f2f4f7; --text: #d0d5dd; --muted: #98a2b3; --line: #2a3142;
+      --bg: #0d1117; --card: #151b23; --soft: #1c2330; --blue: #7aa2ff;
+      --green: #47cd89; --amber: #fdb022;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 16px 80px; }
+  header { border-bottom: 3px solid var(--red); padding-bottom: 20px; margin-bottom: 28px; }
+  .kicker { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 700; }
+  h1 { font-size: 34px; line-height: 1.15; color: var(--ink); margin: 6px 0 8px; }
+  h2 { font-size: 22px; color: var(--ink); margin: 40px 0 12px; }
+  h3 { font-size: 17px; color: var(--ink); margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .lead { font-size: 18px; color: var(--text); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 12px 0; }
+  .stop { display: grid; grid-template-columns: 44px 1fr; gap: 14px; }
+  .num { width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .where { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: var(--soft); border-radius: 6px; padding: 2px 6px; color: var(--ink); }
+  .say { border-left: 3px solid var(--blue); padding: 6px 12px; margin: 10px 0 0; color: var(--ink); font-style: italic; background: var(--soft); border-radius: 0 8px 8px 0; }
+  .click { color: var(--muted); font-size: 14px; margin: 6px 0 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .bid { background: #ecfdf3; color: #067647; } .sub { background: #eff8ff; color: #175cd3; } .no { background: #fef3f2; color: #b42318; }
+  ul { margin: 0 0 12px 20px; padding: 0; } li { margin: 4px 0; }
+  .warn { border-color: #fedf89; background: color-mix(in srgb, #fffaeb 80%, var(--card)); }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 600px) { h1 { font-size: 27px; } .stop { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">GovPreneurs · sales demo</div>
+  <h1>Demo guide for Tim</h1>
+  <p class="lead">One sample member, three opportunities, four AI helpers. This page tells you where to click and what each screen proves. The order is a suggestion; every page works in any order.</p>
+</header>
+
+<h2>The member in 30 seconds</h2>
+<div class="card">
+  <p><strong>Amira Haddad, Haddad Catering &amp; Food Services LLC, Fayetteville, NC.</strong> A woman-owned caterer: 5 staff, one kitchen, two refrigerated vans, about $620K a year. She targets $120K–$750K jobs within 200 miles: Fort Bragg, the VA and NC school districts.</p>
+  <p>Her record: county school summer meals ($198K), a subcontract under Carolina Dining Group at Fort Bragg ($340K), church events ($62K), and her first federal prime at Womack Army Medical Center ($126K).</p>
+  <p style="margin:0">She is registered and positioned. She is now bidding, with Sarah Mitchell as her mentor. Her wallet holds $306.</p>
+</div>
+
+<h2>Suggested path (about 15 minutes)</h2>
+
+<div class="card stop"><div class="num">1</div><div>
+  <h3>Success Center <span class="where">/</span></h3>
+  <p>The member's home: plan, mentor, wallet, recent activity and overall progress.</p>
+  <p class="say">"Every member gets a home that shows where they are, who their mentor is, and what moved this week."</p>
+</div></div>
+
+<div class="card stop"><div class="num">2</div><div>
+  <h3>Roadmap <span class="where">Roadmap</span></h3>
+  <p>82% done. Registered, compliant and positioned. Now in Execution. "Do this next" is the quarterly targeting call.</p>
+  <p class="click">Optional: open "Quarterly Targeting Call", pick a time, confirm. The call appears on Success Center and the progress goes up.</p>
+  <p class="say">"We get you ready first. The roadmap is the plan, and the mentor approves it."</p>
+</div></div>
+
+<div class="card stop"><div class="num">3</div><div>
+  <h3>Opportunities, with Hunter <span class="where">Opportunities</span></h3>
+  <p>Hunter reads every new notice and puts 14 at the top for Amira. Each card says <em>why</em> in one line. Point at the first card:</p>
+  <p class="say">"Field meals for Camp Mackall: her food-service code, a woman-owned set-aside, about $660K, under an hour from her kitchen. Every reason is a fact from her profile."</p>
+  <p class="click">Ask Hunter in the right-hand chat: <em>"Why does the Field meals for Camp Mackall match me?"</em> or <em>"Compare my top 3."</em></p>
+</div></div>
+
+<div class="card stop"><div class="num">4</div><div>
+  <h3>Grant says Bid <span class="where">Camp Mackall field meals</span> <span class="pill bid">BID</span></h3>
+  <p>Open the first card. Grant introduces himself; click through to the review. Show the call, "Why Grant likes it", "What limits the opportunity" and the recommended next move.</p>
+  <p class="say">"Grant doesn't just say yes. He says yes, and here are the two things to fix first: two cooks need food-handler certificates, and 5:30 AM drops mean a 3:30 AM start."</p>
+  <p class="click">Ask Grant: <em>"Can I fix this in time?"</em> or <em>"Where am I weak?"</em></p>
+</div></div>
+
+<div class="card stop"><div class="num">5</div><div>
+  <h3>Grant says No-bid <span class="where">Dining support at a restricted Camp Mackall site</span> <span class="pill no">NO-BID</span></h3>
+  <p>Hunter's card already warns about the clearance. Grant makes the call and lists what would make her ready next time.</p>
+  <p class="say">"This is the one that saves weeks. Every worker needs a Secret clearance on day one. Grant tells you before you spend a month on it."</p>
+</div></div>
+
+<div class="card stop"><div class="num">6</div><div>
+  <h3>Grant says Bid as a subcontractor <span class="where">Run two Fort Bragg dining halls</span> <span class="pill sub">SUB</span></h3>
+  <p>About $2M a year with a $2M bond, held by Carolina Dining Group since 2019. Prime path: no-go. Sub path: go. The next move is <strong>Partners</strong>.</p>
+  <p class="say">"Grant finds the smart way in: team with the incumbent she has already worked for."</p>
+</div></div>
+
+<div class="card stop"><div class="num">7</div><div>
+  <h3>Partners <span class="where">Partners</span></h3>
+  <p>Carolina Dining Group is first: she subcontracted for them in 2024, Mike Sutton was her contact, and they want woman-owned subcontractors for the recompete.</p>
+</div></div>
+
+<div class="card stop"><div class="num">8</div><div>
+  <h3>Ava builds the bid <span class="where">Ava</span></h3>
+  <p>Four bids, each at a different point. Open <strong>Camp Mackall</strong>: Ava has questions about delivery and staff, and writes the proposal on the right as Amira answers.</p>
+  <ul>
+    <li><strong>Fayetteville cafe:</strong> finished, and Sarah has reviewed it.</li>
+    <li><strong>Cumberland County:</strong> paused, because 2 of 5 cooks have no food-handler certificate. Uploading any file resumes it.</li>
+    <li><strong>Fort Bragg reply:</strong> ready to read and send.</li>
+  </ul>
+  <p class="say">"Grant decides; Ava builds the whole bid with you: forms, price and writing. You read it and you send it."</p>
+  <p class="click">Downloads are real files. Ava never sends anything herself.</p>
+</div></div>
+
+<div class="card stop"><div class="num">9</div><div>
+  <h3>Mentor Reviews <span class="where">Mentor Reviews</span></h3>
+  <p>Sarah Mitchell's written review of the Fayetteville proposal, with three specific changes. A review costs $97 from the wallet.</p>
+  <p class="click">Optional, live: on any opportunity, click "Send to mentor". The wallet goes down by $97 and the review appears here as "Sarah is reviewing".</p>
+</div></div>
+
+<div class="card stop"><div class="num">10</div><div>
+  <h3>Pipeline <span class="where">Pipeline</span></h3>
+  <p>Every pursuit in one board: saved, mentor review, proposal (with "Ava is building" tags), and outcomes. Outcomes include a submission, a win (Womack) and a loss on price by 4%.</p>
+  <p class="say">"Nothing falls through the cracks: every bid, its stage and its next move."</p>
+</div></div>
+
+<h2>Also worth showing if asked</h2>
+<table>
+  <tr><th>Page</th><th>What it shows</th></tr>
+  <tr><td>Forecasts</td><td>Work the government plans to buy. The Fort Bragg 2027 dining program is first, with Hunter's advice to team up.</td></tr>
+  <tr><td>Small Orders</td><td>Small DLA buys a caterer can fill: meal pouches, coffee, food trays.</td></tr>
+  <tr><td>Awards</td><td>Who won what nearby, including Carolina Dining Group's Fort Bragg contract.</td></tr>
+  <tr><td>My Business</td><td>Everything GovPreneurs knows about her business. Every field can be edited. The score shows what to fix next.</td></tr>
+  <tr><td>Mentors</td><td>Sarah and five more mentors. "Book a call" works end to end.</td></tr>
+  <tr><td>Tasks</td><td>Her to-do list, fed by Ava, Grant, Sarah and the Roadmap.</td></tr>
+</table>
+
+<h2>Good questions to type</h2>
+<div class="card">
+  <p><strong>To Hunter</strong> (Opportunities page):</p>
+  <ul>
+    <li>Why does the Field meals for Camp Mackall match me?</li>
+    <li>Compare my top 3: which should I chase?</li>
+    <li>What's new since last week?</li>
+    <li>Show only woman-owned set-asides. / Only federal. / Under $500K.</li>
+    <li>Find work in Virginia. / What is a sources sought?</li>
+  </ul>
+  <p><strong>To Grant</strong> (any opportunity page, right-hand panel):</p>
+  <ul>
+    <li>Can I fix this in time? · Where am I weak? · What should my response say? · Do I have enough time?</li>
+  </ul>
+  <p style="margin:0">Any other question gets a sensible answer and buttons for the nearest questions. Nothing dead-ends.</p>
+</div>
+
+<h2>Before and between calls</h2>
+<div class="card warn">
+  <ul style="margin-bottom:0">
+    <li><strong>Click "Reset demo"</strong> (top right) before each call. It restores the starting story: wallet $306, nothing extra booked or sent.</li>
+    <li>The demo remembers what you do during a call, even after a reload.</li>
+    <li>The thin strip at the top says the data is sample data about a fictional business. Keep it: it is honest, and prospects accept it.</li>
+    <li>Dates move with the calendar. Deadlines never go stale.</li>
+    <li>Ava's hidden controls: <strong>Shift + Alt + A</strong> on an Ava bid lets you jump to any of Ava's states.</li>
+    <li>Use a laptop browser, 1280 px wide or more.</li>
+  </ul>
+</div>
+
+<h2>Say it carefully</h2>
+<div class="card">
+  <ul style="margin-bottom:0">
+    <li>Don't promise wins. Hunter finds and explains; Grant advises; the member decides.</li>
+    <li>Mentor reviews take about one business day in the product. In the demo a new one stays "Sarah is reviewing".</li>
+  </ul>
+</div>
+
+<footer>Built 16 Oct 2026. The sample member and all companies are fictional; the government buyers are real agencies.</footer>
+</div>
+</body>
+</html>
