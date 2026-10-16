@@ -297,6 +297,7 @@ const detention: Maker = (f, sol) => {
     rows: [
       { match: /Food-handler/, kind: "certs", category: "submission", required: "a certificate for every cook" },
       { match: /bid bond/i, kind: "bond", category: "submission", required: "a 5% bid bond" },
+      { match: /Performance and payment bond/i, kind: "bond", category: "bonding", required: "50% of the first-year price, after award" },
       { match: /vendor registration/i, kind: "sam", category: "submission", required: "an active county vendor registration" },
     ],
     nextBold: "Two certificates unblock the whole bid",
@@ -309,7 +310,7 @@ const detention: Maker = (f, sol) => {
         items: [
           { glyph: "ok", text: rt("Sealed bid: **lowest price** from a qualified bidder wins."), source: sourceOf(sol, "evaluate") },
           { glyph: "warn", text: rt("A bid without a food-handler certificate for **every cook** is rejected."), source: sourceOf(sol, "certs") },
-          { glyph: "ok", text: rt("A 5% bid bond and a payment bond. Both fit your bonding history."), source: sourceOf(sol, "bond") },
+          { glyph: "ok", text: rt("A 5% bid bond, then a performance and payment bond of half the first-year price. Both fit your bonding history."), source: sourceOf(sol, "bond") },
         ],
       },
       {

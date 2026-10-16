@@ -85,3 +85,8 @@ name its number.
 - D61. **Closed pursuits on the Pipeline open a dialog** with the submission, the debrief or the award, rather than a dead link.
 - D62. **Sending a review to a mentor also saves the record**, as production does.
 - D63. **`/home` (frontend-v2's old home page) redirects to Success Center.**
+- D64. **Ava's last step has an "I sent it" button** that records the day, and the list card then says "You sent it". The prototype had no done state. Ava still never submits anything herself.
+- D65. **Ava's "Talk" button speaks a sample answer** instead of using the browser's speech recognition, which would send audio outside the app.
+- D66. **Sarah's notes on the Fayetteville proposal are about the draft she read.** Ava has already applied them, and the current draft marks two of her edits.
+- D67. **Cumberland County asks for a 5% bid bond and, after award, a performance and payment bond of half the first-year price (about $175K).** Grant, Ava and the opportunity page all say the same, and it fits her $200K bonding history.
+- D68. **The Fort Bragg sources-sought reply is due at 3:00 PM Eastern.**

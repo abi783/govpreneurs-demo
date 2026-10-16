@@ -214,7 +214,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       "Can you do the work?": { rating: "watch", text: "The county requires a food-handler certificate for every cook. You have 3 of 5." },
       "Can you win it?": { rating: "good", text: "Lowest price from a qualified bidder wins. Your costs are low because the kitchen is close." },
       "Will you make money?": { rating: "watch", text: "Price-only bids are thin. Hold food cost under 40% or walk away." },
-      "Can you survive winning?": { rating: "good", text: "A 5% bid bond and a payment bond; both within your $200K bonding history." },
+      "Can you survive winning?": { rating: "good", text: "A 5% bid bond, then a performance and payment bond of half the first-year price, about $175K. Both fit inside the $200K you have bonded before." },
       "Do you understand the buyer's intent?": { rating: "strong", text: "Reliable, safe, low-cost meals with no surprises." },
       "Does this move you forward?": { rating: "good", text: "Steady year-round volume that smooths out your event seasons." },
     },
@@ -231,6 +231,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
     compliance: [
       { requirement: "Food-handler certificate for every cook", status: "partial", note: "3 of 5." },
       { requirement: "5% bid bond", status: "have", note: "Within your surety history." },
+      { requirement: "Performance and payment bond, 50% of the first-year price", status: "have", note: "About $175K; you have bonded $200K before." },
       { requirement: "County vendor registration", status: "have", note: "Active." },
     ],
     redTeam: [{ challenge: "Can a national vendor bid lower?", answer: "Possibly, but their delivery costs from out of county are higher than yours." }],

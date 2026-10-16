@@ -221,7 +221,7 @@ const cafe: Builder = (f) => ({
 const detention: Builder = (f) => {
   const payBond = Math.round(((f.annual ?? 0) * 0.5) / 5000) * 5000;
   return {
-    quickSummary: `Cumberland County wants three meals a day for about 240 people at the detention annex, cooked off site and delivered hot. This is a sealed bid: the lowest price from a qualified bidder wins. Any qualified firm can compete. The county estimates the value at ${usd(f.opp.valueLow!)} to ${usd(f.opp.valueHigh!)} a year. A bid bond of 5% and a payment bond are due.`,
+    quickSummary: `Cumberland County wants three meals a day for about 240 people at the detention annex, cooked off site and delivered hot. This is a sealed bid: the lowest price from a qualified bidder wins. Any qualified firm can compete. The county estimates the value at ${usd(f.opp.valueLow!)} to ${usd(f.opp.valueHigh!)} a year. A 5% bid bond comes with the bid, and a performance and payment bond of half the first-year price comes after award.`,
     accordions: {
       what_the_buyer_needs: [
         "Breakfast, lunch and dinner for about 240 people at the detention center annex, every day of the year.",
