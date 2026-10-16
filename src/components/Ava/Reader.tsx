@@ -65,13 +65,19 @@ import { fullDate } from "../../lib/ava/dates";
 import { daysLeft } from "../../lib/ava/derive";
 import { findOpportunity } from "../../demo/ava/opportunity";
 import { getGrantSummary } from "../../demo/ava/grantSummary";
-import { createReview, MENTOR_REPLY, MENTOR_REPLY_DAYS } from "../../demo/ava/mentorReviews";
+import {
+  createReview,
+  MENTOR_REPLY,
+  MENTOR_REPLY_DAYS,
+  type MentorReview,
+} from "../../demo/ava/mentorReviews";
 import { ava } from "../../lib/ava/store";
 import type { Part } from "../../lib/ava/package";
 import { sentencesOf } from "../../lib/ava/thread";
 import { openOutside } from "./outside";
 import { SendToMentorModal } from "./SendToMentorModal";
 import { answerByWords, avaFace, QuestionCard, TALK_LINE } from "./Asking";
+import { readerReply } from "./chatReplies";
 import { BidText } from "./BidText";
 import { downloadBid } from "./download";
 import { modeFor, planDownload, type PlannedPaper } from "./downloads";
@@ -192,8 +198,6 @@ function heldParts(parts: Part[], holds: Hold[]): Set<string> {
   return out;
 }
 
-/** What Ava says to words she cannot act on yet in her read of the bid. The
- *  demo has no model, so the answers are scripted for what a person asks. */
 /** Words typed after she taps a sentence: a question about it, an order about
  *  it, or the new words themselves. */
 export function aboutSentence(text: string): "why" | "order" | "words" {
@@ -207,21 +211,6 @@ export function aboutSentence(text: string): "why" | "order" | "words" {
   )
     return "order";
   return "words";
-}
-
-function readerReply(text: string, bid: AvaBid): string {
-  const t = text.toLowerCase();
-  if (/download|pdf|word|excel|file/.test(t))
-    return "Press Download in the bar over your bid. I build every file on your device, so nothing leaves it.";
-  if (/send|email|submit|deliver|portal/.test(t))
-    return "After you download your bid, How to send it shows your steps, in order. I never send anything for you.";
-  if (/due|deadline|when|date|late/.test(t))
-    return `Your ${bid.kind === "reply" ? "reply" : "bid"} is due ${dueWords(bid)}. Send it a day early.`;
-  if (/mentor|sarah|review|second opinion/.test(t))
-    return "Press the mentor button at the top. A review costs $97 from your wallet, and the mentor usually replies within 1 business day.";
-  if (/price|cost|total|how much/.test(t))
-    return "Open the price part of your bid to see every line. If you change a cost, I ask you to approve the price again.";
-  return "Tap the sentence you want to change first. Then tell me the new words.";
 }
 
 export function Reader({
@@ -693,7 +682,7 @@ function ReadChat({
       return;
     }
     if (focusQ && answerByWords(ctx, focusQ, text, how.voice)) return;
-    setSaid({ you: text, ava: readerReply(text, bid) });
+    setSaid({ you: text, ava: readerReply(text, bid, view.bidReview) });
   };
 
   /** The question a hold opens: its own, or the check's question about it. */

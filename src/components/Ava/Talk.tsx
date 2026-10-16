@@ -40,6 +40,7 @@ import {
   TALK_LINE,
 } from "./Asking";
 import { initials, Showing } from "./Showing";
+import { buildReply } from "./chatReplies";
 import { FoldedSide, SideFold } from "../ds/AgentWorkspace";
 import type { Side } from "./Frame2";
 
@@ -420,7 +421,7 @@ export function Talk({
       {
         you: text,
         voice: how.voice,
-        ava: notUnderstood(flow.current),
+        ava: buildReply(text, bid, view.bidReview ?? view.oppReview) ?? notUnderstood(flow.current),
       },
     ]);
   };
