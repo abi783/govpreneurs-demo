@@ -13,6 +13,7 @@ import path from "node:path";
 import { test, type BrowserContext, type Page, type Request } from "@playwright/test";
 import { allKnownRoutes, crawlRoutes } from "./routes";
 import type { ClickFailure, ClickRecord, RouteResult } from "./crawlTypes";
+import { copyProblem } from "./copyRules";
 
 test.skip(Boolean(process.env.QA_SHOTS), "screenshot run");
 
@@ -243,6 +244,11 @@ function problemsFrom(probe: Probe, snap: PageSnapshot, base?: PageSnapshot): st
     const all = `${snap.bodyText} | ${snap.attrText}`;
     const at = all.indexOf(old[0]);
     out.push(`old sample-member text "${old[0]}": …${all.slice(Math.max(0, at - 40), at + 60)}…`);
+  }
+  const copy = copyProblem(`${snap.bodyText} | ${snap.attrText}`);
+  const copyBefore = base ? copyProblem(`${base.bodyText} | ${base.attrText}`) : null;
+  if (copy && copy.found !== copyBefore?.found) {
+    out.push(`copy rule "${copy.rule}" broken by "${copy.found}": …${copy.context}…`);
   }
   return Array.from(new Set(out));
 }
