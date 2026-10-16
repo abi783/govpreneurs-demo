@@ -14,7 +14,6 @@ import { getPlaybookState } from "./store";
 export const PLAN_ASSIGNMENT_ID = "plan-fort-bragg-and-va";
 
 const fieldMeals = getOpportunity(HERO_IDS.fieldMeals)!;
-const fortBragg = getOpportunity(HERO_IDS.fortBraggDining)!;
 
 /** Steps that are done when the demo opens. The rest she can tick. */
 const DONE_AT_START = ["step-cap-statement", "step-mackall-review"];
@@ -25,6 +24,11 @@ const STEP_IDS = {
   ava: "step-ava",
   targeting: "step-targeting",
 } as const;
+
+/** A title inside a sentence: lower-case the first letter only, so names such as "Camp Mackall" keep their capitals. */
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
 
 /** The story's due dates for the tasks that these steps repeat. */
 function dueText(taskId: string): string {
@@ -50,7 +54,7 @@ export function getActionPlans(): ActivePlaybook[] {
       description:
         `**From ${MENTOR.name}.** After your positioning call, these are the six things that will move ${PERSONA.businessShortName} toward Fort Bragg dining and the VA.\n\n` +
         `Work from the top down. Tick each step when it is done. Your **Tasks** page shows the same work, with due dates.\n\n` +
-        `> Fort Bragg and the VA buy food service on a schedule. The members who win are the ones who are registered, referenced and ready *before* the solicitation posts.`,
+        `> Fort Bragg and the VA buy food service on a schedule. Be registered, referenced and ready *before* the solicitation posts.`,
       sourceDocUrl: null,
       sourceDocName: null,
       currentStepIndex: 0,
@@ -94,7 +98,7 @@ export function getActionPlans(): ActivePlaybook[] {
           id: STEP_IDS.certificates,
           title: "Get your last two cooks food-handler certified",
           content:
-            `The Camp Mackall quote asks for proof for **every cook**. ${PERSONA.foodHandlerCertified} of your ${PERSONA.employeesW2} staff hold a certificate today.\n\n` +
+            `The Camp Mackall quote asks for proof for **every cook**. ${PERSONA.foodHandlerCertified} of your ${PERSONA.employeesW2} cooks hold a certificate today.\n\n` +
             `1. Book the ServSafe food-handler course for the two cooks who do not have it.\n` +
             `2. When they pass, upload the certificates here as one PDF.\n` +
             `3. Ava uses them in your quote. Due ${dueText("task-certificates")}.`,
@@ -107,7 +111,7 @@ export function getActionPlans(): ActivePlaybook[] {
         },
         {
           id: STEP_IDS.ava,
-          title: `Answer Ava's questions on ${fieldMeals.plainTitle.toLowerCase()}`,
+          title: `Answer Ava's questions on ${lowerFirst(fieldMeals.plainTitle)}`,
           content:
             `Ava has questions about your **delivery times** and your **staffing plan**. She cannot finish the quote without them. It takes about ten minutes. Due ${dueText("task-ava-mackall")}.`,
           videoUrl: null,
@@ -121,7 +125,7 @@ export function getActionPlans(): ActivePlaybook[] {
           id: STEP_IDS.partner,
           title: `Contact ${KEY_PARTNER.name} about the Fort Bragg dining recompete`,
           content:
-            `${KEY_PARTNER.name} has held ${fortBragg.plainTitle.toLowerCase()} since 2019. They are looking for woman-owned subcontractors, and you worked for them in 2024.\n\n` +
+            `${KEY_PARTNER.name} has run the two Fort Bragg dining halls since 2019. They are looking for woman-owned subcontractors, and you worked for them in 2024.\n\n` +
             `Call ${KEY_PARTNER.contact}, their ${KEY_PARTNER.contactTitle.toLowerCase()}. Keep it short:\n\n` +
             `> "We worked together on the weekend dining shifts. The recompete is open. We are woman-owned, and we would like to be on your team."`,
           videoUrl: null,
