@@ -195,8 +195,9 @@ export function staffingOpen(bid: AvaBid, s: BidState): boolean {
   return !!p && p.builtBy !== "you" && p.roles.length > 0 && !s.fixes[STAFFING_KEY];
 }
 
-/** Her answer to "How long will it take?", in days. */
-const LEAD_DAYS: Record<Exclude<LeadSaid, "unsure">, number> = { days: 3, week: 7, weeks: 14 };
+/** Her answer to "How long will it take?", in business days: a few days, a
+ *  week, two weeks. A day to ask for it on never falls on a weekend. */
+const LEAD_DAYS: Record<Exclude<LeadSaid, "unsure">, number> = { days: 3, week: 5, weeks: 10 };
 
 /** The answers she can give, in her words. */
 export const LEAD_WORDS: Record<LeadSaid, string> = {
@@ -231,7 +232,7 @@ export function leadLine(
       fits: null,
       text: `Ask for it today. It must be in your bid by ${fullDate(addBy)}. If you are not sure it comes in time, ask a mentor.`,
     };
-  const askBy = new Date(addBy.getTime() - LEAD_DAYS[said] * 86_400_000);
+  const askBy = minusBusinessDays(addBy, LEAD_DAYS[said]);
   if (askBy.getTime() >= today().getTime())
     return {
       fits: true,
@@ -353,7 +354,11 @@ export function mustRows(bid: AvaBid, s: BidState, askingKey?: string | null): M
     const said = s.mustHave[rule.id];
     const asks = ruleAsks(bid, s, rule);
     const copy = asks.find((a) => a.kind === "upload");
-    const by = copy ? fullDate(decideBy(copy, bid)) : null;
+    // The day the paper must be in her bid. A paper tied to an event has its own
+    // day. Otherwise it is the day her bid needs it, never a lead time of
+    // Ava's own (PRD OD2): how long a paper takes is her answer's job (leadLine).
+    const fixedDay = copy?.decideByDaysFromNow !== undefined;
+    const by = copy ? fullDate(fixedDay ? decideBy(copy, bid) : addByDay(bid)) : null;
     if (state === "cant-meet") return { rule, state: "cant-meet", line: "You cannot meet this" };
     if (sam && rule.id === sam.rule.id) return { rule, state: sam.state, line: sam.line };
     if (state === "meets") return { rule, state: "meets", line: evidence ?? "You have it" };
@@ -364,7 +369,15 @@ export function mustRows(bid: AvaBid, s: BidState, askingKey?: string | null): M
     if (reopened)
       return { rule, state: "open", line: `Addendum ${reopened.number} changed this rule` };
     if (said?.says === "getting")
-      return { rule, state: "getting", line: by ? `Get it by ${by}` : "You are getting it" };
+      return {
+        rule,
+        state: "getting",
+        line: by
+          ? fixedDay
+            ? `Get it by ${by}`
+            : `Needed in your bid by ${by}`
+          : "You are getting it",
+      };
     if (said?.says === "have")
       return {
         rule,
