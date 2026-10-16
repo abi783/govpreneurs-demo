@@ -137,7 +137,7 @@ interface Person {
 }
 
 const FEDERAL_PEOPLE: Person[] = [
-  { name: "Renee Calloway", title: "Contracting Officer" },
+  { name: "Denise Harrow", title: "Contracting Officer" },
   { name: "Martin Whitfield", title: "Contract Specialist" },
   { name: "Dolores Ainsley", title: "Contracting Officer" },
   { name: "Terrence Boyle", title: "Contract Specialist" },
