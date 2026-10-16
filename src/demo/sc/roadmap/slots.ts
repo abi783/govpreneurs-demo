@@ -36,12 +36,26 @@ function zoneOffsetMs(at: number, tz: string): number {
     second: "2-digit",
   }).formatToParts(new Date(at));
   const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
-  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  const asUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour"),
+    get("minute"),
+    get("second"),
+  );
   return asUtc - Math.floor(at / 1000) * 1000;
 }
 
 /** The instant that is `hour:minute` on a calendar day in `tz`. */
-export function zonedTimeToUtcMs(y: number, m: number, d: number, hour: number, minute: number, tz: string): number {
+export function zonedTimeToUtcMs(
+  y: number,
+  m: number,
+  d: number,
+  hour: number,
+  minute: number,
+  tz: string,
+): number {
   const guess = Date.UTC(y, m - 1, d, hour, minute);
   const first = guess - zoneOffsetMs(guess, tz);
   // A second pass fixes the hour around a daylight saving change.

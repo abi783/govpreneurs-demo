@@ -12,7 +12,11 @@ import type { VerifyKey } from "./model";
 /** "2027-04-15" → "April 15, 2027". */
 function longDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y!, (m ?? 1) - 1, d ?? 1).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  return new Date(y!, (m ?? 1) - 1, d ?? 1).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 const MESSAGE: Record<VerifyKey, string> = {
@@ -65,11 +69,17 @@ function dataFor(key: VerifyKey, checkedAt: string, inputs?: Record<string, unkn
         contactPhone: PERSONA.phone,
       };
     case "sled": {
-      const rows = Array.isArray(inputs?.sledRegistrations) ? (inputs!.sledRegistrations as Record<string, string>[]) : null;
+      const rows = Array.isArray(inputs?.sledRegistrations)
+        ? (inputs!.sledRegistrations as Record<string, string>[])
+        : null;
       return {
         entries:
           rows && rows.length > 0
-            ? rows.map((r) => ({ state: r.state, registryType: r.registryType, businessName: r.businessName }))
+            ? rows.map((r) => ({
+                state: r.state,
+                registryType: r.registryType,
+                businessName: r.businessName,
+              }))
             : [
                 { state: "NC", registryType: "State", businessName: PERSONA.businessName },
                 { state: "NC", registryType: "County", businessName: PERSONA.businessName },
@@ -82,7 +92,11 @@ function dataFor(key: VerifyKey, checkedAt: string, inputs?: Record<string, unkn
         level: "Level 1",
         statusType: "Self-assessment",
         statusText: "Affirmed",
-        assessmentDate: new Date(checkedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+        assessmentDate: new Date(checkedAt).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
         scope: "Kitchen and office systems",
         affirmingOfficial: PERSONA.ownerName,
       };
@@ -100,5 +114,10 @@ export function storyVerification(key: VerifyKey, checkedAt: string): DemoVerifi
  */
 export function runVerification(key: VerifyKey, inputs: Record<string, unknown>): DemoVerification {
   const checkedAt = new Date().toISOString();
-  return { status: "pass", message: MESSAGE[key], checkedAt, data: dataFor(key, checkedAt, inputs) };
+  return {
+    status: "pass",
+    message: MESSAGE[key],
+    checkedAt,
+    data: dataFor(key, checkedAt, inputs),
+  };
 }

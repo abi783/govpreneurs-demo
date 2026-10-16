@@ -14,7 +14,28 @@ import { CALL_STEP_IDS } from "@sc/lib/callStepIds";
 import { getWalletBalance } from "@/demo/state/wallet";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { MENTOR, PERSONA } from "@/demo/story/persona";
-import { CALL_PRICE, MEMBER_TIME_ZONE, STEP_CONTENT, SHAPE, TARGETING_STEP_ID, COMPLIANCE_CALL_DAYS_AGO, EARLY_RELEASE, POSITIONING_CALL_DAYS_AGO, SELF_TICK_IDS, MEMBER_SINCE_DAYS, computeRoadmap, enrollmentSignals, itemTicked, offerFor, offersBySubStep, purchasedSlugList, receiptNumber, VERIFY_STEP, type VerifyKey } from "./model";
+import {
+  CALL_PRICE,
+  DONE_DATES,
+  MEMBER_TIME_ZONE,
+  STEP_CONTENT,
+  SHAPE,
+  TARGETING_STEP_ID,
+  COMPLIANCE_CALL_DAYS_AGO,
+  EARLY_RELEASE,
+  POSITIONING_CALL_DAYS_AGO,
+  SELF_TICK_IDS,
+  MEMBER_SINCE_DAYS,
+  computeRoadmap,
+  enrollmentSignals,
+  itemTicked,
+  offerFor,
+  offersBySubStep,
+  purchasedSlugList,
+  receiptNumber,
+  VERIFY_STEP,
+  type VerifyKey,
+} from "./model";
 import { bookingForCall, getEnrollments, getForms, getUploads, getVerifications } from "./state";
 import { storyVerification } from "./verifyData";
 
@@ -24,30 +45,81 @@ function callFor(stepId: string, kind: "positioning" | "targeting" | "compliance
   // A call she booked here shows as booked, even when an older call of the same kind was held.
   const booking = bookingForCall(stepId);
   if (booking) {
-    return { stepId, bookable: true, price: CALL_PRICE, state: "booked", startTime: booking.startTime, meetingLocation: "Zoom" };
+    return {
+      stepId,
+      bookable: true,
+      price: CALL_PRICE,
+      state: "booked",
+      startTime: booking.startTime,
+      meetingLocation: "Zoom",
+    };
   }
   if (kind === "positioning") {
-    return { stepId, bookable: true, price: CALL_PRICE, state: "completed", startTime: ago(POSITIONING_CALL_DAYS_AGO), meetingLocation: null };
+    return {
+      stepId,
+      bookable: true,
+      price: CALL_PRICE,
+      state: "completed",
+      startTime: ago(POSITIONING_CALL_DAYS_AGO),
+      meetingLocation: null,
+    };
   }
   if (kind === "compliance") {
     // The first compliance call was free (she earned it with the audit form); another costs the ordinary price.
-    return { stepId, bookable: true, price: CALL_PRICE, state: "completed", startTime: ago(COMPLIANCE_CALL_DAYS_AGO), meetingLocation: null };
+    return {
+      stepId,
+      bookable: true,
+      price: CALL_PRICE,
+      state: "completed",
+      startTime: ago(COMPLIANCE_CALL_DAYS_AGO),
+      meetingLocation: null,
+    };
   }
-  return { stepId, bookable: true, price: CALL_PRICE, state: "required", startTime: null, meetingLocation: null };
+  return {
+    stepId,
+    bookable: true,
+    price: CALL_PRICE,
+    state: "required",
+    startTime: null,
+    meetingLocation: null,
+  };
 }
 
 /** The Digital Compliance findings she sees: the audit passed, a few gaps were fixed with her mentor. */
 function complianceResults(): FormResult[] {
-  const evidence: Record<string, { status: FormResult["status"]; evidence: string; provided?: string }> = {
-    websiteCage: { status: "pass", evidence: `Found your CAGE code ${PERSONA.cage} and your address in the footer.` },
+  const evidence: Record<
+    string,
+    { status: FormResult["status"]; evidence: string; provided?: string }
+  > = {
+    websiteCage: {
+      status: "pass",
+      evidence: `Found your CAGE code ${PERSONA.cage} and your address in the footer.`,
+    },
     domainMatch: { status: "pass", evidence: `Your domain matches ${PERSONA.businessShortName}.` },
-    professionalEmail: { status: "pass", evidence: "This address uses your own domain.", provided: PERSONA.email },
-    businessPhone: { status: "pass", evidence: "This number is listed on your site.", provided: PERSONA.phone },
-    a2p: { status: "fixed", evidence: "Your brand and campaign are registered with the phone carriers." },
+    professionalEmail: {
+      status: "pass",
+      evidence: "This address uses your own domain.",
+      provided: PERSONA.email,
+    },
+    businessPhone: {
+      status: "pass",
+      evidence: "This number is listed on your site.",
+      provided: PERSONA.phone,
+    },
+    a2p: {
+      status: "fixed",
+      evidence: "Your brand and campaign are registered with the phone carriers.",
+    },
     contactConsent: { status: "pass", evidence: "Your contact page has the consent boxes." },
-    govLandingCaps: { status: "pass", evidence: "Your government page lists your codes and links to your capability statement." },
+    govLandingCaps: {
+      status: "pass",
+      evidence: "Your government page lists your codes and links to your capability statement.",
+    },
     letterhead: { status: "fixed", evidence: "Your letterhead now matches your site." },
-    privacyPolicy: { status: "pass", evidence: "Your privacy policy is live and linked from every page." },
+    privacyPolicy: {
+      status: "pass",
+      evidence: "Your privacy policy is live and linked from every page.",
+    },
   };
   return DC_ITEMS.map((item) => {
     const e = evidence[item.key];
@@ -70,8 +142,10 @@ function verifyLatest(): V3Payload["verify"]["latest"] {
   return out;
 }
 
-/** Days ago each check last ran in the story. */
-const VERIFY_DAYS_AGO: Record<VerifyKey, number> = { llc: 168, sam: 112, sled: 98, capability: 90, sbs: 88, cmmc: 84 };
+/** Days ago each check last ran in the story: the day its step finished. */
+const VERIFY_DAYS_AGO = Object.fromEntries(
+  (Object.keys(VERIFY_STEP) as VerifyKey[]).map((k) => [k, DONE_DATES[VERIFY_STEP[k]]!.done]),
+) as Record<VerifyKey, number>;
 
 export function buildRoadmapPayload(): V3Payload {
   const roadmap = computeRoadmap();
@@ -122,6 +196,20 @@ export function buildRoadmapPayload(): V3Payload {
         d.items = cfg.items.map((title) => ({ title, done: itemTicked(sub.id, title) }));
       }
 
+      // Proposal Building is under way, so the Do it yourself card is gone. Ava does the
+      // work here, so the right column points at her. `selfServe` is the step setting the
+      // page already reads ("her mentor's own plan, not a course"); an address that starts
+      // with http is opened as a plain link, and the link guard keeps this one in the app.
+      if (sub.id === "p4-proposal-building") {
+        (d as Record<string, unknown>).selfServe = {
+          title: "Build your proposals with Ava",
+          desc: "Ava writes the first draft of each bid. You answer her questions and check the work.",
+          cta: "Open Ava",
+          href: `${typeof window !== "undefined" ? window.location.origin : ""}/ava`,
+          icon: "plan",
+        };
+      }
+
       const vk = verifyKeyFor(sub.id);
       if (vk) d.verifyKey = vk;
 
@@ -140,7 +228,12 @@ export function buildRoadmapPayload(): V3Payload {
         count: Math.max(bought.length, 1),
         inProgress: bought.length > 0,
         ...(bought.length > 0
-          ? { working: { state: "in_progress" as const, openedAt: bought[bought.length - 1]!.enrolledAt } }
+          ? {
+              working: {
+                state: "in_progress" as const,
+                openedAt: bought[bought.length - 1]!.enrolledAt,
+              },
+            }
           : {}),
       },
     };
@@ -170,7 +263,12 @@ export function buildRoadmapPayload(): V3Payload {
     intake: null,
     purchasedSlugs: purchased,
     enrollmentsBySlug: enrollments,
-    wallet: { balance: walletBalance, paidBalance: walletBalance, promotionalCredit: 0, currency: "USD" },
+    wallet: {
+      balance: walletBalance,
+      paidBalance: walletBalance,
+      promotionalCredit: 0,
+      currency: "USD",
+    },
     mentor: { name: MENTOR.name, title: MENTOR.title, email: null, avatarUrl: null },
     calls: {
       positioning: callFor(CALL_STEP_IDS.positioning, "positioning"),

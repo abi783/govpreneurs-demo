@@ -16,7 +16,11 @@ async function open(page: Page, path: string) {
 }
 
 const balance = (page: Page) =>
-  page.evaluate(async (loc) => (await (await fetch(`/api/portal/${loc}/wallet-balance`)).json()).balance as number, LOC);
+  page.evaluate(
+    async (loc) =>
+      (await (await fetch(`/api/portal/${loc}/wallet-balance`)).json()).balance as number,
+    LOC,
+  );
 
 const unhandled = (page: Page) =>
   page.evaluate(() => ({
@@ -34,10 +38,15 @@ test("the Roadmap shows Amira in Execution with the quarterly call next", async 
   await expect(page.locator("#rm2-tab-4")).toContainText("You're here");
 });
 
-test("book the quarterly call: pick a time, confirm, see it booked, wallet goes down, Tasks agrees", async ({ page }) => {
+test("book the quarterly call: pick a time, confirm, see it booked, wallet goes down, Tasks agrees", async ({
+  page,
+}) => {
   await open(page, "/roadmap");
   expect(await balance(page)).toBe(306);
-  await page.getByRole("button", { name: /Quarterly Targeting Call/ }).first().click();
+  await page
+    .getByRole("button", { name: /Quarterly Targeting Call/ })
+    .first()
+    .click();
   await page.getByRole("button", { name: /Book Your Call/ }).click();
   await page.locator(".mbook__day.is-open").first().click();
   await page.locator(".mbook__slot").first().click();
@@ -52,7 +61,7 @@ test("book the quarterly call: pick a time, confirm, see it booked, wallet goes 
 
   await page.getByRole("link", { name: "Tasks", exact: true }).first().click();
   await page.waitForLoadState("networkidle");
-  await expect(page.getByText(/4 things need you/)).toBeVisible();
+  await expect(page.getByText(/5 things need you/)).toBeVisible();
   expect(await unhandled(page)).toEqual({ unhandled: [], errors: [] });
 });
 
@@ -64,11 +73,13 @@ test("book the call from the Tasks page", async ({ page }) => {
   await page.getByRole("button", { name: /Confirm & Book/ }).click();
   await expect(page.getByText("Booking confirmed!")).toBeVisible();
   await page.getByRole("button", { name: "Close", exact: true }).last().click();
-  await expect(page.getByText(/4 things need you/)).toBeVisible();
+  await expect(page.getByText(/5 things need you/)).toBeVisible();
   expect(await balance(page)).toBe(209);
 });
 
-test("buy a service with a coupon: the wallet goes down and the step shows the purchase", async ({ page }) => {
+test("buy a service with a coupon: the wallet goes down and the step shows the purchase", async ({
+  page,
+}) => {
   await open(page, "/roadmap?step=p3-prime-registration");
   await page.getByRole("button", { name: /Register with another prime/ }).click();
   await page.getByPlaceholder("Code").fill("DEMO10");
@@ -81,18 +92,21 @@ test("buy a service with a coupon: the wallet goes down and the step shows the p
   expect(await balance(page)).toBeCloseTo(128.7, 2);
   await expect(page.locator(".rm2-detail-right")).toContainText("You bought this");
   // The receipt is a real file.
-  const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("link", { name: "View receipt" }).click()]);
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("link", { name: "View receipt" }).click(),
+  ]);
   expect(download.suggestedFilename()).toMatch(/^receipt-INV-\d+\.txt$/);
 });
 
 test("a short wallet is topped up in place, then the purchase goes through", async ({ page }) => {
   await open(page, "/roadmap?step=p1-federal-registration");
-  await page.evaluate(
-    async (loc) => {
-      await fetch(`/api/portal/${loc}/verify-reset`, { method: "POST", body: JSON.stringify({ validationKey: "sam" }) });
-    },
-    LOC,
-  );
+  await page.evaluate(async (loc) => {
+    await fetch(`/api/portal/${loc}/verify-reset`, {
+      method: "POST",
+      body: JSON.stringify({ validationKey: "sam" }),
+    });
+  }, LOC);
   await page.reload();
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: /Learn more/ }).click();
@@ -109,8 +123,15 @@ test("a short wallet is topped up in place, then the purchase goes through", asy
 
 test("upload a file on a verify step and the check passes", async ({ page }) => {
   await open(page, "/roadmap?step=p2-capability-statement");
-  await page.getByRole("button", { name: /Re-verify/ }).first().click();
-  await page.locator("input[type=file]").setInputFiles({ name: "capability.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 sample") });
+  await page
+    .getByRole("button", { name: /Re-verify/ })
+    .first()
+    .click();
+  await page.locator("input[type=file]").setInputFiles({
+    name: "capability.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4 sample"),
+  });
   await expect(page.locator(".rm3-verify__drop")).toContainText("PDF uploaded");
   await page.getByRole("button", { name: "Verify", exact: true }).click();
   await expect(page.locator(".rm3-verify--pass")).toContainText("verified");
@@ -119,16 +140,41 @@ test("upload a file on a verify step and the check passes", async ({ page }) => 
 test("tick a task, reload, and it is still ticked", async ({ page }) => {
   await open(page, "/tasks");
   await expect(page.getByText(/6 things need you/)).toBeVisible();
-  await page.getByRole("button", { name: /I've completed this task/ }).first().click();
+  await page
+    .getByRole("button", { name: /I've completed this task/ })
+    .first()
+    .click();
   await expect(page.getByText(/5 things need you/)).toBeVisible();
   await page.reload();
   await page.waitForLoadState("networkidle");
   await expect(page.getByText(/5 things need you/)).toBeVisible();
-  await expect(page.locator(".gpds-prog")).toContainText("3 of 8 done");
+  await expect(page.locator(".gpds-prog")).toContainText(/3\s*of 8 done/);
 });
 
 test("a task button opens its page in this app", async ({ page }) => {
   await open(page, "/tasks");
   await page.getByRole("link", { name: "Open", exact: true }).first().click();
   await expect(page).toHaveURL(/\/ava\/SP4701-26-Q-0021/);
+});
+
+test("links stay in the app: Ava, Hunter, Tasks, and the course library notice", async ({
+  page,
+}) => {
+  await open(page, "/roadmap?step=p4-proposal-building");
+  await page.getByRole("link", { name: /Open Ava/ }).click();
+  await expect(page).toHaveURL(/\/ava(\?|$)/);
+
+  await open(page, "/roadmap?step=p3-planned-pursuit");
+  await page.getByRole("link", { name: /See what Hunter found/ }).click();
+  await expect(page).toHaveURL(/\/opportunities/);
+
+  await open(page, "/roadmap?step=p3-planned-pursuit");
+  await page.getByRole("link", { name: /Watch the course/ }).click();
+  await expect(page.locator(".demo-dialog")).toContainText("course library");
+  await page.getByRole("button", { name: "OK" }).click();
+  await expect(page).toHaveURL(/\/roadmap/);
+
+  await open(page, "/roadmap?step=p1-business-setup");
+  await page.getByRole("link", { name: "here" }).click();
+  await expect(page).toHaveURL(/\/tasks/);
 });

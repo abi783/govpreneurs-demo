@@ -79,7 +79,10 @@ export function isLiveUpload(url: string | null | undefined): boolean {
 function textFile(name: string, body: string): Response {
   return new Response(body, {
     status: 200,
-    headers: { "Content-Type": "text/plain; charset=utf-8", "Content-Disposition": `attachment; filename="${name}"` },
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${name}"`,
+    },
   });
 }
 
@@ -97,7 +100,14 @@ export const routes: DemoRouteDef[] = [
     path: `${P}/booking-mentors`,
     handler: () => ({
       mentors: [
-        { id: MENTOR_ID, name: MENTOR.name, title: MENTOR.title, bio: MENTOR.bio, avatarUrl: null, ghlUserId: "ghl-sarah-mitchell" },
+        {
+          id: MENTOR_ID,
+          name: MENTOR.name,
+          title: MENTOR.title,
+          bio: MENTOR.bio,
+          avatarUrl: null,
+          ghlUserId: "ghl-sarah-mitchell",
+        },
       ],
       bookingUseAssignedMentor: true,
       assignedMentorId: MENTOR_ID,
@@ -123,16 +133,24 @@ export const routes: DemoRouteDef[] = [
       if (!b?.stepId || !b.startTime || !b.endTime) {
         return demoResponse(400, { error: "stepId, startTime, endTime required" });
       }
-      if (!known.includes(b.stepId)) return demoResponse(400, { error: "Step has no booking calendar" });
+      if (!known.includes(b.stepId))
+        return demoResponse(400, { error: "Step has no booking calendar" });
 
       const mine = getBookings().filter((x) => x.kind === "call" && x.stepId === b.stepId);
-      const sameSlot = mine.some((x) => new Date(x.startTime).getTime() === new Date(b.startTime!).getTime());
+      const sameSlot = mine.some(
+        (x) => new Date(x.startTime).getTime() === new Date(b.startTime!).getTime(),
+      );
       // Moving a call she already booked costs nothing more.
       const pays = mine.length === 0 && !sameSlot ? CALL_PRICE : 0;
       if (pays > 0) {
         const balance = getWalletBalance();
         if (balance < pays) {
-          return demoResponse(402, { error: "Insufficient wallet balance", balance, total: pays, currency: "USD" });
+          return demoResponse(402, {
+            error: "Insufficient wallet balance",
+            balance,
+            total: pays,
+            currency: "USD",
+          });
         }
         chargeWallet(`Mentor call — ${callLabel(b.stepId)} with ${MENTOR.name}`, pays);
       }
@@ -163,14 +181,20 @@ export const routes: DemoRouteDef[] = [
     method: "POST",
     path: `${P}/book-delivery`,
     handler: (ctx) => {
-      const b = ctx.body as { sectionId?: string; serviceTitle?: string; startTime?: string; endTime?: string } | null;
+      const b = ctx.body as {
+        sectionId?: string;
+        serviceTitle?: string;
+        startTime?: string;
+        endTime?: string;
+      } | null;
       if (!b?.sectionId || !b.startTime || !b.endTime) {
         return demoResponse(400, { error: "sectionId, startTime, endTime required" });
       }
       const svc = serviceBySection(b.sectionId);
       const enrolled = getEnrollments().filter((e) => e.sectionId === b.sectionId);
       const latest = enrolled[enrolled.length - 1];
-      if (!svc || !latest) return demoResponse(400, { error: "Buy this service first, then book your call." });
+      if (!svc || !latest)
+        return demoResponse(400, { error: "Buy this service first, then book your call." });
       updateEnrollment(latest.id, { deliveryAppointmentAt: new Date(b.startTime).toISOString() });
       addBooking({
         id: newId("booking"),
@@ -190,7 +214,9 @@ export const routes: DemoRouteDef[] = [
     method: "POST",
     path: `${P}/coupon-check`,
     handler: (ctx) => {
-      const code = String((ctx.body as { code?: string } | null)?.code ?? "").trim().toUpperCase();
+      const code = String((ctx.body as { code?: string } | null)?.code ?? "")
+        .trim()
+        .toUpperCase();
       if (!code) return demoResponse(400, { valid: false, reason: "Enter a coupon code." });
       const coupon = COUPONS[code];
       if (!coupon) return { valid: false, reason: "That code is not valid." };
@@ -227,7 +253,9 @@ export const routes: DemoRouteDef[] = [
         return demoResponse(409, { error: "You already own this service." });
       }
       if (owned.length > 0 && svc.slug === "prime-contractor-registration") {
-        return demoResponse(409, { error: "Our team is still working on your newest registration." });
+        return demoResponse(409, {
+          error: "Our team is still working on your newest registration.",
+        });
       }
 
       const optionId = b.priceOptionIds?.[title];
@@ -237,14 +265,20 @@ export const routes: DemoRouteDef[] = [
       let couponCode: string | null = null;
       if (b.couponCode) {
         const coupon = COUPONS[String(b.couponCode).trim().toUpperCase()];
-        if (!coupon) return demoResponse(400, { error: "That code is not valid.", couponInvalid: true });
+        if (!coupon)
+          return demoResponse(400, { error: "That code is not valid.", couponInvalid: true });
         discount = money(list * (coupon.percent / 100));
         couponCode = String(b.couponCode).trim().toUpperCase();
       }
       const total = money(list - discount);
       const balance = getWalletBalance();
       if (balance < total) {
-        return demoResponse(402, { error: "Insufficient wallet balance", balance, total, currency: "USD" });
+        return demoResponse(402, {
+          error: "Insufficient wallet balance",
+          balance,
+          total,
+          currency: "USD",
+        });
       }
       if (total > 0) chargeWallet(svc.title, total);
       const id = newId("enr");
@@ -316,7 +350,8 @@ export const routes: DemoRouteDef[] = [
     handler: (ctx) => {
       const form = ctx.body as FormData | null;
       const file = form instanceof FormData ? form.get("file") : null;
-      const type = form instanceof FormData ? String(form.get("type") ?? "capability") : "capability";
+      const type =
+        form instanceof FormData ? String(form.get("type") ?? "capability") : "capability";
       if (!(file instanceof File)) return demoResponse(400, { error: "Choose a file first." });
       const url = URL.createObjectURL(file);
       liveBlobs.add(url);
@@ -330,14 +365,21 @@ export const routes: DemoRouteDef[] = [
     method: "POST",
     path: `${P}/verify`,
     handler: (ctx) => {
-      const b = ctx.body as { validationKey?: string; inputs?: Record<string, unknown>; action?: string } | null;
+      const b = ctx.body as {
+        validationKey?: string;
+        inputs?: Record<string, unknown>;
+        action?: string;
+      } | null;
       const key = b?.validationKey ?? "";
       if (key === "digital_compliance_intake") {
-        const inputs = Object.fromEntries(Object.entries(b?.inputs ?? {}).map(([k, v]) => [k, String(v ?? "")]));
+        const inputs = Object.fromEntries(
+          Object.entries(b?.inputs ?? {}).map(([k, v]) => [k, String(v ?? "")]),
+        );
         setForm(key, { inputs, submittedAt: new Date().toISOString() });
         return { result: { status: "pass", message: "We have your answers.", data: {} } };
       }
-      if (!VERIFY_KEYS.includes(key as VerifyKey)) return demoResponse(400, { error: "Unknown check." });
+      if (!VERIFY_KEYS.includes(key as VerifyKey))
+        return demoResponse(400, { error: "Unknown check." });
       const result = runVerification(key as VerifyKey, b?.inputs ?? {});
       setVerification(key, result);
       return { result: { status: result.status, message: result.message, data: result.data } };
@@ -348,7 +390,8 @@ export const routes: DemoRouteDef[] = [
     path: `${P}/verify-reset`,
     handler: (ctx) => {
       const key = (ctx.body as { validationKey?: string } | null)?.validationKey ?? "";
-      if (!VERIFY_KEYS.includes(key as VerifyKey)) return demoResponse(400, { error: "Unknown check." });
+      if (!VERIFY_KEYS.includes(key as VerifyKey))
+        return demoResponse(400, { error: "Unknown check." });
       setVerification(key, null);
       return { ok: true };
     },
@@ -360,7 +403,8 @@ export const routes: DemoRouteDef[] = [
     path: `${P}/roadmap-v3/item-tick`,
     handler: (ctx) => {
       const b = ctx.body as { subStepId?: string; itemTitle?: string; ticked?: boolean } | null;
-      if (!b?.subStepId || !b.itemTitle) return demoResponse(400, { error: "Unknown checklist line" });
+      if (!b?.subStepId || !b.itemTitle)
+        return demoResponse(400, { error: "Unknown checklist line" });
       setTick(`${b.subStepId}::${b.itemTitle}`, b.ticked !== false);
       return { ok: true };
     },

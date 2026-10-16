@@ -21,7 +21,12 @@ import { KEY_PARTNER, MENTOR } from "@/demo/story/persona";
 import { MENTOR_REVIEWS, TASKS, type StoryTask } from "@/demo/story/workspace";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { readDemoState, updateDemoState } from "@/demo/runtime/store";
-import { CALL_PRICE, POSITIONING_CALL_DAYS_AGO, TARGETING_STEP_ID } from "../roadmap/model";
+import {
+  CALL_PRICE,
+  DONE_DATES,
+  POSITIONING_CALL_DAYS_AGO,
+  TARGETING_STEP_ID,
+} from "../roadmap/model";
 import { bookingForCall } from "../roadmap/state";
 
 // ── What the visitor changed ───────────────────────────────────────────────
@@ -38,7 +43,10 @@ const KEY = "tasks.changes";
 const getChanges = () => readDemoState<Record<string, TaskChange>>(KEY, {});
 
 export function changeTask(id: string, patch: TaskChange): void {
-  updateDemoState<Record<string, TaskChange>>(KEY, {}, (prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  updateDemoState<Record<string, TaskChange>>(KEY, {}, (prev) => ({
+    ...prev,
+    [id]: { ...prev[id], ...patch },
+  }));
 }
 
 export function taskExists(id: string): boolean {
@@ -66,7 +74,11 @@ const DUE_REASON: Record<string, string> = {
 };
 
 function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: PROGRAM_TZ });
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: PROGRAM_TZ,
+  });
 }
 
 /** The opportunity a task's button opens, when it opens one. */
@@ -75,13 +87,28 @@ function opportunityFor(to: string) {
   return id ? OPPORTUNITIES.find((o) => o.id === id) : undefined;
 }
 
+/** When a finished roadmap task was finished: the day its roadmap step was. */
+function finishedDaysAgo(t: StoryTask): number {
+  return t.id === "task-positioning-call"
+    ? POSITIONING_CALL_DAYS_AGO
+    : DONE_DATES["p2-capability-statement"]!.done;
+}
+
 function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
   const base = { occurredAt: null, actorName: null, excerpt: null, deepLink: null };
   const out: TaskSourceView[] = [];
 
   if (t.source === "ava") {
     const opp = opportunityFor(t.to);
-    out.push({ ...base, kind: "SYSTEM", isPrimary: true, refId: `ava:${opp?.id ?? t.id}`, label: `Ava · ${opp?.plainTitle ?? "your bid"}`, actorName: "Ava", occurredAt: ago(0) });
+    out.push({
+      ...base,
+      kind: "SYSTEM",
+      isPrimary: true,
+      refId: `ava:${opp?.id ?? t.id}`,
+      label: `Ava · ${opp?.plainTitle ?? "your bid"}`,
+      actorName: "Ava",
+      occurredAt: ago(0),
+    });
   } else if (t.source === "mentor") {
     const review = MENTOR_REVIEWS.find((r) => t.to.endsWith(r.id));
     out.push({
@@ -94,7 +121,15 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
       occurredAt: ago(review?.lastMessageDaysAgo ?? 0),
     });
   } else if (t.source === "grant" || t.source === "partners") {
-    out.push({ ...base, kind: "SYSTEM", isPrimary: true, refId: `grant:${t.id}`, label: `Grant · ${KEY_PARTNER.name}`, actorName: "Grant", occurredAt: ago(1) });
+    out.push({
+      ...base,
+      kind: "SYSTEM",
+      isPrimary: true,
+      refId: `grant:${t.id}`,
+      label: `Grant · ${KEY_PARTNER.name}`,
+      actorName: "Grant",
+      occurredAt: ago(1),
+    });
   } else {
     // A roadmap task. The quarterly call books in place; the finished ones are labels.
     if (t.id === "task-targeting-call") {
@@ -117,18 +152,33 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
         label: `${MENTOR.name} · Positioning call · ${shortDate(ago(POSITIONING_CALL_DAYS_AGO))}`,
         actorName: MENTOR.name,
         occurredAt: ago(POSITIONING_CALL_DAYS_AGO),
-        excerpt: "Let's set up a targeting call every quarter, so we plan your next bids around Fort Bragg and the VA.",
+        excerpt:
+          "Let's set up a targeting call every quarter, so we plan your next bids around Fort Bragg and the VA.",
       });
     } else {
       const step = t.id === "task-positioning-call" ? "Positioning Call" : "Capability Statement";
-      out.push({ ...base, kind: "ROADMAP", isPrimary: true, refId: null, label: `Your roadmap · ${step}`, occurredAt: ago(80) });
+      out.push({
+        ...base,
+        kind: "ROADMAP",
+        isPrimary: true,
+        refId: null,
+        label: `Your roadmap · ${step}`,
+        occurredAt: ago(finishedDaysAgo(t)),
+      });
     }
   }
 
   // The button. An open task gets one "Open" button to its page in this app.
   // It rides on a source the card draws as a button and not as a chip.
   if (open && t.id !== "task-targeting-call") {
-    out.push({ ...base, kind: "ONBOARDING", isPrimary: false, refId: "open", label: "Open", deepLink: t.to });
+    out.push({
+      ...base,
+      kind: "ONBOARDING",
+      isPrimary: false,
+      refId: "open",
+      label: "Open",
+      deepLink: t.to,
+    });
   }
   return out;
 }
@@ -151,16 +201,23 @@ function viewFor(t: StoryTask, now: Date): TaskView {
       doneAt = bookingForCall(CALL_STEP_IDS.targeting)!.createdAt;
       doneBy = "auto:booking";
     } else {
-      doneAt = ago(t.id === "task-positioning-call" ? POSITIONING_CALL_DAYS_AGO : 90);
+      doneAt = ago(finishedDaysAgo(t));
       doneBy = auto ? "auto:roadmap" : "member";
     }
   }
 
   const dueAt = t.dueInDays != null ? isoDaysFromNow(t.dueInDays, 17) : null;
-  const dueDays = dueAt ? Math.ceil((new Date(dueAt).getTime() - now.getTime()) / 86_400_000) : null;
+  const dueDays = dueAt
+    ? Math.ceil((new Date(dueAt).getTime() - now.getTime()) / 86_400_000)
+    : null;
   const due =
     dueAt && DUE_REASON[t.id]
-      ? { at: dueAt, reason: DUE_REASON[t.id]!, source: "derived", state: dueDays! < 0 ? "overdue" : dueDays! <= 7 ? "soon" : "calm" }
+      ? {
+          at: dueAt,
+          reason: DUE_REASON[t.id]!,
+          source: "derived",
+          state: dueDays! < 0 ? "overdue" : dueDays! <= 7 ? "soon" : "calm",
+        }
       : null;
 
   return {
@@ -195,7 +252,8 @@ const NO_DATE = Number.MAX_SAFE_INTEGER;
 function compareForList(a: TaskView, b: TaskView, now: Date): number {
   const road = (t: TaskView) => t.section === "govready";
   if (road(a) !== road(b)) return road(a) ? -1 : 1;
-  const days = (t: TaskView) => (t.due ? Math.ceil((new Date(t.due.at).getTime() - now.getTime()) / 86_400_000) : null);
+  const days = (t: TaskView) =>
+    t.due ? Math.ceil((new Date(t.due.at).getTime() - now.getTime()) / 86_400_000) : null;
   const press = (t: TaskView) => days(t) !== null && days(t)! <= PRESSING_DAYS;
   if (press(a) !== press(b)) return press(a) ? -1 : 1;
   const at = (t: TaskView) => (t.due ? new Date(t.due.at).getTime() : NO_DATE);
@@ -209,7 +267,8 @@ function startHereFor(lead: TaskView | undefined, now: Date): string | null {
   if (days < 0) return "This one has been waiting the longest";
   if (days > PRESSING_DAYS) return null;
   const primary = displaySource(lead.sources);
-  const human = primary?.kind === "MENTOR" || primary?.kind === "MEETING" || primary?.kind === "ACTION_PLAN";
+  const human =
+    primary?.kind === "MENTOR" || primary?.kind === "MEETING" || primary?.kind === "ACTION_PLAN";
   if (human && primary?.actorName) return `${primary.actorName} is waiting on this one`;
   return days === 0 ? "This one is due today" : "This one is due first";
 }
@@ -218,8 +277,11 @@ export function buildTasksPayload(): TasksPayload {
   const now = new Date();
   const views = TASKS.map((t) => viewFor(t, now));
 
-  const snoozed = (v: TaskView) => !!v.snoozedUntil && new Date(v.snoozedUntil).getTime() > now.getTime();
-  const open = views.filter((v) => v.status === "open" && !snoozed(v)).sort((a, b) => compareForList(a, b, now));
+  const snoozed = (v: TaskView) =>
+    !!v.snoozedUntil && new Date(v.snoozedUntil).getTime() > now.getTime();
+  const open = views
+    .filter((v) => v.status === "open" && !snoozed(v))
+    .sort((a, b) => compareForList(a, b, now));
   const done = views
     .filter((v) => v.status === "done")
     .sort((a, b) => (b.doneAt ?? "").localeCompare(a.doneAt ?? ""));

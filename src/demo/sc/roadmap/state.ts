@@ -62,14 +62,19 @@ export const getEnrollments = () => readDemoState<DemoEnrollment[]>(ENROLLMENTS,
 /** `${subStepId}::${itemTitle}` → true (ticked) or false (the member un-ticked a story tick). */
 export const getTicks = () => readDemoState<Record<string, boolean>>(TICKS, {});
 /** validationKey → the newest result. `null` means the member reset the check, so nothing is verified. */
-export const getVerifications = () => readDemoState<Record<string, DemoVerification | null>>(VERIFY, {});
+export const getVerifications = () =>
+  readDemoState<Record<string, DemoVerification | null>>(VERIFY, {});
 export const getUploads = () => readDemoState<Record<string, DemoUpload>>(UPLOADS, {});
 /** validationKey → the answers the member sent. */
-export const getForms = () => readDemoState<Record<string, { inputs: Record<string, string>; submittedAt: string }>>(FORMS, {});
+export const getForms = () =>
+  readDemoState<Record<string, { inputs: Record<string, string>; submittedAt: string }>>(FORMS, {});
 export const getExplored = () => readDemoState<string[]>(EXPLORED, []);
 
 export function addBooking(b: DemoBooking): void {
-  updateDemoState<DemoBooking[]>(BOOKINGS, [], (prev) => [...prev.filter((x) => !(x.kind === b.kind && x.stepId === b.stepId)), b]);
+  updateDemoState<DemoBooking[]>(BOOKINGS, [], (prev) => [
+    ...prev.filter((x) => !(x.kind === b.kind && x.stepId === b.stepId)),
+    b,
+  ]);
 }
 
 export function addEnrollment(e: DemoEnrollment): void {
@@ -77,7 +82,9 @@ export function addEnrollment(e: DemoEnrollment): void {
 }
 
 export function updateEnrollment(id: string, patch: Partial<DemoEnrollment>): void {
-  updateDemoState<DemoEnrollment[]>(ENROLLMENTS, [], (prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  updateDemoState<DemoEnrollment[]>(ENROLLMENTS, [], (prev) =>
+    prev.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+  );
 }
 
 export function setTick(key: string, ticked: boolean): void {
@@ -85,23 +92,36 @@ export function setTick(key: string, ticked: boolean): void {
 }
 
 export function setVerification(key: string, v: DemoVerification | null): void {
-  updateDemoState<Record<string, DemoVerification | null>>(VERIFY, {}, (prev) => ({ ...prev, [key]: v }));
+  updateDemoState<Record<string, DemoVerification | null>>(VERIFY, {}, (prev) => ({
+    ...prev,
+    [key]: v,
+  }));
 }
 
 export function setUpload(kind: string, u: DemoUpload): void {
   updateDemoState<Record<string, DemoUpload>>(UPLOADS, {}, (prev) => ({ ...prev, [kind]: u }));
 }
 
-export function setForm(key: string, value: { inputs: Record<string, string>; submittedAt: string }): void {
-  updateDemoState<Record<string, { inputs: Record<string, string>; submittedAt: string }>>(FORMS, {}, (prev) => ({ ...prev, [key]: value }));
+export function setForm(
+  key: string,
+  value: { inputs: Record<string, string>; submittedAt: string },
+): void {
+  updateDemoState<Record<string, { inputs: Record<string, string>; submittedAt: string }>>(
+    FORMS,
+    {},
+    (prev) => ({ ...prev, [key]: value }),
+  );
 }
 
 export function addExplored(stepId: string): void {
-  updateDemoState<string[]>(EXPLORED, [], (prev) => (prev.includes(stepId) ? prev : [...prev, stepId]));
+  updateDemoState<string[]>(EXPLORED, [], (prev) =>
+    prev.includes(stepId) ? prev : [...prev, stepId],
+  );
 }
 
 export function resetRoadmapState(): void {
-  for (const k of [BOOKINGS, ENROLLMENTS, TICKS, VERIFY, UPLOADS, FORMS, EXPLORED]) writeDemoState(k, k === TICKS || k === VERIFY || k === UPLOADS || k === FORMS ? {} : []);
+  for (const k of [BOOKINGS, ENROLLMENTS, TICKS, VERIFY, UPLOADS, FORMS, EXPLORED])
+    writeDemoState(k, k === TICKS || k === VERIFY || k === UPLOADS || k === FORMS ? {} : []);
 }
 
 /** The booking for one call step, if the member made one. */

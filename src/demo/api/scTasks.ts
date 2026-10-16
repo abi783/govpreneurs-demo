@@ -31,10 +31,16 @@ export const routes: DemoRouteDef[] = [
       const id = ctx.params.taskId!;
       if (!taskExists(id)) return missing();
       const next = (ctx.body as { status?: string } | null)?.status;
-      if (next !== "done" && next !== "open") return demoResponse(400, { error: "status must be 'done' or 'open'" });
+      if (next !== "done" && next !== "open")
+        return demoResponse(400, { error: "status must be 'done' or 'open'" });
       const story = TASKS.find((t) => t.id === id)!;
       if (next === "done") {
-        changeTask(id, { status: "done", doneAt: new Date().toISOString(), doneBy: "member", snoozedUntil: null });
+        changeTask(id, {
+          status: "done",
+          doneAt: new Date().toISOString(),
+          doneBy: "member",
+          snoozedUntil: null,
+        });
       } else if (story.done) {
         // Re-opening a finished roadmap task puts it back on her list.
         changeTask(id, { status: "open", doneAt: null, doneBy: null });
@@ -50,7 +56,8 @@ export const routes: DemoRouteDef[] = [
     handler: (ctx) => {
       const id = ctx.params.taskId!;
       if (!taskExists(id)) return missing();
-      if (statusOf(id) === "done") return demoResponse(400, { error: "Cannot dismiss a done task" });
+      if (statusOf(id) === "done")
+        return demoResponse(400, { error: "Cannot dismiss a done task" });
       const raw = (ctx.body as { reason?: unknown } | null)?.reason;
       const reason = typeof raw === "string" && raw.trim() ? raw.trim().slice(0, 500) : null;
       changeTask(id, { status: "dismissed", dismissedReason: reason });
@@ -74,7 +81,8 @@ export const routes: DemoRouteDef[] = [
       const id = ctx.params.taskId!;
       if (!taskExists(id)) return missing();
       const until = (ctx.body as { until?: string } | null)?.until;
-      if (!until || !Number.isFinite(new Date(until).getTime())) return demoResponse(400, { error: "until must be an ISO date" });
+      if (!until || !Number.isFinite(new Date(until).getTime()))
+        return demoResponse(400, { error: "until must be an ISO date" });
       changeTask(id, { snoozedUntil: new Date(until).toISOString() });
       return buildTasksPayload();
     },

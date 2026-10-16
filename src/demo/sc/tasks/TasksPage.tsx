@@ -14,6 +14,8 @@ import "../search";
 
 export function TasksPage() {
   const refreshTick = useDemoRefresh();
+  // The tick is not read inside, but a new tick means "ask again".
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const payload = useMemo(() => buildTasksPayload(), [refreshTick]);
 
   return (

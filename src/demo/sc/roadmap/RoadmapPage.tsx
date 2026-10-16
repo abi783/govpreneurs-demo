@@ -19,6 +19,8 @@ export function RoadmapPage() {
   const [walletTick, bumpWallet] = useReducer((n: number) => n + 1, 0);
   useEffect(() => subscribeDemoState("wallet.entries", bumpWallet), []);
 
+  // The ticks are not read inside, but a new tick means "ask again".
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const payload = useMemo(() => buildRoadmapPayload(), [refreshTick, walletTick]);
   const step = useSearchParams().get("step") ?? undefined;
 
@@ -27,7 +29,12 @@ export function RoadmapPage() {
       <div className="gpds-stripe" />
       <div className="w-full px-4 sm:px-6 lg:px-12 pt-8 pb-20">
         <DemoLinkBridge>
-          <RoadmapV3Client key={step ?? "none"} payload={payload} locationId={PERSONA.locationId} initialStep={step} />
+          <RoadmapV3Client
+            key={step ?? "none"}
+            payload={payload}
+            locationId={PERSONA.locationId}
+            initialStep={step}
+          />
         </DemoLinkBridge>
       </div>
     </ScPage>

@@ -13,8 +13,21 @@
 //
 // Every date is "days ago" from the demo clock (clock.ts).
 
-import { DFY_FOR_SUBSTEP, PROGRAMME, deriveRoadmap, isRepeatableSlug, type ProgrammeShape, type SubStepOverride } from "@sc/lib/roadmapV3/programme";
-import type { DfySlug, EnrollmentSignal, Roadmap, V3Offer, V3Payload } from "@sc/lib/roadmapV3/types";
+import {
+  DFY_FOR_SUBSTEP,
+  PROGRAMME,
+  deriveRoadmap,
+  isRepeatableSlug,
+  type ProgrammeShape,
+  type SubStepOverride,
+} from "@sc/lib/roadmapV3/programme";
+import type {
+  DfySlug,
+  EnrollmentSignal,
+  Roadmap,
+  V3Offer,
+  V3Payload,
+} from "@sc/lib/roadmapV3/types";
 import { nextActionFor } from "@sc/lib/roadmapV3/nextAction";
 import { CALL_STEP_IDS } from "@sc/lib/callStepIds";
 import { SUB_STEP_DETAIL } from "@sc/components/portal/roadmap-v3/detailContent";
@@ -37,7 +50,13 @@ export const TARGETING_STEP_ID = "p4-quarterly-targeting-call";
 
 export const SHAPE: ProgrammeShape = PROGRAMME.map((phase) =>
   phase.index === 4
-    ? { ...phase, subSteps: [{ id: TARGETING_STEP_ID, label: "Quarterly Targeting Call", weeks: 1 }, ...phase.subSteps] }
+    ? {
+        ...phase,
+        subSteps: [
+          { id: TARGETING_STEP_ID, label: "Quarterly Targeting Call", weeks: 1 },
+          ...phase.subSteps,
+        ],
+      }
     : phase,
 );
 
@@ -57,7 +76,12 @@ export const STEP_CONTENT: Record<string, ContentSub> = {
   // DEMO: Ava is live in this sample, so the line no longer says "Coming Soon!".
   "p4-proposal-building": {
     ...CONTENT.find((c) => c.id === "p4-proposal-building")!,
-    items: ["Ava - Your Proposal Builder", "You correct the work details", "Add past performance", "Price it"],
+    items: [
+      "Ava - Your Proposal Builder",
+      "You correct the work details",
+      "Add past performance",
+      "Price it",
+    ],
   },
 };
 
@@ -81,7 +105,14 @@ export interface ServiceDef {
 
 /** The done-for-you catalog. Prices follow the prototype's catalog (dfyServices.ts). */
 export const SERVICES: Record<DfySlug, ServiceDef> = {
-  "llc-application": { slug: "llc-application", sectionId: "sec-llc-application", stepId: "step-llc-application", title: "LLC Application", price: "$600", turnaround: "3–5 days" },
+  "llc-application": {
+    slug: "llc-application",
+    sectionId: "sec-llc-application",
+    stepId: "step-llc-application",
+    title: "LLC Application",
+    price: "$600",
+    turnaround: "3–5 days",
+  },
   "govcompliant-digital-setup": {
     slug: "govcompliant-digital-setup",
     sectionId: "sec-digital-setup",
@@ -89,17 +120,62 @@ export const SERVICES: Record<DfySlug, ServiceDef> = {
     title: "GovCompliant Digital Setup",
     price: "$397",
     options: [
-      { id: "basic", label: "Basic", price: "$397", description: "Domain, email, phone and a one-page site." },
-      { id: "premium", label: "Premium", price: "$2,499", description: "Everything in Basic, plus the government page and A2P texting." },
+      {
+        id: "basic",
+        label: "Basic",
+        price: "$397",
+        description: "Domain, email, phone and a one-page site.",
+      },
+      {
+        id: "premium",
+        label: "Premium",
+        price: "$2,499",
+        description: "Everything in Basic, plus the government page and A2P texting.",
+      },
     ],
     turnaround: "5–7 days",
   },
-  "sam-registration": { slug: "sam-registration", sectionId: "sec-sam", stepId: "step-sam", title: "SAM.gov Registration", price: "$2,997", turnaround: "8–10 weeks" },
-  "sbs-visibility-setup": { slug: "sbs-visibility-setup", sectionId: "sec-sbs", stepId: "step-sbs", title: "SBS Visibility Setup", price: "$997", turnaround: "3 days" },
-  "capability-statement": { slug: "capability-statement", sectionId: "sec-capability", stepId: "step-capability", title: "Capability Statement", price: "$2,000", turnaround: "3 days" },
-  "sled-enrollment": { slug: "sled-enrollment", sectionId: "sec-sled", stepId: "step-sled", title: "SLED Enrollment", price: "$2,497", turnaround: "1–2 weeks" },
+  "sam-registration": {
+    slug: "sam-registration",
+    sectionId: "sec-sam",
+    stepId: "step-sam",
+    title: "SAM.gov Registration",
+    price: "$2,997",
+    turnaround: "8–10 weeks",
+  },
+  "sbs-visibility-setup": {
+    slug: "sbs-visibility-setup",
+    sectionId: "sec-sbs",
+    stepId: "step-sbs",
+    title: "SBS Visibility Setup",
+    price: "$997",
+    turnaround: "3 days",
+  },
+  "capability-statement": {
+    slug: "capability-statement",
+    sectionId: "sec-capability",
+    stepId: "step-capability",
+    title: "Capability Statement",
+    price: "$2,000",
+    turnaround: "3 days",
+  },
+  "sled-enrollment": {
+    slug: "sled-enrollment",
+    sectionId: "sec-sled",
+    stepId: "step-sled",
+    title: "SLED Enrollment",
+    price: "$2,497",
+    turnaround: "1–2 weeks",
+  },
   // DEMO: the prototype catalog has no price for these two. Sample prices.
-  "cmmc-level-1": { slug: "cmmc-level-1", sectionId: "sec-cmmc", stepId: "step-cmmc", title: "CMMC 2.0 Level 1", price: "$497", turnaround: "2 weeks" },
+  "cmmc-level-1": {
+    slug: "cmmc-level-1",
+    sectionId: "sec-cmmc",
+    stepId: "step-cmmc",
+    title: "CMMC 2.0 Level 1",
+    price: "$497",
+    turnaround: "2 weeks",
+  },
   "prime-contractor-registration": {
     slug: "prime-contractor-registration",
     sectionId: "sec-prime",
@@ -176,27 +252,31 @@ export function verifyPasses(key: VerifyKey): boolean {
 
 const ago = (days: number) => isoDaysFromNow(-days, 10);
 
-/** When she started and finished each step the story marks done (days ago). */
-const DONE_DATES: Record<string, { started?: number; done: number }> = {
-  "p1-business-setup": { started: 176, done: 168 },
-  "p1-digital-compliance": { started: 170, done: 141 },
-  "p1-federal-registration": { started: 168, done: 112 },
-  "p1-sled-registration": { started: 112, done: 98 },
-  "p2-capability-statement": { started: 96, done: 90 },
-  "p2-sbs-registration": { started: 90, done: 88 },
-  "p2-cmmc-level-1": { started: 88, done: 84 },
-  "p3-positioning-call": { done: 80 },
-  "p3-planned-pursuit": { done: 78 },
-  "p3-prime-registration": { done: 74 },
-  "p3-send-to-mentor": { done: 60 },
+/**
+ * When she started and finished each step the story marks done (days ago).
+ * SAM.gov finished 183 days ago, which is a year before PERSONA.samActiveUntil
+ * (a SAM registration lasts one year).
+ */
+export const DONE_DATES: Record<string, { started?: number; done: number }> = {
+  "p1-business-setup": { started: 218, done: 210 },
+  "p1-digital-compliance": { started: 212, done: 196 },
+  "p1-federal-registration": { started: 205, done: 183 },
+  "p1-sled-registration": { started: 183, done: 170 },
+  "p2-capability-statement": { started: 168, done: 160 },
+  "p2-sbs-registration": { started: 160, done: 158 },
+  "p2-cmmc-level-1": { started: 158, done: 154 },
+  "p3-positioning-call": { done: 150 },
+  "p3-planned-pursuit": { done: 148 },
+  "p3-prime-registration": { done: 144 },
+  "p3-send-to-mentor": { done: 130 },
 };
 
 /** The member joined this many days ago. */
-export const MEMBER_SINCE_DAYS = 176;
+export const MEMBER_SINCE_DAYS = 220;
 
 /** Days ago the compliance call and the positioning call were held. */
-export const COMPLIANCE_CALL_DAYS_AGO = 150;
-export const POSITIONING_CALL_DAYS_AGO = 80;
+export const COMPLIANCE_CALL_DAYS_AGO = 205;
+export const POSITIONING_CALL_DAYS_AGO = 150;
 
 /** Lines she ticked herself on the member-ticked steps. The story has all of them ticked. */
 export function itemTicked(subId: string, title: string): boolean {
@@ -245,8 +325,13 @@ export function computeRoadmap(): Roadmap {
 
   // Execution.
   const targeting = bookingForCall(CALL_STEP_IDS.targeting);
-  if (targeting) overrides[TARGETING_STEP_ID] = { state: "in_progress", kickoffOn: targeting.startTime };
-  overrides["p4-proposal-building"] = { state: "in_progress", awaiting: { who: "you" }, openedAt: ago(2) };
+  if (targeting)
+    overrides[TARGETING_STEP_ID] = { state: "in_progress", kickoffOn: targeting.startTime };
+  overrides["p4-proposal-building"] = {
+    state: "in_progress",
+    awaiting: { who: "you" },
+    openedAt: ago(2),
+  };
 
   // A service she bought moves its step on, as production does (mapping.ts enrollmentState):
   // our team is working on it. A step that starts with a call waits for her to book it.
@@ -254,10 +339,15 @@ export function computeRoadmap(): Roadmap {
     for (const sub of phase.subSteps) {
       const slug = DFY_FOR_SUBSTEP[sub.id];
       if (!slug || isRepeatableSlug(slug) || overrides[sub.id]?.state === "done") continue;
-      const bought = getEnrollments().filter((e) => e.slug === slug).at(-1);
+      const bought = getEnrollments()
+        .filter((e) => e.slug === slug)
+        .at(-1);
       if (!bought) continue;
-      const callFirst = SUB_STEP_DETAIL[sub.id]?.handoff === "call" && !bought.deliveryAppointmentAt;
-      const held = bought.deliveryAppointmentAt && new Date(bought.deliveryAppointmentAt).getTime() < Date.now();
+      const callFirst =
+        SUB_STEP_DETAIL[sub.id]?.handoff === "call" && !bought.deliveryAppointmentAt;
+      const held =
+        bought.deliveryAppointmentAt &&
+        new Date(bought.deliveryAppointmentAt).getTime() < Date.now();
       overrides[sub.id] = callFirst
         ? { state: "in_progress", awaiting: { who: "you" }, openedAt: bought.enrolledAt }
         : { state: "in_progress", ...(held ? { kickoffOn: bought.deliveryAppointmentAt! } : {}) };
@@ -291,7 +381,11 @@ function signalFor(e: DemoEnrollment): EnrollmentSignal {
     hasIntakeForm: false,
     enrolledAt: e.enrolledAt,
     deliveryAppointmentAt: e.deliveryAppointmentAt,
-    receipt: { state: "ready", number: receiptNumber(e), url: `/api/portal/${PERSONA.locationId}/receipts/${encodeURIComponent(e.id)}` },
+    receipt: {
+      state: "ready",
+      number: receiptNumber(e),
+      url: `/api/portal/${PERSONA.locationId}/receipts/${encodeURIComponent(e.id)}`,
+    },
   };
 }
 
@@ -300,7 +394,9 @@ export function purchasedSlugList(): DfySlug[] {
 }
 
 /** Resolved early releases: the audit form gave her website, domain, email and phone. */
-export const EARLY_RELEASE: V3Payload["earlyRelease"] = { "p1-federal-registration": { "p1-digital-compliance": true } };
+export const EARLY_RELEASE: V3Payload["earlyRelease"] = {
+  "p1-federal-registration": { "p1-digital-compliance": true },
+};
 
 // ── The pieces "Do this next" reads ──────────────────────────────────────────
 
@@ -321,4 +417,3 @@ export function nextStepNow() {
 export function allBookings() {
   return getBookings();
 }
-

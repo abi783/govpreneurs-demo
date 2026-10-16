@@ -17,7 +17,11 @@ import { showDemoNotice } from "@/demo/ui/notice";
 const GHL_HOSTS = new Set(["app.govpreneurs.com", "scv2.govpreneurs.com"]);
 
 function dollars(n: number): string {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  });
 }
 
 /** How much to add: the amount on the link, else the shortfall named nearby, else $500. */
@@ -29,7 +33,9 @@ function topUpAmount(link: HTMLAnchorElement): number {
   const own = num(link.textContent, /\$([\d,]+(?:\.\d+)?)/);
   if (own) return Math.ceil(own);
   const scope = link.closest("[role=dialog], .fixed") ?? link.parentElement;
-  const short = num(scope?.textContent, /\$([\d,]+(?:\.\d+)?)\s+more/i) ?? num(scope?.textContent, /recharge\s+\$([\d,]+(?:\.\d+)?)/i);
+  const short =
+    num(scope?.textContent, /\$([\d,]+(?:\.\d+)?)\s+more/i) ??
+    num(scope?.textContent, /recharge\s+\$([\d,]+(?:\.\d+)?)/i);
   if (short) return Math.max(100, Math.ceil(short / 50) * 50);
   return 500;
 }
