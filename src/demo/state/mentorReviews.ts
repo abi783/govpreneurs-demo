@@ -5,6 +5,7 @@
 import { readDemoState, updateDemoState } from "@/demo/runtime/store";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { getOpportunity } from "@/demo/story/opportunities";
+import { describeSaved } from "@/demo/state/workspace";
 import { MENTOR, PERSONA } from "@/demo/story/persona";
 import { MENTOR_REVIEWS, type MentorReviewStory } from "@/demo/story/workspace";
 import type {
@@ -172,7 +173,8 @@ export function createReview(input: { oppKey: string; title: string; message: st
   const summary: MentorReviewSummary = {
     id: `rev-${Date.now()}`,
     oppKey: input.oppKey,
-    oppResolved: Boolean(getOpportunity(input.oppKey)),
+    // DEMO: forecasts and small orders are records too, so their reviews link back.
+    oppResolved: Boolean(getOpportunity(input.oppKey)) || describeSaved(input.oppKey) !== null,
     sourceType: input.sourceType ?? null,
     solNumber: input.oppKey,
     title: input.title,
