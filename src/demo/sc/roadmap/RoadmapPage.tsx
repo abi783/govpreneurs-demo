@@ -12,7 +12,6 @@ import { ScPage } from "../ScPage";
 import { DemoLinkBridge } from "../linkBridge";
 import { buildRoadmapPayload } from "./payload";
 import "../search";
-import "./rm2-isolation.css";
 
 export function RoadmapPage() {
   const refreshTick = useDemoRefresh();
