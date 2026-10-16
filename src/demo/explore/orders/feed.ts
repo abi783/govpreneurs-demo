@@ -5,7 +5,7 @@
 import type { SmallOrdersFeed } from "@/lib/microPurchases/api";
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroOrder } from "@/lib/microPurchases/order";
-import { dateDaysFromNow } from "@/demo/story/clock";
+import { calendarDay } from "../dates";
 import { ORDERS, ORDER_META } from "./data";
 
 /** Production serves 50 orders a page. */
@@ -58,7 +58,7 @@ function walkOrder(a: MicroOrder, b: MicroOrder): number {
 
 /** The day the board is for. A date only, as the client reads it. */
 export function boardDay(): string {
-  return dateDaysFromNow(0);
+  return calendarDay(0);
 }
 
 export interface WalkQuery {

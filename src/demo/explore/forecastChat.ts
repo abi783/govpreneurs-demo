@@ -2,7 +2,7 @@
 // the scripted answers in the chat on a forecast page. Everything here reads
 // the forecast record and Amira's facts, so the numbers are true for her.
 
-import { daysUntil } from "@/demo/story/clock";
+import { daysToDay } from "./dates";
 import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
 import { forecastRecord, FORECAST_MEMBER, scoredRow } from "./forecastData";
@@ -24,7 +24,7 @@ function weeksOrMonths(days: number): string {
 
 /** Days from today to the expected date, or null. */
 function expectedDays(r: ForecastRecordDto): number | null {
-  return r.dueOn ? daysUntil(r.dueOn) : null;
+  return r.dueOn ? daysToDay(r.dueOn) : null;
 }
 
 function when(r: ForecastRecordDto): string {
@@ -103,7 +103,7 @@ function whoSentence(r: ForecastRecordDto): string {
 function samSentence(r: ForecastRecordDto): string {
   const ends = FORECAST_MEMBER.registration.endsOn;
   const d = expectedDays(r);
-  const endsInDays = ends ? daysUntil(ends) : null;
+  const endsInDays = ends ? daysToDay(ends) : null;
   const base = `Your SAM registration is active until ${ends ?? "a date I do not have"}.`;
   if (endsInDays != null && d != null && endsInDays < d + 30) {
     return `${base} The bid request may come after that date, so renew it first.`;

@@ -7,7 +7,7 @@
 // Group's 2019 Fort Bragg award and Amira's Womack award (persona.ts).
 
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING } from "./firms";
-import { dateDaysFromNow, daysUntil } from "@/demo/story/clock";
+import { calendarDay, daysToDay } from "./dates";
 import { PAST_PERFORMANCE } from "@/demo/story/persona";
 import type { AwardBench, AwardRecord } from "@/lib/awardsApi";
 
@@ -754,7 +754,7 @@ function daysBetween(laterIso: string, earlierIso: string): number {
 
 function startedOn(s: Seed): string {
   if (s.startedOn) return s.startedOn;
-  return dateDaysFromNow(-(s.startedDaysAgo ?? 365));
+  return calendarDay(-(s.startedDaysAgo ?? 365));
 }
 
 function benchOf(s: Seed): AwardBench | null {
@@ -774,9 +774,9 @@ export function toAwardRecord(s: Seed): AwardRecord {
   const winner = anyFirmByKey(s.winner)!;
   const agency = AGENCIES[s.agency];
   const awardedAt = startedOn(s);
-  const days = Math.max(0, daysBetween(dateDaysFromNow(0), awardedAt));
-  const recompeteAt = s.endsInDays !== undefined ? dateDaysFromNow(s.endsInDays) : null;
-  const months = recompeteAt ? daysUntil(recompeteAt) / 30 : null;
+  const days = Math.max(0, daysBetween(calendarDay(0), awardedAt));
+  const recompeteAt = s.endsInDays !== undefined ? calendarDay(s.endsInDays) : null;
+  const months = recompeteAt ? daysToDay(recompeteAt) / 30 : null;
   return {
     awardId: s.id,
     title: s.title,

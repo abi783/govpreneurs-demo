@@ -10,7 +10,7 @@ import type { DemoRouteDef } from "../runtime/router";
 import { demoResponse } from "../runtime/router";
 import { readDemoState, writeDemoState } from "../runtime/store";
 import { registerSavedResolver, setSaved } from "../state/workspace";
-import { isoDaysFromNow } from "../story/clock";
+import { dayToIso } from "../explore/dates";
 import { acquisitionCodeDocuments } from "../explore/orders/acquisitionCodes";
 import { ORDERS, findOrder } from "../explore/orders/data";
 import { categoryCounts, codeCensus, decodeCursor, feedPage, fitScores } from "../explore/orders/feed";
@@ -27,7 +27,7 @@ registerSavedResolver((oppKey) => {
     oppKey: order.id,
     title: order.plainName,
     agency: order.buyer,
-    dueDate: order.closesOn ? isoDaysFromNow(daysTo(order.closesOn), 17) : null,
+    dueDate: order.closesOn ? dayToIso(order.closesOn) : null,
     sourceType: "dibbs",
   };
 });
@@ -38,13 +38,6 @@ const SEEDED = "explore.smallOrders.seeded";
 if (typeof window !== "undefined" && !readDemoState<boolean>(SEEDED, false)) {
   setSaved("mp-109", true);
   writeDemoState(SEEDED, true);
-}
-
-function daysTo(day: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const [y, m, d] = day.split("-").map(Number);
-  return Math.round((new Date(y, m - 1, d).getTime() - today.getTime()) / 86_400_000);
 }
 
 function list(value: string | null): string[] {

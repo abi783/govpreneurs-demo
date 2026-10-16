@@ -6,7 +6,7 @@
 // record and from the member's facts below, exactly as it does in production.
 // So a line like "the right size for you" is true because the numbers say so.
 
-import { dateDaysFromNow } from "@/demo/story/clock";
+import { calendarDay } from "./dates";
 import { PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
 import type {
   ForecastListRowDto,
@@ -39,8 +39,8 @@ const PERIOD_DAYS = new Set(["01-01", "04-01", "07-01", "09-30", "10-01", "06-30
 /** A date `days` from today that is not one of the period dates, so it reads as a day. */
 function plainDate(days: number): string {
   let d = days;
-  while (PERIOD_DAYS.has(dateDaysFromNow(d).slice(5))) d += 1;
-  return dateDaysFromNow(d);
+  while (PERIOD_DAYS.has(calendarDay(d).slice(5))) d += 1;
+  return calendarDay(d);
 }
 
 /** How close the industry code is to Amira's own, 0 to 1. Null: no code. */

@@ -9,7 +9,8 @@
 
 import { demoResponse, type DemoRouteDef } from "../runtime/router";
 import { readDemoState, updateDemoState } from "../runtime/store";
-import { isoDaysFromNow, dateDaysFromNow } from "../story/clock";
+import { isoDaysFromNow } from "../story/clock";
+import { calendarDay, dayToIso } from "../explore/dates";
 import { getSavedOpps, registerSavedResolver } from "../state/workspace";
 import { numParam } from "./util";
 import type {
@@ -56,7 +57,7 @@ registerSavedResolver((oppKey) => {
     oppKey,
     title: r.hunter.plainTitle ?? r.hgTitle ?? "Forecast",
     agency: r.agencyName,
-    dueDate: r.dueOn ? `${r.dueOn}T12:00:00.000Z` : null,
+    dueDate: r.dueOn ? dayToIso(r.dueOn) : null,
     sourceType: r.lane === "sled" ? "sled_forecast" : "forecast",
   };
 });
@@ -210,7 +211,7 @@ function eventsFor(oppKey: string, seen: boolean): ForecastWatchEvent[] {
   if (!record) return [];
   if (oppKey === FORT_BRAGG_FORECAST_KEY) {
     return [
-      event("fb-1", "date_moved", 3, { field: "expectedOn", before: dateDaysFromNow(120), after: record.dueOn }, seen),
+      event("fb-1", "date_moved", 3, { field: "expectedOn", before: calendarDay(120), after: record.dueOn }, seen),
     ];
   }
   if (oppKey === POPE_FORECAST_KEY) {
@@ -269,7 +270,7 @@ export const routes: DemoRouteDef[] = [
         forecast: {
           ...record,
           files: forecastFiles(record.oppKey),
-          checkedOn: dateDaysFromNow(0),
+          checkedOn: calendarDay(0),
         },
       };
     },

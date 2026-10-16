@@ -6,7 +6,7 @@
 // shape of the live buyer API, for any caller that asks by name or by key.
 
 import { demoResponse, type DemoRouteDef } from "../runtime/router";
-import { dateDaysFromNow } from "../story/clock";
+import { calendarDay } from "../explore/dates";
 import { GOV_BUYERS, type GovBuyer } from "@/lib/mock/governmentBuyers";
 import type { BuyerDetail, OfficeSummary } from "@/lib/buyers";
 
@@ -42,7 +42,7 @@ function detail(b: GovBuyer): BuyerDetail {
       awardsExamined,
       setAsideAwards: setAside,
       officers: b.officers.length,
-      asOf: dateDaysFromNow(-1),
+      asOf: calendarDay(-1),
     },
     figures: {
       spendByYear: a

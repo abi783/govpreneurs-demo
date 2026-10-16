@@ -5,7 +5,8 @@
 // NC, VA and SC. Money, places and counts come from the award record in
 // awardsData.ts, so a company file and an award never disagree.
 
-import { dateDaysFromNow, daysUntil, isoDaysFromNow } from "@/demo/story/clock";
+import { isoDaysFromNow } from "@/demo/story/clock";
+import { calendarDay, daysToDay } from "./dates";
 import { getOpportunity, HERO_IDS } from "@/demo/story/opportunities";
 import { PAST_PERFORMANCE, PERSONA, KEY_PARTNER } from "@/demo/story/persona";
 import {
@@ -306,7 +307,7 @@ function geographyOf(awards: AwardRecord[], hq: Firm): PrimeCandidate["geography
 function economicsOf(awards: AwardRecord[]): PrimeCandidate["economics"] {
   const values = awards.map((a) => a.obligated ?? 0);
   const ends = awards
-    .map((a) => (a.recency.recompeteAt ? daysUntil(a.recency.recompeteAt) : null))
+    .map((a) => (a.recency.recompeteAt ? daysToDay(a.recency.recompeteAt) : null))
     .filter((d): d is number => d !== null && d > 0);
   const soonest = ends.length ? Math.min(...ends) : null;
   const offers = awards.map((a) => a.offersReceived).filter((o): o is number => o !== null);
@@ -393,7 +394,7 @@ function build(spec: Spec): PrimeCandidate {
     scoreBreakdown: spec.breakdown,
     reasons: reasonsFor(spec, geography, economics),
     flags: spec.flags,
-    asOf: dateDaysFromNow(-1),
+    asOf: calendarDay(-1),
     whyAboveNext: null,
   };
 }
@@ -478,7 +479,7 @@ export function companyByKey(key: number): { company: PrimeCandidate; inMatches:
         scoreBreakdown: {},
         reasons: [],
         flags: [],
-        asOf: dateDaysFromNow(-1),
+        asOf: calendarDay(-1),
         whyAboveNext: null,
       },
     };
@@ -508,7 +509,7 @@ export function companyByKey(key: number): { company: PrimeCandidate; inMatches:
         { signal: "S2", text: "They buy work close to yours.", evidence: "their work: Food Service Contractors" },
       ],
       flags: [],
-      asOf: dateDaysFromNow(-1),
+      asOf: calendarDay(-1),
       whyAboveNext: null,
     },
   };

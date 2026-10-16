@@ -8,6 +8,7 @@
 // stands for it.
 
 import { isoDaysFromNow } from "@/demo/story/clock";
+import { calendarIso } from "./dates";
 import { OPPORTUNITIES, getOpportunity, type StoryOpportunity } from "@/demo/story/opportunities";
 import { CLOSED_PURSUITS, type ClosedPursuit } from "@/demo/story/workspace";
 import { describeSaved } from "@/demo/state/workspace";
@@ -47,7 +48,7 @@ function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean
   const pursuit = withPursuit ? o.pursuit : undefined;
   // An outcome card (submitted, won, not awarded, declined) shows no countdown.
   const outcome = ["submitted", "won", "not_awarded", "declined"].includes(stage);
-  const deadline = outcome ? null : isoDaysFromNow(o.closesInDays, 17);
+  const deadline = outcome ? null : calendarIso(o.closesInDays);
   return {
     id: `story_${o.id}`,
     opportunityId: o.id,
@@ -110,7 +111,7 @@ function reviewBid(review: MentorReviewSummary): DemoBid {
     title: story?.plainTitle ?? review.title,
     agency: story?.agency ?? saved?.agency ?? "",
     mode: "prime",
-    deadline: story ? isoDaysFromNow(story.closesInDays, 17) : null,
+    deadline: story ? calendarIso(story.closesInDays) : null,
     stage: "with_mentor",
     nextAction: { label: review.unread ? "Read reply" : "Open thread", href: `/mentors/${review.id}` },
     lastActivityAt: review.lastMessageAt,

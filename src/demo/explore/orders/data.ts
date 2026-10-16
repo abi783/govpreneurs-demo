@@ -17,7 +17,7 @@
 
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroAward, MicroOrder } from "@/lib/microPurchases/order";
-import { dateDaysFromNow } from "@/demo/story/clock";
+import { calendarDay } from "../dates";
 import { SUPPLIERS, type SupplierKey } from "./suppliers";
 
 export type ShipTo = "fortBragg" | "campLejeune" | "popeAaf";
@@ -96,7 +96,7 @@ function toAward(a: AwardSpec): MicroAward {
     contract,
     quantity,
     unitCost,
-    awardedOn: dateDaysFromNow(-daysAgo),
+    awardedOn: calendarDay(-daysAgo),
     surplus: false,
     partNumber: partNumber ?? null,
   };
@@ -112,7 +112,7 @@ function build(s: Spec): { order: MicroOrder; meta: OrderMeta } {
     dlaOrderUrl: null,
     paper: s.paper === false ? null : { fileName: `${s.sol}.pdf`, fileSize: null },
     version: s.version ?? s.sol,
-    amendedOn: s.amendedDaysAgo != null ? dateDaysFromNow(-s.amendedDaysAgo) : null,
+    amendedOn: s.amendedDaysAgo != null ? calendarDay(-s.amendedDaysAgo) : null,
     nsn: s.nsn,
     plainName: s.plain,
     officialName: s.official,
@@ -132,8 +132,8 @@ function build(s: Spec): { order: MicroOrder; meta: OrderMeta } {
     repeats: s.repeats ?? null,
     needsDrawings: s.drawings ?? null,
     dibbsStatus: s.status ?? "Open",
-    postedOn: dateDaysFromNow(-s.postedDaysAgo),
-    closesOn: s.closesInDays == null ? null : dateDaysFromNow(s.closesInDays),
+    postedOn: calendarDay(-s.postedDaysAgo),
+    closesOn: s.closesInDays == null ? null : calendarDay(s.closesInDays),
     buyer: "DLA Troop Support",
     buyerContact: { name: s.contact[0], email: emailOf(s.contact[0]), phone: s.contact[1] },
     partNumbers: [...new Set(s.approved.map(([, part]) => part))].join(", ") || null,
