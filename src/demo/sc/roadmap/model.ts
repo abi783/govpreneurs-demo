@@ -33,6 +33,13 @@ import { CALL_STEP_IDS } from "@sc/lib/callStepIds";
 import { SUB_STEP_DETAIL } from "@sc/components/portal/roadmap-v3/detailContent";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { PERSONA } from "@/demo/story/persona";
+import {
+  COMPLIANCE_CALL_DAYS_AGO,
+  FIRST_MENTOR_QUESTION_DAYS_AGO,
+  MEMBER_SINCE_DAYS,
+  POSITIONING_CALL_DAYS_AGO,
+  SAM_CHECKED_DAYS_AGO,
+} from "@/demo/sc/timeline";
 import { CONTENT, type ContentSub } from "./content";
 import {
   getBookings,
@@ -260,23 +267,19 @@ const ago = (days: number) => isoDaysFromNow(-days, 10);
 export const DONE_DATES: Record<string, { started?: number; done: number }> = {
   "p1-business-setup": { started: 218, done: 210 },
   "p1-digital-compliance": { started: 212, done: 196 },
-  "p1-federal-registration": { started: 205, done: 183 },
+  "p1-federal-registration": { started: 205, done: SAM_CHECKED_DAYS_AGO },
   "p1-sled-registration": { started: 183, done: 170 },
   "p2-capability-statement": { started: 168, done: 160 },
   "p2-sbs-registration": { started: 160, done: 158 },
   "p2-cmmc-level-1": { started: 158, done: 154 },
-  "p3-positioning-call": { done: 150 },
+  "p3-positioning-call": { done: POSITIONING_CALL_DAYS_AGO },
   "p3-planned-pursuit": { done: 148 },
   "p3-prime-registration": { done: 144 },
-  "p3-send-to-mentor": { done: 130 },
+  "p3-send-to-mentor": { done: FIRST_MENTOR_QUESTION_DAYS_AGO },
 };
 
-/** The member joined this many days ago. */
-export const MEMBER_SINCE_DAYS = 220;
-
-/** Days ago the compliance call and the positioning call were held. */
-export const COMPLIANCE_CALL_DAYS_AGO = 205;
-export const POSITIONING_CALL_DAYS_AGO = 150;
+// The dates of the calls and of the SAM check live in ../timeline.ts, so every page tells the same history.
+export { COMPLIANCE_CALL_DAYS_AGO, MEMBER_SINCE_DAYS, POSITIONING_CALL_DAYS_AGO };
 
 /** Lines she ticked herself on the member-ticked steps. The story has all of them ticked. */
 export function itemTicked(subId: string, title: string): boolean {

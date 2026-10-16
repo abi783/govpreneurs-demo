@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { PAST_PERFORMANCE, PERSONA } from "../story/persona";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
+import { SAM_CHECKED_DAYS_AGO } from "../sc/timeline";
 import type { FieldOverride, FieldState, FieldValue } from "./store";
 import type { DfyServiceId } from "./dfy";
 
@@ -93,7 +94,7 @@ function asList(v: FieldValue): string[] {
 
 const STATE_NAMES: Record<string, string> = { NC: "North Carolina", VA: "Virginia", SC: "South Carolina", GA: "Georgia" };
 
-const SAM_DAYS = 150;
+const SAM_DAYS = SAM_CHECKED_DAYS_AGO;
 const FORMED_ISO = toIsoDay(PERSONA.formedOn);
 const SECONDARY = PERSONA.secondaryNaics;
 const CORE_CAPABILITIES = [

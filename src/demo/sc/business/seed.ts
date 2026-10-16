@@ -20,6 +20,7 @@
 
 import { PAST_PERFORMANCE, PERSONA, MENTOR } from "../../story/persona";
 import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
+import { MEMBER_SINCE_DAYS, POSITIONING_CALL_DAYS_AGO, SAM_CHECKED_DAYS_AGO } from "../timeline";
 import { catalogFor, copyFor } from "@sc/lib/businessProfile/catalog";
 import { fromMb } from "@sc/lib/businessProfile/legacyShapes";
 import { fieldDef } from "@sc/lib/businessProfile/registry";
@@ -103,12 +104,9 @@ export const CAPABILITY_STATEMENT_BYTES = 2960;
 
 // ── timeline ───────────────────────────────────────────────────────────────
 
-/** She joined about four months ago (the profile page tells the same story). "Days ago". */
-const JOINED_DAYS_AGO = 115;
-const INTAKE_SENT_DAYS_AGO = 107;
-const POSITIONING_CALL_DAYS_AGO = 105;
-/** SAM.gov was last checked this long ago. The profile page uses the same number. */
-const SAM_CHECKED_DAYS_AGO = 150;
+// "Days ago". The numbers are shared with Home, the Roadmap and Tasks (../timeline.ts).
+const JOINED_DAYS_AGO = MEMBER_SINCE_DAYS;
+const INTAKE_SENT_DAYS_AGO = MEMBER_SINCE_DAYS - 8;
 
 // ── provenance ─────────────────────────────────────────────────────────────
 
@@ -503,7 +501,7 @@ function buildRows(): DemoFieldRow[] {
   add(
     "ninety_day_goal",
     text(
-      "Win my first prime contract with Cumberland County Schools or Fort Bragg dining, and team up with Carolina Dining Group on the Fort Bragg recompete.",
+      "Send bids on Camp Mackall field meals and the Fayetteville cafe, and team up with Carolina Dining Group on the Fort Bragg dining recompete.",
       true,
     ),
     typed(JOINED_DAYS_AGO - 3),
