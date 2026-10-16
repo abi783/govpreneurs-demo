@@ -98,7 +98,7 @@ export const BUYER_SEED: GovBuyer[] = [
     agencyMatchers: ["Fort Bragg", "Camp Mackall"],
     awardAgencies: ab(A.braggMicc.abbrev),
     officers: [
-      sblo("bragg-1", "Renee Calloway", "r.calloway@army.mil.sample", "910-555-0131", "Sends small businesses to the right contracting officer."),
+      sblo("bragg-1", "Marguerite Albright", "m.albright@army.mil.sample", "910-555-0131", "Sends small businesses to the right contracting officer."),
       co("bragg-2", "Maj. Terrence Hale", "t.hale@army.mil.sample", "910-555-0132", "Signs the dining facility and field feeding awards."),
       co("bragg-3", "Priya Venkataraman", "p.venkataraman@army.mil.sample", "910-555-0133", "Event catering and order-as-needed contracts."),
       spec("bragg-4", "Gregory Lindqvist", "g.lindqvist@army.mil.sample", "910-555-0134"),

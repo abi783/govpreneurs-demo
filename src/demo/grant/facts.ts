@@ -7,6 +7,7 @@
 import { deadlineDate, deadlineIso, postedDate, postedIso } from "./calendar";
 import {
   getOpportunity,
+  OPPORTUNITIES,
   type SetAside,
   type StoryOpportunity,
 } from "@/demo/story/opportunities";
@@ -130,28 +131,121 @@ export function termText(years: number): string {
 }
 
 // ── Contracting officers (fictional) ─────────────────────────────────────
+//
+// One person works for one office. A buyer's team is chosen by the buyer, never
+// by the opportunity alone, so the same name never shows for the Army on one
+// page and the Navy on the next. Where the Government Buyers page names an
+// office's people, the same people appear here (src/demo/explore/buyersData.ts).
 
 interface Person {
   name: string;
   title: string;
 }
 
-const FEDERAL_PEOPLE: Person[] = [
+/** Army buyers. The order is fixed: the three hero opportunities pick from it. */
+const ARMY_TEAM: Person[] = [
   { name: "Denise Harrow", title: "Contracting Officer" },
   { name: "Martin Whitfield", title: "Contract Specialist" },
-  { name: "Dolores Ainsley", title: "Contracting Officer" },
+  { name: "Beatrice Calhoun", title: "Contracting Officer" },
   { name: "Terrence Boyle", title: "Contract Specialist" },
   { name: "Janelle Okafor", title: "Contracting Officer" },
   { name: "Gregory Lindqvist", title: "Contract Specialist" },
 ];
 
-const LOCAL_PEOPLE: Person[] = [
-  { name: "Patricia Dunmore", title: "Purchasing Manager" },
-  { name: "Howard Kessler", title: "Procurement Officer" },
-  { name: "Angela Pruitt", title: "Buyer III" },
-  { name: "Samuel Oyelaran", title: "Purchasing Agent" },
-  { name: "Lorraine Beaudry", title: "Procurement Specialist" },
+const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
+  {
+    match: /Navy/i,
+    team: [
+      { name: "Dolores Ainsley", title: "Contracting Officer" },
+      { name: "Colleen Pruitt", title: "Contracting Officer" },
+      { name: "Isaiah Greer", title: "Contract Specialist" },
+      { name: "Tobias Sandoval", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Air Force/i,
+    team: [
+      { name: "Harlan Vance", title: "Contracting Officer" },
+      { name: "Priscilla Odom", title: "Contract Specialist" },
+      { name: "Warren Teague", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Veterans/i,
+    team: [
+      { name: "Lorraine Dubois", title: "Contracting Officer" },
+      { name: "Walter Nakamura", title: "Contracting Officer" },
+      { name: "Kevin Adeyemi", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /General Services/i,
+    team: [
+      { name: "Dale Harmon", title: "Contracting Officer" },
+      { name: "Jun Tanaka", title: "Contract Specialist" },
+    ],
+  },
 ];
+
+/** State and local buyers that the Government Buyers page already names. */
+const LOCAL_TEAMS: Record<string, Person[]> = {
+  "City of Fayetteville, NC": [
+    { name: "Dominic Reyes", title: "Procurement Officer" },
+    { name: "Ayesha Khan", title: "Purchasing Agent" },
+  ],
+  "Cumberland County, NC": [
+    { name: "Calvin Moore", title: "Purchasing Manager" },
+    { name: "Joy Mathis", title: "Purchasing Agent" },
+  ],
+  "Cumberland County Schools, NC": [
+    { name: "Gordon Yates", title: "Purchasing Director" },
+    { name: "Tamika Bell", title: "Purchasing Agent" },
+  ],
+  "North Carolina National Guard": [
+    { name: "Beth Anne Parrish", title: "Procurement Officer" },
+    { name: "Curtis Lowe", title: "Purchasing Agent" },
+  ],
+  "Public Schools of Robeson County, NC": [
+    { name: "Terrence Bullard", title: "Purchasing Manager" },
+    { name: "Patricia Lowry", title: "Purchasing Agent" },
+  ],
+  "Durham County, NC": [
+    { name: "Edward Kincaid", title: "Procurement Officer" },
+    { name: "Monica Alvarez", title: "Purchasing Agent" },
+  ],
+};
+
+const LOCAL_FIRST = [
+  "Patricia", "Howard", "Angela", "Samuel", "Lorraine", "Vernon", "Marisol", "Desmond", "Rosalie", "Everett", "Nadine",
+  "Clifton", "Imani", "Warren", "Delphine", "Raymond", "Joanna", "Lamar", "Cecilia", "Boyd", "Tessa", "Alvin",
+];
+const LOCAL_LAST = [
+  "Dunmore", "Kessler", "Pruitt", "Oyelaran", "Beaudry", "Whitlock", "Espinoza", "Garrity", "Thornton", "Abernathy", "Castellano",
+  "Hollis", "Mbeki", "Sturgis", "Lavoie", "Penrose", "Valdez", "Rutledge", "Kimura", "Fontaine", "Ashworth", "Delacroix",
+];
+const LOCAL_TITLES = ["Purchasing Manager", "Procurement Officer", "Buyer III", "Procurement Specialist"];
+
+/** The agencies of the story that no team names yet, in story order. Each gets two people of its own. */
+function otherLocalAgencies(): string[] {
+  const seen: string[] = [];
+  for (const o of OPPORTUNITIES) {
+    if (o.scope === "sled" && !LOCAL_TEAMS[o.agency] && !seen.includes(o.agency)) seen.push(o.agency);
+  }
+  return seen;
+}
+
+function teamFor(opp: StoryOpportunity): Person[] {
+  if (opp.scope === "fed") return FEDERAL_TEAMS.find((t) => t.match.test(opp.agency))?.team ?? ARMY_TEAM;
+  const named = LOCAL_TEAMS[opp.agency];
+  if (named) return named;
+  // 22 first names and 22 last names. A step of 5 through the last names (5 and 22 share no factor) pairs each first name with its own last name.
+  const k = Math.max(0, otherLocalAgencies().indexOf(opp.agency));
+  const person = (i: number, title: string): Person => ({
+    name: `${LOCAL_FIRST[i % LOCAL_FIRST.length]} ${LOCAL_LAST[(i * 5 + 3) % LOCAL_LAST.length]}`,
+    title,
+  });
+  return [person(2 * k, LOCAL_TITLES[k % LOCAL_TITLES.length]), person(2 * k + 1, "Purchasing Agent")];
+}
 
 function hash(s: string): number {
   let h = 0;
@@ -187,18 +281,20 @@ function emailDomain(opp: StoryOpportunity): string {
 
 /** The buying office's contact. Fictional: the name, phone number and email are made up. */
 export function contactFor(opp: StoryOpportunity, secondary = false): Contact {
-  const pool = opp.scope === "fed" ? FEDERAL_PEOPLE : LOCAL_PEOPLE;
-  const idx = (hash(opp.id) + (secondary ? 3 : 0)) % pool.length;
+  const pool = teamFor(opp);
+  // The first contact is picked by the opportunity. The second is the next person on the same team.
+  const base = hash(opp.id) % pool.length;
+  const idx = secondary ? (base + (pool.length > 3 ? 3 : 1)) % pool.length : base;
   const p = pool[idx];
   const place = PLACES[opp.place];
   const area = AREA_CODE[place.city] ?? "910";
   const last = String(100 + (hash(`${opp.id}${secondary}`) % 90)).padStart(4, "0");
-  const [first, ...rest] = p.name.toLowerCase().split(" ");
+  const words = p.name.toLowerCase().split(" ");
   return {
     name: p.name,
     title: p.title,
     phone: `(${area}) 555-${last}`,
-    email: `${first}.${rest.join("")}@${emailDomain(opp)}`,
+    email: `${words[0]}.${words[words.length - 1]}@${emailDomain(opp)}`,
   };
 }
 

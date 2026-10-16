@@ -15,9 +15,14 @@ describe("invented people", () => {
   it("each full name appears in only one demo area", () => {
     const areas = new Map<string, Set<string>>();
     for (const f of files("src/demo")) {
-      const area = f.split("/").slice(0, 3).join("/");
+      // The Government Buyers page (explore) and the buyer contacts on the opportunity pages (grant) name the
+      // same buyer staff on purpose, so those two count as one area.
+      const folder = f.split("/").slice(0, 3).join("/");
+      const area = folder === "src/demo/grant" || folder === "src/demo/explore" ? "buyer staff" : folder;
       const text = readFileSync(f, "utf8");
-      for (const m of text.matchAll(/name: "([A-Z][a-z]+ [A-Z][a-z]+)"/g)) {
+      // `name: "First Last"` and the buyer-page helpers `sblo("id", "First Last", ...)`. A rank in front of the name is allowed.
+      const shapes = /(?:name: "|\b(?:sblo|co|spec|fpm)\("[^"]+", ")(?:(?:Maj|Capt|Lt|SFC|SSgt|MSgt|TSgt|Sgt|LCDR|LtCol|CW3|Dr)\.? )*([A-Z][a-z]+ [A-Z][a-z]+)"/g;
+      for (const m of text.matchAll(shapes)) {
         if (!areas.has(m[1])) areas.set(m[1], new Set());
         areas.get(m[1])!.add(area);
       }
