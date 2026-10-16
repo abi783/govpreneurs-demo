@@ -47,6 +47,31 @@ function useEscapeForHandBuiltDialogs() {
   }, []);
 }
 
+/**
+ * DEMO: a quick double-click on a dialog button closes the dialog with the first click. The second
+ * click then lands on whatever sits under the dialog (a card, a link) and opens it by surprise. This
+ * drops that second click. It only applies when the first click was inside a dialog and the second
+ * is outside every dialog, within a short time.
+ */
+function useNoClickThroughAfterDialog() {
+  useEffect(() => {
+    let last = { at: 0, inDialog: false };
+    const onClick = (e: MouseEvent) => {
+      const inDialog = Boolean((e.target as Element | null)?.closest?.('[role="dialog"], [role="alertdialog"]'));
+      const now = performance.now();
+      if (e.detail >= 2 && last.inDialog && !inDialog && now - last.at < 900) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+      last = { at: now, inDialog };
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
+}
+
 const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 
 export function DemoShell({ children }: { children: ReactNode }) {
@@ -54,6 +79,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   useEscapeForHandBuiltDialogs();
+  useNoClickThroughAfterDialog();
 
   return (
     <div className="demo-shell">
