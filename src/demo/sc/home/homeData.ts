@@ -105,6 +105,13 @@ function currentOfferRows(): { title: string; done: boolean }[] {
   ];
 }
 
+/** Eight in the morning today, or five minutes ago when it is earlier than that. */
+function earlierToday(hour: number): string {
+  const start = new Date();
+  start.setHours(hour, 0, 0, 0);
+  return new Date(Math.min(Date.now() - 5 * 60_000, start.getTime())).toISOString();
+}
+
 function relativeAt(daysAgo: number, hour = 15): string {
   return isoDaysFromNow(-daysAgo, hour);
 }
@@ -119,7 +126,7 @@ function activityFeed(): ActivityItem[] {
       kind: "ava",
       title: `Ava is drafting your quote: ${fieldMeals.plainTitle}`,
       detail: fieldMeals.ava.statusLine,
-      at: new Date(Date.now() - 2 * 3_600_000).toISOString(),
+      at: earlierToday(8),
       to: `/ava/${fieldMeals.id}`,
     });
   }

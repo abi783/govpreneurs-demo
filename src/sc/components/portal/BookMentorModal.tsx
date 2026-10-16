@@ -115,7 +115,12 @@ export function BookMentorModal({
   const isFreeCovered = freeBooking || fetchedFreeLeft > 0;
   const canAfford = isFreeCovered || balance >= price;
   // The two pools, read when the modal opens: the footer shows them apart.
-  const walletAmounts = useWalletAmounts(locationId);
+  const fetchedAmounts = useWalletAmounts(locationId);
+  // DEMO: the footer follows the live balance, so it is right after the member adds funds.
+  const walletAmounts =
+    optimisticBalance != null
+      ? { paidBalance: optimisticBalance, promotionalCredit: fetchedAmounts?.promotionalCredit ?? 0 }
+      : fetchedAmounts;
   const breakdown = isFreeCovered ? null : purchaseBreakdown(price, walletAmounts);
   const [coveredByCredit, setCoveredByCredit] = useState(false);
   const money = (n: number) => formatMoney(n, walletCurrency);

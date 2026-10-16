@@ -17,7 +17,7 @@ import { getRoadmapSummary } from "@/demo/sc/roadmap/summary";
 import { MENTOR } from "@/demo/story/persona";
 import { SARAH_ID, getBenchMentor, type BenchMentor } from "@/demo/sc/mentors/bench";
 import { chargeWallet } from "@/demo/state/wallet";
-import { CONTACT_TIMEZONE, easternInstant } from "./time";
+import { easternInstant } from "./time";
 import type { GHLAppointment } from "./types";
 import { PROGRAM_SPECIALIST } from "./people";
 
@@ -306,7 +306,6 @@ export function chargeForCall(mentor: BenchMentor, price: number): void {
   chargeWallet(`Mentor call — ${mentor.name}`, price);
 }
 
-export { CONTACT_TIMEZONE };
 
 // ── Activity the visitor causes ────────────────────────────────────────────
 
@@ -328,4 +327,24 @@ export function addActivity(entry: Omit<ActivityEntry, "id" | "at">): void {
     ...prev,
     { ...entry, id: `act-${Date.now().toString(36)}-${prev.length}`, at: new Date().toISOString() },
   ]);
+}
+
+// ── For other pages ────────────────────────────────────────────────────────
+
+/**
+ * The next mentor call that is on the member's calendar, or null. The Roadmap and
+ * Tasks pages can read it, so "Book your targeting call" goes away once a call is booked.
+ */
+export function upcomingMentorCall(): GHLAppointment | null {
+  const now = Date.now();
+  return (
+    getAppointments()
+      .filter(
+        (a) =>
+          mentorIdFromCalendar(a.calendarId ?? "") !== null &&
+          !INACTIVE.has((a.appointmentStatus ?? "").toLowerCase()) &&
+          new Date(a.startTime).getTime() >= now,
+      )
+      .sort((a, b) => a.startTime.localeCompare(b.startTime))[0] ?? null
+  );
 }

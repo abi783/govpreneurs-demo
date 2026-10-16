@@ -10,6 +10,7 @@
 
 import { MENTOR } from "@/demo/story/persona";
 import { MENTOR_REVIEW_PRICE } from "@/demo/state/wallet";
+import { registerSearchEntries } from "@/demo/nav/searchIndex";
 
 export interface BenchMentor {
   id: string;
@@ -133,3 +134,14 @@ export function toPortalMentor(m: BenchMentor) {
     comingSoon: false,
   };
 }
+
+// The command palette finds each mentor and sends the member to the Mentors page.
+registerSearchEntries([
+  ...BENCH.map((m) => ({
+    label: `${m.name}: ${m.title.split(" · ")[0]}`,
+    hint: "Mentor",
+    to: "/find-a-mentor",
+    keywords: ["mentor", "book", "call", "consultation", m.name],
+  })),
+  { label: "Book a mentor call", hint: "Mentors", to: "/find-a-mentor", keywords: ["schedule", "appointment", "consultation"] },
+]);
