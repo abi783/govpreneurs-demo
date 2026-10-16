@@ -1,0 +1,50 @@
+/* DEMO: layout rules for the Success Center home inside the demo shell.
+
+   The real page sits in a frame as wide as the browser. Here the 244 px menu
+   takes part of that width, and Tailwind's breakpoints (`lg:`) still read the
+   browser width. So the page needs a few rules of its own:
+
+   - the lower grid (main column + sidebar) is set here, with a sidebar of a fixed width;
+   - on a browser narrower than 1280 px the four top cards become two, and the
+     sidebar goes below the main column;
+   - on a browser narrower than 1360 px the contact column (640 px) goes below the header. */
+
+.sc-home .sc-home__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.sc-home .sc-home__side > div {
+  /* PortalSidebar's own root: a column of cards. */
+  min-width: 0;
+}
+
+@media (min-width: 1280px) {
+  .sc-home .sc-home__grid {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+@media (max-width: 1279px) {
+  .sc-home .lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sc-home .sc-home__side > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 1359px) {
+  .sc-home .sc-home__top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .sc-home .sc-home__contact {
+    width: 100%;
+    max-width: 640px;
+  }
+}

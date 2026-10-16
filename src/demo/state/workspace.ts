@@ -4,7 +4,7 @@
 
 import { readDemoState, updateDemoState } from "@/demo/runtime/store";
 import { OPPORTUNITIES, getOpportunity } from "@/demo/story/opportunities";
-import { isoDaysFromNow } from "@/demo/story/clock";
+import { deadlineIso } from "@/demo/story/clock";
 import type { SavedOppDetail, SavedSearch } from "@/lib/workspace";
 
 const SAVED = "workspace.savedOpps";
@@ -53,7 +53,7 @@ export function describeSaved(oppKey: string): SavedOppDetail | null {
       oppKey: o.id,
       title: o.plainTitle,
       agency: o.agency,
-      dueDate: isoDaysFromNow(o.closesInDays, 17),
+      dueDate: deadlineIso(o.closesInDays),
       sourceType: o.scope === "sled" ? "sled" : "sam",
     };
   }

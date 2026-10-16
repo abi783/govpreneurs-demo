@@ -36,3 +36,4 @@ qa/report/
 test-results/
 playwright-report/
 .qa-dist/
+.claude/

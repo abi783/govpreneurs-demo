@@ -44,3 +44,29 @@ name its number.
 - D23. **The demo keeps its state through a reload.** "Reset demo" restores the starting story for the next call.
 - D24. **No network call leaves the browser** except page assets and Google Fonts. Anything else is blocked and fails the tests.
 - D25. **The old booth lead form, the admin bypass and the public `/tools` pages are removed.**
+
+## Build
+
+- D26. **The pages are built by seven parallel agents**, each in its own git worktree with its own files. I merge their work. The story file and the shared state (saved list, wallet, mentor reviews) are mine, so no two pages can disagree.
+- D27. **Amira has a one-page capability statement PDF** (`public/demo-files/`), generated from the story. Hunter's "Why these?" panel and My Business link to it.
+- D28. **A new mentor review stays "Sarah is reviewing"** after Tim sends it. In the product, a reply takes about one business day. A fake instant reply would mislead a buyer.
+- D29. **Sending a review costs $97 from the wallet**, as in production. The balance goes down live on the call.
+- D30. **Hunter's chat is scripted.** Every starter question has a specific, true answer. About 30 typed questions are recognised. Any other question gets a helpful reply with the nearest questions as buttons.
+- D31. **Grant's hand-written reviews:** Camp Mackall field meals, Fayetteville cafe, Cumberland County, Fort Bragg dining, the restricted site and the Fort Bragg reply. Every other opportunity gets a review generated from the story facts. Production's own generator still talks about roofing.
+- D32. **Opportunity documents download as real PDFs**, generated from the story: the solicitation, the work statement and the wage determination.
+- D33. **"Build this bid with Ava" appears on every opportunity Grant says to bid.** The 4 story bids open Ava's full flow. Any other bid opens Ava's honest "I'm reading the buyer's files" state, as the prototype designed.
+- D34. **Ava's prototype controls are hidden.** Shift+Alt+A shows them, so Tim can jump to any of Ava's states.
+- D35. **Small Orders shows food-service product buys** (meal components, food carriers, trays, coffee), not the auto parts in production's sample data.
+- D36. **Five more fictional mentors join Sarah Mitchell** on the Mentors page. Booking a session works end to end.
+- D37. **Roadmap progress is computed once**, from the Roadmap's own data. Success Center home shows the same numbers.
+- D38. **Success Center home has a "Recent activity" card that production lacks.** It shows Ava drafting, Sarah's reply, Grant's pass and the submitted bid, so the first screen tells the story. Everything else on the page is production's. Remove it if you want the page exactly as members see it.
+- D39. **Program specialist: "Jordan Ellis"** (fictional). Onboarding call 98 days ago; positioning call with Sarah 24 days ago.
+- D40. **Five more mentors with prices from $75 to $120 a session.** Sarah is $97, the same as a written review.
+- D41. **"Re-charge wallet" and "Add funds" open an in-app top-up** instead of GHL billing, and it succeeds.
+- D42. **The Roadmap has a "Quarterly Targeting Call" step** at the start of Execution. Production retired this step, but the story's next action is to book that call with Sarah. Amira starts at 82% (11 of 14 steps). Booking the call moves her to 86%.
+- D43. **Sample prices for two done-for-you services: CMMC $497, Prime Registration $197.** The coupon `DEMO10` gives 10% off. The other prices come from the prototype's catalog.
+- D44. **One calendar for every page.** A call booked on the Roadmap or from Tasks appears on Success Center home too. The home progress card shows the Roadmap's own phases.
+- D45. **Shared Success Center calls (wallet balance, time zone, uploads) are answered in one place** (`src/demo/api/scShared.ts`). A test fails if two pages answer the same call.
+- D46. **Every deadline is midnight at the start of its day, counted in calendar days.** All pages then read the same "Closes in N days" at any hour, including after the 1 November clock change.
+- D47. **Value filters hide the Fort Bragg sources sought**, which states no value. Production would keep it. This way a filter such as "Under $25K" never shows a card with no value.
+- D48. **Hunter's chat may move Tim to the All tab** when a question matches nothing on For You (for example "work in Virginia"), and says so.

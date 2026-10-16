@@ -22,8 +22,9 @@ import { routes as scBusiness } from "./scBusiness";
 import { routes as scHome } from "./scHome";
 import { routes as scMentors } from "./scMentors";
 import { routes as misc } from "./misc";
+import { routes as scShared } from "./scShared";
 
-const ALL = [
+export const ALL_ROUTE_GROUPS = [
   session,
   hunter,
   opportunity,
@@ -43,6 +44,7 @@ const ALL = [
   scBusiness,
   scHome,
   scMentors,
+  scShared,
   misc,
 ];
 
@@ -51,5 +53,5 @@ let done = false;
 export function registerAllDemoRoutes(): void {
   if (done) return;
   done = true;
-  for (const routes of ALL) registerRoutes(routes);
+  for (const routes of ALL_ROUTE_GROUPS) registerRoutes(routes);
 }

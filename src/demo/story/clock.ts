@@ -10,11 +10,11 @@ export const DEMO_TODAY: Date = (() => {
   return d;
 })();
 
-/** A Date `days` from today (negative = in the past), at the given hour. */
+/** A Date `days` from today (negative = in the past), at the given hour.
+ *  Counts calendar days, so a daylight-saving change in between cannot move
+ *  the date by one day. */
 export function daysFromNow(days: number, hour = 12): Date {
-  const d = new Date(DEMO_TODAY.getTime() + days * MS_PER_DAY);
-  d.setHours(hour, 0, 0, 0);
-  return d;
+  return new Date(DEMO_TODAY.getFullYear(), DEMO_TODAY.getMonth(), DEMO_TODAY.getDate() + days, hour, 0, 0, 0);
 }
 
 /** ISO timestamp `days` from today. */
@@ -34,4 +34,21 @@ export function dateDaysFromNow(days: number): string {
 export function daysUntil(date: Date | string): number {
   const t = typeof date === "string" ? new Date(date).getTime() : date.getTime();
   return Math.round((t - DEMO_TODAY.getTime()) / MS_PER_DAY);
+}
+
+/** A response deadline `closesInDays` from today, at midnight at the start of
+ *  that day. Production shows "Closes in N days" as ceil(deadline - now), so a
+ *  midnight deadline reads N all day on every page. Use this for every
+ *  deadline in the demo. */
+export function deadlineIso(closesInDays: number): string {
+  return daysFromNow(closesInDays, 0).toISOString();
+}
+
+/** A posted date `postedDaysAgo` days back, at noon. A notice posted 7 days
+ *  ago or less always counts as "new this week" (posted >= now - 7 days). */
+export function postedIso(postedDaysAgo: number): string {
+  const noon = daysFromNow(-postedDaysAgo, 12);
+  if (postedDaysAgo > 7) return noon.toISOString();
+  const floor = Date.now() - 7 * MS_PER_DAY + 6 * 3_600_000;
+  return new Date(Math.max(noon.getTime(), floor)).toISOString();
 }

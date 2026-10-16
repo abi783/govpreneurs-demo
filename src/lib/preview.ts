@@ -27,6 +27,8 @@ export interface PreviewOpportunityDto {
   id: string;
   solNumber?: string;
   title: string;
+  /** DEMO: the plain-English title. The demo sends it on every tab, so a card has one name everywhere. */
+  geminiPlainEnglishTitle?: string | null;
   scope: "fed" | "sled";
   agency: { name: string };
   noticeType: string;
@@ -133,6 +135,8 @@ export function mapPreviewToCard(dto: PreviewOpportunityDto): CardOpportunity {
   return {
     id: dto.id,
     title: dto.title,
+    // DEMO: show the plain-English title on the All and Saved tabs, as on For You.
+    geminiPlainEnglishTitle: dto.geminiPlainEnglishTitle || undefined,
     agency: dto.agency.name,
     agencyAbbrev: dto.agency.name,
     workType: noticeType ?? dto.noticeType,
