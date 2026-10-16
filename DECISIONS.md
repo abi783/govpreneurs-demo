@@ -13,6 +13,7 @@ name its number.
 - R5. Success Center home, Roadmap, Tasks, Mentors and My Business are in the demo and work fully, on sample data.
 - R6. Nothing may break or do nothing when clicked.
 - R7. Subagents use Sonnet.
+- R8. (17 Oct) Add a "Know Your Market" menu section at the bottom: Government Buyers, Partners, Awards, Vehicles, Labor Pricing. Partners and Awards move there from Explore.
 
 ## Story
 

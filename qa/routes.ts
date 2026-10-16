@@ -20,6 +20,9 @@ export const MENU_ROUTES: string[] = [
   "/ava",
   "/find-a-mentor",
   "/mentors",
+  "/government-buyers",
+  "/vehicles",
+  "/labor-pricing",
 ];
 
 import { ROUTES as HUNTER } from "./area-routes/hunter";

@@ -4,15 +4,18 @@
 
 import {
   Award,
+  Banknote,
   Building2,
   CalendarRange,
   Columns3,
   GraduationCap,
   Handshake,
+  Landmark,
   LayoutDashboard,
   ListChecks,
   Map as MapIcon,
   MessagesSquare,
+  ScrollText,
   ShoppingCart,
   Sparkles,
   Target,
@@ -50,8 +53,6 @@ export const MENU_SECTIONS: MenuSection[] = [
       { key: "opportunities", label: "Opportunities", to: "/opportunities", icon: Target, match: ["/opportunities"], keywords: ["hunter", "feed", "bids", "rfp", "contracts"] },
       { key: "forecasts", label: "Forecasts", to: "/forecasts", icon: CalendarRange, keywords: ["upcoming", "future"] },
       { key: "small-orders", label: "Small Orders", to: "/small-orders", icon: ShoppingCart, keywords: ["micro purchase", "dibbs", "dla"] },
-      { key: "partners", label: "Partners", to: "/partners", icon: Handshake, match: ["/partners", "/partner-finder"], keywords: ["teaming", "primes", "subcontract"] },
-      { key: "awards", label: "Awards", to: "/awards", icon: Award, keywords: ["past awards", "incumbents", "winners"] },
     ],
   },
   {
@@ -62,6 +63,17 @@ export const MENU_SECTIONS: MenuSection[] = [
       { key: "ava", label: "Ava", to: "/ava", icon: Sparkles, keywords: ["proposal", "draft", "assistant", "ai"] },
       { key: "mentors", label: "Mentors", to: "/find-a-mentor", icon: GraduationCap, keywords: ["find a mentor", "directory", "coach"] },
       { key: "mentor-reviews", label: "Mentor Reviews", to: "/mentors", icon: MessagesSquare, keywords: ["feedback", "conversation", "sent to mentor"] },
+    ],
+  },
+  {
+    // Not in today's GHL menu: the market pages Tim shows on calls (Shyam, 17 Oct 2026).
+    title: "Know Your Market",
+    items: [
+      { key: "government-buyers", label: "Government Buyers", to: "/government-buyers", icon: Landmark, match: ["/government-buyers", "/agencies"], keywords: ["agencies", "contracting officers", "buyers"] },
+      { key: "partners", label: "Partners", to: "/partners", icon: Handshake, match: ["/partners", "/partner-finder", "/whos-winning"], keywords: ["teaming", "primes", "subcontract", "who's winning"] },
+      { key: "awards", label: "Awards", to: "/awards", icon: Award, keywords: ["past awards", "incumbents", "winners"] },
+      { key: "vehicles", label: "Vehicles", to: "/vehicles", icon: ScrollText, keywords: ["contract vehicles", "idiq", "gsa schedule", "bpa"] },
+      { key: "labor-pricing", label: "Labor Pricing", to: "/labor-pricing", icon: Banknote, keywords: ["wages", "rates", "price", "wage determination"] },
     ],
   },
 ];
