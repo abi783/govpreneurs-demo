@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { useMemo, useState } from "react";
 import { Search, Info } from "lucide-react";
 import {
@@ -5,12 +6,13 @@ import {
   fmtRate,
   type ExperienceTier,
   type EducationLevel,
+  type LcatLocation,
 } from "../../lib/mock/laborRates";
 import { JargonGloss } from "../Layout/JargonGloss";
 
 const EXP_OPTIONS: (ExperienceTier | "all")[] = ["all", "0–3 yrs", "3–7 yrs", "7–15 yrs", "15+ yrs"];
 const EDU_OPTIONS: (EducationLevel | "all")[] = ["all", "HS", "Associate", "Bachelor", "Master", "PhD"];
-const LOC_OPTIONS = ["all", "Nationwide", "DC Metro", "Raleigh-Durham", "Charlotte"] as const;
+const LOC_OPTIONS: (LcatLocation | "all")[] = ["all", "Nationwide", "Fayetteville", "Raleigh-Durham", "Charlotte", "Norfolk"];
 
 export function LcatBenchmark() {
   const [q, setQ] = useState("");
@@ -34,8 +36,9 @@ export function LcatBenchmark() {
       <div className="lcat-banner" role="note">
         <Info size={13} aria-hidden />
         <span>
-          This is for <strong>service contracts</strong> (people billed by the hour) — not how
-          construction or roofing is priced. Browse for context; don't use it to bid your jobs.
+          This is for <strong>professional service contracts</strong> (people billed by the hour) —
+          not how meals and catering are usually priced. Browse for context; don't use it to bid
+          your jobs.
         </span>
       </div>
 

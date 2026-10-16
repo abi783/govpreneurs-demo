@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { useMemo, useState, type RefObject } from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -14,14 +15,30 @@ import {
 } from "lucide-react";
 import {
   getOpenOppsForBuyer,
-  getRoofingAwardsForBuyer,
+  getFoodAwardsForBuyer,
   type GovBuyer,
   type BuyerOfficer,
   type OfficerRole,
 } from "@/lib/mock/governmentBuyers";
 import { JargonGloss } from "@/components/Layout/JargonGloss";
-import { daysUntil } from "@/lib/format";
+import { awardedAgo, usd } from "@/lib/awardsApi";
 import { DraftIntroModal } from "./DraftIntroModal";
+import { showDemoNotice } from "@/demo/ui/notice";
+
+// DEMO: a mail or phone link would open a program on the visitor's computer. These contacts
+// are sample data, so a click copies the address and says so.
+function copyContact(e: { preventDefault: () => void }, value: string) {
+  e.preventDefault();
+  try {
+    void navigator.clipboard?.writeText(value).catch(() => undefined);
+  } catch {
+    // The notice below still tells the visitor what happened.
+  }
+  showDemoNotice({
+    title: "Copied",
+    message: `${value} is copied. This contact is sample data, so nothing is sent.`,
+  });
+}
 import { BuyerPursueAnalysis } from "./BuyerPursueAnalysis";
 
 const ROLE_GLOSS: Record<OfficerRole, string> = {
@@ -31,8 +48,8 @@ const ROLE_GLOSS: Record<OfficerRole, string> = {
     "The person legally authorized to sign a contract on behalf of the government.",
   "Contract Specialist":
     "Works under a contracting officer; often the first person actually reading your emails.",
-  "Facilities/Engineering POC":
-    "On-the-ground facility manager who scopes the work before it ever becomes an RFP.",
+  "Food Program Manager":
+    "Runs the dining program day to day, and tells the contracting office what the meals must be like.",
 };
 
 export function BuyerDetailPanel({
@@ -47,7 +64,7 @@ export function BuyerDetailPanel({
   ref?: RefObject<HTMLElement | null>;
 }) {
   const opps = useMemo(() => getOpenOppsForBuyer(buyer), [buyer]);
-  const awards = useMemo(() => getRoofingAwardsForBuyer(buyer), [buyer]);
+  const awards = useMemo(() => getFoodAwardsForBuyer(buyer), [buyer]);
 
   const [showAll, setShowAll] = useState(false);
   const [openAwards, setOpenAwards] = useState(false);
@@ -110,7 +127,7 @@ export function BuyerDetailPanel({
             <JargonGloss term="Contracting Officer">
               {ROLE_GLOSS["Contracting Officer"]}
             </JargonGloss>{" "}
-            for roofing work.
+            for food service work.
           </li>
           <li>
             <strong>Why:</strong> COs don't take cold pitches well — they're heads-down on active
@@ -119,8 +136,8 @@ export function BuyerDetailPanel({
           <li>
             <strong>What to send:</strong> one short paragraph (who you are, where you're based,
             what you do, your set-asides) plus your capability statement. Lead with{" "}
-            <strong>SDVOSB + Fayetteville-local</strong> — both are concrete reasons to keep
-            reading.
+            <strong>woman-owned (WOSB) + Fayetteville-local</strong> — both are concrete reasons to
+            keep reading.
           </li>
         </ul>
         <div className="gov-your-move-actions">
@@ -170,10 +187,14 @@ export function BuyerDetailPanel({
                   </div>
                 </div>
                 <div className="officer-row-contact">
-                  <a className="officer-contact" href={`mailto:${o.email}`}>
+                  <a className="officer-contact" href={`mailto:${o.email}`} onClick={(e) => copyContact(e, o.email)}>
                     <Mail size={11} /> <span className="fr-mono">{o.email}</span>
                   </a>
-                  <a className="officer-contact" href={`tel:${o.phone.replace(/\s+/g, "")}`}>
+                  <a
+                    className="officer-contact"
+                    href={`tel:${o.phone.replace(/\s+/g, "")}`}
+                    onClick={(e) => copyContact(e, o.phone)}
+                  >
                     <Phone size={11} /> <span className="fr-mono">{o.phone}</span>
                   </a>
                 </div>
@@ -207,7 +228,7 @@ export function BuyerDetailPanel({
         <p className="sample-data-note">Contact details shown are sample data for demo purposes.</p>
       </section>
 
-      {/* Recent roofing awards (collapsed) */}
+      {/* Recent food service awards (collapsed) */}
       <section className="gov-buyer-section">
         <button
           type="button"
@@ -217,45 +238,39 @@ export function BuyerDetailPanel({
         >
           {openAwards ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
           <Trophy size={12} />
-          <span>Recent roofing awards by this buyer</span>
+          <span>Recent food service awards by this buyer</span>
           <span className="gov-buyer-disclosure-count">{awards.length}</span>
         </button>
         {openAwards && (
           <div className="gov-buyer-disclosure-body">
             {awards.length === 0 ? (
               <p className="t-body-sm" style={{ color: "var(--text-3)" }}>
-                None in our current awarded-contract view. Check the Awarded tab for the full picture.
+                None in our current award record. Check Awards for the full picture.
               </p>
             ) : (
               <ul className="gov-buyer-mini-list">
-                {awards.slice(0, 6).map((a) => {
-                  const lastName = a.signingCO.name.split(" ").slice(-1)[0];
-                  return (
-                    <li key={a.id}>
-                      <Link
-                        to="/opportunities/awarded/$contractId"
-                        params={{ contractId: a.id }}
-                        className="gov-buyer-mini-row"
-                      >
-                        <span className="gov-buyer-mini-title">{a.title}</span>
-                        <span className="gov-buyer-mini-meta">
-                          <span className="fr-mono">${Math.round(a.awardValue / 1000)}K</span> · {a.winner} · {a.location}
-                        </span>
-                        <span className="gov-buyer-mini-sub">
-                          Signed by {lastName} · Obligated{" "}
-                          <span className="fr-mono">${Math.round(a.obligated / 1000)}K</span>
-                          {a.ceiling ? (
-                            <> of <span className="fr-mono">${Math.round(a.ceiling / 1000)}K</span> ceiling</>
-                          ) : null}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
+                {awards.slice(0, 6).map((a) => (
+                  <li key={a.awardId}>
+                    <Link
+                      to="/awards/$awardId"
+                      params={{ awardId: a.awardId }}
+                      className="gov-buyer-mini-row"
+                    >
+                      <span className="gov-buyer-mini-title">{a.title}</span>
+                      <span className="gov-buyer-mini-meta">
+                        <span className="fr-mono">{usd(a.obligated)}</span> · {a.winner.name} ·{" "}
+                        {[a.location.city, a.location.state].filter(Boolean).join(", ")}
+                      </span>
+                      <span className="gov-buyer-mini-sub">
+                        Work started {awardedAgo(a) ?? "a while ago"}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
               </ul>
             )}
-            <Link to="/whos-winning" className="gov-buyer-disclosure-foot">
-              Open the Awarded tab →
+            <Link to="/awards" className="gov-buyer-disclosure-foot">
+              Open Awards →
             </Link>
           </div>
         )}
@@ -293,9 +308,11 @@ export function BuyerDetailPanel({
                       <span className="gov-buyer-mini-meta">
                         <MapPin size={10} /> {o.location} ·{" "}
                         <span className="fr-mono">
-                          ${Math.round(o.valueLow / 1000)}K–${Math.round(o.valueHigh / 1000)}K
+                          {o.valueLow !== null && o.valueHigh !== null
+                            ? `$${Math.round(o.valueLow / 1000)}K–$${Math.round(o.valueHigh / 1000)}K`
+                            : "No value stated"}
                         </span>{" "}
-                        · closes in {daysUntil(o.closesAt)}d
+                        · closes in {o.closesInDays}d
                       </span>
                     </Link>
                   </li>

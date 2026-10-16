@@ -1,9 +1,10 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, MapPin } from "lucide-react";
 import {
   PREVAILING_WAGES_CUMBERLAND_NC,
   PREVAILING_WAGE_META,
-  COMPARABLE_ROOFING_AWARDS,
+  COMPARABLE_FOOD_AWARDS,
   fmtRate,
   fmtMoney,
 } from "../../lib/mock/laborRates";
@@ -16,12 +17,12 @@ export function PrevailingWageTable() {
         <h2 className="t-display-sm">Your wage floor (Cumberland County, NC)</h2>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 700 }}>
           The{" "}
-          <JargonGloss term="Davis-Bacon prevailing wage">
-            By law, federal construction contracts over $2,000 must pay at least the local prevailing
-            wage set by the U.S. Department of Labor.
+          <JargonGloss term="Service Contract Act wage determination">
+            By law, federal service contracts over $2,500 must pay at least the local wage set by the
+            U.S. Department of Labor for each job title.
           </JargonGloss>{" "}
-          rates below are the <em>minimum</em> you can pay on a federal roofing job here. You can pay
-          more — you can't pay less.
+          rates below are the <em>minimum</em> you can pay on a federal food service contract here.
+          You can pay more — you can't pay less. These are sample figures.
         </p>
         <div className="wage-meta">
           <span><MapPin size={11} aria-hidden /> {PREVAILING_WAGE_META.county}</span>
@@ -36,7 +37,7 @@ export function PrevailingWageTable() {
         <table className="wage-table">
           <thead>
             <tr>
-              <th>Trade</th>
+              <th>Job title</th>
               <th className="num">Base / hr</th>
               <th className="num">
                 <JargonGloss term="Fringe">
@@ -67,29 +68,26 @@ export function PrevailingWageTable() {
       <div className="wage-compare">
         <h3 className="t-body-md" style={{ fontWeight: 600 }}>What similar jobs actually awarded for</h3>
         <p className="t-body-sm" style={{ color: "var(--text-2)", marginTop: "var(--s-1)" }}>
-          Wage floors are the bottom; here's where comparable NC roofing jobs landed on total price.
+          Wage floors are the bottom; here's where comparable NC food service jobs landed on total price.
         </p>
         <ul className="wage-compare-list">
-          {COMPARABLE_ROOFING_AWARDS.map((c) => (
-            <li key={c.contractId} className="wage-compare-row">
+          {COMPARABLE_FOOD_AWARDS.map((c) => (
+            <li key={c.awardId} className="wage-compare-row">
               <div className="wage-compare-main">
                 <Link
-                  to="/opportunities/awarded/$contractId"
-                  params={{ contractId: c.contractId }}
+                  to="/awards/$awardId"
+                  params={{ awardId: c.awardId }}
                   className="wage-compare-title"
                 >
                   {c.title} <ExternalLink size={11} aria-hidden />
                 </Link>
                 <div className="wage-compare-sub">
                   {c.agency} · {c.location}
-                  {c.squareFootage ? ` · ${c.squareFootage}` : ""}
                 </div>
               </div>
               <div className="wage-compare-figs">
                 <div className="mono wage-compare-total">{fmtMoney(c.awardValue)}</div>
-                {c.pricePerSqFt ? (
-                  <div className="mono wage-compare-psf">${c.pricePerSqFt.toFixed(2)}/sq ft</div>
-                ) : null}
+                <div className="wage-compare-psf">{c.unitNote}</div>
               </div>
             </li>
           ))}

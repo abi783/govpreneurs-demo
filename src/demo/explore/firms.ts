@@ -57,3 +57,22 @@ export const ALL_FIRMS: Firm[] = [CAROLINA_DINING, ...OTHER_FIRMS];
 export function firmByKey(key: number): Firm | undefined {
   return key === AMIRA_FIRM.key ? AMIRA_FIRM : ALL_FIRMS.find((f) => f.key === key);
 }
+
+/**
+ * Companies that win food-service awards near Amira but do not fit her as partners
+ * (too large, or outside her states). Awards link to them, and Partners opens them
+ * with the reasons they are not one of her matches. Fictional.
+ */
+export const OTHER_WINNERS: Firm[] = [
+  { key: 4101, name: "Ironwood Federal Facilities", city: "Charlotte", state: "NC", uei: "IF2L8Q4MR6X1", cage: "3IFF7" },
+  { key: 4102, name: "Summit Healthcare Nutrition", city: "Durham", state: "NC", uei: "SH6T3Z9KB5N8", cage: "7SHN2" },
+  { key: 4103, name: "Atlantic Field Feeding", city: "Norfolk", state: "VA", uei: "AF1C7V4DW2Y6", cage: "5AFF3" },
+  { key: 4104, name: "Magnolia School Foods", city: "Charleston", state: "SC", uei: "MS8P5J2XH9Q4", cage: "8MSF6" },
+];
+
+/** Every fictional company, Amira included, for a lookup by key. */
+export const EVERY_FIRM: Firm[] = [AMIRA_FIRM, ...ALL_FIRMS, ...OTHER_WINNERS];
+
+export function anyFirmByKey(key: number): Firm | undefined {
+  return EVERY_FIRM.find((f) => f.key === key);
+}
