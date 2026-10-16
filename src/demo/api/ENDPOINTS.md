@@ -2,7 +2,7 @@
 
 ## How to read this
 
-This file lists every backend call that the frontend code under `src/` makes. A handler writer uses it to build the in-browser answer for each call. The inventory was made on 2026-10-16 from the code in this repo. Every `file:line` was checked after the file was written.
+This file lists every backend call that the frontend code under `src/` makes. A handler writer uses it to build the in-browser answer for each call. The inventory was made on 2026-10-16 from the code in this repo. Every `file:line` was checked after the file was written. Other people edit the code in this repo at the same time, so a line can move by a few lines later. Search for the symbol that follows the line number.
 
 **Where calls come from**
 - Every call goes through `apiFetch` in `src/lib/api.ts:54`. `API_BASE_URL` is `/__demo_api` (`src/lib/api.ts:6`).
@@ -13,7 +13,7 @@ This file lists every backend call that the frontend code under `src/` makes. A 
 **Blocks**
 - One block per endpoint (an endpoint is a method plus a path).
 - "Area file" names the file `src/demo/api/<area>.ts` that owns the handler.
-- "Called from" gives the wrapper function, then each call site as `path:line` plus the symbol on that line, then when the call runs. "Wrapper" gives the function that holds the `apiFetch` call.
+- "Called from" starts with the wrapper function that holds the `apiFetch` call, with the line of that call in brackets. Then it lists each call site as `path:line` plus the symbol on that line, and says when the call runs.
 - "No call site" means that no non-test code calls the wrapper today. The handler is still listed so that the file is complete. It is low priority.
 - The request body and response are the frontend types. The production backend in `prod-main/backend/src` was used only to confirm status codes, error bodies and field meaning.
 
@@ -29,12 +29,20 @@ This file lists every backend call that the frontend code under `src/` makes. A 
 9. Dates in sample data must be relative to today. The feed cards and the opportunity page measure time left with `new Date()` (`src/lib/discoverMapper.ts:70`).
 10. Elite plan avoids every upsell wall. `src/demo/session.ts` sets `productId` to the Elite id and `grantV2: true`.
 
+**Helpers for handler writers**
+- `src/demo/api/util.ts`: `notFound`, `badRequest`, `forbidden`, `paginate`, `newId`, `numParam`.
+- `src/demo/runtime/store.ts`: `readDemoState`, `writeDemoState`, `updateDemoState`, `useDemoState`. Keep every change a visitor makes here (saved items, wallet balance, sent reviews). The value survives a reload and `resetDemo()` clears it.
+- `src/demo/story/`: the persona and the clock (`daysFromNow`). Never write a date as a fixed string.
+- A handler may return a `Response` (a file download, for example). Use `demoResponse(status, body)` for an error.
+- The shell already answers `POST /users/from-highlevel`, `GET /users/:userId/subscription`, `GET /business-profile` (a boot version from the persona) and `POST /api/portal/:locationId/track`.
+
 **Abbreviations**
 - API: application programming interface. DTO: data transfer object (a response type). UI: user interface.
 - GHL: GoHighLevel, the platform that hosts the real app. SLED: state, local and education buyers.
 - NAICS: North American Industry Classification System. PSC: Product and Service Code.
 - SAM: System for Award Management. DLA: Defense Logistics Agency. DIBBS: DLA Internet Bid Board System.
 - `oppKey`: the id of one opportunity record. A small order and a forecast use the same kind of id.
+- ms: milliseconds. ISO: the ISO 8601 date and time text, for example `2026-10-16T12:00:00.000Z`. USPS: United States Postal Service (its two-letter state codes). CAGE: Commercial and Government Entity code. HTML: the markup language of web pages. URL: web address. JSON: the text format of a request or response body.
 
 ## Table of contents
 
@@ -125,7 +133,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 ### POST /opportunities/discover/v2
 - Area file: hunter
 - Called from: `fetchDiscoverV2` `src/lib/discoverApi.ts:91` (apiFetch at :103).
-  - `src/routes/opportunities.index.tsx:902` `fetchDiscoverV2`: page 1 of the For you tab. Runs on page load, on every filter, sort, search or buyer-lane change, when the member opens the For you tab, on Retry, and when the profile defaults settle. A new run aborts the old run. The wait before the call is 120 ms for filter and sort changes and 250 ms for search text (`src/lib/feedDebounce.ts:6` and `:8`). The effect runs again when the profile defaults settle, so the first call can be aborted and sent again.
+  - `src/routes/opportunities.index.tsx:902` `fetchDiscoverV2`: page 1 of the For you tab. Runs on page load, on every filter, sort, search or buyer-lane change, when the member opens the For you tab, and on Retry. A new run aborts the old run. The wait before the call is 120 ms for filter and sort changes and 250 ms for search text (`src/lib/feedDebounce.ts:6` and `:8`). The effect runs again when the profile defaults settle, so the first call can be aborted and sent again.
   - `src/routes/opportunities.index.tsx:958` `fetchDiscoverV2`: a poll every 5000 ms (`MATCHES_POLL_INTERVAL_MS`, `:102`). It runs only while the "matches generating" state shows. It stops after 3 failed calls (`MAX_MATCHES_POLL_FAILURES`, `:103`). The body carries only `page: 1`, `limit: 50` and the buyer lane.
   - `src/routes/opportunities.index.tsx:1014` `fetchDiscoverV2`: the badge count after a buyer-lane change, when the open tab is not For you. The body has `page: 1`, `limit: 1`. The page reads `total` only.
   - `src/routes/opportunities.index.tsx:1337` `fetchDiscoverV2`: the next page, when the scroll sentinel comes near the screen. The body has `page: N+1`, `limit: 50`.
@@ -133,7 +141,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Request body: `{ userId: string; page?: number; limit?: number; filters?: ServerFilters; sort?: ServerSort }` (the options of `fetchDiscoverV2` minus `signal`, plus `userId`). The page size is 50 (`PAGE`, `src/routes/opportunities.index.tsx:413`).
 - Response: `DiscoverV2ResponseDto` (`src/lib/discoverApi.ts:29`). The page reads `data`, `total`, `totalPages` and `profileIndexing`. It does not read `page`, `limit`, `scoringEngine` or `counts`. Each row is a `DiscoverV2OpportunityDto` (`src/lib/discoverMapper.ts:8`). The card mapper (`src/lib/discoverMapper.ts:46`) dereferences these without a check, so a row must have them: `agency.name`, `placeOfPerformance` (an object), `matchBreakdown` (an object, with `eligible` and optional `certifiable`), `tier` (`priority`, `strong`, `stretch` or `low`), a parseable `responseDeadline` and `postedDate`, `relevanceScore`. It also reads `id`, `title`, `geminiPlainEnglishTitle`, `noticeType`, `setAside`, `naicsCode`, `valEstLow`, `valEstHigh`, `quickSummary`, `scope`, `category`, `dibbs`.
 - Errors the UI handles: any non-2xx (501 and 500 included) sets the one sentence `FEED_LOAD_ERROR_MESSAGE` ("We could not load your opportunities. The problem is on our side, not your filters.", `src/components/Hunter/FeedErrorNotice.tsx:14`) and shows `FeedErrorNotice` with a Retry button. The console gets the backend message. During the poll, the third failure stops the poll, clears the indexing state and shows "We couldn't reach the matching service. Please refresh in a moment." A request that the page aborted is ignored.
-- Notes: the server must apply `filters`, `sort` and `page`. The page trusts the server order and sends no client sort. `totalPages` must equal `ceil(total / limit)`. The page keeps no row that the server did not return, but it also filters rows on the client for smart lists (a residual layer). The body `userId` is ignored (production uses the session location). Keep `profileIndexing` false or absent.
+- Notes: the server must apply `filters`, `sort` and `page`. The page trusts the server order and sends no client sort. `totalPages` must equal `ceil(total / limit)`. The page also applies the smart-list filters again on the client, to the rows that the server returned. The body `userId` is ignored (production uses the session location). Keep `profileIndexing` false or absent.
 
 ### POST /opportunities/discover/v2/counts
 - Area file: hunter
@@ -167,7 +175,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 ### GET /opportunities/filters/cities
 - Area file: hunter
 - Called from: `fetchCities` `src/lib/discoverApi.ts:188` (apiFetch at :191).
-  - `src/components/Hunter/LocationPicker.tsx:128` `fetchCities`: when the member expands a state in the filters drawer. It also runs once for every state when the member types in the location search box (about 51 calls).
+  - `src/components/Hunter/LocationPicker.tsx:128` `fetchCities`: when the member expands a state in the filters drawer. It also runs once for every state that has not loaded yet when the member types in the location search box. That is up to 51 calls: 50 states and DC (`STATES`, `src/lib/vocab/usStates.ts:17`).
   - `src/components/Hunter/WarmStartWizard.tsx:143` `fetchCities`: when the member expands a state in step 2 of the preview wizard (only shown in preview mode).
 - Query: `state` (two-letter USPS code, optional). Both callers always send it.
 - Request body: none
@@ -244,7 +252,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 
 ### POST /hunter-chat/message
 - Area file: hunter
-- Called from: `postHunterMessage` `src/lib/hunterChat.ts:408` (apiFetch at :414). Call site `src/components/Hunter/HunterChatOverlay.tsx:379` `postHunterMessage`, in `submit`. It runs when the member sends a message, clicks a suggestion chip, uses an ask that the feed or the profile journey hands to the rail (`src/routes/opportunities.index.tsx:1224` `askHunter`), or answers a profile ask with a question. The rail shows on `/opportunities` and on `/forecasts` (`src/routes/forecasts.index.tsx:326`, `surface: "forecasts"`).
+- Called from: `postHunterMessage` `src/lib/hunterChat.ts:408` (apiFetch at :414). Call site `src/components/Hunter/HunterChatOverlay.tsx:379` `postHunterMessage`, in `submit`. It runs when the member sends a message or clicks a suggestion chip. It also runs when the feed hands a question to the rail (`src/routes/opportunities.index.tsx:1224` `askHunter`) and when the member answers a profile question with a question. The rail shows on `/opportunities` and on `/forecasts` (`src/routes/forecasts.index.tsx:326`, `surface: "forecasts"`).
 - Query: none
 - Request body: `{ message: string; visibleOpps: VisibleOpp[]; tab?: FeedTab; surface: HunterSurface }`. `VisibleOpp` is `src/lib/hunterChat.ts:382`. `FeedTab` is `"for_you" | "all" | "saved"`. `HunterSurface` is `"feed" | "forecasts"`.
 - Response: `HunterTurnResponse` (`src/lib/hunterChat.ts:352`): `{ chatReply, uiPayload: { kind, data }, sessionId, turnId?, actPayload? }`. The page reads `chatReply`, `uiPayload.kind`, `uiPayload.data`, `sessionId`, `turnId` and `actPayload`. `uiPayload` is optional in practice: the page guards a missing value. The `kind` decides the `data` type:
@@ -345,9 +353,9 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Called from: `getEnrichmentState` `src/lib/enrichment.ts:167` (apiFetch at :168; base path `ENRICHMENT_BASE`, `:164`). Call site `src/components/Hunter/EnrichmentJourney.tsx:138` `getEnrichmentState`. It runs once when the Hunter rail mounts (`/opportunities` and `/forecasts`).
 - Query: none
 - Request body: none
-- Response: `EnrichmentStatePayload` (`src/lib/enrichment.ts:54`). The component reads `posture`, `active`, `paused`, `rail` (a missing `rail` is allowed), `scoringMode`, `embedReady`.
+- Response: `EnrichmentStatePayload` (`src/lib/enrichment.ts:54`). The component reads `active`, `paused`, `rail` (a missing `rail` is allowed), `scoringMode` and `embedReady`. No code reads `posture`, but the type requires it.
 - Errors the UI handles: the component logs `Failed to load enrichment state` and renders nothing (no strength meter and no button).
-- Notes: the idle dock shows a profile strength meter from `rail` (`answered` and `total` per milestone) and an entry button when `scoringMode` is `rule_only` and `embedReady` is false, or when `scoringMode` is `hybrid` and the profile is not complete.
+- Notes: the idle dock shows a profile strength meter that it builds from `rail` (`answered` and `total` for each milestone). It shows the entry button in two cases. In the first case, `scoringMode` is `rule_only` and `embedReady` is false. In the second case, `scoringMode` is `hybrid` and the profile is not complete.
 
 ### POST /hunter-chat/enrichment/enter
 - Area file: hunter
@@ -386,7 +394,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Query: none
 - Request body: none
 - Response: `NextPayload`. A `question` payload (`NextQuestionPayload`, `src/lib/enrichment.ts:75`) has `kind: "question"`, `milestone`, `ask` (`ProfileAsk`), `elicitShape`, `rail`, and optional `canGoBack`, `followUp`, `draft`. A `checkpoint` payload (`CheckpointPayload`, `src/lib/enrichment.ts:97`) has `options: ["continue", "stop"]`. A `complete` payload (`CompletePayload`, `src/lib/enrichment.ts:155`) has `kind: "complete"`.
-- Errors the UI handles: an error in `loadNext` is not caught at the call. The click handler gets a rejected promise and the card does not change. A 501 or 500 shows no message.
+- Errors the UI handles: `reopen` and the answer and skip flow catch the error and log a warning, and the card does not change. The call that follows `POST .../enter` from `onEntered` has no catch, so a failure there is an unhandled promise rejection and no card shows. A 501 or 500 behaves the same.
 - Notes: none.
 
 ### POST /hunter-chat/enrichment/answer
@@ -439,7 +447,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 ### GET /naics/descriptions
 - Area file: hunter
 - Called from: two wrappers with the same request and response.
-  - `fetchBatch` `src/lib/naicsApi.ts:22` (apiFetch at :25), from `useNaicsDescriptionMap` (`src/lib/useNaicsDescriptions.ts:49`). It runs once per set of codes: for each rendered page of feed cards (`src/routes/opportunities.index.tsx:1429` `useNaicsDescriptions`), when a trade is selected in the filters drawer (`src/components/Hunter/WorkPicker.tsx:51`), and when the forecast filters drawer is open (`src/components/Forecast/ForecastFiltersDrawer.tsx:139`).
+  - `fetchBatch` `src/lib/naicsApi.ts:22` (apiFetch at :25), from `useNaicsDescriptionMap` (`src/lib/useNaicsDescriptions.ts:49`). It runs once for each set of codes. Three screens use it. The feed asks for the rendered cards (`src/routes/opportunities.index.tsx:1429` `useNaicsDescriptions`). The filters drawer asks when the member selects a trade (`src/components/Hunter/WorkPicker.tsx:51`). The forecast filters drawer asks while it is open (`src/components/Forecast/ForecastFiltersDrawer.tsx:139`).
   - `fetchNaicsDescriptions` `src/lib/preview.ts:212` (apiFetch at :215), from `ensureNaicsDescriptions` (`src/lib/naicsCatalog.ts:41`). It runs when the preview wizard mounts (`src/components/Hunter/WarmStartWizard.tsx:131`) and when a NAICS picker on a profile question card resolves codes (`src/lib/askOptions.ts:80`).
 - Query: `codes` (comma-separated NAICS codes, at most 100 per request; the production backend answers 400 above 100)
 - Request body: none
@@ -481,9 +489,9 @@ Area file: `src/demo/api/opportunity.ts`. This area owns the detail of one oppor
   - `src/lib/microPurchases/paperHref.ts:35` `API_BASE_URL`: the order paper link of a small order. Call site `src/routes/small-orders.$orderId.tsx:187` `paperHref`, drawn at `:1064`. The path has the same shape. This caller URL-encodes `oppKey`.
 - Query: `fileName` (string, URL-encoded)
 - Request body: none
-- Response: production answers with a redirect (HTTP 302 to a fresh file URL). It is not JSON.
-- Errors the UI handles: none.
-- Notes: a click on an anchor is not a fetch. `fetchInterceptor` never sees it, and `linkGuard` (`src/demo/nav/linkGuard.ts:43`) leaves `/__demo_api/` links to the browser. A handler cannot answer it. The static host answers with the app page or a 404. The safe choice is to give the page no document: return `documents: []` from the detail call and `paper: null` on small orders. Then no link renders (`EvidenceBlock.tsx:392` and `paperHref.ts:33`). A real download needs a static file or a click guard, which is outside this file.
+- Response: production answers with a redirect (HTTP 302 to a fresh file URL). It is not JSON. In the demo, return a `Response` with a body and a content type: `new Response(blob, { headers: { "Content-Type": "application/pdf", "Content-Disposition": 'attachment; filename="Statement-of-Work.pdf"' } })`. The body can be a small file that you generate (`pdf-lib` is installed) or a text file.
+- Errors the UI handles: a non-2xx answer, or a throw, shows the notice "File not available".
+- Notes: a click on an anchor is not a fetch, but the demo covers it. `linkGuard` (`src/demo/nav/linkGuard.ts`) catches a click on any anchor, or any `window.open`, whose URL starts with `/__demo_api/` or `/api/`. It asks the router for the answer with `fetch` and saves the body as a download. The file name comes from `Content-Disposition`, then from the `fileName` query key, then from the last path segment. A document that you do not want to serve: return `documents: []` from the detail call and `paper: null` on small orders, and no link renders (`EvidenceBlock.tsx:392` and `paperHref.ts:33`).
 
 ## grant
 
@@ -595,7 +603,7 @@ Area file: `src/demo/api/workspace.ts`. This area owns the member's saved list a
 - Area file: workspace
 - Called from: `addSavedSearch` `src/lib/workspace.ts:77` (apiFetch at :85). Call site `src/routes/opportunities.index.tsx:1515` `addSavedSearch`, in `handleSaveSearch`. It runs when the member saves a search from the filters drawer footer or from the summary row.
 - Query: none
-- Request body: `{ name: string; filters: OpportunityFilters }` where `prefilled` is sent as an array (`src/lib/workspace.ts:84`). `OpportunityFilters` is `src/lib/opportunityFilters.ts`.
+- Request body: `{ name: string; filters: OpportunityFilters }` where `prefilled` is sent as an array (`src/lib/workspace.ts:84`). `OpportunityFilters` is `src/lib/opportunityFilters.ts:18`. It is the full client filter object, not `ServerFilters`. The handler can store it without reading it.
 - Response: `SavedSearch`. The page reads `id`, `name` and `filters`. Echo the `filters` of the request and add `id` and `createdAt`.
 - Errors the UI handles: the page logs "Failed to save search" and adds no chip.
 - Notes: none.
@@ -825,7 +833,7 @@ Area file: `src/demo/api/awards.ts`. This area owns `/awards*`. The pages are `/
 - Request body: `AwardListRequest` (`src/lib/awardsApi.ts:131`): `{ filters?: AwardFilterId[]; sort?: AwardSort; q?: string; page?: number; limit?: number }`. The page sends `filters`, `sort`, `q` and `page`, and never `limit`. A filter id is `trade`, `area`, `size`, `justAwarded` or `comingUpAgain`. A sort is `relevant`, `recent` or `largest`. The default filters are `trade` and `area` (`:43`).
 - Response: `AwardListResult` (`src/lib/awardsApi.ts:110`): `{ awards: AwardRecord[], page, limit, hasMore, appliedFilters, droppedFilters?, needsProfile? }`. `AwardRecord` is `:85`. `appliedFilters` draws the removable chips.
 - Errors the UI handles: the page shows the error `message` ("Something went wrong loading awards." by default).
-- Notes: production answers 200 for this POST. Use a page size that your list supports and set `hasMore`.
+- Notes: production answers 200 for this POST. The page sends no `limit`, so the handler picks the page size, returns it as `limit` and sets `hasMore`. The page changes pages with the `page` key in the URL.
 
 ### GET /awards/saved
 - Area file: awards
@@ -896,7 +904,7 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 ### GET /forecasts
 - Area file: forecasts
 - Called from: `fetchForecastList` `src/lib/forecastsApi.ts:118` (apiFetch at :124). It is called by `useForecastList` (`src/routes/forecasts.index.tsx:165`).
-  - `src/lib/forecasts/useForecastList.ts:224` `fetchForecastList`: page 1. It runs on page load and on every change of the query: the view tab, the buyer lane, the search text (250 ms wait), the capture tab, the sort and the drawer filters (120 ms wait). It also runs on Retry, and again (same query, rows kept) after a Track or Untrack write settles while the Saved view is open. A new run aborts the old run.
+  - `src/lib/forecasts/useForecastList.ts:224` `fetchForecastList`: page 1. It runs on page load. It runs again on every change of the query: the view tab, the buyer lane, the search text (250 ms wait), the capture tab, the sort and the drawer filters (120 ms wait). It also runs on Retry, and again (same query, rows kept) after a Track or Untrack write settles while the Saved view is open. A new run aborts the old run.
   - `src/lib/forecasts/useForecastList.ts:255` `fetchForecastList`: the next page, when the scroll sentinel comes within 400 px of the screen.
 - Query: `view` (always sent: `for_you`, `all` or `saved`), `lane` (`federal` or `sled`; absent for all), `q` (at most 200 characters), `tab` (`act_now`, `start_capture`, `position_early` or `watch`; absent for all), `sort` (`soonest`, `newest` or `value`; absent for the view default, and `match` is never sent), `work` (comma list of `food`, `building`, `sites`, `other`), `place` (`served`), `who` (comma list of `small`, `undecided`, `program`, `not_shared`), `size` (`under_250k`, `250k_1m`, `1m_5m` or `over_5m`), `bought` (`again` or `new`), `status` (`open`), `expected` (comma list of `this_week`, `2_weeks`, `30_days`, `60_plus`), `valueMin`, `valueMax` (whole dollars), `states` (comma list of USPS codes), `cities` (comma list, at most 50, each at most 100 characters), `naics` (comma list, at most 100), `posted` (days, a positive whole number), `page` (starts at 1), `limit` (always 20, `FORECAST_PAGE_SIZE`, `src/lib/forecasts/listQuery.ts:20`). The builder is `forecastListQueryKey` (`src/lib/forecasts/listQuery.ts:88`).
 - Request body: none
@@ -918,7 +926,7 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 - Called from: `requestTake` `src/lib/forecasts/grantTakeApi.ts:209` (apiFetch at :212), through `fetchForecastTake` (`:228`). Call site `src/lib/forecasts/useForecastTake.ts:14` `fetchForecastTake`, used at `src/routes/forecasts.$forecastId.tsx:134`. It runs once for each forecast in a browser session when the forecast page mounts. A failed result is cached too.
 - Query: none
 - Request body: none
-- Response: `ForecastTakeResponse` (`src/lib/forecasts/grantTakeApi.ts:76`). The client checks the body and treats a body that fails any check as a failed call (`toTake`, `:185`). The checks: `oppKey` equals the requested key; `noticeType` is `"forecast"`; `analyzedAt` is a string; `reads` is an array; `counted` holds all six keys (`comparableAwards`, `fieldSize`, `marketWinners`, `buyer`, `upcoming`, `subUse`), each either `{ state: "notChecked" }` or a counted fact with `figure`, `basis` (`countedOver` at least 1, a non-empty `matchedOn`, `yearsCovered` string or null, `atLeast` boolean), a `source` pin with `provenance: { type: "public", ref }` and `label`, and `asOf` (string or null); `memberSources` holds all four keys (`profile`, `capabilityStatement`, `learnedFacts`, `match`) with a state of `used`, `empty` or `notChecked`.
+- Response: `ForecastTakeResponse` (`src/lib/forecasts/grantTakeApi.ts:76`). The client checks the body (`toTake`, `src/lib/forecasts/grantTakeApi.ts:185`). A body that fails any check counts as a failed call. The checks are as follows. `oppKey` equals the requested key. `noticeType` is `"forecast"`. `analyzedAt` is a string. `reads` is an array. `counted` holds all six keys: `comparableAwards`, `fieldSize`, `marketWinners`, `buyer`, `upcoming` and `subUse`. Each key is either `{ state: "notChecked" }` or a counted fact. A counted fact has a `figure`, a `basis`, a `source` and an `asOf`. The `basis` has `countedOver` of at least 1, a non-empty `matchedOn`, `yearsCovered` (a string or null) and `atLeast` (a boolean). The `source` is a pin with `label` and `provenance: { type: "public", ref }`. `asOf` is a string or null. `memberSources` holds all four keys (`profile`, `capabilityStatement`, `learnedFacts`, `match`). Each key has the state `used`, `empty` or `notChecked`.
 - Errors the UI handles: none shown. 404 or any failure makes the page read as if there were no take.
 - Notes: a take adds counted rows to "How to win it". `notChecked` hides that fact.
 
@@ -952,7 +960,7 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 ### GET /forecast-watch
 - Area file: forecasts
 - Called from: `requestWatch` `src/lib/forecasts/watch.ts:319` (apiFetch at :322; the path is `WATCH_PATH = "/forecast-watch"`, `src/lib/forecasts/watch.ts:145`). `loadForecastWatch` (`src/lib/forecasts/watch.ts:349`) shares one read for the session. `refreshForecastWatch` (`src/lib/forecasts/watch.ts:356`) reads again.
-  - `src/lib/forecasts/watch.ts:377` `loadForecastWatch`, in `useForecastWatch`: the first time any of these mounts: `WatchMarker` on a tracked forecast card (`src/components/Forecast/ForecastCard.tsx:87`), on a saved forecast card in the feed (`src/components/Hunter/OpportunityCard.tsx:277`) and on a forecast bid card (`src/components/Bids/BidCard.tsx:166`); `ForecastWatchChanges` on the forecast page (`src/components/Forecast/ForecastWatchChanges.tsx:119`); and the forecast page itself (`src/routes/forecasts.$forecastId.tsx:142`).
+  - `src/lib/forecasts/watch.ts:377` `loadForecastWatch`, in `useForecastWatch`: it runs the first time one of these parts mounts. `WatchMarker` is on a tracked forecast card (`src/components/Forecast/ForecastCard.tsx:87`), on a saved forecast card in the feed (`src/components/Hunter/OpportunityCard.tsx:277`) and on a forecast bid card (`src/components/Bids/BidCard.tsx:166`). `ForecastWatchChanges` is on the forecast page (`src/components/Forecast/ForecastWatchChanges.tsx:119`). The forecast page also reads the watch itself (`src/routes/forecasts.$forecastId.tsx:142`).
   - `src/lib/trackedForecasts.ts:79` and `:102` `refreshForecastWatch`: after a Track or Untrack write succeeds, and after Hunter saves or unsaves a record.
   - `src/lib/forecasts/watch.ts:370` `refreshForecastWatch`: after Mark as seen.
 - Query: none
@@ -985,7 +993,7 @@ Area file: `src/demo/api/smallOrders.ts`. This area owns `/small-orders*`. These
   - The walks start on `/small-orders` page load (`src/routes/small-orders.index.tsx:196`, through `walkFeedFor`), on a change of tab or of the member's categories, and on `/small-orders/$orderId` load (`src/routes/small-orders.$orderId.tsx:89`, `loadFeed`).
 - Query: `after` (the cursor from `more.cursor`; set only for a next page), `view` (set only when it is `for-you`), `categories` (comma list of category ids, sorted, set only when not empty), `codes` (comma list of acquisition-code pairs such as `1C`, sorted, set only when not empty), `bidCodes` (comma list, sorted; set when the walk is "For you", and the value can be empty). A cursor pins `view`, `categories`, `codes` and `bidCodes` for the whole walk.
 - Request body: none
-- Response: `SmallOrdersFeed` (`src/lib/microPurchases/api.ts:34`): `{ orders: MicroOrder[], asOf: string (ISO), postedOnLabel: string, count: number, total: number, boardTotal: number | null, more: { cursor: string, loads: number, remaining: number } | null }`. `more` is null on the last page. The client checks the envelope: `orders` is an array, `asOf` and `postedOnLabel` are strings, `count` and `total` are numbers, and `more` is null or has a non-empty `cursor` string and numbers for `loads` and `remaining`. `count` should equal `orders.length`. `total` is the number of orders that matched before paging. The server page size is 50 and the server cap is 500 rows.
+- Response: `SmallOrdersFeed` (`src/lib/microPurchases/api.ts:34`): `{ orders: MicroOrder[], asOf: string (ISO), postedOnLabel: string, count: number, total: number, boardTotal: number | null, more: { cursor: string, loads: number, remaining: number } | null }`. `more` is null on the last page. The client checks the envelope. `orders` must be an array. `asOf` and `postedOnLabel` must be strings. `count` and `total` must be numbers. `more` must be null, or an object with a non-empty `cursor` string and numbers for `loads` and `remaining`. `count` should equal `orders.length`. `total` is the number of orders that matched before paging. The server page size is 50 and the server cap is 500 rows.
 - Errors the UI handles: any failure or bad body gives null. The board then says "Today's orders from DLA did not load". An empty `orders` array with a good envelope says there are no orders today.
 - Notes: the "For you" walk calls `GET /small-orders/code-census` first and sends `bidCodes`. If the census fails, the walk fails. Return a few pages (use `more`) to show Load more. The board opens on "All orders" when "For you" is empty and the URL names no view.
 
@@ -1023,7 +1031,7 @@ Area file: `src/demo/api/smallOrders.ts`. This area owns `/small-orders*`. These
 - Request body: none
 - Response: `MicroState` (`src/lib/state/microPurchases.ts:85`). It must be a keyed object, not an array. A document with fewer fields merges with the defaults.
 - Errors the UI handles: a failure gives null and the store keeps its defaults. The store holds back any write until this call ends.
-- Notes: an empty `{}` shows the first-run board (the member has not chosen categories). Return the member's real state to skip the first-run screen: `onboarded: true`, `categories`, and `registrations`.
+- Notes: an empty document leaves the defaults: no categories and `onboarded: false`. The board then still lists every order and shows a chip that reads "You have not said yet" (`catLabel`, `src/routes/small-orders.index.tsx:408`). Return `onboarded: true` and a `categories` list to remove that chip. The walks then send those categories in the `categories` query key of `GET /small-orders/feed`. `registrations` sets the four ticks of the checklist: SAM, CAGE (Commercial and Government Entity code), DIBBS and PIEE (Procurement Integrated Enterprise Environment).
 
 ### PUT /small-orders/state
 - Area file: smallOrders
@@ -1100,14 +1108,14 @@ These are network-looking references that are not calls to the backend. The demo
 - **PostHog analytics**: `src/main.tsx:25` to `src/main.tsx:47` mount `PostHogProvider` only when `VITE_POSTHOG_KEY` is set. The repo has no `.env` file, so it is not mounted. If a key is set, `posthog-js` calls `https://app.posthog.com` (the default host, `src/main.tsx:28`) with `fetch`, `XMLHttpRequest` and `sendBeacon`. `fetchInterceptor` blocks each call and records it in `window.__DEMO_BLOCKED__`, which fails the QA crawl. Keep the key unset.
 - **GoHighLevel wallet billing page**: `GHL_WALLET_BILLING_URL` (`src/lib/walletApi.ts:61`) is `https://app.govpreneurs.com/v2/location/{locationId}/settings/company-billing/billing?tab=wallet_transactions`. The "Add funds" button on `/wallet` no longer opens it: it shows a demo notice (`src/routes/wallet.tsx:66`). The Send to mentor dialog still links to it with an anchor (`src/components/Mentors/MentorSendModal.tsx:318`). `linkGuard` catches that host and shows the "Not part of this demo" notice (`src/demo/nav/linkGuard.ts`).
 - **Plan upgrade frame**: `UPGRADE_PLAN_LINK` (`src/lib/plans.ts:16`, `https://govpreneurs.com/membership`) or the `link` of `POST /opportunities/upgradePlan` loads into an `<iframe src>` (`src/components/Hunter/UpgradePlanModal.tsx:149`). A frame load is not a fetch, so nothing blocks it. The Elite member never opens it.
-- **Links to outside sites**: these are anchors, not fetches. `linkGuard` leaves them to the browser. They include `sam.gov`, `dibbs.bsm.dla.mil` and `piee.eb.mil` (`src/components/MicroPurchases/PrereqLine.tsx:61`, `:81`, `:88`), the government links in `src/lib/stayReady.ts`, `src/lib/forecasts/copy.ts:431`, the forecast `sourceLink` and `publisherSite` urls, a prior award `noticeUrl`, a partner `website` (`src/components/Partners/PrimeDetailPanel.tsx:236`), the acquisition-code `citation.url`, and a mentor attachment `url`.
+- **Links to outside sites**: these are anchors, not fetches. `linkGuard` leaves them to the browser. Examples: `sam.gov`, `dibbs.bsm.dla.mil` and `piee.eb.mil` (`src/components/MicroPurchases/PrereqLine.tsx:61`, `:81`, `:88`); the government links in `src/lib/stayReady.ts` and `src/lib/forecasts/copy.ts:431`; the forecast `sourceLink` and `publisherSite` urls; a prior award `noticeUrl`; a partner `website` (`src/components/Partners/PrimeDetailPanel.tsx:236`); the acquisition-code `citation.url`; and a mentor attachment `url`.
 - **No other transport**: a search of `src/` (without tests) finds no `XMLHttpRequest`, `EventSource`, `WebSocket`, `new Request`, `navigator.sendBeacon` or relative-path `fetch(` in app code. The only `fetch(` is inside `apiFetch` (`src/lib/api.ts:60` and `:63`).
 - **ArcGIS and Google Maps**: nothing in `src/` calls ArcGIS, a map tile server or a geocoder. The word "Google" appears only in the Google Fonts import and in the labels "Google Drive" and "Google Docs" (`src/lib/knowledgeBase.ts:60`, `src/lib/knowledgeHub.ts:59`, `:66`).
-- **Success Center `/api/...` calls**: this repo does not contain any yet. The router accepts them when the Success Center code arrives (see the next section).
+- **Success Center `/api/...` calls**: no code in `src/` makes one today, and `src/sc/` has none. The router accepts them when the Success Center code arrives (see the Success Center section).
 
 ## Href links
 
-Two places and one response field turn a backend path or url into an anchor. A click does not reach `fetchInterceptor`, so no handler answers it.
+Two places and one response field turn a backend path or url into an anchor. A click is not a fetch, so `fetchInterceptor` does not see it. `linkGuard` (`src/demo/nav/linkGuard.ts`) turns a click on a `/__demo_api/...` or `/api/...` anchor into a fetch through the router and saves the answer as a file. So a handler for these paths works, and it must return a `Response` with a body.
 - `GET /opportunities/discover/v2/:oppKey/documents` from `src/components/Opportunity/EvidenceBlock.tsx:399` (href, not fetch).
 - The same endpoint from `src/lib/microPurchases/paperHref.ts:35` (href, not fetch).
 - A mentor attachment `url` in `GET /mentor-reviews/:id` (`src/components/Mentors/ConversationView.tsx:148`). Use `url: null`.
@@ -1115,3 +1123,120 @@ Two places and one response field turn a backend path or url into an anchor. A c
 ## Success Center areas: filled in later
 
 Areas `scRoadmap`, `scTasks`, `scBusiness`, `scHome` and `scMentors` will be added here by the person who lifts the Success Center code. Use the path rule in `src/demo/runtime/router.ts`: a Success Center request keeps its full `/api/portal/...` path.
+
+## Coverage check
+
+**Method**
+- The brief's grep (`apiFetch\(|[^a-zA-Z.]fetch\(|API_BASE_URL` over `src`, tests and `src/demo` left out) finds 160 lines. 90 of them are `apiFetch(` calls. The rest are imports, `${API_BASE_URL}` strings, and the two `fetch(` calls inside `apiFetch` (`src/lib/api.ts:60` and `:63`).
+- Check 1: every `${API_BASE_URL}...` and `${ENRICHMENT_BASE}...` string in the code (93 strings) matches the path of a block in this file. A script compared the path segments, with `:param` as a wildcard. Three strings did not match only because the script could not read them: the `cities` URL (`${params}` is appended), the `feed` URL (a ternary is appended) and the `ENRICHMENT_BASE` definition itself. All three are documented.
+- Check 2: every one of the 90 `apiFetch(` call lines sits in a function that this file names (`fetchDiscoverV2`, `fetchBatch`, `answer`, and so on).
+- Check 3: a search of `src` (without tests and `src/demo`) for `XMLHttpRequest`, `EventSource`, `WebSocket`, `new Request`, `navigator.sendBeacon` and `.src =` finds no use in app code. `src/sc/` (62 files on 2026-10-16) holds no network call.
+- Result: no gap. Every endpoint has one block, and the area of each block equals its `Area file` line.
+
+**Distinct `METHOD /path`, sorted by path (93)**
+
+```text
+POST /awards
+GET /awards/:awardId
+GET /awards/saved
+POST /awards/saved
+DELETE /awards/saved/:awardId
+GET /business-profile
+GET /buyers
+GET /buyers/:agencyKey
+GET /forecast-watch
+POST /forecast-watch/:oppKey/seen
+GET /forecasts
+GET /forecasts/:oppKey
+POST /forecasts/:oppKey/grant/reply
+GET /forecasts/:oppKey/grant/session
+GET /forecasts/:oppKey/grant/take
+POST /forecasts/takes
+POST /grants-take/analysis
+POST /grants-take/opportunity
+POST /grants-take/rail
+POST /grants-take/rail/reset
+POST /grants-take/rail/session
+POST /grants-take/rail/skip
+POST /hunter-chat/enrichment/answer
+POST /hunter-chat/enrichment/back
+POST /hunter-chat/enrichment/checkpoint
+POST /hunter-chat/enrichment/enter
+GET /hunter-chat/enrichment/next
+POST /hunter-chat/enrichment/organic
+POST /hunter-chat/enrichment/pause
+POST /hunter-chat/enrichment/skip
+GET /hunter-chat/enrichment/state
+POST /hunter-chat/feedback
+GET /hunter-chat/memory-conflicts
+POST /hunter-chat/memory-conflicts/resolve
+POST /hunter-chat/message
+GET /hunter-chat/profile
+POST /hunter-chat/profile
+POST /hunter-chat/profile-update/:proposalId/confirm
+POST /hunter-chat/profile-update/:proposalId/reject
+POST /hunter-chat/profile/answer
+POST /hunter-chat/reset
+POST /hunters-take/feed
+GET /mentor-reviews
+GET /mentor-reviews/:id
+POST /mentor-reviews/:id/reply
+POST /mentor-reviews/:id/viewed
+GET /naics/descriptions
+GET /naics/search
+POST /opportunities/all
+POST /opportunities/discover/v2
+GET /opportunities/discover/v2/:oppKey
+GET /opportunities/discover/v2/:oppKey/documents
+POST /opportunities/discover/v2/counts
+GET /opportunities/discover/v2/scores
+GET /opportunities/filters/cities
+GET /opportunities/filters/defaults
+GET /opportunities/get-credit
+POST /opportunities/preview
+GET /opportunities/preview/answers
+POST /opportunities/preview/answers
+POST /opportunities/saved
+POST /opportunities/send-for-review
+POST /opportunities/upgradePlan
+GET /partners
+GET /partners/company/:awardeeKey
+GET /partners/market
+GET /partners/pipeline
+POST /partners/pipeline
+DELETE /partners/pipeline/:awardeeKey
+PATCH /partners/pipeline/:awardeeKey
+POST /partners/suppress
+DELETE /partners/suppress/:awardeeKey
+GET /psc/search
+GET /small-orders/acquisition-codes
+GET /small-orders/code-census
+GET /small-orders/feed
+GET /small-orders/fit
+GET /small-orders/naics-categories
+GET /small-orders/orders
+GET /small-orders/orders/:orderId
+GET /small-orders/orders/:orderId/suppliers
+GET /small-orders/state
+PUT /small-orders/state
+GET /users/:userId/subscription
+POST /users/from-highlevel
+GET /wallet/balance
+GET /wallet/ledger
+GET /workspace
+POST /workspace/saved-opps
+DELETE /workspace/saved-opps/:oppKey
+GET /workspace/saved-opps/details
+POST /workspace/saved-searches
+DELETE /workspace/saved-searches/:id
+```
+
+Count: 93. By area: session 2, hunter 33, opportunity 2, grant 6, workspace 6, pipeline 0, mentorReviews 5, wallet 4, partners 9, awards 5, buyers 2, forecasts 8, smallOrders 10, businessProfile 1, misc 0.
+
+**Documented, but the demo never reaches them (8)**
+
+- No call site (6): `POST /users/from-highlevel` (the session no longer calls it), `GET /opportunities/discover/v2/scores`, `POST /hunter-chat/profile`, `GET /wallet/ledger`, `GET /buyers`, `GET /buyers/:agencyKey`.
+- Reached only through a hook that no component uses (1): `GET /hunter-chat/profile`.
+- A call site exists, but it runs only when `session.grantV2` is false (1): `POST /grants-take/opportunity`.
+
+`GET /opportunities/discover/v2/:oppKey/documents` is listed too. Its only users are anchors (href, not fetch). `linkGuard` fetches it through the router on click and saves the answer as a download, so the opportunity area needs a handler that returns a `Response` with a file body. See the opportunity area.
