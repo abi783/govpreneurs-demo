@@ -57,6 +57,75 @@ function isWords(unit: EnterField["unit"]): boolean {
   return unit === "text" || unit === "phone" || unit === "email";
 }
 
+/** The largest number a box takes, by what it asks for. A percent is out of 100. */
+const MOST: Record<string, number> = {
+  percent: 100,
+  "usd-hour": 1_000,
+  usd: 100_000_000,
+  count: 10_000_000,
+};
+
+/** One example for each kind of box, in the message that says what it needs. */
+const EXAMPLE: Record<EnterField["unit"], string> = {
+  percent: "5",
+  "usd-hour": "18.50",
+  usd: "4.25",
+  count: "400",
+  text: "a few words",
+  phone: "(910) 555-0100",
+  email: "name@example.com",
+};
+
+/** The number in a box ("$18.50", "5%", "1,200"), or null when the words are
+ *  not a number a bid can use: letters, a minus sign, two points, a number too
+ *  big for the box, or a fraction where a count is asked. */
+export function parseNumber(text: string, unit: EnterField["unit"]): number | null {
+  const t = text.trim().replace(/^\$/, "").replace(/%$/, "").replace(/\s/g, "");
+  const plain = /^\d{1,3}(,\d{3})+(\.\d+)?$/.test(t) ? t.replace(/,/g, "") : t;
+  if (!/^(\d+\.?\d*|\.\d+)$/.test(plain)) return null;
+  const n = Number(plain);
+  if (!Number.isFinite(n) || n > (MOST[unit] ?? 1e9)) return null;
+  if (unit === "count" && !Number.isInteger(n)) return null;
+  return n;
+}
+
+/** What a box needs, in one sentence: "“Their email” needs an email address, like name@example.com." */
+export function fieldNeeds(f: EnterField): string {
+  const what =
+    f.unit === "email"
+      ? "an email address"
+      : f.unit === "phone"
+        ? "a phone number"
+        : f.unit === "text"
+          ? "some words"
+          : "a number";
+  return `“${f.label}” needs ${what}, like ${EXAMPLE[f.unit]}.`;
+}
+
+/** What is wrong with the words in a box, or null. An empty box is not wrong:
+ *  it is not filled yet. */
+export function fieldProblem(f: EnterField, text: string): string | null {
+  const t = text.trim();
+  if (t === "") return null;
+  if (!isWords(f.unit)) return parseNumber(t, f.unit) === null ? fieldNeeds(f) : null;
+  if (f.unit === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) return fieldNeeds(f);
+  if (f.unit === "phone" && t.replace(/\D/g, "").length < 7) return fieldNeeds(f);
+  return null;
+}
+
+/** Ava's reply when the talk box gets words that do not answer the question on
+ *  screen. */
+export function notUnderstood(q: Question | null): string {
+  if (!q) return "Thank you. I keep working. I will ask you when I need something.";
+  const ask = q.ask;
+  if (ask?.answer.type === "enter") {
+    return ask.answer.fields.length === 1
+      ? `${fieldNeeds(ask.answer.fields[0])} Type it in the box above, or say “Why?”.`
+      : "Fill the boxes above, one fact in each box. Or say “Why?”.";
+  }
+  return "I cannot use words for this question yet. Tap one of the answers above, or say “Why?”.";
+}
+
 /** The input for a typed box: a phone gets the phone keypad, an email the
  *  email keyboard, a number the number pad. Her browser never fills in her
  *  own details: these boxes are often someone else's (a reference). */
@@ -616,7 +685,8 @@ export function QuestionCard({
     );
   } else if (ask && ask.answer.type === "enter") {
     const fields = ask.answer.fields;
-    const all = fields.every((f) => (values[f.id] ?? "").trim() !== "");
+    const wrong = fields.map((f) => fieldProblem(f, values[f.id] ?? "")).filter((x) => x !== null);
+    const all = fields.every((f) => (values[f.id] ?? "").trim() !== "") && wrong.length === 0;
     body = (
       <div className="ava2-fields">
         {fields.map((f) => (
@@ -649,7 +719,7 @@ export function QuestionCard({
                       f.id,
                       isWords(f.unit)
                         ? values[f.id].trim()
-                        : Number(values[f.id].replace(/[$,%\s]/g, "")),
+                        : (parseNumber(values[f.id], f.unit) ?? 0),
                     ]),
                   ),
                 })
@@ -657,6 +727,10 @@ export function QuestionCard({
             >
               Save it
             </button>
+          ) : wrong.length > 0 ? (
+            <span className="ava2-need" role="alert">
+              {wrong[0]}
+            </span>
           ) : (
             <span className="ava2-need">
               {fields.length === 1 ? "Type it, or say it with Talk." : "Fill every box to save."}
@@ -1088,8 +1162,9 @@ export function answerByWords(
     const fields = ask.answer.fields;
     if (fields.length !== 1) return false;
     const f = fields[0];
-    const v = isWords(f.unit) ? text : Number(text.replace(/[$,%\s]/g, ""));
-    if (!isWords(f.unit) && !Number.isFinite(v as number)) return false;
+    if (fieldProblem(f, text)) return false;
+    const v = isWords(f.unit) ? text.trim() : parseNumber(text, f.unit);
+    if (v === null) return false;
     ava.answer(id, ask.id, {
       status: "done",
       values: { [f.id]: v, ...(voice ? { spoken: text } : {}) },

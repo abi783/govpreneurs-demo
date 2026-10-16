@@ -31,7 +31,14 @@ import { currentMember } from "../../demo/ava/member";
 import { openOutside } from "./outside";
 import { keepPaper } from "./paperFiles";
 import { SendToMentorModal } from "./SendToMentorModal";
-import { answerByWords, avaFace, matchReply, QuestionCard, TALK_LINE } from "./Asking";
+import {
+  answerByWords,
+  avaFace,
+  matchReply,
+  notUnderstood,
+  QuestionCard,
+  TALK_LINE,
+} from "./Asking";
 import { initials, Showing } from "./Showing";
 import { FoldedSide, SideFold } from "../ds/AgentWorkspace";
 import type { Side } from "./Frame2";
@@ -413,9 +420,7 @@ export function Talk({
       {
         you: text,
         voice: how.voice,
-        ava: flow.current
-          ? "I cannot use words for this question yet. Tap one of the answers above, or say “Why?”."
-          : "Thank you. I keep working. I will ask you when I need something.",
+        ava: notUnderstood(flow.current),
       },
     ]);
   };
@@ -429,6 +434,8 @@ export function Talk({
     if (ask?.answer.type === "enter" && ask.answer.fields.length === 1) {
       const f = ask.answer.fields[0];
       if (f.unit === "text") return "We cook every meal fresh in our own kitchen.";
+      if (f.unit === "phone") return "(910) 555-0100";
+      if (f.unit === "email") return "name@example.com";
       return String(f.floor ? Math.ceil(f.floor.value) : 12);
     }
     if (q.kind === "decision") return "Use your words, Ava.";
