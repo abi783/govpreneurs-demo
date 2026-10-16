@@ -9,6 +9,10 @@
 // Layer: ENTITIES. This module imports nothing.
 
 export type MicroCategory =
+  // DEMO: three food-service categories for a caterer. Production has none.
+  | "food-beverage"
+  | "food-service-supplies"
+  | "kitchen-equipment"
   | "fasteners"
   | "pipes-valves"
   | "wire-cable"
@@ -29,6 +33,19 @@ export type MicroCategory =
   | "other";
 
 export const MICRO_CATEGORIES: { id: MicroCategory; label: string; hint: string }[] = [
+  // DEMO: the sample member is a caterer, so her three kinds of food-service
+  // buy come first. The hardware categories stay below, as in production.
+  { id: "food-beverage", label: "Food and drink", hint: "Meal pouches, rice, pasta, coffee, water" },
+  {
+    id: "food-service-supplies",
+    label: "Serving and packaging supplies",
+    hint: "Pans, trays, cups, napkins",
+  },
+  {
+    id: "kitchen-equipment",
+    label: "Kitchen and serving equipment",
+    hint: "Food carriers, dispensers, utensils",
+  },
   // Ordered by how likely a first-time reseller can actually source them.
   // Fasteners sit LOWER than instinct suggests: a defined population of FSG 53
   // stock numbers are Critical Safety Items carrying extra requirements for new

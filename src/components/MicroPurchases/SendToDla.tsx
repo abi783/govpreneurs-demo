@@ -554,14 +554,15 @@ export function SendToDla({ order: o, now }: { order: MicroOrder; now: Date | nu
             <div className="mp-send__btns">
               <a
                 className="btn btn-primary"
-                href="/home"
+                // DEMO: the registration checklist lives on the board (/small-orders).
+                href="/small-orders"
                 onClick={(e) => {
                   // Client navigation on purpose: a full page load would wipe
                   // the registrations she came here to finish, since this
                   // surface holds them in memory.
                   if (!router) return;
                   e.preventDefault();
-                  void router.navigate({ to: "/home" });
+                  void router.navigate({ to: "/small-orders" });
                 }}
               >
                 Get registered to sell
