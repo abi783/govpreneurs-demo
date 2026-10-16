@@ -33,7 +33,9 @@ test.describe("at the pace of a call", () => {
     ).setFiles({ name: "c.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
     const t0 = Date.now();
     await answerAll(page);
-    console.log(`cumberland: after the upload to "Read my bid" took ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+    console.log(
+      `cumberland: after the upload to "Read my bid" took ${((Date.now() - t0) / 1000).toFixed(1)} s`,
+    );
     await page.getByRole("button", { name: "Read my bid" }).click();
     await settleHolds(page);
     await expect(page.locator(".ava2-tabs [role=tab]").first()).toBeVisible();

@@ -220,17 +220,24 @@ export async function settleHolds(page: Page): Promise<void> {
   }
 }
 
-/** The files a person gets: name, size and the first bytes. */
-export async function filesOf(w: Watch): Promise<{ name: string; size: number; head: string }[]> {
-  const out: { name: string; size: number; head: string }[] = [];
+/** The files a person gets: name, size, the first bytes, and whether the inside holds up. */
+export async function filesOf(
+  w: Watch,
+): Promise<{ name: string; size: number; head: string; inside: string | null }[]> {
+  const out: { name: string; size: number; head: string; inside: string | null }[] = [];
   for (const d of w.downloads) {
     const p = await d.path();
     const buf = fs.readFileSync(p);
-    out.push({
-      name: d.suggestedFilename(),
-      size: buf.length,
-      head: buf.subarray(0, 4).toString("latin1"),
-    });
+    const name = d.suggestedFilename();
+    let inside: string | null = null;
+    // A PDF ends with its end marker. A Word or Excel file is a zip that holds its main part.
+    if (/\.pdf$/i.test(name) && !buf.subarray(-64).toString("latin1").includes("%%EOF"))
+      inside = "a PDF with no end marker";
+    if (/\.docx$/i.test(name) && !buf.includes("word/document.xml"))
+      inside = "a Word file with no word/document.xml";
+    if (/\.xlsx$/i.test(name) && !buf.includes("xl/workbook.xml"))
+      inside = "an Excel file with no xl/workbook.xml";
+    out.push({ name, size: buf.length, head: buf.subarray(0, 4).toString("latin1"), inside });
   }
   return out;
 }
@@ -249,13 +256,16 @@ export async function saveDownloads(w: Watch, folder: string): Promise<string[]>
 }
 
 /** A download is a real file: a PDF starts with "%PDF", Word and Excel with "PK". */
-export function expectValidFiles(files: { name: string; size: number; head: string }[]): void {
+export function expectValidFiles(
+  files: { name: string; size: number; head: string; inside: string | null }[],
+): void {
   expect(files.length, "no download happened").toBeGreaterThan(0);
   for (const f of files) {
     expect(f.name, "download name").toMatch(/\.(pdf|docx|xlsx|txt|csv)$/i);
     expect(f.name, "download name").not.toMatch(/undefined|NaN|\[object|null/i);
     if (/\.pdf$/i.test(f.name)) expect(f.head, f.name).toBe("%PDF");
     else if (/\.(docx|xlsx)$/i.test(f.name)) expect(f.head.slice(0, 2), f.name).toBe("PK");
+    expect(f.inside, f.name).toBeNull();
     expect(f.size, f.name).toBeGreaterThan(800);
   }
 }

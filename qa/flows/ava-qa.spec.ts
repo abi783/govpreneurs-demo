@@ -692,7 +692,6 @@ test.describe("odd text", () => {
   });
 });
 
-
 // ─── Something the visitor adds finishes without a hidden control ───
 
 test.describe("an addendum the visitor adds", () => {
@@ -711,12 +710,24 @@ test.describe("an addendum the visitor adds", () => {
       if (id === BIDS.cumberland) {
         const chooser = page.waitForEvent("filechooser");
         await page.getByRole("button", { name: /Upload the certificates/i }).click();
-        await (await chooser).setFiles({ name: "c.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
-        await page.getByRole("button", { name: "Read my bid" }).waitFor({ timeout: 1 }).catch(() => undefined);
+        await (
+          await chooser
+        ).setFiles({
+          name: "c.pdf",
+          mimeType: "application/pdf",
+          buffer: Buffer.from("%PDF-1.4\n"),
+        });
+        await page
+          .getByRole("button", { name: "Read my bid" })
+          .waitFor({ timeout: 1 })
+          .catch(() => undefined);
         await page.goto(`/ava/${id}?fast=1`);
         await answerAll(page);
         await page.getByRole("button", { name: "Read my bid" }).click();
         await settleHolds(page);
+        // Back to the pace of a call: the state stays in the session.
+        await page.goto(`/ava/${id}`);
+        await page.waitForLoadState("networkidle");
       }
       const add = page.getByRole("button", { name: "Add an addendum" });
       if (!(await add.isVisible().catch(() => false))) {
@@ -727,13 +738,91 @@ test.describe("an addendum the visitor adds", () => {
       await add.scrollIntoViewIfNeeded();
       const chooser = page.waitForEvent("filechooser");
       await add.click();
-      await (await chooser).setFiles({ name: "Addendum_3.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
-      await expect(page.getByText(/Reading Addendum_3\.pdf/).first()).toBeVisible();
-      await expect(page.getByText(/Addendum_3\.pdf needs your acknowledgment/).first()).toBeVisible({
-        timeout: 15_000,
+      await (
+        await chooser
+      ).setFiles({
+        name: "Addendum_3.pdf",
+        mimeType: "application/pdf",
+        buffer: Buffer.from("%PDF-1.4\n"),
       });
+      await expect(page.getByText(/Reading Addendum_3\.pdf/).first()).toBeVisible();
+      await expect(page.getByText(/Addendum_3\.pdf needs your acknowledgment/).first()).toBeVisible(
+        {
+          timeout: 15_000,
+        },
+      );
       await cleanText(page, `${name}-addendum`);
       expect(w.problems).toEqual([]);
     });
   }
+});
+
+// ─── Word and Excel files ───
+
+test.describe("Word and Excel downloads", () => {
+  test("Camp Mackall with one thing left gives Word files with the right names", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await open(page, BIDS.mackall);
+    // Approve the promises, and say "I'm not sure" to the driver question, so one part stays open.
+    const steps = await answerAll(page, {
+      pick: (labels) => {
+        const unsure = labels.findIndex((l) => /not sure/i.test(l));
+        return unsure >= 0
+          ? unsure
+          : Math.max(
+              labels.findIndex((l) => /promise/i.test(l)),
+              0,
+            );
+      },
+    });
+    expect(steps.length).toBeGreaterThan(0);
+    await page.getByRole("button", { name: "Read my bid" }).click();
+    const finish = page.getByRole("button", { name: /Download your bid to finish \(Word\)/ });
+    await expect(finish.first()).toBeVisible();
+    await finish.first().click();
+    await expect.poll(() => w.downloads.length, { timeout: 30_000 }).toBeGreaterThan(3);
+    await page.waitForTimeout(1200);
+    const files = await filesOf(w);
+    expectValidFiles(files);
+    expect(files.map((f) => f.name).sort()).toEqual(
+      [
+        "Signed_Forms_Haddad_Catering.docx",
+        "Volume_I_Technical_Capability_Haddad_Catering.docx",
+        "Volume_II_Past_Performance_Haddad_Catering.docx",
+        "Volume_III_Price_Haddad_Catering.docx",
+      ].sort(),
+    );
+    await saveDownloads(w, "mackall-word");
+    expect(w.problems).toEqual([]);
+  });
+
+  test("Fayetteville: each part alone, and the whole bid, with the names the city asks for", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await open(page, BIDS.fayetteville);
+    const tabs = page.locator(".ava2-tabs [role=tab]");
+    for (let i = 0; i < (await tabs.count()); i++) {
+      await tabs.nth(i).click();
+      await page
+        .getByRole("button", { name: /This part/ })
+        .first()
+        .click();
+      await page.waitForTimeout(500);
+    }
+    await page.getByRole("button", { name: "Download your bid" }).first().click();
+    await expect.poll(() => w.downloads.length, { timeout: 30_000 }).toBeGreaterThan(7);
+    await page.waitForTimeout(1200);
+    const files = await filesOf(w);
+    expectValidFiles(files);
+    expect([...new Set(files.map((f) => f.name))].sort()).toEqual([
+      "1_Proposal_HaddadCatering.pdf",
+      "2_PriceSheet_HaddadCatering.xlsx",
+      "3_Forms_HaddadCatering.pdf",
+      "4_Certificates_HaddadCatering.pdf",
+    ]);
+    expect(w.problems).toEqual([]);
+  });
 });
