@@ -111,7 +111,7 @@ describe("awards", () => {
     const a = findAwardRecord("FA4800-26-P-0007")!;
     expect(a.obligated).toBeLessThan(188_000);
     expect(188_000 / a.obligated!).toBeCloseTo(1.04, 1);
-    expect(a.winner.name).toBe("Blackwater Dining Group");
+    expect(a.winner.name).toBe("Falling Creek Dining Group");
   });
 });
 

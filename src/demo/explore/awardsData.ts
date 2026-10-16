@@ -495,7 +495,7 @@ const SEEDS: Seed[] = [
     bench: { distinct: 9, repeat: 4, subs: [[4011, 3], [4007, 1]] },
   },
 
-  // ── Blackwater Dining Group (4009) ─────────────────────────────────────
+  // ── Falling Creek Dining Group (4009) ─────────────────────────────────────
   {
     id: "FA4800-26-P-0007",
     solicitationId: "FA4800-26-Q-0007",

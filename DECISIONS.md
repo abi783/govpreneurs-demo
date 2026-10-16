@@ -81,7 +81,7 @@ name its number.
 - D57. **A photo or logo uploaded on Success Center home also shows in My Business**, and the Roadmap and My Business share one set of checks.
 - D58. **Forecasts: 48 in all.** 40 are recorded catering forecasts with dates moved to today; 8 are written for the story. The Fort Bragg 2027 dining program comes first, and Hunter says to team up for it.
 - D59. **Small Orders: about 20 food-service DLA orders** (meal pouches, spaghetti, coffee, food trays, gloves, water). 14 match her; one saved order shows on the Pipeline.
-- D60. **Partners: Carolina Dining Group first**, with Mike Sutton named as her contact from the 2024 subcontract. Then 2 more top partners and fictional competitors. Some competitors are tied to her own story; for example, Blackwater Dining Group beat her on price at Seymour Johnson.
+- D60. **Partners: Carolina Dining Group first**, with Mike Sutton named as her contact from the 2024 subcontract. Then 2 more top partners and fictional competitors. Some competitors are tied to her own story; for example, Falling Creek Dining Group beat her on price at Seymour Johnson.
 - D61. **Closed pursuits on the Pipeline open a dialog** with the submission, the debrief or the award, rather than a dead link.
 - D62. **Sending a review to a mentor also saves the record**, as production does.
 - D63. **`/home` (frontend-v2's old home page) redirects to Success Center.**
