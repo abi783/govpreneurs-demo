@@ -1,4 +1,4 @@
-// The twelve part categories, as a list she ticks.
+// The part categories, as a list she ticks.
 //
 // Twelve human categories sit over DLA's 666 Federal Supply Classes. She never
 // sees a code. The mapping is ours and lives in code (the server's
@@ -61,8 +61,8 @@ export function CategoryPicker({
         })}
       </ul>
 
-      {/* "Other" is deliberately unpickable, and none of the twelve is food, so
-          picking nothing must be a real answer: it shows every order. */}
+      {/* "Other" is deliberately unpickable, so picking nothing must be a real
+          answer: it shows every order. */}
       <p className="mp-q__note">Pick none to see every part.</p>
     </fieldset>
   );

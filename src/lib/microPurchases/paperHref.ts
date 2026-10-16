@@ -31,8 +31,10 @@ export function paperHref(order: {
   paper: { fileName: string } | null;
 }): string | null {
   if (order.paper == null) return null;
+  // DEMO: the sample order paper is served by the small-orders handler
+  // (src/demo/api/smallOrders.ts), not by the opportunity documents route.
   return (
-    `${API_BASE_URL}/opportunities/discover/v2/${encodeURIComponent(order.id)}` +
+    `${API_BASE_URL}/small-orders/orders/${encodeURIComponent(order.id)}` +
     `/documents?fileName=${encodeURIComponent(order.paper.fileName)}`
   );
 }

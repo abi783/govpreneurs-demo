@@ -20,6 +20,8 @@
 import {
   Bolt,
   Cable,
+  ChefHat,
+  Coffee,
   Cog,
   Disc3,
   Droplets,
@@ -28,6 +30,7 @@ import {
   Layers,
   Lightbulb,
   Package,
+  UtensilsCrossed,
   SprayCan,
   Waves,
   Wrench,
@@ -36,6 +39,10 @@ import {
 import type { MicroCategory } from "../../lib/microPurchases/categories";
 
 const CATEGORY_ICON: Record<MicroCategory, LucideIcon> = {
+  // DEMO: the three food-service categories.
+  "food-beverage": Coffee,
+  "food-service-supplies": UtensilsCrossed,
+  "kitchen-equipment": ChefHat,
   "office-cleaning": SprayCan,
   "hand-tools": Wrench,
   "safety-gear": HardHat,
