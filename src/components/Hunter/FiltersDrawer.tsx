@@ -408,9 +408,8 @@ export function FiltersDrawer({
                     cityCounts={facetCounts?.cities}
                     prefilledStates={new Set(prefilledValues(filters, "states"))}
                   />
-                  <p className="fd-microgloss">
-                    County and ZIP-radius live in Advanced below until the gazetteer tree is ported.
-                  </p>
+                  {/* DEMO: production shows a build note here ("until the gazetteer tree is ported").
+                      The note reads as unfinished work, and the Advanced panel has no county or ZIP filter. */}
                 </div>
               </section>
 
