@@ -1,0 +1,1501 @@
+/* ═══════════════════ Forecasts (Forecasts-UI, 16 Sep 2026) ═══════════════════
+   The list reuses the Hunter opportunity card (.ui-card--opp and its blocks). What is
+   here is what that card does not have: the Capture Status tabs with their meaning
+   on the page, the held-back row, and the forecast page. Tokens only.
+   Colour: timing uses the insight family, darker as the date nears (never red — a
+   date is not an error). Amber marks only what Hunter worked out. */
+
+.fc-page__head {
+  margin-bottom: var(--s-4);
+}
+.fc-page__intro {
+  margin-top: var(--s-2);
+  max-width: 660px;
+}
+
+/* ── Capture Status tabs ── */
+.fc-tabs__question {
+  margin: 0 0 var(--s-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.fc-tabs__row {
+  display: grid;
+  grid-template-columns: 0.8fr repeat(4, 1fr);
+  gap: var(--s-2);
+}
+.fc-tab {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 44px;
+  padding: 10px 12px 11px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-rest);
+  cursor: pointer;
+  transition:
+    border-color var(--d-fast) var(--ease),
+    box-shadow var(--d-fast) var(--ease),
+    background var(--d-fast) var(--ease);
+}
+.fc-tab:hover {
+  border-color: var(--text-3);
+}
+.fc-tab:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.fc-tab.is-active {
+  background: var(--blue-1);
+  border-color: var(--blue-7);
+  box-shadow: inset 0 0 0 1px var(--blue-7);
+}
+.fc-tab__top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.fc-tab__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fc-tab--act_now .fc-tab__dot {
+  background: var(--insight-9);
+}
+.fc-tab--start_capture .fc-tab__dot {
+  background: var(--insight-7);
+}
+.fc-tab--position_early .fc-tab__dot {
+  background: var(--insight-6);
+}
+.fc-tab--watch .fc-tab__dot {
+  background: var(--n-7);
+}
+.fc-tab__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+  white-space: nowrap;
+}
+.fc-tab__count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  line-height: 18px;
+  padding: 0 7px;
+  border-radius: var(--r-pill);
+  color: var(--text-3);
+  background: var(--bg-element);
+}
+.fc-tab.is-active .fc-tab__count {
+  background: var(--blue-3);
+  color: var(--blue-10);
+}
+.fc-tab__when {
+  margin-top: var(--s-1);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+}
+.fc-tab__advice {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-3);
+}
+
+/* ── Toolbar ── */
+
+/* The three views (the Opportunities tabs) and the buyer switch share one row, with
+   one rule under both. The search runs full width below it. */
+.fc-viewbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin-top: var(--s-3);
+  border-bottom: 1px solid var(--border-soft);
+}
+.fc-viewbar .opps-tabs {
+  margin: 0;
+  border-bottom: 0;
+}
+.fc-viewbar .fc-lanes {
+  margin-bottom: 6px;
+}
+/* The search, with Filters and Sort on its line (the Opportunities controls). */
+.fc-searchrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+}
+.fc-searchrow .fc-search {
+  flex: 1 1 320px;
+}
+.fc-search {
+  flex: 1 1 280px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 0 var(--s-3);
+  min-height: 38px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-3);
+}
+.fc-search:focus-within {
+  box-shadow: var(--ring-focus);
+}
+.fc-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.fc-lanes {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+.fc-lane {
+  appearance: none;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  padding: 0 var(--s-3);
+  min-height: 38px;
+  color: var(--text-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fc-lane:last-child {
+  border-right: 0;
+}
+.fc-lane.is-on {
+  background: var(--blue-1);
+  color: var(--blue-10);
+  font-weight: 600;
+}
+.fc-lane:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--blue-7);
+}
+
+/* ── Hunter's line and tab notes ── */
+.fc-hunter-line {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: var(--s-3) 0;
+  padding: var(--s-2) var(--s-3);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--n-10);
+}
+.fc-hunter-line__text {
+  min-width: 0;
+}
+.fc-tabnote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin-bottom: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  font-size: 13px;
+  color: var(--n-10);
+  background: var(--ai-1);
+  border-left: 2px solid var(--ai-7);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.fc-textlink {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue-7);
+  text-decoration: none;
+  cursor: pointer;
+}
+.fc-textlink:hover {
+  text-decoration: underline;
+}
+.fc-textlink:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: 2px;
+}
+
+/* ── List ── */
+.fc-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.fc-card .fc-card__title {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.fc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 14px;
+}
+.fc-empty p {
+  margin: 0;
+}
+
+/* ── Chips ── */
+.fc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.fc-chip--quiet {
+  background: var(--n-2);
+  color: var(--n-10);
+  border-color: var(--border);
+}
+
+/* The card's fit chip: the tier of her match row. Amber for a good fit, mauve
+   (`--warn-*` inside `.fc-shell`) for a possible fit, neutral for a weak fit. */
+.fc-fit--bid {
+  background: var(--ai-2);
+  color: var(--ai-9);
+  border-color: var(--ai-3);
+}
+.fc-fit--lean {
+  background: var(--warn-2);
+  color: var(--warn-9);
+  border-color: var(--warn-3);
+}
+.fc-fit--pass {
+  background: var(--n-2);
+  color: var(--n-10);
+  border-color: var(--border);
+}
+
+.fc-ourread {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 16px;
+  text-transform: uppercase;
+  vertical-align: 1px;
+  white-space: nowrap;
+  color: var(--ai-9);
+  background: var(--ai-1);
+  border: 1px solid var(--ai-3);
+  border-radius: 3px;
+}
+
+/* ── Held-back row ── */
+
+/* ── Forecast page ── */
+.fc-detail {
+  max-width: 980px;
+}
+
+.fc-quote {
+  margin: var(--s-3) 0 0;
+  padding: var(--s-2) var(--s-3);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-subtle);
+  border-left: 3px solid var(--n-6);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.fc-quote cite {
+  display: block;
+  margin-top: var(--s-1);
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.fc-evidence .fc-textlink {
+  margin-top: var(--s-2);
+}
+
+.fc-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  font-size: 13.5px;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+.fc-sources svg {
+  color: var(--text-3);
+}
+.fc-sources__meta {
+  flex: 1;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.fc-sources__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+}
+.fc-sources__links .fc-textlink {
+  margin-top: 0;
+}
+
+.fc-money {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════ Forecasts v5 — the forecast page (17 Sep 2026) ═══════════════
+   One job per box, one home per fact (Forecasts UI Proposal v5). The page mirrors the
+   Grant page on Opportunities and reuses its classes: .opp-sticky, .grant-canvas and
+   every .gt-* part, .evidence-divider and the Grant rail. What is here is only what a
+   forecast adds: the job card, the timeline with the time to prepare, a third path
+   tile with its reason, Still unknown, How to win it, the numbered Get ready plan and
+   the evidence cards.
+   Colour: amber marks Grant's work only; timing uses the insight family; status
+   colours mark path states; blue stays the one interactive colour. Tokens only. */
+
+.fc-detail-shell {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.fc-trackbtn.is-tracked {
+  background: var(--pos-2);
+  color: var(--pos-9);
+}
+/* 1 · The header title waits until the job card's title has scrolled away. */
+.fc-sticky__title {
+  transition: opacity var(--d-fast) var(--ease);
+}
+.fc-sticky__title.is-quiet {
+  opacity: 0;
+}
+
+/* ── 2 · The opportunity ── */
+.fc-job {
+  padding: var(--s-4) var(--s-5);
+  margin-bottom: var(--s-3);
+}
+.fc-job__title {
+  margin: 0 0 2px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--text-ink);
+}
+.fc-job__their {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.fc-job__summary {
+  margin: var(--s-3) 0 0;
+  max-width: 78ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.fc-job__facts {
+  --fc-facts: 4;
+  display: grid;
+  grid-template-columns: repeat(var(--fc-facts), minmax(0, 1fr));
+  margin: var(--s-4) 0 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.fc-job__fact {
+  min-width: 0;
+  padding: var(--s-3);
+  border-left: 1px solid var(--border);
+}
+.fc-job__fact:first-child {
+  border-left: 0;
+}
+.fc-job__fact dt {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.fc-job__fact dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-ink);
+  overflow-wrap: anywhere;
+}
+.fc-job__fact dd small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* ── 3 · Timeline ── */
+.fc-tl {
+  padding: var(--s-3) var(--s-5);
+  margin-bottom: var(--s-4);
+}
+.fc-tl__title {
+  margin: 0;
+}
+.fc-tl__track {
+  --fc-tl-n: 5;
+  --fc-tl-from: 0;
+  --fc-tl-to: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--fc-tl-n), minmax(0, 1fr));
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.fc-tl__track::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: calc(50% / var(--fc-tl-n));
+  right: calc(50% / var(--fc-tl-n));
+  height: 2px;
+  background: var(--n-4);
+}
+/* The time to prepare: a band from today to the likely bid request. */
+.fc-tl__track.has-band::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: calc((var(--fc-tl-from) + 0.5) * 100% / var(--fc-tl-n));
+  width: calc((var(--fc-tl-to) - var(--fc-tl-from)) * 100% / var(--fc-tl-n));
+  height: 4px;
+  border-radius: 2px;
+  background: var(--insight-6);
+}
+.fc-tl__mark {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 4px;
+  text-align: center;
+}
+.fc-tl__dot {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-ink);
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.fc-tl__mark--past .fc-tl__dot {
+  background: var(--n-6);
+}
+.fc-tl__mark--today .fc-tl__dot {
+  background: var(--surface);
+  box-shadow:
+    0 0 0 3px var(--surface),
+    inset 0 0 0 3px var(--text-ink);
+}
+.fc-tl__mark--window .fc-tl__dot {
+  width: 40px;
+  border-radius: 8px;
+  background: var(--insight-7);
+}
+.fc-tl__mark--unknown .fc-tl__dot {
+  box-sizing: border-box;
+  border: 2px dashed var(--n-8);
+  background: var(--surface);
+}
+.fc-tl__date {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-ink);
+}
+.fc-tl__mark--unknown .fc-tl__date {
+  color: var(--text-3);
+}
+.fc-tl__label {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+.fc-tl__mark--today .fc-tl__label {
+  font-weight: 600;
+  color: var(--insight-9);
+}
+.fc-tl__mark .fc-ourread {
+  margin: 2px 0 0;
+}
+
+/* ── 4 · Grant's call ── */
+/* Skip is grey, not red: a forecast Grant would not chase is not an error. */
+.grant-chip--skip {
+  background: var(--n-9);
+}
+.grant-chip--quiet {
+  background: var(--n-7);
+}
+.fc-conf__raise {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-2);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.fc-call__closed {
+  margin: var(--s-3) 0 0;
+  max-width: 78ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.fc-paths {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.fc-paths__note {
+  margin: var(--s-2) 0 0;
+  max-width: 78ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.fc-path {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fc-path__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+.fc-path__best {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--pos-2);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--pos-9);
+}
+.fc-path__plain {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.fc-path__state {
+  margin-top: 4px;
+}
+.fc-path--go .fc-path__state {
+  color: var(--pos-9);
+}
+.fc-path--no_go .fc-path__state {
+  color: var(--urg-8);
+}
+.fc-path--not_yet .fc-path__state {
+  color: var(--text-2);
+}
+.fc-path--not_needed .fc-path__state {
+  color: var(--text-3);
+}
+.fc-path.is-best {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--pos-7);
+}
+.fc-path__why {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+/* ── 5 and 6 · What works for you / What holds you back ── */
+.fc-cell__term {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.fc-cell__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.fc-src {
+  padding: 1px 6px;
+  border: 1px solid var(--border-soft);
+  border-radius: 3px;
+  background: var(--bg-subtle);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.fc-fix {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.fc-fix--yes {
+  background: var(--pos-2);
+  color: var(--pos-9);
+}
+
+.fc-fix__step {
+  font-size: 12px;
+}
+
+/* ── 7 · Still unknown: dashed and neutral, never red. A missing fact is not a weakness. */
+.fc-unknown {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border: 1.5px dashed var(--n-6);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+}
+.fc-unknown__title {
+  margin-bottom: var(--s-2);
+}
+.fc-unknown__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fc-unknown__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.fc-unknown__list li:last-child {
+  border-bottom: 0;
+}
+.fc-unknown__icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--n-8);
+}
+.fc-unknown__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.fc-unknown__label small {
+  display: block;
+  margin-top: 2px;
+  max-width: 90ch;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.fc-how {
+  flex: none;
+  margin-left: var(--s-2);
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  background: var(--bg-element);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-2);
+}
+.fc-how--watch {
+  background: var(--insight-2);
+  color: var(--insight-9);
+}
+
+/* ── 8 · How to win it: three labelled lines, each with its source. */
+.fc-win__rows {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  margin: 0;
+}
+.fc-win__row {
+  display: contents;
+}
+.fc-win__row dt,
+.fc-win__row dd {
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--border-soft);
+}
+.fc-win__row:first-child dt,
+.fc-win__row:first-child dd {
+  padding-top: 0;
+  border-top: 0;
+}
+.fc-win__row dt {
+  padding-top: calc(var(--s-3) + 3px);
+  padding-right: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.fc-win__row:first-child dt {
+  padding-top: 3px;
+}
+.fc-win__row dd {
+  margin: 0;
+  max-width: 90ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* A take row's basis and source: what each figure was counted over, and where from. */
+.fc-take-basis {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.fc-take-basis__src,
+.fc-take-basis__note {
+  font-style: italic;
+}
+
+/* ── Forecast source: who published it, and the one link to open it ── */
+.fc-origin {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-5);
+  margin: var(--s-4) 0 0;
+}
+.fc-origin__main {
+  flex: 1;
+  min-width: 0;
+}
+.fc-origin__title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.fc-origin__title svg {
+  color: var(--text-3);
+}
+.fc-origin__who {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.fc-origin__facts {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.fc-origin__note {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.fc-origin__open {
+  flex-shrink: 0;
+}
+/* The publisher's department forecast site, linked in the line and in the note. */
+.fc-origin__site {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.fc-origin__site svg {
+  vertical-align: -1px;
+}
+
+/* Still unknown's pointer to Track this; the answer Grant says back; the record's text. */
+.fc-unknown__track {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.fc-oq__given {
+  margin: 0 0 var(--s-2);
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.fc-quote--record p {
+  margin: 0 0 var(--s-2);
+}
+.fc-quote--record p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Documents in the record: listed, not linked, because the file links expire. */
+.fc-docs {
+  margin: 0 0 var(--s-4);
+}
+
+/* ── 9 · Get ready ── */
+.fc-plan {
+  padding: var(--s-4) var(--s-5);
+  margin: var(--s-4) 0 var(--s-5);
+}
+.fc-plan__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.fc-plan__title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.fc-plan__count {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.fc-phase {
+  margin-top: var(--s-4);
+}
+.fc-phase__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.fc-phase__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-ink);
+}
+.fc-phase__when {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.fc-phase__goal {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.fc-plan__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fc-step {
+  display: grid;
+  grid-template-columns: 22px 18px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+  scroll-margin: 96px;
+}
+.fc-step:last-child {
+  border-bottom: 0;
+}
+.fc-step:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+/* Start here: the first unfinished task, in the interactive blue family. */
+.fc-step.is-start {
+  margin: 0 calc(-1 * var(--s-3));
+  padding-left: var(--s-3);
+  padding-right: var(--s-3);
+  border-bottom-color: transparent;
+  border-radius: var(--r-md);
+  background: color-mix(in oklab, var(--blue-2) 45%, var(--surface));
+}
+.fc-step.is-flash {
+  animation: fc-step-flash 1.6s var(--ease);
+}
+@keyframes fc-step-flash {
+  from {
+    box-shadow: inset 0 0 0 2px var(--blue-7);
+  }
+  to {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-step.is-flash {
+    animation: none;
+    box-shadow: inset 0 0 0 2px var(--blue-7);
+  }
+}
+.fc-step__box {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  padding: 0;
+  border: 1.5px solid var(--n-7);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--n-0);
+  cursor: pointer;
+}
+.fc-step__box[aria-checked="true"] {
+  border-color: var(--pos-7);
+  background: var(--pos-7);
+}
+.fc-step__box:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.fc-step__auto {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 4px;
+  background: var(--insight-2);
+  color: var(--insight-9);
+}
+.fc-step__n {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: right;
+  color: var(--text-3);
+}
+.fc-step--if {
+  padding-left: var(--s-2);
+  padding-right: var(--s-2);
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--insight-2) 45%, transparent);
+}
+.fc-step--if .fc-step__n {
+  font-size: 10.5px;
+  text-transform: uppercase;
+}
+.fc-step__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.fc-step.is-done .fc-step__title {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+.fc-step__start {
+  display: inline-block;
+  margin-right: var(--s-2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--blue-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+  color: var(--blue-8);
+}
+.fc-step__body {
+  margin: 2px 0 0;
+  max-width: 80ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.fc-step__term {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.fc-step__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.fc-owner {
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  background: var(--bg-element);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.fc-owner--grant_help,
+.fc-owner--grant_drafts {
+  background: var(--ai-2);
+  color: var(--ai-10);
+}
+.fc-step__for {
+  font-size: 12px;
+  color: var(--text-3);
+}
+.fc-step__for b {
+  font-weight: 600;
+  color: var(--text-2);
+}
+.fc-step__action {
+  margin-top: 1px;
+  white-space: nowrap;
+}
+.fc-step__action.btn {
+  align-self: center;
+  margin-top: 0;
+}
+
+/* ── 10 to 12 · The details behind my read ── */
+.fc-evidence {
+  margin-top: var(--s-2);
+}
+.fc-ev__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--s-4);
+  margin-bottom: var(--s-4);
+}
+.fc-ev__grid.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+.fc-ev {
+  padding: var(--s-4);
+}
+.fc-ev__title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.fc-ev__title svg {
+  color: var(--text-3);
+}
+.fc-ev__line {
+  margin: 0 0 var(--s-2);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.fc-ev__note {
+  margin: 0 0 var(--s-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.fc-ev__term {
+  display: block;
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.fc-ev__docs {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fc-sources__checked::before {
+  content: " · ";
+}
+
+/* Grant's rail and intro: forecast additions only. */
+.fc-draft__body {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 12.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.fc-oq .gt-kicker {
+  margin-bottom: 4px;
+}
+.fc-meet {
+  margin-bottom: var(--s-4);
+}
+
+/* ── Forecasts list with Hunter's panel docked on the right, as on Opportunities ── */
+.fc-shell {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.fc-shell > .fc-page {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--s-8) var(--s-6) var(--s-12);
+}
+
+/* ── Rules the forecast pages need that the app's sheets do not have ──
+   The forecasts prototype built on its own Opportunities page. These are the
+   parts of that page the forecast list and page render and the app has no rule
+   for: the Sort control, the list wrapper, the drawer's pills and Clear link,
+   the chat message fade, and the done-for-you service window. Desktop only
+   (PRD P1). */
+
+/* The line under Hunter's reply that names the filters this list did not use. */
+.hunter-msg__filter-note {
+  margin: 4px 0 0;
+  max-width: 92%;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+/* Grant's forecast intro keeps the prototype's pill size. The Opportunities intro
+   has a bigger call to action; this one only dismisses the card (PRD B2). */
+.fc-meet .meet__opener--solo {
+  padding: 8px 13px;
+  font-size: 13px;
+  box-shadow: none;
+}
+.fc-meet .meet__opener--solo:hover {
+  box-shadow: none;
+}
+
+/* Grant's forecast chat keeps the prototype's thread: messages spaced by the
+   thread's gap alone, and the member's answers in a light bubble. */
+.fc-grant-dock .grant-msg {
+  margin-top: 0;
+}
+.fc-grant-dock .grant-msg--user {
+  display: block;
+  align-self: flex-end;
+  max-width: 85%;
+  background: var(--blue-1);
+  border: 1px solid var(--blue-2);
+  color: var(--text-ink);
+  border-radius: var(--r-md);
+  padding: var(--s-2) var(--s-3);
+}
+.fc-grant-dock .grant-msg--user p {
+  background: none;
+  color: inherit;
+  padding: 0;
+  max-width: none;
+  border-radius: 0;
+}
+
+/* The app sizes segmented options for phones everywhere. The forecasts drawer is
+   desktop only, and its five size options must fit, so they wrap at their text height. */
+.fc-filters .of-seg {
+  overflow-x: visible;
+}
+.fc-filters .of-seg__btn {
+  white-space: normal;
+  min-height: 0;
+}
+
+/* The sentence under the value range that says which forecasts it does not show. */
+.fc-filters__note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.fd-pillrow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fd-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fd-pill:hover {
+  border-color: color-mix(in oklab, var(--blue-7) 30%, var(--border));
+}
+.fd-pill.is-on {
+  background: color-mix(in oklab, var(--blue-7) 10%, var(--surface));
+  border-color: color-mix(in oklab, var(--blue-7) 40%, transparent);
+  color: var(--blue-9);
+}
+.fd-pill__count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+.fd-pill.is-on .fd-pill__count {
+  color: var(--blue-9);
+}
+
+.fd-foot__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--text-2);
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+.fd-foot__clear:hover {
+  color: var(--urg-9);
+  background: color-mix(in oklab, var(--urg-7) 8%, transparent);
+}
+
+.opps-summary__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 4px 10px;
+  background: var(--surface);
+  font-size: 12.5px;
+}
+.opps-summary__sort:hover {
+  border-color: var(--text-3);
+}
+.opps-summary__sort-label {
+  color: var(--text-2);
+  font-size: 12.5px;
+}
+.opps-summary__sort-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.opps-summary__sort select {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text-ink);
+  padding-right: 16px;
+  cursor: pointer;
+}
+.opps-summary__sort-chev {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  color: var(--text-3);
+}
+
+.opp-list {
+  transition: opacity 200ms var(--ease);
+}
+.opp-list__item {
+  position: relative;
+}
+
+.grant-msg--in {
+  animation: grant-msg-in 220ms var(--ease);
+}
+@keyframes grant-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grant-msg--in {
+    animation: none;
+  }
+}
+
+/* A failed mentor send, pinned to the bottom of the page as on small orders. */
+.fc-mentor-error {
+  position: fixed;
+  bottom: var(--s-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+/* What changed since you tracked it (the forecast watch). A New tag carries its word, so
+   the state never rests on colour alone. */
+.fc-detail-shell .fc-watch {
+  padding: var(--s-4) var(--s-5);
+  margin: var(--s-4) 0 0;
+}
+.fc-detail-shell .fc-watch__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin: 0 0 var(--s-3);
+}
+.fc-detail-shell .fc-watch__title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.fc-detail-shell .fc-watch__title svg {
+  color: var(--text-3);
+}
+.fc-detail-shell .fc-watch__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fc-detail-shell .fc-watch__item {
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--border-soft);
+}
+.fc-detail-shell .fc-watch__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.fc-detail-shell .fc-watch__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-1);
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.fc-detail-shell .fc-watch__tag {
+  padding: 0 var(--s-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.fc-detail-shell .fc-watch__tag.is-new {
+  border-color: var(--blue-7);
+  color: var(--blue-7);
+}
+.fc-detail-shell .fc-watch__text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.fc-detail-shell .fc-watch__basis {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.fc-detail-shell .fc-watch__open {
+  margin: var(--s-2) 0 0;
+}

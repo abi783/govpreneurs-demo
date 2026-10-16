@@ -1,0 +1,1068 @@
+/* Shared styling for the public /tools/* surface. Built on the app's existing
+   tokens/components — this file only adds patterns that don't already have a
+   home in components.css (nav chips, the landing "receipt" line, tool-page
+   skeletons, and small layout knobs specific to this surface). */
+
+.tool-mono {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-feature-settings: "tnum" 1;
+}
+
+/* ── Base type scale for tool pages ─────────────────────── */
+.tool-shell {
+  font-size: 16px;
+  overflow-x: hidden; /* guard; real fixes are the layout rules below */
+}
+@media (min-width: 1280px) {
+  .tool-shell {
+    font-size: 17px;
+  }
+}
+.tool-shell input,
+.tool-shell button,
+.tool-shell .option-card,
+.tool-shell select {
+  font-size: max(15px, 1em);
+}
+
+/* ── Page title ──────────────────────────────────────────── */
+.tool-page-title {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-ink);
+  text-wrap: balance;
+}
+
+/* ── Canvas: header/footer inner row + main content ─────── */
+/* Explicit gutters rather than a pure clamp() so the three named
+   breakpoints (phone/tablet/desktop) are easy to reason about and can't
+   drift to 0 at some width nobody tested. */
+.tool-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+@media (min-width: 640px) {
+  .tool-container {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+@media (min-width: 1024px) {
+  .tool-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* ── Two-column tool layout: main + sticky rail ─────────── */
+.tool-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-8);
+}
+.tool-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 720px;
+}
+.tool-rail {
+  flex: 0 0 320px;
+  width: 320px;
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+@media (max-width: 959px) {
+  .tool-layout {
+    flex-direction: column;
+  }
+  .tool-main {
+    max-width: none;
+    width: 100%;
+  }
+  .tool-rail {
+    position: static;
+    width: 100%;
+    flex: none;
+  }
+}
+
+/* ── Header shell: one sticky 64px row (desktop), two rows ≤1024px ──
+   Apple/Stripe-restraint pass: a single white sticky bar with a blur
+   backdrop and a hairline bottom border. The thin brand gradient stripe
+   (`.brand-stripe`, rendered by ToolShell just above <header>) stays as
+   the only color accent — everything else in the bar is text or one
+   bordered button. */
+.tool-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.tool-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  height: 64px;
+}
+
+/* ── Brand lockup: logo + quiet "Tools" wordmark suffix ─────────── */
+.tool-brand-lockup {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.tool-brand-lockup__logo {
+  display: block;
+  height: 24px;
+  width: auto;
+  align-self: center;
+}
+.tool-brand-lockup__suffix {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--n-8);
+  white-space: nowrap;
+}
+
+/* ── Desktop plain-text nav: only the active link has any fill ──── */
+.tool-nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.tool-nav-link {
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--n-9);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+}
+.tool-nav-link:hover {
+  color: var(--text-ink);
+}
+.tool-nav-link:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-nav-link.active {
+  background: var(--blue-1);
+  color: var(--blue-9);
+  font-weight: 600;
+}
+/* Below 1024px the plain-text row can't fit without wrapping or clipping,
+   so it moves to the scrollable tab strip (row 2) instead. */
+@media (max-width: 1024px) {
+  .tool-nav-desktop {
+    display: none;
+  }
+}
+
+.tool-header-account {
+  flex-shrink: 0;
+  margin-left: var(--s-5); /* 24px — never touches the nav even when it's tight */
+}
+
+/* Two class hops so this beats `.tool-shell button` (0,1,1), which would
+   otherwise push the header button to 17px in a 28px box. Sized to sit
+   level with the 14px nav links. */
+.tool-header-account .tool-signin-btn {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 7px 12px;
+  gap: 8px;
+  line-height: 1.2;
+}
+.tool-header-account .tool-signin-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Signed-in account pill + dropdown ───────────────────────────── */
+.tool-account-placeholder {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+.tool-account {
+  flex-shrink: 0;
+}
+.tool-account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 36px;
+  padding: 0 10px 0 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease), border-color var(--d-fast) var(--ease);
+}
+.tool-account-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--n-7);
+}
+.tool-account-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  background: var(--blue-1);
+  color: var(--blue-11);
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.tool-account-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--n-9);
+  white-space: nowrap;
+}
+.tool-account-chevron {
+  color: var(--n-8);
+  flex-shrink: 0;
+}
+@media (max-width: 1280px) {
+  .tool-account-name {
+    display: none;
+  }
+  .tool-account-btn {
+    padding: 0 8px 0 6px;
+  }
+}
+
+.tool-account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sheet);
+  padding: 6px;
+  z-index: 30;
+  animation: tool-account-menu-in var(--d-fast) var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-account-menu {
+    animation: none;
+  }
+}
+@keyframes tool-account-menu-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tool-account-menu__header {
+  padding: 6px 10px 8px;
+}
+.tool-account-menu__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tool-account-menu__email {
+  font-size: 12px;
+  color: var(--n-8);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tool-account-menu__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+/* Two class hops so this beats `.tool-shell button` (0,1,1) for the
+   <button> item; otherwise "Sign out" renders at the shell's 17px. */
+.tool-account-menu .tool-account-menu__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: none;
+  background: none;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+}
+.tool-account-menu__item:hover {
+  background: var(--bg-subtle);
+}
+.tool-account-menu__item:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+
+/* ── Mobile/tablet tab strip: row 2, horizontally scrollable ─────── */
+.tool-nav-strip {
+  display: none;
+}
+@media (max-width: 1024px) {
+  .tool-nav-strip {
+    display: flex;
+    gap: var(--s-1);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 clamp(16px, 4vw, 32px) var(--s-2);
+    /* Right-edge fade signals there's more to scroll. */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+  }
+  .tool-nav-strip::-webkit-scrollbar {
+    display: none;
+  }
+}
+.tool-nav-strip__item {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+}
+.tool-nav-tab {
+  display: block;
+  padding: 6px 4px 8px;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--n-9);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tool-nav-tab:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-nav-tab.active {
+  border-bottom-color: var(--blue-7);
+  color: var(--text-ink);
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-nav-strip {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── Google sign-in: official GIS button or the same-shaped fallback ── */
+.tool-google-slot {
+  display: flex;
+  justify-content: stretch;
+}
+.tool-google-gsi {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+}
+.tool-google-btn {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  padding: 0 var(--s-4);
+  border: 1px solid var(--n-5);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--d-fast) var(--ease), background var(--d-fast) var(--ease);
+}
+.tool-google-btn:hover {
+  border-color: var(--n-7);
+  background: var(--n-1);
+}
+.tool-google-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-or-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  color: var(--n-8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tool-or-divider::before,
+.tool-or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Snapshot heading + PDF button ──────────────────────── */
+.tool-snapshot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+@media (max-width: 480px) {
+  .tool-snapshot-head > .btn {
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+}
+
+/* ── Landing hero band + receipt line ───────────────────── */
+.tool-band {
+  background: var(--n-2);
+  border-bottom: 1px solid var(--border);
+  /* Full-bleed regardless of an ancestor's max-width container. */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+.tool-hero-title {
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  color: var(--text-ink);
+  text-wrap: balance;
+}
+.tool-receipt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.6em;
+  color: var(--n-9);
+}
+.tool-receipt .sep {
+  color: var(--n-6);
+}
+
+/* ── Landing "receipt" as figure tiles ──────────────────── */
+.figure-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-4);
+}
+@media (max-width: 640px) {
+  .figure-tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.figure-tile__value {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  color: var(--text-ink);
+  font-feature-settings: "tnum" 1;
+}
+.figure-tile__label {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+
+/* ── Skeletons (shimmer, matches .grant-skel) ──────────── */
+.tool-skel {
+  display: inline-block;
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--n-3) 25%, var(--n-2) 37%, var(--n-3) 63%);
+  background-size: 400% 100%;
+  animation: tool-shimmer 1.4s ease infinite;
+}
+@keyframes tool-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-skel {
+    animation: none;
+  }
+}
+
+/* ── Tool landing cards: 3/2/1 responsive grid, equal height ────── */
+.tool-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-4);
+  align-items: stretch;
+}
+@media (max-width: 960px) {
+  .tool-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .tool-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.tool-card-grid > a {
+  height: 100%;
+}
+.tool-card-grid .ui-card {
+  height: 100%;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--d-fast) var(--ease), border-color var(--d-fast) var(--ease);
+}
+.tool-card-grid a:hover .ui-card {
+  transform: translateY(-1px);
+  border-color: var(--n-7);
+}
+
+/* ── Option cards (scorecard, big-tap-target choices) ───── */
+.option-card-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+@media (min-width: 560px) {
+  .option-card-group {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+.option-card {
+  flex: 1 1 auto;
+  min-width: 140px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--n-5);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--d-fast) var(--ease), background var(--d-fast) var(--ease),
+    box-shadow var(--d-fast) var(--ease);
+}
+.option-card:hover {
+  border-color: var(--blue-6);
+  background: var(--blue-1);
+}
+.option-card:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.option-card[aria-checked="true"] {
+  border-color: var(--blue-7);
+  background: var(--blue-2);
+  color: var(--blue-11);
+  box-shadow: inset 0 0 0 1px var(--blue-7);
+}
+@media (max-width: 559px) {
+  .option-card {
+    width: 100%;
+  }
+}
+
+/* ── Progress bar shared by the ported checklists ───────── */
+.tool-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--n-3);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.tool-progress-fill {
+  height: 100%;
+  background: var(--blue-7);
+  border-radius: var(--r-pill);
+  transition: width var(--d-base) var(--ease);
+}
+.tool-progress-fill.complete {
+  background: var(--pos-7);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-progress-fill {
+    transition: none;
+  }
+}
+
+/* ── Scorecard question rail (mirrors the registration-checklist rail) ── */
+.tool-q-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 32px;
+}
+.tool-q-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--blue-9);
+}
+.tool-q-num.done {
+  background: var(--blue-7);
+  border-color: var(--blue-7);
+  color: var(--n-0);
+}
+.tool-q-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+  margin: 6px 0;
+  border-radius: 2px;
+  min-height: 12px;
+}
+
+/* ── Sticky answered-count progress ─────────────────────── */
+.tool-sticky-progress {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-rest);
+}
+
+/* ── Scorecard verdict color band: 10% tint + colored left rule ──── */
+.tool-verdict-band {
+  border-radius: var(--r-lg);
+  padding: var(--s-6);
+  border-left: 4px solid transparent;
+}
+.tool-verdict-band.red {
+  background: color-mix(in srgb, var(--urg-7) 10%, var(--surface));
+  border-left-color: var(--urg-7);
+}
+.tool-verdict-band.red .t-label,
+.tool-verdict-band.red .tool-page-title {
+  color: var(--urg-9);
+}
+.tool-verdict-band.yellow {
+  background: color-mix(in srgb, var(--warn-7) 10%, var(--surface));
+  border-left-color: var(--warn-7);
+}
+.tool-verdict-band.yellow .t-label,
+.tool-verdict-band.yellow .tool-page-title {
+  color: var(--warn-9);
+}
+.tool-verdict-band.green {
+  background: color-mix(in srgb, var(--pos-7) 10%, var(--surface));
+  border-left-color: var(--pos-7);
+}
+.tool-verdict-band.green .t-label,
+.tool-verdict-band.green .tool-page-title {
+  color: var(--pos-9);
+}
+
+/* ── Set-aside inline progress bar (StatBreakdown) ──────── */
+.tool-inline-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--n-3);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.tool-inline-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--blue-7);
+  border-radius: var(--r-pill);
+}
+
+/* OTP boxes: shrink to fit six 44px boxes + gaps on very narrow screens. */
+.tools-otp {
+  max-width: 100%;
+}
+@media (max-width: 360px) {
+  .tools-otp > div {
+    gap: var(--s-1) !important;
+  }
+  .tools-otp > div > div {
+    width: 38px !important;
+    height: 46px !important;
+    font-size: 17px !important;
+  }
+}
+
+/* ── NAICS search results: table-like row list ─────────── */
+.tool-naics-row + .tool-naics-row {
+  border-top: 1px solid var(--border);
+}
+.tool-naics-row__btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 72px 1fr auto auto auto;
+  align-items: baseline;
+  gap: var(--s-3);
+  text-align: left;
+  padding: var(--s-3) var(--s-2);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: background var(--d-fast) var(--ease);
+}
+.tool-naics-row__btn:hover {
+  background: var(--bg-subtle);
+}
+.tool-naics-row__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-naics-row__code {
+  color: var(--n-8);
+  font-size: 12.5px;
+}
+.tool-naics-row__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.tool-naics-row__figure {
+  text-align: right;
+  color: var(--n-8);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  /* The desktop 5-col grid (code | title | $ | awards | median) relies on
+     column position to tell the three figures apart — collapsing that to one
+     stacked column (the old rule) left three bare numbers with no way to
+     tell which was which. Switch to flex-wrap: code and title each force a
+     line break (full-width flex-basis), then the three figures wrap onto
+     their own line together, so position still groups them even without
+     room for 5 columns. */
+  .tool-naics-row__btn {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 6px;
+    row-gap: 2px;
+  }
+  .tool-naics-row__code {
+    flex: 1 0 100%;
+  }
+  .tool-naics-row__title {
+    flex: 1 0 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .tool-naics-row__figure {
+    text-align: left;
+  }
+  .tool-naics-row__figure + .tool-naics-row__figure::before {
+    content: "·";
+    margin-right: 6px;
+    color: var(--n-6);
+  }
+}
+
+@media (max-width: 759px) {
+  .tool-breakdown-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.tool-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-4);
+}
+.tool-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+@media (max-width: 640px) {
+  .tool-hz-map {
+    height: 320px !important;
+  }
+  .tool-footer-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tool-footer-brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-1);
+  }
+}
+
+/* ── Search row: input + button, both 52px tall ─────────── */
+.tool-search-row {
+  display: flex;
+  gap: var(--s-2);
+}
+.tool-search-row .ui-input,
+.tool-search-row .ui-input-wrap,
+.tool-search-row .btn {
+  height: 52px;
+  font-size: 15px;
+}
+.tool-search-row .ui-input {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .tool-search-row {
+    flex-direction: column;
+  }
+  .tool-search-row .btn {
+    width: 100%;
+  }
+}
+
+/* ── Sign-in modal: bottom sheet on mobile ──────────────── */
+@media (max-width: 640px) {
+  .tools-sign-in-modal.ui-modal-content {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+/* ── Sticky bottom action bar (scorecard, mobile) ───────── */
+.tool-sticky-cta {
+  display: none;
+}
+@media (max-width: 640px) {
+  .tool-cta-inline {
+    display: none;
+  }
+  .tool-sticky-cta {
+    display: block;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: var(--s-4) -24px 0;
+    padding: var(--s-3) 24px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px -8px rgba(15, 23, 42, 0.15);
+    z-index: 10;
+  }
+  .tool-sticky-cta .btn {
+    width: 100%;
+  }
+}
+
+/* ── Snapshot teaser: ribbon, locked stack, unlock toast ─── */
+.tool-teaser-ribbon {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+  color: var(--blue-11);
+  font-weight: 600;
+}
+
+.tool-locked-stack {
+  position: relative;
+}
+.tool-locked-stack__hit {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: var(--r-md);
+}
+.tool-locked-stack__hit:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+
+/* ── Focusable chip (demand's "not the right trade?" alternates) ── */
+/* The base .ui-chip is a fixed-height (22px), white-space:nowrap pill — fine
+   for short labels, but a full NAICS title ("238190 · Other Foundation,
+   Structure, and Building Exterior Contractors") is long enough to run past
+   the pill's edge at both mobile and desktop widths instead of wrapping.
+   Let this specific chip grow: wrap its own text and let the pill's height
+   follow, while the parent flex row still wraps chips onto new lines. */
+.ui-chip.tool-focusable-chip {
+  height: auto;
+  min-height: 22px;
+  white-space: normal;
+  text-align: left;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.tool-focusable-chip:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.tool-locked-stack__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  filter: blur(3px);
+  user-select: none;
+  /* A peek, not a page: the gate sits above this, so cap the blurred stack. */
+  max-height: 360px;
+  overflow: hidden;
+}
+.tool-locked-stack__fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 92%);
+  pointer-events: none;
+}
+.tool-locked-stack__badge {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s-4);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--n-5);
+  box-shadow: var(--sh-rest);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-ink);
+  white-space: nowrap;
+}
+
+.tool-unlocked-toast {
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--pos-7) 12%, var(--surface));
+  color: var(--pos-9);
+  font-weight: 600;
+}
+
+/* ── CapStatement preview: scale to fit on mobile ───────── */
+.cs-preview-scale-wrap {
+  overflow: auto;
+  width: 100%;
+}
+@media (max-width: 720px) {
+  .cs-preview-scale-wrap {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* ── Industry browser (NAICS page "browse by industry") ──── */
+.tool-industry-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-3);
+}
+@media (min-width: 600px) {
+  .tool-industry-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 960px) {
+  .tool-industry-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.tool-industry-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  text-align: left;
+  justify-content: flex-start;
+  min-height: 0;
+  font-weight: 400;
+}
+
+.tool-industry-row {
+  width: 100%;
+  text-align: left;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--d-fast) var(--ease), background var(--d-fast) var(--ease);
+}
+.tool-industry-row:hover {
+  border-color: var(--blue-6);
+  background: var(--blue-1);
+}
+.tool-industry-row:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}

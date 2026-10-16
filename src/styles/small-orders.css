@@ -1,0 +1,3989 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MICRO PURCHASES — "Small orders" over DLA DIBBS.
+   Tokens only, per the doctrine at the top of this file.
+   Phone first: audited at 390px before 1440px.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* The 680px cap is the measure and it stays. What was missing is the centring:
+   at 1440px the column sat hard against the sidebar with ~870px of empty ground
+   to its right, so the desktop view read as the phone view stretched and pushed
+   left. `margin-inline: auto` is what every other capped column in this file
+   already does (.sr-page, .cs-shell-inner, .bp-shell-inner) — the pattern
+   existed, this surface just had not used it. */
+.mp-page {
+  /* `width: 100%` is load-bearing, not belt-and-braces. The parent is a flex
+     container, so without it this column sizes to its CONTENT and `max-width`
+     only ever caps it. Measured at 1440x900: every route rendered 680px wide at
+     left 505 except /micro-purchases/wins, whose empty state is narrow enough
+     to expose it — 479px wide at left 606, so walking from the board to
+     "Orders you won" narrowed the page by 201px and jumped it 101px right.
+     Invisible at 390px, where the max-width never binds, which is why a
+     phone-first pass cannot find it. */
+  width: 100%;
+  /* 680px WAS A READING MEASURE ON A SURFACE THAT IS NOT PROSE.
+     The board is a comparison table: a name, a figure and a deadline that only
+     do their job when five of them line up in columns she can run her eye down.
+     At 680 those columns were 160px each on a 2000px display, so the row was
+     squeezed into a fifth of the screen and the other four fifths were empty —
+     the layout was fighting for width it had already been given.
+     THE PROSE TAKES THE WIDTH TOO. The first pass capped the lede, the panel's
+     scope line, its warning and the sample banner at a 68ch measure, on the
+     usual argument that a long line is harder to track back from. Rejected on
+     review, and the reason is worth keeping: a paragraph set to 500px inside a
+     1100px page does not read as a considered measure, it reads as a column
+     that failed to fill — the same "why is this crunched up" the page-width cap
+     itself produced, one level down. One decision about width, applied once.
+     `.mp-detail` is the exception and keeps a 760px cap: the order page is a
+     page of sentences and a decision she commits to, not a table. */
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-bottom: var(--s-8);
+}
+/* The order page took a 760px measure while it was a single column of prose.
+   The design it is being rebuilt to is two columns — the read on the left, the
+   quote and the contract terms on the right — and the header strip spans both,
+   so the cap moves up to the board's. Sentence-length measure is now the job of
+   the columns inside it rather than of the page. */
+.mp-detail {
+  max-width: 1120px;
+}
+.mp-header {
+  margin-bottom: var(--s-5);
+}
+/* No second measure. `.mp-page` is already capped at 680px, and a 46ch cap
+   inside it (~350px) wrapped the first paragraph of the page three times while
+   every card below ran the full column — one page, two measures, and the
+   difference is only visible on a wide screen where nothing explains it.
+   The column is the measure; below 680px this rule never applied anyway. */
+.mp-header__lede {
+  margin-top: var(--s-2);
+  color: var(--n-9);
+}
+/* Acronym rule: official term small, underneath, never the headline. */
+.mp-header__term {
+  margin-top: var(--s-2);
+  font-size: 12px;
+  color: var(--n-8);
+  letter-spacing: 0.01em;
+}
+/* THE BOX HEADING, taken from Grant's `.gt-kicker--rule` so the two features
+   label a card the same way. Uppercase with POSITIVE tracking — negative
+   tracking is for lowercase shapes and jams capitals together — and a 2px rule
+   in the same ink as the words, so heading and underline read as one mark
+   rather than as a heading above a divider.
+   `width: fit-content` is the whole trick: the element stays a block, so it
+   still owns its line, but the rule stops at the end of the words instead of
+   running the width of the card. A rule that spans the box is a section
+   divider, and these are labels.
+   SHOUTED, AND THAT IS A DECISION RATHER THAN A STYLESHEET HABIT. It is
+   registered in the EYEBROWS allowlist in
+   `src/lib/microPurchases/stylesheet.test.ts`, which exists so a copy reviewer
+   reading TSX can find out that a string is set in capitals — see the note
+   there for the argument. */
+.mp-h2 {
+  width: fit-content;
+  max-width: 100%;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  color: var(--text-ink);
+  padding-bottom: 4px;
+  margin: 0 0 var(--s-3);
+  border-bottom: 2px solid var(--text-ink);
+}
+
+.mp-send__waiting {
+  margin: var(--s-2) 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.mp-source__hint {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* `.mp-wins`, `.mp-wins .mp-h2`, `.mp-wins__list`, `.mp-wins__list li` and
+   `.mp-wins__none` — a "who has won this before" section — were defined here
+   and rendered by no .tsx in the repo. The award history that survived is drawn
+   by `.mp-hist__*`. Deleted; see the dead-selector sweep in
+   `src/lib/microPurchases/stylesheet.test.ts`, which fails on any .mp-* rule
+   with no element behind it. */
+
+/* The set-aside notice used to be its own block here — `.mp-setaside` and its
+   `__text` / `__term` parts. It now renders as `.mp-verdict__term`, the same
+   line "Acquisition code · 1B" and "One-year contract · AIDC" use, so the
+   government facts about one order read as one list instead of one list and a
+   framed box. The rules went with the markup. */
+
+.mp-deadend {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--n-2);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.mp-hunter__who {
+  margin: 0;
+}
+/* ── WHAT TO DO WITH A PAGE OF NOs ──
+   The three questions every group leaves behind, gathered once at the foot. A
+   card like the groups above it and on the same white ground, so it reads as the
+   last block of the page rather than as a banner bolted to the bottom.
+   Three columns from 720px, one below — these are three separate questions and
+   stacking them on a phone is right; side by side they would be 100px wide. */
+.mp-next {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-next__mark {
+  flex: none;
+  margin-top: 2px;
+  color: var(--n-7);
+}
+.mp-next__body {
+  flex: 1;
+  min-width: 0;
+}
+.mp-next__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4) 0;
+}
+@media (min-width: 720px) {
+  .mp-next__cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  /* A rule between the questions, once they are side by side. Three answers in
+     three columns with only whitespace between them read as one paragraph in
+     three pieces — the line is what says they are separate questions.
+     `:not(:first-child)`, not `:nth-child(2), :nth-child(3)`: a fourth question
+     rules itself without anyone remembering to add a selector. And only inside
+     this query — stacked on a phone the columns are one above another, where a
+     left border would draw a stripe down the side of nothing. */
+  .mp-next__cols > div + div {
+    padding-left: var(--s-5);
+    border-left: 1px solid var(--border);
+  }
+}
+.mp-next__h {
+  margin: 0 0 var(--s-1);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--n-12);
+}
+.mp-next__cols p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+/* The one control on this card: a button to the Mentors page. */
+.mp-next__ask {
+  margin-top: var(--s-2);
+}
+
+/* ── A REASON GROUP on "Ones not open to you" ──
+   A white card per reason, like every other box on this feature. The refusal
+   is carried by a badge and a count, not by tinting the card: four tinted cards
+   would have undone the one-ground rule this feature was just brought into line
+   with, and a 28px badge says the same thing. */
+.mp-grp {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-grp__head {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+}
+/* THE ROUTE, AS A COLOUR. Blue where a form exists, amber where the rule has
+   not been read, red where DLA is not taking new sellers at all — the three
+   things that can be done about a refusal, readable before the heading is.
+   --blue-9 and not --blue-7: the interactive accent belongs to controls, and
+   this is a mark on a number. */
+.mp-grp__n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 650;
+}
+.mp-grp__n--sar {
+  background: var(--blue-2);
+  color: var(--blue-9);
+}
+.mp-grp__n--unknown {
+  background: var(--ai-2);
+  color: var(--ai-9);
+}
+/* Limited competition: DLA is asking, but only the sellers it already has. Not
+   blue — blue is the badge for the tier with a form, and this tier has none. */
+.mp-grp__n--approved {
+  background: var(--ai-2);
+  color: var(--ai-9);
+}
+/* Limited competition again, and this one names a route: a qualified products
+   list. Not blue either — blue is the badge for the Source Approval Request,
+   and the whole point of this tier is that it is NOT that form. Not red: the
+   route is real, it just runs past this order's closing date. */
+.mp-grp__n--qpl {
+  background: var(--ai-2);
+  color: var(--ai-9);
+}
+.mp-grp__n--none {
+  background: var(--urg-2);
+  color: var(--urg-8);
+}
+.mp-grp__id {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+/* `.mp-grp__h` is gone: the group heading takes the shared `.mp-h2` box heading
+   like every other card on this feature. Only the bottom margin is dropped —
+   `.mp-h2` carries one for a heading that stands above its card, and this one
+   shares a flex row with the count chip. */
+.mp-grp__id .mp-h2 {
+  margin-bottom: 0;
+}
+.mp-grp__count {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--n-2);
+  color: var(--n-9);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mp-grp__body {
+  margin: var(--s-2) 0 0;
+  max-width: 68ch;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+/* The parts in the group, as a wrapping row of cards rather than a stack. They
+   are here to say what KIND of thing is in the group — she is not choosing one,
+   she cannot bid any of them — so they read across, not down. */
+.mp-grp__rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}
+/* The same shape as the board's offer row: a category mark, then the words. */
+.mp-grp__rows .mp-card--locked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s-3);
+  align-items: start;
+  min-height: 0;
+  padding: var(--s-3);
+}
+/* A link, not a card. It reveals the rest of this group in place, so it takes
+   the quiet treatment rather than competing with the parts it is counting. */
+.mp-grp__more {
+  align-self: center;
+  justify-self: start;
+  padding: var(--s-2) var(--s-3);
+  border: 1px dashed var(--n-6);
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--n-9);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mp-grp__more:hover {
+  border-color: var(--n-7);
+  color: var(--n-11);
+}
+
+/* THE STATS BAR on "Ones not open to you": who is speaking on the left, the two
+   figures that answer "am I seeing everything?" in the middle, and whose rule it
+   is on the right. Wraps to a stack below 720px — three groups of content cannot
+   share a phone line, and the figures are the half that must not shrink. */
+.mp-hunter--stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-5);
+}
+.mp-hunter--stats .mp-hunter__say {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex: 1 1 20rem;
+  min-width: 0;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+/* `.ai-attr` ships at 11.5px in the AI accent — right for a byline under a
+   paragraph, wrong beside a 48px portrait, where it is the name of whoever is
+   talking. Same step-up the board's panel head and ledger make. */
+.mp-hunter--stats .ai-attr {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-12);
+}
+.mp-hunter--stats .mp-hunter__note {
+  margin-top: 2px;
+}
+/* The figures read as figures: a large mono number over the noun it counts,
+   which is the same shape the board's money column uses. Divided by a hairline
+   rather than boxed, so they read as two halves of one answer. */
+.mp-hunter__stats {
+  display: flex;
+  margin: 0;
+  flex: none;
+}
+.mp-hunter__stats > div {
+  padding: 0 var(--s-5);
+  border-left: 1px solid var(--ai-3);
+  max-width: 11rem;
+}
+.mp-hunter__stats dt {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.1;
+  color: var(--n-12);
+}
+.mp-hunter__stats dd {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--n-9);
+}
+/* A statement of provenance, not a control: no pointer, no hover, no href. It
+   is a chip in shape only, and it says so by never lighting up. */
+.mp-hunter__basis {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex: none;
+  max-width: 12rem;
+  margin: 0;
+  padding: var(--s-3);
+  border-radius: var(--r-md);
+  background: color-mix(in oklab, var(--n-0) 62%, transparent);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--n-10);
+}
+.mp-hunter__basis > svg {
+  flex: none;
+  color: var(--ai-8);
+}
+/* ─── What DLA has paid before ───
+   Section shell copied from .mp-source / .mp-cash rather than invented: the
+   house convention on this page is --s-4 padding, --border, --r-lg, --surface.
+   No new primitive — the §8a audit found the system already had this. */
+.mp-awards {
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-awards__head {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--n-11);
+}
+.mp-awards__body {
+  margin: var(--s-2) 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--n-10);
+}
+.mp-awards__list {
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-awards__list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+.mp-awards__when {
+  font-size: 13.5px;
+  color: var(--n-9);
+}
+/* Tabular figures so the column of prices lines up on the decimal. */
+.mp-awards__price {
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--n-11);
+}
+.mp-awards__more {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* ─── Hunter ─── */
+.mp-hunter {
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+}
+.mp-hunter__line {
+  margin: var(--s-2) 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--n-11);
+}
+/* The board-level attribution for AI-written item names. Quieter than Hunter's
+   line: it is a standing note about how the board is built, not today's news. */
+.mp-hunter__note {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* First run had its own layout — one Hunter line and one button over an empty
+   board — and the wall it styled is gone. She lands on the real board now, so
+   there is no first-run screen to lay out. Deleted rather than left behind:
+   a rule with no element is what the dead-selector gate exists to catch. */
+
+/* ─── Prerequisite gate: ONE line until tapped ─── */
+/* THE ONBOARDING CARD — the one amber surface on this feature that is not
+   Hunter's, and the exception is deliberate and narrow.
+   The design system reserves --ai-* for AI-authored output, and the rule is
+   about ATTRIBUTION: amber says "a machine produced this, check it". Nothing in
+   this card is machine-produced — every row is a registration she performs on a
+   government website — so the tint is doing a second job the system had not
+   needed yet: this is the one block on the page that is about HER and not about
+   the orders, and it has to be told apart from the board at a glance, on a
+   phone, before she has read a word. It carries no `.ai-surface` class and no
+   `.ai-attr` chip, and those two are what mark a machine-authored surface, so
+   nothing here can be mistaken for Hunter speaking. NO GATE HOLDS THAT: this
+   repo has no amber-attribution sweep, so the rule is kept by hand.
+   `src/lib/microPurchases/stylesheet.test.ts` reads this stylesheet, but it
+   sweeps dead selectors and shouted text and rules on no tint.
+   Ink is --ai-8, not the --ai-6 the design draws: #e19345 on white is 2.5:1 and
+   the numeral inside the ring is the one glyph in the card that has to be READ.
+   The ring keeps the brighter step, because a ring is a shape. */
+.mp-prereq {
+  border: 1px solid var(--ai-3);
+  border-radius: var(--r-lg);
+  background: var(--ai-1);
+  margin-bottom: var(--s-4);
+}
+.mp-prereq > summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+.mp-prereq > summary::-webkit-details-marker {
+  display: none;
+}
+.mp-prereq__mark {
+  flex: none;
+  color: var(--ai-6);
+}
+/* The header is the first line on the page and reads as one: 19px/700, the
+   weight the board's own h1 sets, rather than the 14px chrome label this was.
+   A count she has to hunt for is a count she does not act on. */
+.mp-prereq__count {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--n-12);
+}
+/* Below the count on a phone, beside it once there is width. It never hides:
+   it is the sentence that says the board still works, and a phone is the screen
+   where giving up is one thumb away. `order` rather than a second element, so
+   there is one copy of the string. */
+.mp-prereq__gate {
+  flex: 1 0 100%;
+  order: 2;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--n-9);
+}
+.mp-prereq__caret {
+  order: 1;
+  margin-left: auto;
+  flex: none;
+  color: var(--n-11);
+  transition: transform var(--d-fast) var(--ease);
+}
+@media (min-width: 720px) {
+  .mp-prereq__gate {
+    flex: 0 1 auto;
+    order: 0;
+    margin-left: auto;
+    text-align: right;
+  }
+  .mp-prereq__caret {
+    margin-left: 0;
+  }
+}
+.mp-prereq[open] .mp-prereq__caret {
+  transform: rotate(180deg);
+}
+.mp-prereq__list {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--s-4) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+/* Each step is its own white card on the tint. They were separated by a 1px
+   top border at the same weight as the border around the block, so the block
+   read as one surface ruled into quarters — and every one of those quarters is
+   a separate errand, on a separate government website, taking a separate number
+   of weeks. Four cards say four things, which is what she has four of.
+   Three columns: the ring, the words, and the control. The control used to sit
+   UNDER the words, which put the only thing to tap on the row below the row. */
+.mp-prereq__step {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: var(--s-2) var(--s-4);
+  align-items: center;
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+/* THE STEP'S CONTROLS, in one cell. There are two of them now — a link to the
+   government site where the errand is done, and the tick that records it — and
+   `.mp-prereq__step > .btn` could only ever place one, so a second control in
+   that column would have landed on top of the first. Wrapping them also means
+   they wrap TOGETHER at the end of the row rather than one dropping below the
+   other. */
+.mp-prereq__acts {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+/* Dashed while it is outstanding, solid once it is done — the ring itself
+   carries the state, so the number is legible as "not yet" without reading the
+   control beside it. --font-ui, not mono: it is a step number, not a figure,
+   and the mono face was the only thing on the card set in it. */
+.mp-prereq__num {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 650;
+  border: 2px dashed var(--ai-5);
+  background: transparent;
+  color: var(--ai-8);
+}
+.mp-prereq__step.is-done .mp-prereq__num {
+  border-style: solid;
+  border-color: var(--pos-3);
+  background: var(--pos-2);
+  color: var(--pos-7);
+}
+.mp-prereq__body {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mp-prereq__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--n-12);
+  line-height: 1.35;
+}
+.mp-prereq__hint {
+  font-size: 13.5px;
+  color: var(--n-9);
+  line-height: 1.45;
+}
+/* The one row in the list that is not a step. It carries the way back to a
+   step she has ticked, so it is a link and not a card: giving it the step
+   card's ground would put a fifth thing to do on a list of four. */
+.mp-prereq__doneline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-2);
+  padding: var(--s-1) var(--s-2) 0;
+  font-size: 13px;
+}
+/* WHAT DLA'S FORM CALLS A FIELD, under our own plain label for it. The send
+   block used `.mp-prereq__term` — a class owned by `PrereqLine` — for its one
+   instance of this. Same treatment, own name: a class is borrowed once and then
+   it is two components' to change, and neither can move it without breaking the
+   other. Quiet and mono, because it is a quotation from a government form
+   rather than a sentence of ours. */
+.mp-send__term {
+  font-size: 11.5px;
+  color: var(--n-8);
+  font-family: var(--font-mono);
+}
+.mp-prereq__term {
+  font-size: 11.5px;
+  color: var(--n-8);
+  font-family: var(--font-mono);
+}
+.mp-prereq__dfy {
+  margin: 0;
+  padding: var(--s-3) var(--s-5) var(--s-4);
+  font-size: 13px;
+  color: var(--n-9);
+  border-top: 1px solid var(--ai-3);
+}
+.mp-linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-7);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.mp-linkbtn:hover {
+  color: var(--blue-8);
+}
+
+/* ─── Tabs + narrow ─── */
+.mp-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-2);
+}
+/* The tabs are the opportunities feed's tab bar (`.opps-tabs` in styles.css).
+   Here it wraps rather than scrolls: at 390px a hidden third tab has nothing
+   to say it is there. */
+.mp-page .opps-tabs {
+  flex-wrap: wrap;
+}
+/* `.mp-narrow` and `.mp-narrow.is-on` — a square icon control beside the sort
+   pills — went the same way as the `.mp-narrow__n` badge that used to sit on
+   them: rendered by no .tsx in the repo. The board asks its questions in
+   `.mp-q` now. Deleted, along with the `.mp-page .mp-narrow` touch-target rule
+   that sized a control nothing draws. */
+/* The explanation sits WITH the control it explains. */
+.mp-sorthint {
+  margin: 0 0 var(--s-4);
+  font-size: 12.5px;
+  color: var(--n-8);
+}
+
+/* ─── The open-orders panel ───
+   The container the list was missing. A sort row, a hint, a heading, five cards
+   and two tail buttons all sat at the same level on the page ground, so nothing
+   said where the orders began or what made them one set — and the count, the
+   scope sentence and the rows had no shared edge to be read against.
+   `--r-lg`, one step above the `--r-md` on the row container inside it, so the
+   two nested borders read as outer and inner rather than as two of the same
+   thing. */
+.mp-panel {
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+/* HUNTER'S ROW IS THE PANEL HEAD. `.mp-panel__head`, `.mp-panel__mark` and
+   `.mp-panel__title` are gone with the second header they drew — a target
+   glyph, "Open opportunities" and a count, sitting directly under an amber card
+   that had already introduced the same list in Hunter's own words. Deleted
+   rather than left behind: a rule with no element is what the dead-selector
+   sweep in `src/lib/microPurchases/stylesheet.test.ts` exists to catch.
+   `.mp-panel__lede` went the same way — "These are parts DLA buys that are open
+   to any seller." is a sentence hunterSummary() already speaks, in the first
+   person, six pixels above where this used to sit. */
+.mp-panel__count {
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--n-2);
+  color: var(--n-9);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* THE HEAD BAND — Hunter's own row, flush to the top edge of the panel.
+   Negative margins pull it out through the panel's padding so the amber runs
+   corner to corner and the rows below start against a clean neutral ground.
+   Only the top corners are rounded: it is the top of the card, not a card.
+   Three columns — who is speaking, what he said, and the control that folds
+   it — collapsing to one on a phone, where a 40px avatar and a paragraph
+   cannot share a line. */
+.mp-hunter--head {
+  margin: calc(var(--s-4) * -1) calc(var(--s-4) * -1) var(--s-4);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: var(--s-4);
+  row-gap: var(--s-2);
+  align-items: start;
+}
+/* HUNTER AT 72px, and it is a context override rather than a new size on the
+   shared component. `AgentAvatar`'s `size` prop is a closed union topping out
+   at 48, and adding a step to it for one caller would put a hunk of this branch
+   in the shared avatar block, outside the small-orders region. Two classes, so
+   it beats `.agent-avatar--48` on specificity rather than on source order.
+   `font-size` moves with the box because the letter fallback is sized in `em`
+   — a member on a slow connection sees an H the right size, not a 48px one in
+   a 72px circle. */
+.mp-hunter__face.agent-avatar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  width: 88px;
+  height: 88px;
+  font-size: 88px;
+  box-shadow: 0 0 0 2px var(--ai-3);
+}
+/* Folded, the band is one line of name and chip, and an 88px portrait beside a
+   22px row would set the height of a strip whose whole point is that it has got
+   out of the way. The face steps back down with everything else it introduces.
+   Keyed off whether `.mp-hunter__say` is in the DOM rather than off a class the
+   route interpolates: a literal class name is one a scan of the source text
+   can find, and a template literal on this element hides it from every such
+   scan. The dead-selector sweep in `src/lib/microPurchases/stylesheet.test.ts`
+   is one of them — an interpolated name has to be registered there by hand,
+   with a reason. */
+.mp-hunter--head:not(:has(.mp-hunter__say)) .mp-hunter__face.agent-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+}
+/* The byline steps up with the portrait. 11.5px is right for a chip under a
+   paragraph on the order page; beside a 72px face it read as a caption on a
+   photograph rather than as the name of whoever is talking. */
+.mp-hunter--head .ai-attr {
+  grid-column: 2;
+  grid-row: 1;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: 18px;
+  font-weight: 650;
+}
+.mp-hunter--head .mp-hunter__line {
+  margin-top: 0;
+}
+.mp-hunter__say {
+  grid-column: 2 / -1;
+  grid-row: 2;
+  min-width: 0;
+}
+/* 44px, not the 32 the icon wants. It is the only control in this band and the
+   design system's floor for anything a thumb has to find. The glyph points down
+   when there is something hidden and up when there is not, which is the one
+   thing the label cannot say without being read. */
+/* COLUMN 3, NOT 2. It read `grid-column: 2` and a media query moved it to 3 at
+   720px; when the band became `auto 1fr auto` at every width that query was
+   deleted and this was left pointing at the middle track — the same cell
+   `.ai-attr` occupies, so the caret rendered on top of the word "Hunter".
+   Grid does not clear an overlap the way a flex row would; two items given the
+   same cell simply stack. Explicit row AND column, and justified to the end of
+   its own track, so nothing about where it lands depends on source order. */
+.mp-hunter__fold {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--n-10);
+  cursor: pointer;
+  transition: transform var(--d-fast) var(--ease);
+}
+.mp-hunter__fold[aria-expanded="true"] {
+  transform: rotate(180deg);
+}
+/* No media query on this band any more. The three columns are `auto 1fr auto`
+   at every width — a 72px face, a column of words that can shrink to nothing,
+   and a 44px control — and at 390px that still fits because the middle track is
+   `minmax(0, 1fr)` and the words wrap. The previous two-shape version existed
+   to stop a 40px avatar and a paragraph sharing a line on a phone; the face is
+   out of that line now. */
+
+/* The cautionary register, not the error one. --warn-* is "pending / medium
+   confidence cautionary" and is the family `.mp-card__urgent` on the row below
+   already speaks, so the two cautions on this screen are the same colour.
+   --urg-* would be wrong twice over: it is reserved for errors and destructive
+   confirmations, and nothing has gone wrong — she has not done anything yet.
+   Ink is --warn-11 rather than --warn-7 so a full sentence of it stays
+   comfortable to read; the glyph carries the colour. */
+.mp-panel__warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--warn-3);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warn-11);
+}
+.mp-panel__warn > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn-7);
+}
+
+/* ─── The offer card ─── */
+.mp-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+/* THE BOARD'S LISTS ARE SEPARATE CARDS, not one hairline-divided panel.
+   Changed 8 September 2026 at Karthik's direction, ported from prototype PR 45:
+   each row carries its own border, radius and resting shadow, gapped by `--s-3`
+   — the same treatment `/small-orders/restricted` and `/small-orders/wins`
+   already used, so all three lists in the feature now read the same way.
+   What the panel was for, if it is ever weighed again: five separate cards put
+   four visual boundaries between rows that differ in nothing but their content,
+   and every card setting its own left edge meant the money and the deadline —
+   the two facts she scans DOWN the list for — had no shared column to be scanned
+   down. Inside one panel they lined up. They still line up here, because the
+   tracks belong to the card and every card is the same width; what is traded is
+   the hairline's economy for the card's separation.
+   The rules are deleted rather than left dormant. A commented-out block is the
+   same debt in a disguise, and git has them if they are ever wanted back. The
+   prototype's own reason was that a dead `.mp-*` rule fails its dead-rule sweep;
+   this repo has one too now, in `src/lib/microPurchases/stylesheet.test.ts`, so
+   deleting them is enforced here rather than a choice. */
+.mp-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  min-height: 96px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  box-shadow: var(--sh-rest);
+  cursor: pointer;
+  transition:
+    box-shadow var(--d-fast) var(--ease),
+    border-color var(--d-fast) var(--ease);
+}
+.mp-card:hover {
+  box-shadow: var(--sh-hover);
+  border-color: var(--n-7);
+}
+.mp-card:active {
+  box-shadow: var(--sh-press);
+}
+.mp-card:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+/* Already opened: quieter, no badge, no "new" label, no count. */
+/* --n-2, not --n-1. `.mp-card` is `background: var(--bg)` and `--bg` is defined
+   AS `var(--n-1)`, so this override used to compute to the exact value it was
+   overriding and the seen card was not quieter by any amount — only the title
+   moved. The sibling of D-D7: there an undefined token kills a declaration,
+   here a defined one makes it silently do nothing, and the browser says nothing
+   either way. --n-2 puts the card a step BELOW the page ground (body is --bg),
+   so an opened card reads as recessed. Every ink inside still clears AA on it:
+   --n-12 title 17.98, --n-10 seen title 10.42, --n-9 11.9, --n-8 4.99,
+   --pos-7 5.32, --warn-9 9.52. */
+.mp-card.is-seen {
+  background: var(--n-2);
+}
+.mp-card.is-seen .mp-card__title {
+  color: var(--n-10);
+}
+/* THE BOARD ROW IS THREE COLUMNS, AND ON A PHONE IT IS ONE.
+   Mark · what it is and what it is worth · what she has to do about it.
+
+   The stack this replaced gave every line the full width, so the one sentence
+   she acts on — "Quote today." — sat below a caption she reads once, and the
+   height of the row was set by the longest sentence on it rather than by the
+   figure she scans. Folded into columns, the two facts she sorts by (the money
+   and the deadline) sit level with each other and the row is shorter.
+
+   PHONE FIRST, GENUINELY: the base rule below IS the phone layout — mark and
+   words side by side, everything she must do beneath them on its own full-width
+   line, which is the foot this feature already had. The third column only
+   appears at 720px, where there is width to spend on it. Nothing here is a
+   desktop layout squeezed down; the desktop layout is the media query.
+
+   `.mp-card` keeps every shell rule — ground, border, radius, the whole
+   affordance ladder — because `/micro-purchases/restricted` draws its rows out
+   of the same class and must not inherit a grid it has no columns for. This
+   modifier owns the geometry and nothing else. */
+.mp-card--offer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--s-2) var(--s-3);
+  align-items: start;
+}
+/* THE AUTHORITY BLUE, NOT THE INTERACTIVE ONE — and the distinction is the
+   whole argument. This tile was neutral, and the note that made it neutral said
+   a blue mark at the leading edge "would read as the one thing to tap on a row
+   where everything is". That was true of a row whose only affordance was a
+   hover lift a phone does not have. The row now ends in a chevron that says
+   where it goes, so the tap target is stated where taps are made and the
+   leading mark is free to be what it is: the same category mark she picked from
+   on the category sheet.
+   --blue-9, the federal-authority ink, and never --blue-7: the interactive
+   accent is spoken for by controls, and a decorative glyph wearing it is the
+   false affordance the old note was right to refuse. `.mp-card__repeat` one
+   rule below stays neutral for its own reason and is unaffected — it is a pill
+   among pills, with no chevron beside it to carry the tap.
+   --blue-2 rather than --n-3 also survives `.is-seen`, which grounds an opened
+   card in --n-2: a fill that matches the ground it sits on is a fill that is
+   not there. Fixed square, so twelve marks of different widths leave the titles
+   on one line. */
+.mp-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--blue-2);
+  color: var(--blue-9);
+}
+/* `minmax(0, 1fr)` above and `min-width: 0` here, both deliberate: a grid item
+   floors at its content's min-content width, and the longest unbroken thing on
+   this card is a DLA nomenclature that does not wrap. Without both, one
+   MANIFOLD ASSEMBLY pushes the third column off a 390px screen. */
+.mp-card__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+/* Phone: the money drops back under the words and the rail under both, which
+   is the layout this feature already had. The columns are the wide screen's
+   idea and they live in the media query at the foot of this block — nothing
+   here is a desktop layout squeezed down. */
+.mp-card__money {
+  grid-column: 2 / -1;
+  min-width: 0;
+}
+/* WHAT THE ORDER ASKS OF HER — the delivery window and who may bid. On a phone
+   and at the middle widths it sits directly under the name and count, which is
+   where those two facts read as a continuation of "what this is". It only
+   becomes a column of its own at 1280px, where there is width for six tracks;
+   below that a sixth column would take the NAME down to about 70px. */
+.mp-card__terms {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+/* The one blue thing on the row, and it is the authority step rather than the
+   interactive one — --blue-7 is spoken for by controls, and this is a fact off
+   the order paper. Weighted, because it is the fact most likely to end her
+   interest in a row before she opens it: 95% of records carry it, the live
+   median is 86 days, and a member who can only turn work around in a fortnight
+   was previously finding that out eight pages in. */
+.mp-card__deliver {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-9);
+}
+.mp-card__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--n-9);
+}
+/* The micro-purchase cap, stated on the row. It is a CAUTION and not a
+   refusal — DLA is still taking prices on this order — so it takes `--warn-7`,
+   the cautionary ramp rather than the negative one, at the
+   same size and weight as the delivery fact beside it. It sits first in the
+   column because it changes what the money figure means. */
+.mp-card__over {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--warn-7);
+}
+/* One step quieter than the count it follows. Two facts on one line, and the
+   count is the one she is scanning for. */
+.mp-card__buyer {
+  color: var(--n-8);
+}
+.mp-card--offer .mp-card__foot {
+  grid-column: 1 / -1;
+}
+/* Explicit row AND column: it is last in the DOM, after two full-width items,
+   so auto-placement would drop it a row below the rail it is meant to sit
+   beside. Centred on the row rather than aligned to its top — it points at the
+   whole row, not at the title. */
+.mp-card__go {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  flex: none;
+  color: var(--n-7);
+  transition: color var(--d-fast) var(--ease);
+}
+.mp-card:hover .mp-card__go {
+  color: var(--n-10);
+}
+.mp-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+.mp-card__title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--n-12);
+  line-height: 1.3;
+}
+/* `.mp-card__mine` — the shouted "YOURS" chip in the card head — is gone with
+   the chip itself: a one-word mark whose only explanation was a title attribute
+   said nothing on a phone, and the sentence that carries the fact is still on
+   the card. It was also the last string on this feature that the stylesheet
+   shouted. */
+.mp-card__qty {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--n-9);
+}
+/* .mp-card__unitwarn is gone with the block it styled — the unit warning
+   moved to the order page, where the price it guards is actually set.
+   Deleted rather than left: a rule with no element is what the dead-selector
+   gate exists to catch. */
+.mp-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--border);
+}
+.mp-card__closes {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--n-9);
+}
+.mp-card__urgent {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--warn-9);
+}
+/* NEUTRAL, and both halves of that are deliberate.
+   It was --blue-1/-3/-9. Blue is the interactive colour in this system, and
+   this pill is a non-interactive <span> sitting inside a card that IS entirely
+   clickable — so the one blue thing in the footer was the one thing that did
+   nothing, pointing her tap at the wrong target.
+   And not the insight family either: "A year of orders" is a record fact off
+   the order paper, not something Hunter worked out. Amber is reserved. */
+.mp-card__repeat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: var(--r-pill);
+  background: var(--n-2);
+  border: 1px solid var(--border);
+  color: var(--n-9);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.mp-card__why {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+  font-style: italic;
+}
+/* THE ROW STANDS UP INTO COLUMNS, at the width where there is room for them.
+   Same elements, same order, same words — the money and the rail stand up
+   beside the words instead of lying under them, and the hairline that separated
+   each of them moves from its top edge to its left. That hairline is the only
+   thing added: it is what lets five rows be read as three columns rather than
+   as fifteen unrelated blocks.
+   720px because that is where the fourth column can hold "DLA can buy this at
+   any time. Quote today." on two lines without squeezing the money caption
+   beside it below its own comfortable measure. The page itself caps at 680px,
+   so this is a viewport query deciding what a 648px-wide row does with its
+   width — not a container that ever gets wider than that.
+   `align-items: stretch` on the grid, so the two rules run the height of the
+   row rather than the height of whatever happens to be in them: a rail with one
+   chip and a rail with three drew hairlines of two different lengths on
+   otherwise identical rows. */
+@media (min-width: 720px) {
+  .mp-card--offer {
+    /* FIXED MIDDLE TRACKS, and `1fr` only on the words. `minmax(a, b)` tracks
+       are sized to `b` before an `fr` track is fed at all, so two flexible
+       middle columns ate the width the NAME needed and "Nonmetallic tubing"
+       wrapped while the money column sat half empty. The two facts she scans
+       down the list want a constant width — that is the entire reason they are
+       columns — and the name is the one thing on the row that should take what
+       is left.
+       7.5rem holds "$12,600" at the row's figure size with a digit to spare;
+       10.5rem holds the widest thing the rail renders — "Closes Wed, 2 Sept
+       2026" — beside its calendar mark. Measured against the narrow end of the
+       real range: the page caps at 680px but renders nearer 580px in a narrow
+       shell, which leaves the row about 514px once the panel and card padding
+       are taken out. The words column takes what is left, which is 232px at the
+       cap and 132px at the floor. */
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      8rem
+      11rem
+      auto;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .mp-card--offer .mp-card__main {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .mp-card--offer .mp-card__terms {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  /* `1 / span 2`, so the two hairlines run past the terms line rather than
+     stopping at the bottom of the name and leaving the row visibly ruled into
+     an L. */
+  .mp-card--offer .mp-card__money {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    padding-left: var(--s-3);
+    border-left: 1px solid var(--border);
+  }
+  .mp-card--offer .mp-card__foot {
+    grid-column: 4;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-2);
+    padding-top: 0;
+    padding-left: var(--s-3);
+    border-top: none;
+    border-left: 1px solid var(--border);
+  }
+  .mp-card--offer .mp-card__go {
+    grid-column: 5;
+    grid-row: 1 / span 2;
+  }
+  /* The icon is a fixed 40px square and `stretch` cannot make it taller, but
+     the tile would otherwise sit level with the top of the row rather than with
+     the title beside it. */
+  .mp-card--offer .mp-card__icon {
+    align-self: start;
+  }
+  /* Two lines of sentence beside a 13px bolt: centred, the icon floats to the
+     middle of the block and stops reading as the start of it. */
+  .mp-card--offer .mp-card__urgent {
+    align-items: flex-start;
+  }
+  .mp-card--offer .mp-card__urgent,
+  .mp-card--offer .mp-card__closes,
+  .mp-card--offer .figure-caption {
+    text-wrap: pretty;
+  }
+  .mp-card--offer .mp-card__urgent > svg,
+  .mp-card--offer .mp-card__closes > svg {
+    flex: none;
+    margin-top: 2px;
+  }
+}
+/* THE SECOND STEP, and it is not decoration. `.mp-page` caps at 680px but the
+   app shell takes about 230px for its own rail, so the page only REACHES that
+   cap somewhere north of 900px of viewport — below it the same rule is laying
+   out a 580px page, which is 100px less to share between three columns. One
+   breakpoint therefore had to be tuned for the narrow case and left the wide
+   one with a money column too tight for "Price it yourself." and a rail too
+   tight for "For small companies". Two steps, each measured against the width
+   that step actually gets. */
+@media (min-width: 960px) {
+  .mp-card--offer {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      10rem
+      12.5rem
+      auto;
+  }
+}
+/* THE THIRD STEP, where the page stops being capped by the shell and starts
+   being capped by `.mp-page` itself. Everything spare would otherwise land in
+   the name column, which is the one track on the row that does not need it —
+   "Wet mop head" is 100px whatever the screen is. The two tracks she compares
+   ACROSS rows take the width instead, which is what buys the closing date and
+   the set-aside chip a single line each. */
+@media (min-width: 1280px) {
+  /* 30 · 20 · 30 · 20 OF WHAT IS LEFT, in `fr` rather than rem.
+     The four content tracks were `1fr` and three fixed widths, so the name took
+     every spare pixel on the row — about 380px on a 1120 page holding "Wet mop
+     head" — while the money column, which carries a figure AND a caption AND a
+     per-unit line, was pinned at 11rem and set "Price paid last time. The order
+     paper does not say if it repeats." over six lines. One column had slack it
+     could not use and its neighbour was short.
+     `fr` splits the free space by ratio, so the split holds at every width above
+     this breakpoint instead of being true at exactly one. `minmax(0, …)` on each
+     because a grid track floors at its content's min-content width, and an
+     unbreakable DLA nomenclature would otherwise push the ratio apart. */
+  .mp-card--offer {
+    grid-template-columns:
+      auto
+      minmax(0, 30fr)
+      minmax(0, 20fr)
+      minmax(0, 30fr)
+      minmax(0, 20fr)
+      auto;
+    gap: var(--s-4);
+  }
+  .mp-card--offer .mp-card__terms {
+    grid-column: 3;
+    grid-row: 1;
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--border);
+  }
+  .mp-card--offer .mp-card__money {
+    grid-column: 4;
+    grid-row: 1;
+    padding-left: var(--s-4);
+  }
+  .mp-card--offer .mp-card__foot {
+    grid-column: 5;
+    grid-row: 1;
+    padding-left: var(--s-4);
+  }
+  .mp-card--offer .mp-card__go {
+    grid-column: 6;
+    grid-row: 1;
+  }
+}
+/* 28px is the figure primitive's size and it is right where a figure has a
+   card to sit on. In a 124px column it is a number that fills its own track and
+   leaves the caption nowhere to go, and five of them down a list read as five
+   headlines rather than as one column to compare. Stepped down here only —
+   `.figure-value` itself is shared with the order page and the wins record,
+   where the figure IS the content and 28px is correct. */
+.mp-card__money .figure-value:not(.figure-value--words) {
+  font-size: 22px;
+}
+.mp-figure-note {
+  color: var(--n-8);
+}
+
+/* ─── Empty, thin, tail ─── */
+.mp-empty {
+  padding: var(--s-6) var(--s-4);
+  border: 1px dashed var(--n-6);
+  border-radius: var(--r-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  align-items: center;
+}
+.mp-empty__head {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-empty__body {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--n-9);
+}
+.mp-thin {
+  margin: var(--s-3) 0 0;
+  font-size: 13px;
+  color: var(--n-8);
+  text-align: center;
+}
+/* "LOAD MORE" — the board arrives 50 at a time (DH-28).
+   Centred and full-width-on-phone, because it is the end of the list rather
+   than an action on any one row: a button aligned with the cards reads as
+   belonging to the last card above it.
+   `--s-5` of space above it, more than the `--s-3` between cards, so the last
+   order does not read as having a control attached. */
+.mp-more {
+  margin-top: var(--s-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+}
+.mp-more .btn {
+  min-width: 240px;
+  min-height: 44px;
+}
+/* How many are left to load. The same treatment as `.mp-thin` above, which is
+   the board's other quiet end-of-list line — one voice for one kind of fact. */
+.mp-more__left {
+  margin: 0;
+  font-size: 13px;
+  color: var(--n-8);
+  text-align: center;
+}
+.mp-tail {
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--s-4);
+  padding: 12px var(--s-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font-size: 13.5px;
+  color: var(--n-9);
+  cursor: pointer;
+  text-align: left;
+}
+.mp-tail b {
+  color: var(--n-11);
+}
+/* A MARK AND A SENTENCE, not a bold phrase on its own. Both tails led somewhere
+   the board never describes — one to the orders Hunter held back, one to a
+   record she has probably never seen — and a single bold line is the shape of a
+   nav item, which is read as "somewhere else in the app" rather than as
+   "something of yours is in here".
+   `flex: none` on the mark because `.mp-tail` is a flex row and a 24px avatar
+   with nothing pinning it is a 24px avatar the label squeezes. */
+.mp-tail__mark {
+  flex: none;
+  color: var(--n-8);
+}
+.mp-tail__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* Not italic. `em` is the element the second line wants semantically here and
+   the slant is the browser's opinion, not ours — every other supporting line on
+   this feature is upright at --n-8. */
+.mp-tail__text em {
+  font-style: normal;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--n-8);
+}
+.mp-tail:hover {
+  border-color: var(--n-7);
+}
+
+/* ─── Sheets ─── */
+/* On the app's modal layer (the drawer overlay sits at 210), not on a private
+   one. At 60 this sheet sat below the app's own overlays and below the dev
+   switcher, which then swallowed the tap on its primary button at 390px. A
+   modal is the topmost thing while it is open.
+   ONE owner for the layer, both overlays. The panel below is the same modal on
+   this same page, so a second `z-index: 220` written out beside this one would
+   be two owners of one decision — the mistake the colour note flags. Only the
+   LAYOUT differs, and it is what each rule below holds. */
+.mp-sheet-scrim,
+.mp-panel-scrim {
+  z-index: 220;
+}
+.mp-sheet-scrim {
+  /* `position: fixed`, `inset: 0` and the glass come from `.scrim` in
+     components.css, which `MicroSheet` puts on this same element by name.
+     This comment used to say `.mp-sheet-scrim` was LISTED on `.scrim`. That is
+     true in the prototype and was never true here: the port brought the
+     comment and not the selector, so the sheet rendered as a plain block under
+     the board. Wearing the class keeps one owner without editing a shared rule.
+     This rule holds only what is genuinely the sheet's: its layer and layout. */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+/* The narrow filter's shell. Every declaration it needs — the scrim colour, the
+   slide, the panel's width and full height, the header and the scroll region —
+   is `.fd-overlay` / `.fd-panel` / `.fd-head` / `.fd-body` in styles.css, worn
+   rather than copied: the filter and the opportunities drawer are the same
+   control on two pages, and two copies of one look drift apart in a week.
+   `.mp-panel` and `.mp-panel-scrim` ride alongside those classes and hold only
+   what this page adds. */
+.mp-panel__body {
+  /* The filter's `.mp-sheet__foot` is `position: sticky; bottom: 0`, which is
+     held inside its scroll container's CONTENT box. `.fd-body`'s own 20px
+     bottom padding would stop the bar short of the panel edge and let answers
+     scroll through the strip beneath it — the defect measured on the bottom
+     sheet at 390x900 and recorded on `.mp-sheet`. The foot carries the padding
+     instead, so the scroll region ends where the bar begins. */
+  padding-bottom: 0;
+}
+.mp-sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  /* NO BOTTOM PADDING — the sticky foot owns it, and this is not cosmetic.
+     A `position: sticky; bottom: 0` box is held inside its containing block,
+     which is this element's CONTENT box. With padding-bottom here, the foot
+     stopped 16px short of the sheet's edge and category rows scrolled through
+     the strip underneath it: measured at 390x900, the foot ended at 884 while
+     "Electrical parts" spanned 865-925, half behind the bar and half in the
+     gap, clipped by the screen and untappable. It read as "there is more, and
+     something is covering it". Both sheets end in a `.mp-sheet__foot`, which
+     carries the padding instead, so the scroll region now ends where the bar
+     begins. A future sheet without a foot must add its own bottom padding. */
+  padding: var(--s-5) var(--s-4) 0;
+  background: var(--bg);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--sh-sheet);
+}
+/* A POPUP ON A WIDE SCREEN, A BOTTOM SHEET ON A PHONE. On a phone the sheet
+   rises from the bottom edge, where her thumb is. On a desktop a bottom-pinned
+   sheet 88vh tall reads as a new page, so from 720px it sits in the middle of
+   the screen, a little wider, with every corner rounded.
+   IT MUST STAY BELOW `.mp-sheet`. Both rules are one class, so the later one
+   wins; written above it, the bottom-sheet radius (`r-lg r-lg 0 0`) squared off
+   the popup's bottom corners on every desktop. `MicroSheet.test.tsx` holds the
+   order. */
+@media (min-width: 720px) {
+  .mp-sheet-scrim {
+    align-items: center;
+    padding: var(--s-5);
+  }
+  .mp-sheet {
+    max-width: 640px;
+    max-height: 85vh;
+    border-radius: var(--r-lg);
+  }
+}
+.mp-sheet__title {
+  margin: 0 0 var(--s-2);
+  font-size: 19px;
+  font-weight: 650;
+  color: var(--n-12);
+}
+.mp-sheet__foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--s-2);
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: var(--s-4);
+  /* The primary action of a bottom sheet must clear the home indicator. Found
+     by rendering at 390px: the button was landing in the gesture-bar zone,
+     where a real thumb cannot reliably reach it. Matches the safe-area pattern
+     already used by the mobile tab bar. */
+  padding-bottom: max(var(--s-4), env(safe-area-inset-bottom, 0px));
+  margin-top: var(--s-4);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.mp-sheet__zero {
+  font-size: 13px;
+  color: var(--n-8);
+}
+/* The proposal from her profile, above the list it pre-ticked. Hunter's surface
+   because the picks are machine-derived; spacing only — `.ai-surface` owns the
+   colour. */
+.mp-suggested {
+  margin: 0 0 var(--s-2);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+}
+.mp-suggested p {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+/* ONE COLUMN ON A PHONE, TWO WHERE THE SHEET HAS THE WIDTH. At 390px a half-
+   width cell wraps "Office and cleaning supplies" onto three lines, so the
+   second column arrives with the room for it. Grid rather than flex so a row's
+   two cards share one height and their checkboxes line up. */
+.mp-cats {
+  list-style: none;
+  /* Space below as well as above: the "Pick nothing" sentence follows the
+     grid and carries no top margin of its own, so without this it sat flush
+     against the last row. */
+  margin: var(--s-4) 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+@media (min-width: 560px) {
+  .mp-cats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.mp-cat {
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 9px var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: left;
+}
+.mp-cat.is-on {
+  border-color: var(--blue-7);
+  background: var(--blue-1);
+}
+.mp-cat__box {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--n-7);
+  display: grid;
+  place-items: center;
+  color: var(--n-0);
+}
+.mp-cat.is-on .mp-cat__box {
+  background: var(--blue-7);
+  border-color: var(--blue-7);
+}
+.mp-cat__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.mp-cat__text b {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-cat__text em {
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--n-8);
+}
+
+/* ─── Order page ─── */
+.mp-detail > section {
+  margin-bottom: var(--s-5);
+}
+.mp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0;
+  margin-bottom: var(--s-2);
+  background: none;
+  border: 0;
+  font-size: 13.5px;
+  font-weight: 550;
+  color: var(--blue-7);
+  cursor: pointer;
+}
+.mp-detail__head {
+  margin-bottom: var(--s-5);
+}
+/* The name and the two things she can do about it, on one line — the actions
+   act on the ORDER and the order is the h1, so they sit level with it rather
+   than under the whole header. Wraps rather than squeezes: on a phone the
+   buttons drop under the title at full size, because a control shrunk to fit
+   is the one thing on this page she cannot afford to mis-tap. */
+.mp-detail__top {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-4);
+  margin-top: var(--s-3);
+}
+.mp-detail__id {
+  min-width: 0;
+}
+.mp-detail__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex: none;
+  /* `space-between` on the row is gone. It was wrong when the row held three
+     items — it pushed the middle one around every time the title changed
+     length — and the row now holds two, where it would spread the title and
+     the controls to opposite edges of any width. `margin-left: auto` pins the
+     controls to the end and does not depend on how many items share the row,
+     which is why the warning could leave without taking the layout with it. */
+  margin-left: auto;
+}
+/* FOUR FACTS, ONE STRIP, HAIRLINES BETWEEN THEM.
+   `.mp-keyfacts`, not `.mp-facts`: that name was already taken by the "What the
+   order says" section further down this same page — a flex column of `.mp-fact`
+   rows — and the two rules landed on one class, with the later one silently
+   winning. The strip rendered as a single column at every width and nothing
+   failed, because a class collision inside one stylesheet is invisible to every
+   check that reads a selector rather than the cascade.
+   The dividers are the grid's own gap showing the container through, not a
+   border on each cell: with the column count changing at two breakpoints, a
+   per-cell border needs `:nth-child` arithmetic that silently goes wrong the
+   day a fifth fact is added. One rule, any number of columns, no arithmetic. */
+.mp-keyfacts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  margin: var(--s-5) 0 0;
+  padding: 1px;
+  border-radius: var(--r-md);
+  background: var(--border);
+  overflow: hidden;
+}
+.mp-keyfacts__cell {
+  padding: var(--s-3) var(--s-4);
+  background: var(--surface);
+}
+.mp-keyfacts dt {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+/* Never wraps. The values are short and known — "1 year · AIDC", "Anyone can
+   quote", a two-character code — and a strip whose whole job is being read at a
+   glance must not set one of them on two lines. The strip drops a column
+   instead. */
+.mp-keyfacts dd {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--n-11);
+  white-space: nowrap;
+}
+/* The one cell that carries a verdict rather than a value. Green because it is
+   the positive family, and it is the only colour in the strip — three neutral
+   facts and one answer. */
+.mp-keyfacts dd.is-yes {
+  color: var(--pos-7);
+}
+.mp-keyfacts dd.mono {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+/* The government term, AFTER the plain words that explain it rather than under
+   them. The acronym rule is about which comes first, not about which line it is
+   on: the plain phrase leads, the official term follows, quieter and in mono.
+   Beside it the cell is one line like the other three; beneath it, this was the
+   only cell in the strip two lines tall. */
+/* The strip now carries three facts that were only ever in the record below,
+   and two of them are useless without one line of qualification: a quantity
+   that may never be bought, and a date DLA can pre-empt. So the cell takes an
+   optional hint — one line, quieter than the value, and the copy is trimmed to
+   the part she can act on rather than the mechanism behind it. */
+.mp-keyfacts__hint {
+  margin: 3px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--n-8);
+}
+
+.mp-keyfacts__term {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--n-8);
+}
+.mp-keyfacts__term::before {
+  content: "·";
+  margin-right: 5px;
+  color: var(--n-6);
+}
+@media (min-width: 560px) {
+  .mp-keyfacts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 900px) {
+  .mp-keyfacts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.mp-detail__head p {
+  margin-top: var(--s-2);
+  color: var(--n-9);
+}
+.mp-detail__official {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--n-8);
+  margin-top: var(--s-2);
+}
+/* The save action at the foot of the order page. The wrapper was rendered by
+   micro-purchases.$orderId.tsx and had no rule at all, so the one control that
+   closes the page sat flush against the sentence above it with nothing marking
+   it as a separate act. A rule and a step of air, matching the --s-5 rhythm
+   `.mp-detail > section` already uses. */
+/* `.mp-detail__foot` is gone with the block it held — the save control moved
+   into the house `.opp-sticky` action bar at the top of the page. */
+/* THE ORDER PAGE'S STICKY HEADER — title and both actions on one row.
+   `.opp-sticky` supplies the sticky behaviour, the blur and the border; this
+   adds only what carrying a title needs. The page is about 3,700px, so what
+   scrolled away before was the name of the thing she is reading — the controls
+   stayed and lost their subject. */
+/* `.mp-sticky`, `.mp-sticky__title`, `.mp-sticky__save-word` and
+   `.mp-sticky .opp-sticky__actions` are gone with the sticky action bar this
+   page no longer renders — see the note at the head of the JSX for why it went
+   and what replaced it. Deleted rather than left: a rule with no element is
+   what the dead-selector sweep in `src/lib/microPurchases/stylesheet.test.ts`
+   exists to catch, and the truncation note they carried described a title slot that no longer
+   truncates because it is no longer in a one-line bar. */
+/* The non-interactive state that REPLACES Save on a quoted order. Renamed
+   from `.mp-sticky__kept` with the bar it used to live in — a class named for
+   a component that no longer exists is a wrong signpost, and it now sits in
+   the page header beside the control it stands in for. */
+.mp-detail__kept {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--n-9);
+}
+/* ── THE ORDER PAGE'S TWO COLUMNS ──
+   One read on the left and one act on the right. The page was a single stack
+   about 3,700px tall, so the block she types numbers into sat four and a half
+   phone screens below the block that tells her what to type — and every section
+   between them earns its place, which is why the fix is a second column and not
+   a deletion. The lede row above them is the pair that decides whether she goes
+   any further at all: the price, and what it costs to get it wrong.
+   One column until 960px. The right-hand column is a form and a checklist, and
+   a form squeezed to a third of a phone is worse than a form further down. */
+.mp-detail__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: start;
+}
+.mp-detail__main,
+.mp-detail__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+@media (min-width: 960px) {
+  .mp-detail__body {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  }
+}
+/* `.mp-detail__lede` is gone with the row it made. The warning that shared it
+   with Hunter's price now heads the send block in `.mp-send`, above the control
+   that commits her, so the price card is the only thing left at that level and
+   needs no grid to hold one item. */
+/* THE ONE CONSEQUENCE THAT OUTLIVES THE ORDER. --urg-*, which this feature
+   reserves for errors and destructive confirmations and which nothing else on
+   these two surfaces uses: the board's list-level caution is --warn-* because
+   nothing there is committed, and here she is one screen from sending a price
+   she is bound by. A terminated contract is past performance, and past
+   performance is the first thing a contracting officer checks. */
+.mp-fulfil {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--urg-3);
+  border-radius: var(--r-lg);
+  background: var(--urg-1);
+  /* IT HEADS THE SEND BLOCK and takes that block's full width. It lay across
+     the detail header row until now, sized `1 1 22rem` to share that row with
+     the order name and the two controls. It shares nothing here, so it needs
+     no flex basis: `.mp-send` is an ordinary block and its children space
+     themselves, like `.mp-send__body` above. The `display: flex` on this rule
+     is for the icon beside the text and is unrelated to the row it left. */
+  margin: 0 0 var(--s-3);
+}
+.mp-fulfil > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--urg-7);
+}
+.mp-fulfil__text {
+  min-width: 0;
+}
+/* Both sentences run as one paragraph. Stacked they made a tall card; laid out
+   they read as one line of warning, which is what a band across a row is for.
+   The whitespace between the two elements in the JSX is the word space. */
+.mp-fulfil__head,
+.mp-fulfil__body {
+  display: inline;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.mp-fulfil__head {
+  font-weight: 650;
+  color: var(--urg-9);
+}
+/* The word space between the two sentences. JSX drops whitespace between two
+   elements when it contains a newline, so running them inline joined them into
+   "deliver it.If you win". A generated space is a real text run: it separates
+   them AND gives the line a place to break. */
+.mp-fulfil__head::after {
+  content: " ";
+}
+.mp-fulfil__body {
+  color: var(--urg-8);
+}
+/* Hunter's byline on his card: who is speaking, and what he read. The selector
+   was `.mp-price .ai-attr` while the byline sat on a price block of its own.
+   That block is gone — the verdict and the price are one card now — so the
+   ancestor moved and the rule follows it. Left alone it would have matched
+   nothing and the chip would have fallen back to the 11.5px inline treatment,
+   silently, with no test able to see it. */
+.mp-verdict .ai-attr {
+  gap: var(--s-3);
+  font-size: inherit;
+}
+.mp-price__by {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.mp-price__by b {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--n-12);
+}
+.mp-price__by em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--n-9);
+}
+/* THREE COLUMNS AND HAIRLINES, at the width where a cell can hold a hint.
+   `.key-info-row--wide` exists because the house grid is two forced columns at
+   390px — about 155px a cell — and a two-sentence hint cannot live in that. It
+   still cannot, so this override is scoped to 900px and up, where a third of
+   this column is roughly 230px and the hint reads. The phone keeps the wide
+   rows exactly as they were.
+   The dividers are the grid's own gap showing the container through, so a
+   fourth fact needs no :nth-child arithmetic to stay ruled correctly. */
+/* "What the order says" is a card, like every other block in this column. It
+   was a bare h2 over a grid, so the one section on the page with no edge was
+   the one holding seven facts. */
+.mp-facts {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+/* WHITE, AND THE ANSWER IS THE BOLD THING IN THE CELL.
+   The house grid grounds itself in --n-1 and sets its values at 13px regular,
+   which is right where it is one block among many on the opportunities page.
+   Here it is the body of a card that is already white, so the grid read as a
+   grey panel dropped into it — and the label, the value and the hint came out
+   at three sizes but only one weight, so the eye had nothing to land on. The
+   value is the answer to the label above it; it gets the weight.
+   Scoped under `.mp-facts` on purpose: `.key-info-grid` is a house component
+   and every other surface that uses it keeps what it has. */
+.mp-facts .key-info-grid,
+.mp-facts .key-info-row {
+  background: var(--surface);
+}
+.mp-facts .key-info-value {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--n-12);
+}
+/* THE HINT MUST NOT COMPETE WITH THE FACT IT EXPLAINS.
+   `.key-info-hint` had no rule in this repo at all — the house component came
+   across without it — so a hint inherited body type and rendered at 14px in
+   rgb(32,29,26) beside a value at 14px/650 in rgb(12,10,8). Same size, all but
+   the same ink: on "Deliver within — 5 days of the order" the two sentences
+   explaining the trade-off carried the same visual weight as the deadline
+   itself, and the eye had nothing to skip.
+   Ported from the prototype, which sets 12.5px on `--n-8`. Scoped under
+   `.mp-facts` for the same reason the value above it is: `.key-info-grid` is a
+   house component and every other surface keeps what it has. */
+.mp-facts .key-info-hint {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--n-8);
+}
+@media (min-width: 900px) {
+  .mp-facts .key-info-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  /* A RING ON EVERY CELL, not a gap showing the container through. The gap
+     trick draws the container's colour wherever there is no cell — and seven
+     facts in a three-column grid leave two empty, so the tidy version painted a
+     grey rectangle in the corner of the card. A 1px ring per cell collapses
+     with its neighbour's into one hairline and stops at the last real cell. */
+  .mp-facts .key-info-row {
+    padding: var(--s-3) var(--s-4);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .mp-facts .key-info-row--wide {
+    grid-column: auto;
+  }
+}
+/* HUNTER NOTES — the same row shape, because it answers the same kind of
+   question: a label on the left, what it is on the right. Neutral, not amber:
+   this card is ABOUT machine-written lines, it is not itself one of them, and
+   painting it amber would be the inversion the attribution gates exist to
+   catch. */
+/* "Before you quote" is a card, like everything else in this column. It was the
+   one block with no edge, so on a page of bordered cards it read as page
+   furniture rather than as the last thing to check before she commits. */
+.mp-traps {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-notes {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-notes__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+.mp-notes__list > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.mp-notes__list dt {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--n-11);
+}
+.mp-notes__list dd {
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+  color: var(--n-9);
+}
+.mp-notes__foot {
+  margin: var(--s-3) 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-8);
+}
+/* THE REGULATION, UNDER A RULE THAT SEPARATES IT FROM THE ATTRIBUTION ABOVE.
+   The rows above this card's footer are Hunter's work and the footer says so;
+   everything in here is DFARS PGI 217.75 quoted verbatim. The border is the
+   whole point — without a visible break, a federal regulation sits under the
+   sentence "All of that is Hunter’s work" and reads as ours. */
+.mp-notes__reg {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+}
+.mp-notes__reghead {
+  margin: 0 0 var(--s-2);
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--n-11);
+}
+/* THE REGULATION IS A PARAGRAPH, NOT A LABEL/VALUE PAIR.
+   `.mp-notes__list` lays a row out as `space-between` with the value pushed
+   right — correct for "Who may sell / Hunter's reading of the code", and wrong
+   for a PGI paragraph. Reusing it put a six-sentence quotation in the value
+   slot of a two-column row: the label collapsed to a stub column and wrapped
+   down four lines, and the quotation set ragged and right-aligned against it.
+   The rows STACK here instead. The code's label sits above its text, both left
+   aligned, and the text takes the card's whole width — which is what a
+   quotation needs and what the row shape cannot give it. */
+.mp-notes__reg .mp-notes__list > div {
+  display: block;
+  padding: var(--s-3) 0;
+}
+.mp-notes__reg .mp-notes__list dt {
+  display: block;
+  margin-bottom: var(--s-1);
+}
+.mp-notes__reg .mp-notes__list dd {
+  display: block;
+  margin: 0;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--n-10);
+}
+/* Where it came from, quiet and mono, in the same treatment every other
+   provenance mark on this feature uses. */
+.mp-notes__cite {
+  margin: var(--s-3) 0 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--n-8);
+}
+/* The question is asked twice in this card on purpose — the heading is up to
+   890px above the buttons at 390px, with a surplus rule and a non-manufacturer
+   rule in between, and three unlabelled buttons under a government rule shaped
+   like a question is the more expensive mistake. Once the card is a column on a
+   wide screen that distance is gone, and so is the second copy. */
+@media (min-width: 960px) {
+  /* Two classes, not one. `.mp-source__q` is re-declared later in this file, so
+     a single-class rule here loses on source order and the heading stayed
+     doubled — the exact defect this rule exists to remove. */
+  .mp-source .mp-source__q {
+    display: none;
+  }
+}
+/* HUNTER'S CARD. It carries `.ai-surface` as well, which draws the amber
+   ground and the gradient border, so this rule must NOT set a background or a
+   border of its own — it did both while the card was neutral chrome, and left
+   in place they would paint over the tint that marks the whole card as his.
+   Padding and radius only, which is exactly what `.mp-price` did when it was
+   the page's one amber card. */
+.mp-verdict {
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+}
+/* The break between the two halves — may she bid it, and what is it worth. A
+   hairline in the card's own border colour, not a margin: the halves are one
+   answer and a gap would read as two blocks that failed to join. */
+.mp-verdict__rule {
+  height: 0;
+  margin: var(--s-4) 0;
+  border: 0;
+  border-top: 1px solid var(--ai-3);
+}
+.mp-verdict__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--n-12);
+}
+.mp-verdict__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+/* THE GAP NOTE, under the verdict it qualifies (DH-34). Same type as the
+   verdict body — it is the same voice answering the next question, not a
+   footnote — and it takes a rule of its own only for the space above it and
+   the hairline that says a second answer starts here. `.mp-verdict__body` is
+   `margin: 0`, so two of them in a row would touch. */
+.mp-verdict__gap {
+  margin: var(--s-3) 0 0;
+  padding: var(--s-3) 0 0;
+  border-top: 1px solid var(--border);
+}
+.mp-verdict__term {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--n-8);
+}
+.mp-ic-ok {
+  color: var(--pos-7);
+  flex: none;
+}
+.mp-ic-warn {
+  color: var(--warn-7);
+  flex: none;
+}
+/* `.mp-price` the CONTAINER is gone with the card it wrapped; its children
+   keep their names because they still describe what they hold. */
+.mp-price__head {
+  margin: var(--s-2) 0 var(--s-2);
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--n-12);
+  line-height: 1.35;
+}
+.mp-price__body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--n-10);
+}
+/* NO `display` HERE, AND NOTHING ELSE EITHER. This rule used to set
+   `display: inline-block` over `.src-chip`'s `inline-flex`, which left the
+   `align-items: center` that components.css writes beside it with nothing to
+   act on: below 900px the chip took the 44px touch floor and rendered its 11px
+   text on the top edge with ~24px of empty green underneath, and the link after
+   it butted against the chip's right border with no gap at all.
+   The element no longer carries `.src-chip` — it is `.mp-verdict__term` now,
+   the same non-interactive provenance line the verdict uses — so the only thing
+   left for this class to say is that a provenance line sits a step further from
+   the sentence it cites than a verdict term does. Anything more belongs to the
+   primitive. */
+.mp-price__src {
+  margin-top: var(--s-3);
+}
+/* `.mp-unitbox` is gone with the block it styled. The unit warning is not
+   lost: it moved onto the How many cell in the fact strip, where it sits on the
+   count it qualifies instead of in a band beside the price. `.mp-keyfacts__hint`
+   carries it now. */
+.mp-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.mp-fact__hint {
+  font-size: 12.5px;
+  color: var(--n-9);
+  line-height: 1.45;
+}
+
+/* ─── Sourcing panel ─── */
+/* --surface, like every other card on this page. These three were the only
+   blocks in the column that were not: `.mp-send` and `.mp-source` sat on --bg
+   and the contract card on --n-2, which is a step DOWN from the page ground.
+   It read as three cards that had been disabled. One ground for one kind of thing —
+   a card is white here, and a tint means something (the amber is Hunter's, the
+   red is the termination warning, the mauve is a caution). */
+.mp-source {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-source__known {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-2);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-source__known svg {
+  flex: none;
+  color: var(--n-8);
+}
+/* `.mp-source__warn` is gone with the sentence it styled — the termination
+   warning now heads the send block in `.mp-fulfil`, above the control that
+   commits her to the price. */
+/* THE APPROVED SOURCES ARE A TABLE. They were a list of part numbers with the
+   supplier discarded, so "who sells this" was a number she had to take
+   somewhere else to answer. Three columns: who DLA cleared, the number they
+   call the part, and the control that copies it.
+   `table-layout: fixed` so the supplier column cannot be squeezed to nothing by
+   one long part number, and the ID column is sized for the longest identifier
+   seen live (a 30-character `STERISIL FASTCHECK15 IN-OFFICE`). */
+.mp-source__group {
+  margin-bottom: var(--s-3);
+}
+.mp-source__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.mp-source__table th {
+  text-align: left;
+  padding: 0 var(--s-2) 6px 0;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--n-8);
+  border-bottom: 1px solid var(--border);
+}
+.mp-source__table td {
+  padding: 8px var(--s-2) 8px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 13.5px;
+}
+.mp-source__table tr:last-child td {
+  border-bottom: 0;
+}
+/* The copy column is the control's width and nothing more. */
+.mp-source__table th:last-child,
+.mp-source__copycell {
+  width: 52px;
+  padding-right: 0;
+  text-align: right;
+}
+.mp-source__co {
+  display: block;
+  font-weight: 600;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+/* Where nothing resolved. Not red and not an apology — some CAGE codes name a
+   standardisation body rather than a company, so there is no name to find. */
+.mp-source__co--none {
+  font-weight: 400;
+  color: var(--n-8);
+}
+/* Its own column now. Quieter than the name and the part code: it is the
+   identifier the other two are derived from, and she reads it only when she
+   needs to search on it. */
+.mp-source__cage {
+  font-size: 12.5px;
+  color: var(--n-9);
+}
+.mp-source__table b {
+  font-weight: 600;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+/* Fixed layout, so the columns hold their shape whatever the content. The
+   CAGE is always five characters; the copy control is its own width; the name
+   and the part code share what is left, with the name taking more because it
+   wraps and the code does not. */
+.mp-source__table th:nth-child(2),
+.mp-source__table td:nth-child(2) {
+  width: 74px;
+}
+@media (max-width: 620px) {
+  .mp-source__table th:first-child,
+  .mp-source__table td:first-child {
+    width: 38%;
+  }
+}
+/* Screen-reader-only, for the copy column's heading: the column needs a name
+   for a table reader and none on screen. */
+.mp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* No uppercase: "The maker's number for this part" is a sentence, not an
+   eyebrow, and capitals read as a raised voice. Matching `.t-label`'s METRICS is not the test —
+   `.mp-send__stepshead` matched them too and shouted a sentence as well. */
+.mp-source__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--n-11);
+  margin-bottom: 7px;
+}
+/* The count of approved companies, between the label and the table it counts.
+   Ordinary body text: it is a fact about the record, not a verdict, and a
+   treatment louder than the rows beneath it would read as one. */
+.mp-source__count {
+  margin: 0 0 var(--s-2);
+  font-size: 14px;
+  color: var(--n-11);
+}
+/* `.mp-source__row`, `.mp-source__row b` and `.mp-source__row .mp-copy` were
+   defined here and rendered by no .tsx. The approved sources became a table,
+   so the part number and its copy control are now `.mp-source__table` cells.
+   Nothing was lost with the rules: `.mp-source__copycell` holds the control,
+   and `.mp-source__table b` carries the `overflow-wrap: anywhere` that keeps
+   a part number from ever being clipped. Deleted by the dead-selector sweep
+   in lib/microPurchases/stylesheet.test.ts, which fails on any .mp-* rule
+   with no element behind it.
+   `.mp-source__row--legacy-unused span` was defined here and rendered nowhere —
+   the name says it. Deleted; a rule that names itself unused is a comment
+   pretending to be code. */
+.mp-source__answer {
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+.mp-source__q {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--n-11);
+  margin-bottom: var(--s-2);
+}
+.mp-source__btns,
+.mp-cash__btns,
+.mp-send__btns,
+.mp-won__btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.mp-won__asked {
+  margin: 0;
+  font-size: 13px;
+  color: var(--n-9);
+}
+/* Renewal happens at SAM.gov, so that control is an anchor. It has to look
+   like the button it replaced and not carry a browser underline. */
+.mp-renew a.btn {
+  text-decoration: none;
+}
+.btn.is-picked {
+  border-color: var(--blue-7);
+  background: var(--blue-1);
+  color: var(--blue-9);
+}
+.mp-source__saved {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  color: var(--n-8);
+}
+
+/* ─── Cash question — concrete, at her first order ─── */
+.mp-cash {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.mp-cash__head {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--n-11);
+}
+
+/* ─── Repeats ─── */
+
+/* ─── Traps ─── */
+.mp-trap {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mp-trap:last-of-type {
+  border-bottom: 0;
+}
+.mp-trap span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-trap b {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-trap em {
+  font-style: normal;
+  font-size: 13px;
+  color: var(--n-9);
+  line-height: 1.45;
+}
+.mp-traps__rest {
+  margin: var(--s-3) 0 0;
+  font-size: 13px;
+  color: var(--n-9);
+  line-height: 1.5;
+}
+
+/* ─── Send to DLA ─── */
+.mp-send {
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.mp-send__body {
+  margin: 0 0 var(--s-3);
+  font-size: 14px;
+  color: var(--n-9);
+  line-height: 1.5;
+}
+.mp-send__pair {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: var(--s-4);
+}
+.mp-send__field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mp-send__field:last-child {
+  border-bottom: 0;
+}
+.mp-send__flabel {
+  flex: 1 1 130px;
+  font-size: 13px;
+  color: var(--n-8);
+}
+.mp-send__fvalue {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 12px;
+  color: var(--n-9);
+  cursor: pointer;
+}
+.mp-send__cta {
+  width: 100%;
+  justify-content: center;
+}
+/* The one number only she knows. 44px targets, tabular figures. */
+.mp-send__price {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  margin: var(--s-2) 0;
+}
+.mp-send__priceinput {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-7);
+  border-radius: var(--r-md);
+  background: var(--n-1);
+  color: var(--n-11);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+}
+.mp-send__priceinput:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+/* THE BLOCKED NOTICE IS A BLOCK, NOT A LOOSE SENTENCE OVER A SLAB.
+   It was a 12.5px centred grey line with a full-bleed primary button under it,
+   running straight into "DLA asks for three things" with nothing between them.
+   Three things were wrong at once: the notice was centred while every other
+   line in the card is left-aligned; the button was the widest, loudest element
+   in the block while the sentence explaining it was the quietest; and with no
+   separation the pair read as the first step of the recipe rather than as the
+   reason she cannot use it.
+
+   Now it is a bounded region that owns its own space, reads at body size, and
+   ends with a rule — so the recipe below is visibly a different thing. Pattern
+   11 says a gated action is replaced by a sentence naming the step and that
+   step's own button; this is that pair, looking like a pair. */
+.mp-send__blocked {
+  margin: var(--s-3) 0 0;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--n-10);
+}
+.mp-send__blocked + .mp-send__btns {
+  margin: var(--s-2) 0 var(--s-4);
+}
+.mp-send__steps {
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+.mp-send__stepshead {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--n-8);
+  margin-bottom: var(--s-2);
+}
+/* NUMBERED, EXPLICITLY. This was an `<ol>` with a left indent and no marker —
+   Tailwind's preflight zeroes `list-style` on every list, so the element was
+   ordered in the markup and unordered on the screen. Four indented sentences
+   with nothing numbering them read as a paragraph that had been broken up, not
+   as steps to take in order, on the one block that is a set of instructions for
+   a website she has never seen.
+   `list-style-position: outside` with the padding already here, so a step that
+   wraps to two lines keeps its second line aligned with the first rather than
+   running back under its own number. */
+.mp-send__steps ol {
+  margin: 0 0 var(--s-3);
+  padding-left: 1.4em;
+  list-style: decimal outside;
+}
+.mp-send__steps li {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--n-10);
+}
+/* The number is a mark, not a word: quieter than the step it counts, and mono
+   so a two-digit step never shifts the text off the left edge. */
+.mp-send__steps li::marker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--n-8);
+}
+.mp-send__cannot {
+  margin: 0;
+  font-size: 13px;
+  color: var(--n-9);
+}
+/* Two of these in a row, or a waiting line then a reason, rendered with ZERO
+   vertical gap — measured bottom 944px / top 944px. On the won screen that
+   fused "We will ask you on Sunday, 21 February 2027…" and "Only Hunter sees
+   this. We do not tell DLA…" into one 48-word wall directly above the four
+   delivery answers. Two ideas, one paragraph, for the reader who is slowest in
+   English — and the second of the two is the sentence that answers her fear. */
+.mp-send__cannot + .mp-send__cannot,
+.mp-send__waiting + .mp-send__cannot {
+  margin-top: var(--s-2);
+}
+.mp-send__sent,
+.mp-send__q {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-3);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+
+/* ─── Mentor gate ─── */
+.mp-mentor {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  margin-bottom: var(--s-4);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+/* `--required` and `--suggested` are gone with the free mentor's offer block
+   (24 Aug 2026). Their only renderer was `mp-mentor--${decision.mode}`, and the
+   modes they styled — a review the product owed her, and one it suggested —
+   do not exist under one paid model. `--warn-only` below survives because the
+   price-low WARNING survives: it is not an offer and carries no control. */
+.mp-mentor--warn-only {
+  border-color: var(--warn-3);
+  background: var(--warn-2);
+}
+.mp-mentor__head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-2);
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--n-11);
+}
+.mp-mentor__body {
+  margin: 0 0 var(--s-2);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--n-10);
+}
+/* `.mp-mentor__sla` — a turnaround line under the mentor block — is rendered
+   by no .tsx. What the mentor block actually says about time lives in its
+   `.mp-mentor__body` copy. Deleted. */
+
+/* ─── Won ─── */
+.mp-won__head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-3);
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--n-12);
+}
+.mp-won__steps {
+  margin: 0 0 var(--s-3);
+  padding-left: 1.2em;
+}
+.mp-won__steps li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--n-10);
+}
+.mp-won__record {
+  margin: 0 0 var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+
+/* ─── Restricted ─── */
+/* "Locked" is DLA's permission, not ours. Every row on this page is a link and
+   opens its order — the markup carries role="link", tabIndex={0}, Enter/Space
+   and blur-before-open, exactly like a board card.
+
+   This modifier used to add `cursor: default` plus a `:hover` that restored the
+   rest state, and both won on the cascade, so the stylesheet cancelled every
+   affordance the markup promised on all eleven rows. Measured in Chromium at
+   1440x900: hovering left box-shadow and border-color byte-identical, while a
+   board card went to a five-layer lift and a --n-7 border. On a phone there is
+   no cursor AND no hover, so nothing was left at all — and on the `unknown`
+   acquisition-code group this page is the only route to a mentor.
+
+   Only the ground colour is legitimately this modifier's to state: --surface is
+   --n-0 where `.mp-card` is --bg / --n-1, so a restricted row sits a step above
+   the board's. Reading `role="link"` in source is what missed this; the sweep
+   in `src/lib/microPurchases/stylesheet.test.ts` reads the stylesheet instead.
+   It sweeps dead selectors and shouted text, NOT cancelled affordances, so it
+   would not have caught this one either. */
+.mp-card--locked {
+  background: var(--surface);
+}
+/* `.mp-locked__chip`, `__head`, `__body` and `__note` were defined here and
+   rendered nowhere — the restricted page draws its rows out of `.mp-card__*`
+   and `.mp-verdict__term`. Deleted rather than wired up: nothing on the page
+   is missing, and a rule with no element is a second way to build a row that
+   the next person will find and use. */
+
+@media (max-width: 480px) {
+  .mp-page {
+    max-width: 100%;
+  }
+  .mp-source__btns .btn,
+  .mp-cash__btns .btn,
+  .mp-send__btns .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  /* EXCEPT THE LONE BUTTON UNDER THE BLOCKED NOTICE. `flex: 1` is right for the
+     answer rows above — "I can do that" / "That is too much" / "I am not sure"
+     split the width evenly and read as one question. Applied to a row holding a
+     SINGLE control it just stretches it edge to edge, and a full-bleed primary
+     on a phone reads as the page's one action. This one is a detour off the
+     page's action: she came to send a price and cannot yet. It takes its words'
+     width and sits under the sentence that explains it. */
+  .mp-send__blocked + .mp-send__btns .btn {
+    flex: 0 0 auto;
+  }
+}
+
+/* Touch targets. The design system's phone-first rule is ≥44px, and the shared
+   `.btn` is 36px — fine at a desk, not fine for someone holding the phone in one
+   hand in a kitchen. Scoped to this surface rather than changing `.btn`
+   globally, which would sweep every page in the app. Caught by measuring the
+   rendered order page at 390px, not by reading the CSS. */
+.mp-page .btn,
+.mp-sheet .btn,
+.mp-panel .btn {
+  min-height: 44px;
+}
+.mp-page .mp-copy {
+  min-height: 44px;
+  /* SQUARE, because the label is gone. Icon-only left the control 37px wide
+     against a 44px-tall target, so the tap area failed on the axis nobody
+     looks at. `justify-content` centres the icon now that it is the only
+     child — without it the icon sits left and the button reads as clipped. */
+  min-width: 44px;
+  justify-content: center;
+  padding: 6px 10px;
+}
+
+/* The surplus warning. Sits under the part numbers, above the answer buttons
+   because that is the minute in which the mistake gets made. */
+.mp-source__surplus {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0 0 var(--s-4);
+  padding: 10px 12px;
+  border: 1px solid var(--warn-3);
+  border-radius: var(--r-sm);
+  background: var(--warn-2);
+}
+.mp-source__surplus svg {
+  flex: none;
+  color: var(--warn-7);
+  margin-top: 2px;
+}
+.mp-source__surplus span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-source__surplus b {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--warn-11);
+}
+.mp-source__surplus em {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warn-9);
+}
+
+/* Renewal warning. Outranks the setup checklist: every box can be ticked and she
+   can still be disqualified on every quote, because SAM lapses annually. */
+.mp-renew {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  padding: 11px var(--s-4);
+  margin-bottom: var(--s-4);
+  border: 1px solid var(--warn-3);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+}
+.mp-renew.is-expired {
+  border-color: var(--urg-3);
+  background: var(--urg-2);
+}
+.mp-renew svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn-7);
+}
+.mp-renew.is-expired svg {
+  color: var(--urg-7);
+}
+.mp-renew__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-renew__text b {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--warn-11);
+}
+.mp-renew.is-expired .mp-renew__text b {
+  color: var(--urg-9);
+}
+.mp-renew__text em {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warn-9);
+}
+.mp-renew.is-expired .mp-renew__text em {
+  color: var(--urg-8);
+}
+
+/* Amendment notice. Quoting a superseded version is a documented way to be
+   thrown out, and nothing in DIBBS tells her the order changed. */
+.mp-amend {
+  display: flex;
+  /* Wraps. The version is a fixed-width reference string and sat as a peer of
+     the warning, so at 390px it took half the row and crushed "DLA changed
+     this order on Sunday, 16 August 2026" into four words a line. The warning
+     gets the width; the version drops beneath it. */
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: flex-start;
+  padding: 11px var(--s-4);
+  margin-bottom: var(--s-4);
+  border: 1px solid var(--warn-3);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+}
+.mp-amend svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--warn-7);
+}
+.mp-amend__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-amend__text b {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--warn-11);
+}
+.mp-amend__text em {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warn-9);
+}
+/* `.mp-amend__v` — the "Version …" chip beside the amendment warning — is
+   rendered by no .tsx: the chip was cut when it was found printing the order
+   number back at her (D-B5). Both its rule and its narrow-viewport variant are
+   deleted with it. */
+@media (width < 33rem) {
+  .mp-amend__text {
+    flex: 1 1 100%;
+  }
+}
+
+/* ─── Filters as questions, not a toggle row ───────────────────────────────
+   Two questions with mutually exclusive answers, and one genuine boolean. The
+   shape on screen has to say which choices are alternatives — a row of
+   identical toggles says they are all independent, which was a lie. */
+.mp-q {
+  border: 0;
+  margin: 0 0 var(--s-5);
+  padding: 0;
+  min-width: 0;
+}
+.mp-q__legend {
+  padding: 0;
+  margin-bottom: var(--s-2);
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--n-11);
+}
+.mp-q__answers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mp-answer {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 9px var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: left;
+}
+.mp-answer:hover {
+  border-color: var(--n-7);
+}
+.mp-answer.is-on {
+  border-color: var(--blue-7);
+  background: var(--blue-1);
+}
+.mp-answer:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+/* Round mark, not a square box — these are alternatives, and the shape should
+   say so before the label does. */
+.mp-answer__mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--n-7);
+  display: grid;
+  place-items: center;
+  color: var(--n-0);
+}
+.mp-answer.is-on .mp-answer__mark {
+  background: var(--blue-7);
+  border-color: var(--blue-7);
+}
+.mp-answer__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* ═══════════════════ Mentor booking sheet ═══════════════════
+   Reached from the roadmap's mentor panel. Federal blue for every pick and
+   every focus ring — the reference design was purple, which is not a family
+   this system has. Days and slots are real buttons with real disabled state,
+   so a day that cannot be booked cannot be clicked or tabbed to. */
+.mbook__who {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border: 1px solid var(--blue-2);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+}
+.mbook__who-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.mbook__who-role {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.mbook__h {
+  margin: var(--s-5) 0 var(--s-3);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.mbook__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 240px);
+  gap: var(--s-5);
+  align-items: start;
+}
+.mbook__cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  margin-bottom: var(--s-3);
+}
+.mbook__month {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+  min-width: 11ch;
+  text-align: center;
+}
+.mbook__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--blue-3);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--blue-7);
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease);
+}
+.mbook__nav:hover:not(:disabled) {
+  background: var(--blue-1);
+}
+.mbook__nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.mbook__nav:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.mbook__dow,
+.mbook__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.mbook__dow {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+}
+.mbook__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--n-7);
+  cursor: not-allowed;
+}
+.mbook__day.is-open {
+  background: var(--blue-2);
+  color: var(--blue-9);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    color var(--d-fast) var(--ease);
+}
+.mbook__day.is-open:hover {
+  background: var(--blue-3);
+}
+.mbook__day.is-picked {
+  background: var(--blue-7);
+  color: var(--text-inverse);
+}
+.mbook__day:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.mbook__times-head {
+  margin-bottom: var(--s-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.mbook__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mbook__slot {
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--blue-3);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--blue-9);
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-color var(--d-fast) var(--ease);
+}
+.mbook__slot:hover {
+  background: var(--blue-1);
+}
+.mbook__slot.is-picked {
+  background: var(--blue-7);
+  border-color: var(--blue-7);
+  color: var(--text-inverse);
+}
+.mbook__slot:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.mbook__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+.mbook__tz {
+  display: block;
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+}
+.mbook__tz-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.mbook__tz-select {
+  width: 100%;
+  max-width: 320px;
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-6);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+.mbook__tz-select:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.mbook__tz-note {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.mbook__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+.mbook__price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.mbook__price strong {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--text);
+}
+/* Short of funds is a fact, not a failure — neutral, and it says plainly that
+   nothing has been charged. */
+.mbook__short {
+  margin-top: 2px;
+  color: var(--text-3);
+  max-width: 46ch;
+  line-height: 1.45;
+}
+.mbook__cta {
+  width: auto;
+  min-width: 200px;
+}
+.mbook__cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 700px) {
+  .mbook__cols {
+    grid-template-columns: 1fr;
+  }
+  .mbook__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mbook__cta {
+    width: 100%;
+  }
+}
+
+/* ═══════════════════ Done-for-you drawer ═══════════════════
+   Opens from the right over 36% of the page, so the sub-step she is reading
+   stays visible behind it — the offer is about that step, and hiding the step
+   to describe it would make her hold it in her head. Never narrower than
+   380px; full width on a phone, where 36% is unreadable. */
+.dfyd__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 8, 0.32);
+  z-index: 60;
+  animation: dfyd-fade var(--d-base) var(--ease);
+}
+.dfyd {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  width: clamp(380px, 36%, 620px);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--sh-sheet);
+  animation: dfyd-slide var(--d-base) var(--ease);
+}
+@keyframes dfyd-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes dfyd-slide {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dfyd,
+  .dfyd__overlay {
+    animation: none;
+  }
+}
+.dfyd__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border);
+}
+.dfyd__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+  letter-spacing: -0.01em;
+}
+.dfyd__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+}
+.dfyd__close:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.dfyd__close:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.dfyd__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-5);
+}
+.dfyd__svc {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pos-7);
+  margin-bottom: var(--s-2);
+}
+.dfyd__benefit {
+  margin: 0 0 var(--s-5);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.dfyd__h {
+  margin: 0 0 var(--s-3);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.dfyd__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.dfyd__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.dfyd__list svg {
+  flex-shrink: 0;
+  /* Sits on the NAME's line, not the middle of a two-line item. */
+  margin-top: 1px;
+  color: var(--pos-7);
+}
+
+/* Package comparison — shown instead of the flat list when a service sells at
+   more than one level. A real <table>, because it is a real table: the row
+   header names the work and each column answers "is it in this package",
+   which is exactly the relationship a screen reader needs th/scope to state.
+   Scrolls inside its own box rather than widening the drawer; the panel is
+   clamp(380px, 36%, 620px) and the item names are the part that must not
+   wrap to two lines. */
+.dfyd__pkgwrap {
+  margin: 0 0 var(--s-5);
+  overflow-x: auto;
+}
+.dfyd__pkg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.dfyd__pkg thead th {
+  padding: var(--s-2);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  vertical-align: bottom;
+}
+/* The name column takes whatever is left, so the tick columns stay as narrow
+   as their content and the eye has a short distance to travel across. */
+.dfyd__pkg thead th:first-child {
+  width: 100%;
+  text-align: left;
+}
+.dfyd__pkg-name {
+  display: block;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.dfyd__pkg-price {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.dfyd__pkg tbody th {
+  padding: var(--s-3) var(--s-3) var(--s-3) 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--text-2);
+  vertical-align: top;
+  border-bottom: 1px solid var(--n-3);
+}
+.dfyd__pkg tbody td {
+  min-width: 88px;
+  padding: var(--s-2);
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--n-3);
+  color: var(--pos-7);
+}
+.dfyd__pkg tbody td svg {
+  vertical-align: middle;
+}
+.dfyd__pkg tbody tr:last-child th,
+.dfyd__pkg tbody tr:last-child td {
+  border-bottom: none;
+}
+/* The column she is buying, tinted the whole way down so the picker in the
+   footer and the scope up here cannot be read as two unrelated controls. */
+.dfyd__pkg .is-picked {
+  background: var(--blue-1);
+}
+.dfyd__pkg thead th.is-picked {
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+.dfyd__pkg-no {
+  color: var(--text-3);
+}
+.dfyd__foot {
+  flex-shrink: 0;
+  padding: var(--s-4) var(--s-5);
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+.dfyd__price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.dfyd__price {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.dfyd__wallet {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.dfyd__wallet strong,
+.dfyd__short strong {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--text);
+}
+/* Short of funds is a fact, not a failure — neutral, with the way out on it. */
+.dfyd__short {
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.dfyd__topup {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.dfyd__foot .rm2-btn {
+  margin-top: var(--s-3);
+}
+
+/* ── Confirm before you pay ───────────────────────────────────────────
+   The last look before money moves. Deliberately the plainest screen in
+   the drawer: no video, no scope list, no packages. Three facts and two
+   buttons, because the only question left is yes or no. */
+.dfyd__confirm-h {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.dfyd__confirm,
+.dfyd__addmoney {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.dfyd__check {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-4);
+  background: var(--n-2);
+  border: 1px solid var(--n-3);
+  border-radius: var(--r-md);
+}
+.dfyd__check-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) 0;
+}
+.dfyd__check-row + .dfyd__check-row {
+  border-top: 1px solid var(--n-3);
+}
+.dfyd__check-row dt {
+  font-size: 13px;
+  color: var(--text-3);
+}
+.dfyd__check-row dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+  text-align: right;
+}
+/* Money is mono with tabular figures everywhere in this app, so the two
+   amounts in this box line up under each other and can be compared. */
+.dfyd__check-amount {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+.dfyd__confirm-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.dfyd__confirm-acts {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-2);
+}
+/* Quiet on purpose. It sits under a payment button and must never compete
+   with it, but it is a real 44px target — she is on a phone. */
+.dfyd__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: none;
+  background: none;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease);
+}
+.dfyd__back:hover {
+  color: var(--text-ink);
+}
+.dfyd__back:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+
+/* ── Add money, in place ──────────────────────────────────────────────
+   Reuses the wallet page's .add-funds-* primitives rather than growing a
+   second set. Only the two things that are new here get new classes. */
+.dfyd__addmoney-why {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.dfyd__preset-note {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+.add-funds-preset.is-selected .dfyd__preset-note {
+  color: var(--blue-7);
+}
+.dfyd__done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.dfyd__done-icon {
+  color: var(--pos-7);
+}
+.dfyd__done-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.dfyd__done-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.dfyd__done .rm2-btn {
+  width: auto;
+  margin-top: var(--s-2);
+}
+@media (max-width: 700px) {
+  .dfyd {
+    width: 100%;
+  }
+}
+
+/* Package picker in the done-for-you drawer. Whole row is the label, so the
+   tap target is the row and not just the dot — she is on a phone. */
+.dfyd__tiers {
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dfyd__tiers-legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.dfyd__tier {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-6);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color var(--d-fast) var(--ease),
+    background var(--d-fast) var(--ease);
+}
+.dfyd__tier:hover {
+  border-color: var(--pos-7);
+}
+.dfyd__tier.is-picked {
+  border-color: var(--pos-7);
+  background: var(--pos-2);
+}
+.dfyd__tier:focus-within {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.dfyd__tier input {
+  accent-color: var(--pos-7);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.dfyd__tier-name {
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 600;
+  color: var(--text);
+}
+.dfyd__tier-price {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+/* Explainer video slot at the top of the done-for-you drawer. The space is
+   reserved at 16:9 whether or not there is a video yet, so the panel does not
+   jump the day one is added. */
+.dfyd__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--n-3);
+  object-fit: cover;
+}
+.dfyd__video--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  border: 1px dashed var(--n-6);
+  color: var(--text-3);
+  font-size: 12px;
+  text-align: center;
+  padding: var(--s-4);
+}
+
+/* One subject, one grey card. The drawer used to box two facts and leave the
+   scope list bare between them, which read as an afterthought wedged between
+   the things that mattered — when it is the only block on the panel that says
+   what the money buys.
+   Same ground as .dfyd__facts, which the intake modal still uses. */
+.dfyd__block {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+}
+/* .t-body-lg, ink, and BIGGER than the value under it (19 Aug 2026, Shyam).
+   That inverts the usual label-and-figure ratio on purpose: these are section
+   titles, not field labels. At 11px the title was quieter than the answer and
+   the panel read as four loose sentences instead of four named blocks. */
+.dfyd__block-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-2);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.dfyd__block-title svg {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+.dfyd__block-value {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+/* A scope line and what it means. The name holds the weight so the list can
+   still be skimmed by name alone; the sentence underneath is for the lines
+   she has not met before, which on this panel is most of them. */
+.dfyd__item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.mp-answer__text b {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+.mp-answer__text em {
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--n-8);
+}
+.mp-q__note {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--n-8);
+}
+
+/* What she is looking at, in words, with its own undo. */
+.mp-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-4);
+  padding: 9px 12px;
+  border-radius: var(--r-sm);
+  background: var(--blue-1);
+  border: 1px solid var(--blue-3);
+  font-size: 13px;
+  color: var(--blue-10);
+}
+
+/* Touch targets, second sweep. The first pass measured the ORDER page and found
+   zero; the LIST page still had six under 44px, because the sort pills, the
+   gear and the inline links do not use `.btn`. Measure every surface, not one.
+   Inline links grow their hit area with padding plus a negative margin, so the
+   target reaches 44px without pushing the sentence around. */
+.mp-page .opps-tab {
+  min-height: 44px;
+}
+.mp-page .mp-linkbtn,
+.mp-sheet .mp-linkbtn {
+  display: inline-block;
+  padding: 12px 0;
+  margin: -12px 0;
+  line-height: 20px;
+}
+
+.dfyd__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.dfyd__item-note {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+/* How this works — who, how long, what she has to do. */
+.dfyd__facts {
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.dfyd__fact dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+.dfyd__fact dt svg {
+  flex-shrink: 0;
+}
+.dfyd__fact dd {
+  margin: 3px 0 0 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* THE SEND STEPS, CLOSED UNTIL SHE CAN USE THEM.
+   `SendStepsWhenReady` wraps the "here is what to type" block in a closed
+   `<details>` for a member who is not yet registered. The summary has to read
+   as a quiet way to look ahead, not as the panel's main control — the main
+   control is the registration button directly above it. So: no button chrome,
+   secondary ink, and the same 13px the panel's other body copy uses. */
+.mp-send__ahead {
+  margin-top: var(--s-3);
+  border-top: 1px solid var(--border);
+  padding-top: var(--s-3);
+}
+.mp-send__aheadsum {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  list-style: revert;
+}
+.mp-send__aheadsum:hover {
+  color: var(--n-12);
+}
+/* The focus ring is the browser's own on a summary, which is inconsistent
+   across engines; this is the same ring every other control on the surface
+   uses, so keyboard focus reads the same wherever she lands. */
+.mp-send__aheadsum:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* THE ORDER PAPER. Four places on this page tell her to read it; until now it
+   was never on the page. The row sits directly under the record it is the
+   source of, below the DIBBS card that shares this class, so the two ways to
+   reach the order at its source are adjacent rather than a screen apart. */
+.mp-paper {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin: var(--s-3) 0 0;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+}
+a.mp-paper:hover {
+  border-color: var(--n-7);
+  background: var(--n-1);
+}
+a.mp-paper:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.mp-paper__kind {
+  flex: none;
+  min-width: 34px;
+  text-align: center;
+  padding: 6px 7px;
+  border-radius: var(--r-sm);
+  background: var(--n-2);
+  color: var(--n-9);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.mp-paper__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mp-paper__text b {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+}
+/* The file name is an identifier and wraps rather than truncating — the same
+   rule the maker's numbers follow, for the same reason. */
+.mp-paper__text em {
+  display: block;
+  font-style: normal;
+  font-size: 12.5px;
+  color: var(--n-8);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+.mp-paper__go {
+  flex: none;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--blue-7);
+}
+/* We hold no paper for ~59% of live orders, so this is the common state, not
+   an error. Dashed and unfilled: nothing here is red and nothing is her fault. */
+.mp-paper--none {
+  border-style: dashed;
+  background: var(--n-1);
+}
+.mp-paper--none .mp-paper__kind {
+  color: var(--n-7);
+}
+
+/* ═══════════════════ The save that did not land (DH-22) ═══════════════════
+   FIXED TO THE BOTTOM EDGE, not placed in the page column. She is told about
+   this in the minute after she recorded a quote or a win, and she can be a
+   long way down an order page when it appears — a banner at the top of that
+   page is a banner she never reads. It is not a toast: it does not time out
+   and it has no close button, because the condition it reports is her record
+   not reaching the server, and the only thing that ends it is a save that
+   lands.
+   --urg-*, which tokens.css reserves for errors. .mp-renew borrows the same
+   family for its expired branch, and this is the same class of fact: something
+   she is relying on is not true.
+   z-index sits UNDER the sheet scrim (220) on purpose, so an open sheet stays
+   modal. The notice is still there when she closes it. */
+.mp-savefail {
+  position: fixed;
+  z-index: 210;
+  left: var(--s-3);
+  right: var(--s-3);
+  bottom: var(--s-3);
+  margin-inline: auto;
+  max-width: 560px;
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  padding: 11px var(--s-4);
+  border: 1px solid var(--urg-3);
+  border-radius: var(--r-md);
+  background: var(--urg-2);
+  box-shadow: var(--sh-hover);
+}
+.mp-savefail > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--urg-7);
+}
+.mp-savefail__text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mp-savefail__text b {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--urg-9);
+}
+.mp-savefail__text em {
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--urg-8);
+}

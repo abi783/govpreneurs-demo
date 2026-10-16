@@ -1,0 +1,47 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "@tanstack/react-router";
+import { PostHogProvider } from "posthog-js/react";
+import { router } from "./router";
+import "./styles.css";
+// After styles.css, not @imported from it: an @import lands before every rule in
+// the file, and the forecast rules must win over base rules of equal weight.
+import "./styles/forecasts.css";
+// The forecast watch's change marker. Global: it shows on the list, My Bids and Saved.
+import "./styles/forecast-watch.css";
+
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+// PostHog analytics (mirrors the v1 app): wrap the tree in PostHogProvider when
+// a key is configured; when it isn't, render without it so usePostHog() is a
+// no-op and nothing breaks locally / in tests.
+const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+const POSTHOG_HOST =
+  (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ??
+  "https://app.posthog.com";
+
+const app = (
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>
+);
+
+createRoot(rootElement).render(
+  POSTHOG_KEY ? (
+    <PostHogProvider
+      apiKey={POSTHOG_KEY}
+      options={{
+        api_host: POSTHOG_HOST,
+        capture_pageview: false,
+        capture_pageleave: true,
+      }}
+    >
+      {app}
+    </PostHogProvider>
+  ) : (
+    app
+  )
+);

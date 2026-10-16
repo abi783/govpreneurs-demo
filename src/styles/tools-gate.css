@@ -1,0 +1,402 @@
+/* ── Free-tools lead-gate strengthening ─────────────────────────────
+   New CSS only — no edits to tools.css. Overrides of existing tools.css
+   selectors (none currently needed) belong at the very end of this file. */
+
+/* ── SnapshotTeaser: "N more findings" line ─────────────────────── */
+.tool-findings-line {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+  color: var(--blue-11);
+}
+.tool-findings-line strong {
+  font-weight: 700;
+}
+
+/* ── Gate progress bar + label, sits above the LeadGate card ──────
+   Dedicated classes (not the checklist's shared .tool-progress-bar) so this
+   can stay a clearly-visible 4px brand-blue bar without touching that one. */
+.tool-gate-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+.tool-gate-progress__bar {
+  display: block;
+  flex: 1;
+  height: 4px;
+  background: var(--n-4);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.tool-gate-progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--blue-7);
+  border-radius: var(--r-pill);
+}
+.tool-gate-progress__label {
+  white-space: nowrap;
+  color: var(--n-8);
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* ── Reveal-then-slide-in for the gate card ──────────────────────
+   Headline renders first; the gate fades/slides in ~400ms later. */
+.tool-gate-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--d-base) var(--ease),
+    transform var(--d-base) var(--ease);
+}
+.tool-gate-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-gate-reveal {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ── Scorecard "what to fix first" list, gated ───────────────────
+   Same blurred-stack language as SnapshotTeaser's locked stack. The <ol>
+   itself just blurs (.tool-fixlist-locked); the lock pill lives on the
+   wrapping .tool-fixlist-lockwrap so it can centre over both the fix list
+   AND the market-findings stack below it — a single pill for the page. */
+.tool-fixlist-locked {
+  filter: blur(3px);
+  user-select: none;
+  max-height: 160px;
+  overflow: hidden;
+}
+.tool-fixlist-lockwrap {
+  position: relative;
+}
+.tool-fixlist-lockwrap .tool-locked-stack__fade {
+  top: auto;
+  height: 80px;
+}
+
+/* ── Inline gate panel (capability statement, checklists, HUBZone) ──
+   Centred rather than left-aligned inside its full-width parent panel. */
+.tool-inline-gate {
+  margin: 16px auto 24px;
+  max-width: 560px;
+}
+
+/* ── Cross-link row under a result (naics/demand/scorecard) ───────
+   Each link keeps its arrow glued to its label; the row wraps BETWEEN
+   links instead of splitting a link's own text mid-arrow. */
+.tool-crosslink-row {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.tool-crosslink-row > * {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* "Email me this checklist" / "Send me..." CTA — the base .btn is
+   inline-flex + white-space:nowrap, which sizes to its unwrapped content and
+   overflows the viewport on mobile with the longer HUBZone/checklist labels.
+   width:100% makes it a block-level flex item that can actually shrink.
+   Doubled selector for specificity over .btn — dev-mode style injection
+   order otherwise lets the base rule win a same-specificity tie. */
+button.tool-email-cta-btn.tool-email-cta-btn {
+  display: flex;
+  width: 100%;
+  white-space: normal;
+  text-align: left;
+  height: auto;
+  line-height: 1.35;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+/* ── Soft-ask bottom bar: compact, dismissable, never a modal ────── */
+.tool-soft-ask {
+  position: fixed;
+  left: 50%;
+  bottom: var(--s-4);
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  max-width: calc(100% - var(--s-4) * 2);
+  padding: var(--s-1);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px solid var(--n-5);
+  box-shadow: var(--sh-rest);
+  animation: tool-soft-ask-in var(--d-base) var(--ease);
+}
+@keyframes tool-soft-ask-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tool-soft-ask {
+    animation: none;
+  }
+}
+.tool-soft-ask__body {
+  border: none;
+  background: none;
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-4);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue-7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tool-soft-ask__dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--n-8);
+  cursor: pointer;
+}
+.tool-soft-ask__dismiss:hover {
+  background: var(--n-3);
+}
+@media (max-width: 480px) {
+  .tool-soft-ask {
+    left: var(--s-4);
+    right: var(--s-4);
+    bottom: var(--s-3);
+    transform: none;
+    max-width: none;
+  }
+  .tool-soft-ask__body {
+    white-space: normal;
+  }
+  @keyframes tool-soft-ask-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ── Summit pitch (ungated, under scorecard verdict) ─────────────── */
+.summit-pitch {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+  border: 1px solid var(--blue-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.summit-pitch__text {
+  margin: 0;
+  color: var(--n-11);
+}
+.summit-pitch__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+.summit-pitch__coupon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 1px dashed var(--blue-7);
+}
+.summit-pitch__coupon-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+.summit-pitch__coupon-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--blue-11);
+}
+.summit-pitch__cta {
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .summit-pitch__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .summit-pitch__cta {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ── Summit invite (post sign-in) ── */
+.summit-invite.ui-modal-content--md {
+  width: min(600px, calc(100vw - 32px));
+  padding: 0;
+  overflow: hidden;
+  overflow-y: auto;
+}
+.summit-invite__hero {
+  position: relative;
+  flex-shrink: 0;
+}
+.summit-invite__hero img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+}
+.summit-invite__close {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  width: 32px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--n-8);
+  cursor: pointer;
+  box-shadow: var(--sh-rest);
+}
+.summit-invite__close:hover {
+  background: var(--n-3);
+}
+.summit-invite__body {
+  padding: var(--s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.summit-invite__body .t-heading {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+.summit-invite__body .t-body-sm {
+  margin: 0;
+  color: var(--n-8);
+}
+.summit-invite__eyebrow {
+  align-self: flex-start;
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--blue-2);
+  color: var(--blue-7);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.summit-invite__speakers {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+.summit-invite__avatars {
+  display: flex;
+  flex-shrink: 0;
+}
+.summit-invite__avatars img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--surface);
+  margin-left: -8px;
+}
+.summit-invite__avatars img:first-child {
+  margin-left: 0;
+}
+.summit-invite__offer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+  border: 1px solid var(--warn-3);
+  color: var(--warn-11);
+}
+/* The code has to read as something you copy, not as prose. Mono + a dashed
+   edge marks it as a literal a member types at checkout. */
+.summit-invite__coupon {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0 var(--s-1);
+  border-radius: var(--r-sm);
+  /* The offer box is already --warn-2; the chip sits on white so the code
+     reads as a distinct object rather than a shade of its container. */
+  background: #fff;
+  border: 1px dashed var(--warn-7);
+  color: var(--warn-11);
+  user-select: all;
+}
+.summit-invite__actions {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin-top: var(--s-2);
+}
+.summit-invite__actions .btn {
+  flex: 1;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .summit-invite.ui-modal-content--md {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .summit-invite__actions .btn {
+    flex: 1 1 100%;
+  }
+}
