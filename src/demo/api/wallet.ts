@@ -1,11 +1,37 @@
 // DEMO API area: Wallet and plan upgrade.
 // Owns: /wallet/*, /opportunities/get-credit, /opportunities/upgradePlan.
-//
-// Path scheme (see src/demo/runtime/router.ts): paths for frontend-v2 code have no
-// prefix (`/opportunities/...`). Paths for lifted Success Center code keep `/api`.
-// The full list of calls, with request and response types, is in ENDPOINTS.md.
-// Keep a visitor's changes in src/demo/runtime/store.ts so they survive a reload.
+// State lives in src/demo/state/wallet.ts (shared with the mentor send flow).
 
 import type { DemoRouteDef } from "../runtime/router";
+import { getWalletBalance, getWalletEntries, MENTOR_REVIEW_PRICE } from "../state/wallet";
 
-export const routes: DemoRouteDef[] = [];
+export const routes: DemoRouteDef[] = [
+  {
+    method: "GET",
+    path: "/wallet/balance",
+    handler: () => ({ balance: getWalletBalance(), chargeAmount: MENTOR_REVIEW_PRICE }),
+  },
+  {
+    method: "GET",
+    path: "/wallet/ledger",
+    handler: () => ({
+      entries: getWalletEntries().map((e) => ({
+        id: e.id,
+        date: e.at,
+        description: e.label,
+        type: e.amount >= 0 ? "credit" : "debit",
+        amountUSD: Math.abs(e.amount),
+      })),
+    }),
+  },
+  {
+    method: "GET",
+    path: "/opportunities/get-credit",
+    handler: () => ({ credit: 0 }),
+  },
+  {
+    method: "POST",
+    path: "/opportunities/upgradePlan",
+    handler: () => ({ success: true }),
+  },
+];

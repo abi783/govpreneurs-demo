@@ -31,7 +31,7 @@ function buildProfile(): BusinessProfile {
     isSmall: true,
     certifications: ["sam"],
     certificationCategories: [],
-    capabilityStatementUrl: null,
+    capabilityStatementUrl: PERSONA.capabilityStatementFile,
     uei: PERSONA.uei,
     cage: PERSONA.cage,
     ein: null,
