@@ -261,7 +261,8 @@ function compareForList(a: TaskView, b: TaskView, now: Date): number {
 }
 
 /** Why the first row is first, said as a fact she can check (reason.ts). */
-function startHereFor(lead: TaskView | undefined, now: Date): string | null {
+function startHereFor(open: TaskView[], now: Date): string | null {
+  const lead = open[0];
   if (!lead?.due) return null;
   const days = Math.ceil((new Date(lead.due.at).getTime() - now.getTime()) / 86_400_000);
   if (days < 0) return "This one has been waiting the longest";
@@ -270,7 +271,10 @@ function startHereFor(lead: TaskView | undefined, now: Date): string | null {
   const human =
     primary?.kind === "MENTOR" || primary?.kind === "MEETING" || primary?.kind === "ACTION_PLAN";
   if (human && primary?.actorName) return `${primary.actorName} is waiting on this one`;
-  return days === 0 ? "This one is due today" : "This one is due first";
+  if (days === 0) return "This one is due today";
+  // The list puts program work above mentor work, so the first row is not always the earliest due date.
+  const earliest = Math.min(...open.filter((t) => t.due).map((t) => new Date(t.due!.at).getTime()));
+  return new Date(lead.due.at).getTime() === earliest ? "This one is due first" : "This one is due soon";
 }
 
 export function buildTasksPayload(): TasksPayload {
@@ -316,7 +320,7 @@ export function buildTasksPayload(): TasksPayload {
       dismissed: dismissed.length,
       fromMentor: open.filter((t) => t.section === "mentor").length,
     },
-    startHere: startHereFor(open[0], now),
+    startHere: startHereFor(open, now),
     mentorName,
     lastVisitAt: null,
     bookingSteps,
