@@ -537,8 +537,8 @@ const restrictedSite: Maker = (f, sol) => {
   const days = factsFor(getOpportunity(HERO_IDS.fieldMeals)!).daysLeft;
   const roadmap: RoadmapItem[] = [
     {
-      item: rt("**Win Camp Mackall field meals** first"),
-      whyItMattered: rt("It is the same base. A win there gives the Army a name to trust when a cleared-site contract comes."),
+      item: rt("**Bid on Camp Mackall field meals** first"),
+      whyItMattered: rt("It is the same base. A job there gives the Army a name to trust when a cleared-site contract comes."),
       whatItTakes: rt(`The quote is open now. Answer Ava's questions and certify two more cooks. That fits inside ${days} days.`),
     },
     {
@@ -595,7 +595,7 @@ const restrictedSite: Maker = (f, sol) => {
         "That is a path of months. Nothing you send before the due date changes it.",
       ],
       "Does this move you forward?": [
-        "Camp Mackall field meals is the same base and the same buyer, with no clearance. A win there is the record you need.",
+        "Camp Mackall field meals is the same base and the same buyer, with no clearance. A job there is the record you need.",
       ],
     },
     limiting: "Can you do the work?",
