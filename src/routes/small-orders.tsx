@@ -23,5 +23,9 @@ function SmallOrdersLayout() {
 }
 
 export const Route = createFileRoute("/small-orders")({
+  // DEMO: the browser tab said only "GovPreneurs" on every Small Orders page.
+  head: () => ({
+    meta: [{ title: "Small Orders — Defense Logistics Agency · GovPreneurs" }],
+  }),
   component: SmallOrdersLayout,
 });

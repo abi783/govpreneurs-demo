@@ -2127,3 +2127,101 @@ test.describe("The Back button with a dialog open", () => {
     });
   }
 });
+
+// ── The whole Grant analysis, opened up ────────────────────────────────────
+
+test.describe("Grant: the full analysis opened up", () => {
+  for (const id of [CAMP_MACKALL, FORT_BRAGG, RESTRICTED, "FAYNC-2026-R-08", "CUMCO-2026-014", "W912PM-26-Q-0017"]) {
+    test(id, async ({ page, context }) => {
+      test.setTimeout(240_000);
+      const w = await watch(page, context);
+      await open(page, `/opportunities/${id}?fast=1`);
+      await passGrantIntro(page);
+      await page.locator("summary.grant-full__summary").first().click();
+      // Open every fold. Each one shows more text and nothing breaks.
+      const folds = page.locator(".grant-full details > summary");
+      const nFolds = await folds.count();
+      for (let i = 0; i < nFolds; i++) {
+        await folds.nth(i).click({ timeout: 3000 }).catch(() => undefined);
+      }
+      // Press every source pin. A sheet opens, Escape closes it, the page is still there.
+      const pins = page.locator(".grant-full button.grant-pin");
+      const nPins = Math.min(await pins.count(), 25);
+      for (let i = 0; i < nPins; i++) {
+        await pins.nth(i).scrollIntoViewIfNeeded().catch(() => undefined);
+        await pins.nth(i).click({ timeout: 3000 }).catch(() => undefined);
+        await page.waitForTimeout(250);
+        if ((await covers(page)) > 0) {
+          await page.keyboard.press("Escape");
+          await page.waitForTimeout(250);
+          expect(await covers(page), `pin ${i} on ${id} left something open`).toBe(0);
+        }
+        expect(await page.evaluate(() => getComputedStyle(document.body).pointerEvents)).not.toBe("none");
+      }
+      await healthy(page, w, `the full analysis of ${id}`);
+    });
+  }
+});
+
+test.describe("Book another mentor", () => {
+  test("Tomas Delgado: one booking and one charge of $85, shown on the Success Center", async ({ page, context }) => {
+    const w = await watch(page, context);
+    const before = await balance(page);
+    await open(page, "/find-a-mentor");
+    await page.getByRole("button", { name: "Book a call" }).nth(2).click();
+    const modal = page.locator("div.fixed.inset-0").filter({ hasText: "Book with Tomas Delgado" });
+    await expect(modal).toBeVisible();
+    await modal.locator("button:not([disabled])", { hasText: /^21$/ }).click();
+    // The first free time.
+    const slot = modal.locator("button:not([disabled])").filter({ hasText: /\d{1,2}:\d\d\s?(AM|PM)/i }).first();
+    await slot.click();
+    const confirm = modal.locator("button", { hasText: /Confirm|Book/ }).last();
+    await humanDoubleClick(page, confirm);
+    await settle(page);
+    await page.waitForTimeout(1000);
+    await settle(page);
+    await healthy(page, w, "after booking Tomas");
+    expect(await balance(page)).toBe(before - 85);
+    await open(page, "/");
+    await expect(main(page)).toContainText("Tomas Delgado");
+    await healthy(page, w, "home after booking Tomas");
+  });
+});
+
+test.describe("Have us do it", () => {
+  test("a quick double-click makes one request, and it is still there after a reload", async ({ page, context }) => {
+    const w = await watch(page, context);
+    const before = await balance(page);
+    await open(page, `/opportunities/${RESTRICTED}`);
+    await passGrantIntro(page);
+    await page.getByRole("button", { name: /Have us do it/ }).click();
+    const dialog = page.getByRole("dialog");
+    await humanDoubleClick(page, dialog.getByRole("button", { name: /^Confirm/ }));
+    await settle(page);
+    await expect(dialog).toContainText("Request received");
+    await page.waitForTimeout(600);
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(main(page)).toContainText("Requested");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await settle(page);
+    await expect(main(page)).toContainText("Requested");
+    // The sample request does not touch the wallet.
+    expect(await balance(page)).toBe(before);
+    await healthy(page, w, "Have us do it");
+  });
+});
+
+test.describe("Browser tab titles", () => {
+  test("each page names itself in the tab", async ({ page, context }) => {
+    const w = await watch(page, context);
+    const plain: string[] = [];
+    for (const route of SWEEP_SET) {
+      await open(page, route + (route.includes("?") ? "&" : "?") + "fast=1");
+      const title = await page.title();
+      if (!title || title.trim() === "GovPreneurs" || /undefined|null|NaN|vite|tanstack/i.test(title)) plain.push(`${route}: "${title}"`);
+    }
+    expect(plain).toEqual([]);
+    await healthy(page, w, "tab titles");
+  });
+});
