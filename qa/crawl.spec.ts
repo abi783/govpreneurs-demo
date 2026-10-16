@@ -10,7 +10,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { test, expect, type BrowserContext, type Page, type Request } from "@playwright/test";
+import { test, type BrowserContext, type Page, type Request } from "@playwright/test";
 import { allKnownRoutes, crawlRoutes } from "./routes";
 import type { ClickFailure, ClickRecord, RouteResult } from "./crawlTypes";
 
@@ -533,7 +533,13 @@ for (const route of routes) {
         const noisy = baseline > 2;
         const mutated = after ? after.mutations > (noisy ? baseline * 3 + 4 : 0) : true;
         const urlChanged = Boolean(after && after.url !== before.url);
-        const selfLink = Boolean(target.href && new URL(target.href).pathname === new URL(before.url).pathname && new URL(target.href).search === new URL(before.url).search && !new URL(target.href).hash);
+        // A link to the page you are on (the harness adds ?fast=1, so ignore a missing query).
+        const selfLink = (() => {
+          if (!target.href) return false;
+          const to = new URL(target.href);
+          const here = new URL(before.url);
+          return to.pathname === here.pathname && !to.hash && (to.search === "" || to.search === here.search);
+        })();
         const scrolled = Boolean(after && (after.scroll[0] !== before.scroll[0] || after.scroll[1] !== before.scroll[1]));
         const focusInput = Boolean(after && after.editable && after.active !== before.active);
 
@@ -590,6 +596,11 @@ for (const route of routes) {
       ...result.deadClicks.map((d) => `dead click: ${d.role} "${d.name}" (${d.selector})`),
       ...result.clickFailures.map((c) => `click error: ${c.role} "${c.name}": ${c.error}`),
     ];
-    expect(summary, `${route}\n${summary.join("\n")}`).toEqual([]);
+    if (summary.length > 0) {
+      const short = summary.slice(0, 6).map((l) => (l.length > 260 ? `${l.slice(0, 260)}…` : l));
+      throw new Error(
+        `${route}: ${summary.length} problem(s). The first ones:\n${short.map((l) => `  - ${l.split("\n")[0]}`).join("\n")}\nFull list: qa/report/crawl.md`,
+      );
+    }
   });
 }

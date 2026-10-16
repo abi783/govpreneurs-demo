@@ -125,7 +125,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 ### POST /opportunities/discover/v2
 - Area file: hunter
 - Called from: `fetchDiscoverV2` `src/lib/discoverApi.ts:91` (apiFetch at :103).
-  - `src/routes/opportunities.index.tsx:902` `fetchDiscoverV2`: page 1 of the For you tab. Runs on page load, on every filter, sort, search or buyer-lane change, when the member opens the For you tab, on Retry, and when the profile defaults settle. A new run aborts the old run. The wait before the call is 120 ms for filter and sort changes and 250 ms for search text. Up to three calls run in the first seconds after page load.
+  - `src/routes/opportunities.index.tsx:902` `fetchDiscoverV2`: page 1 of the For you tab. Runs on page load, on every filter, sort, search or buyer-lane change, when the member opens the For you tab, on Retry, and when the profile defaults settle. A new run aborts the old run. The wait before the call is 120 ms for filter and sort changes and 250 ms for search text (`src/lib/feedDebounce.ts:6` and `:8`). The effect runs again when the profile defaults settle, so the first call can be aborted and sent again.
   - `src/routes/opportunities.index.tsx:958` `fetchDiscoverV2`: a poll every 5000 ms (`MATCHES_POLL_INTERVAL_MS`, `:102`). It runs only while the "matches generating" state shows. It stops after 3 failed calls (`MAX_MATCHES_POLL_FAILURES`, `:103`). The body carries only `page: 1`, `limit: 50` and the buyer lane.
   - `src/routes/opportunities.index.tsx:1014` `fetchDiscoverV2`: the badge count after a buyer-lane change, when the open tab is not For you. The body has `page: 1`, `limit: 1`. The page reads `total` only.
   - `src/routes/opportunities.index.tsx:1337` `fetchDiscoverV2`: the next page, when the scroll sentinel comes near the screen. The body has `page: N+1`, `limit: 50`.
@@ -429,11 +429,11 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Area file: hunter
 - Called from: `searchNaics` `src/lib/preview.ts:203` (apiFetch at :206).
   - `src/components/Hunter/WarmStartWizard.tsx:163` `searchNaics`: the wizard's NAICS search box.
-  - `src/lib/askOptions.ts:78` `searchNaics`: the NAICS picker on a profile question card, after a 250 ms debounce (`src/lib/useDebouncedSearch.ts:15`).
+  - `src/lib/askOptions.ts:78` `searchNaics`: the NAICS picker on a profile question card, after a 250 ms debounce (`SEARCH_DEBOUNCE_MS`, `src/lib/useDebouncedSearch.ts:12`).
 - Query: `q` (string). An empty `q` never reaches the network.
 - Request body: none
 - Response: `NaicsSearchResult[]` (`src/lib/preview.ts:54`): `[{ code, description }]`
-- Errors the UI handles: the wizard shows no results (`WarmStartWizard.tsx:166`). The picker on a profile question card (`ClosedSetAsk.tsx:55`) shows its empty text "Start typing to search".
+- Errors the UI handles: the wizard shows no results (`src/components/Hunter/WarmStartWizard.tsx:165`). The picker on a profile question card (`src/components/Hunter/ClosedSetAsk.tsx:55`) shows its empty text "Start typing to search".
 - Notes: none.
 
 ### GET /naics/descriptions
@@ -565,7 +565,7 @@ Area file: `src/demo/api/workspace.ts`. This area owns the member's saved list a
 - Called from: `fetchSavedOppDetails` `src/lib/workspace.ts:45` (apiFetch at :46). Call site `src/routes/pipeline.tsx:103` `fetchSavedOppDetails`. It runs when `/pipeline` loads.
 - Query: none
 - Request body: none
-- Response: `SavedOppDetail[]` (`src/lib/workspace.ts:11`): `[{ oppKey, title, agency, dueDate: ISO | null, sourceType: string | null }]`. `sourceType` `dibbs` makes a small order card. `sourceType` `forecast` or `sled_forecast` (`src/lib/forecasts/sourceType.ts:5`) makes a forecast card. A forecast card has no countdown.
+- Response: `SavedOppDetail[]` (`src/lib/workspace.ts:11`): `[{ oppKey, title, agency, dueDate: ISO | null, sourceType: string | null }]`. `sourceType` `dibbs` makes a small order card. `sourceType` `forecast` or `sled_forecast` (`src/lib/forecasts/sourceType.ts:6`) makes a forecast card. A forecast card has no countdown.
 - Errors the UI handles: the page logs "Failed to load saved opportunities" and shows the board with the mentor review cards only. With no card at all, it shows the empty board.
 - Notes: the rows must be the same records as `savedOpps` from `GET /workspace`.
 
@@ -618,7 +618,7 @@ Area file: `src/demo/api/pipeline.ts`. None: it reads workspace + mentorReviews.
 
 ## mentorReviews
 
-Area file: `src/demo/api/mentorReviews.ts`. This area owns `/mentor-reviews/*` and `POST /opportunities/send-for-review`. A shared store (`src/lib/mentorReviewsApi.ts:244`) caches the list, and callers share one in-flight request.
+Area file: `src/demo/api/mentorReviews.ts`. This area owns `/mentor-reviews/*` and `POST /opportunities/send-for-review`. A shared store (`reviewsCache`, `src/lib/mentorReviewsApi.ts:246`) caches the list, and callers share one in-flight request.
 
 ### GET /mentor-reviews
 - Area file: mentorReviews
@@ -942,16 +942,16 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 
 ### POST /forecasts/takes
 - Area file: forecasts
-- Called from: `fetchForecastTakes` `src/lib/forecasts/cardTakeApi.ts:43` (apiFetch at :47). Call site `src/lib/forecasts/useForecastCardTakes.ts:92` `fetchForecastTakes`, used at `src/routes/forecasts.index.tsx:169`. It runs on `/forecasts`, in windows of 20 cards (`TAKE_WINDOW`, `:15`), one window at a time, as the member scrolls. A failed window is asked again after 30000 ms (`RETRY_AFTER_MS`, `:17`).
+- Called from: `fetchForecastTakes` `src/lib/forecasts/cardTakeApi.ts:43` (apiFetch at :47). Call site `src/lib/forecasts/useForecastCardTakes.ts:92` `fetchForecastTakes`, used at `src/routes/forecasts.index.tsx:169`. It runs on `/forecasts`, in windows of 20 cards (`TAKE_WINDOW`, `src/lib/forecasts/useForecastCardTakes.ts:15`), one window at a time, as the member scrolls. A failed window is asked again after 30000 ms (`RETRY_AFTER_MS`, `src/lib/forecasts/useForecastCardTakes.ts:17`).
 - Query: none
 - Request body: `{ oppKeys: string[] }`, at most 50 keys (`FORECAST_CARD_TAKE_MAX_KEYS`)
-- Response: `{ takes: { oppKey: string; line: string }[] }` (`ForecastCardTakesResponse`, `:23`). A line must be a non-empty string of at most 240 characters, for a key that the request named. The client drops any other row.
+- Response: `{ takes: { oppKey: string; line: string }[] }` (`ForecastCardTakesResponse`, `src/lib/forecasts/cardTakeApi.ts:23`). A line must be a non-empty string of at most 240 characters, for a key that the request named. The client drops any other row.
 - Errors the UI handles: none shown. The card keeps its own rule-built line.
 - Notes: a key with no line is not asked again in the session. The literal `takes` segment is a POST. It does not clash with `GET /forecasts/:oppKey`.
 
 ### GET /forecast-watch
 - Area file: forecasts
-- Called from: `requestWatch` `src/lib/forecasts/watch.ts:319` (apiFetch at :322; the path is `WATCH_PATH = "/forecast-watch"`, `:132`). `loadForecastWatch` (`:349`) shares one read for the session. `refreshForecastWatch` (`:356`) reads again.
+- Called from: `requestWatch` `src/lib/forecasts/watch.ts:319` (apiFetch at :322; the path is `WATCH_PATH = "/forecast-watch"`, `src/lib/forecasts/watch.ts:145`). `loadForecastWatch` (`src/lib/forecasts/watch.ts:349`) shares one read for the session. `refreshForecastWatch` (`src/lib/forecasts/watch.ts:356`) reads again.
   - `src/lib/forecasts/watch.ts:377` `loadForecastWatch`, in `useForecastWatch`: the first time any of these mounts: `WatchMarker` on a tracked forecast card (`src/components/Forecast/ForecastCard.tsx:87`), on a saved forecast card in the feed (`src/components/Hunter/OpportunityCard.tsx:277`) and on a forecast bid card (`src/components/Bids/BidCard.tsx:166`); `ForecastWatchChanges` on the forecast page (`src/components/Forecast/ForecastWatchChanges.tsx:119`); and the forecast page itself (`src/routes/forecasts.$forecastId.tsx:142`).
   - `src/lib/trackedForecasts.ts:79` and `:102` `refreshForecastWatch`: after a Track or Untrack write succeeds, and after Hunter saves or unsaves a record.
   - `src/lib/forecasts/watch.ts:370` `refreshForecastWatch`: after Mark as seen.
@@ -1018,7 +1018,7 @@ Area file: `src/demo/api/smallOrders.ts`. This area owns `/small-orders*`. These
 
 ### GET /small-orders/state
 - Area file: smallOrders
-- Called from: `fetchMemberState` `src/lib/microPurchases/api.ts:341` (apiFetch at :343). Call site `src/lib/state/microPurchases.ts:277` `fetchMemberState`, in `hydrateMicroState`. It runs once for each page load, from `/small-orders` (`src/routes/small-orders.index.tsx:184`), `/small-orders/$orderId` (`:90`) and `/small-orders/restricted` (`:265`).
+- Called from: `fetchMemberState` `src/lib/microPurchases/api.ts:341` (apiFetch at :343). Call site `src/lib/state/microPurchases.ts:277` `fetchMemberState`, in `hydrateMicroState`. It runs once for each page load, from `/small-orders` (`src/routes/small-orders.index.tsx:184`), `/small-orders/$orderId` (`src/routes/small-orders.$orderId.tsx:90`) and `/small-orders/restricted` (`src/routes/small-orders.restricted.tsx:265`).
 - Query: none
 - Request body: none
 - Response: `MicroState` (`src/lib/state/microPurchases.ts:85`). It must be a keyed object, not an array. A document with fewer fields merges with the defaults.
@@ -1096,9 +1096,9 @@ Area file: `src/demo/api/misc.ts`. None found. Every call that the code makes fi
 
 These are network-looking references that are not calls to the backend. The demo blocks or ignores them. A handler is not needed for any of them.
 
-- **Google Fonts**: `src/styles.css:1` imports a stylesheet from `fonts.googleapis.com`, and `index.html:11` and `:12` preconnect to `fonts.googleapis.com` and `fonts.gstatic.com`. `fetchInterceptor` lets these two hosts pass (`PASS_HOSTS`, `src/demo/runtime/fetchInterceptor.ts:23`). Without a connection, the page falls back to its default fonts.
-- **PostHog analytics**: `src/main.tsx:21` to `:43` mount `PostHogProvider` only when `VITE_POSTHOG_KEY` is set. The repo has no `.env` file, so it is not mounted. If a key is set, `posthog-js` calls `https://app.posthog.com` (the default host, `:22` to `:24`) with `fetch`, `XMLHttpRequest` and `sendBeacon`. `fetchInterceptor` blocks each call and records it in `window.__DEMO_BLOCKED__`, which fails the QA crawl. Keep the key unset.
-- **GoHighLevel wallet billing page**: `GHL_WALLET_BILLING_URL` (`src/lib/walletApi.ts:61`) is `https://app.govpreneurs.com/v2/location/{locationId}/settings/company-billing/billing?tab=wallet_transactions`. The "Add funds" button opens it with `window.open` (`src/routes/wallet.tsx:66`) and the Send to mentor dialog links to it (`src/components/Mentors/MentorSendModal.tsx:318`). `linkGuard` catches the host and shows the "Not part of this demo" notice (`src/demo/nav/linkGuard.ts`).
+- **Google Fonts**: `src/styles.css:1` imports a stylesheet from `fonts.googleapis.com`, and `index.html:12` and `index.html:13` preconnect to `fonts.googleapis.com` and `fonts.gstatic.com`. `fetchInterceptor` lets these two hosts pass (`PASS_HOSTS`, `src/demo/runtime/fetchInterceptor.ts:23`). Without a connection, the page falls back to its default fonts.
+- **PostHog analytics**: `src/main.tsx:25` to `src/main.tsx:47` mount `PostHogProvider` only when `VITE_POSTHOG_KEY` is set. The repo has no `.env` file, so it is not mounted. If a key is set, `posthog-js` calls `https://app.posthog.com` (the default host, `src/main.tsx:28`) with `fetch`, `XMLHttpRequest` and `sendBeacon`. `fetchInterceptor` blocks each call and records it in `window.__DEMO_BLOCKED__`, which fails the QA crawl. Keep the key unset.
+- **GoHighLevel wallet billing page**: `GHL_WALLET_BILLING_URL` (`src/lib/walletApi.ts:61`) is `https://app.govpreneurs.com/v2/location/{locationId}/settings/company-billing/billing?tab=wallet_transactions`. The "Add funds" button on `/wallet` no longer opens it: it shows a demo notice (`src/routes/wallet.tsx:66`). The Send to mentor dialog still links to it with an anchor (`src/components/Mentors/MentorSendModal.tsx:318`). `linkGuard` catches that host and shows the "Not part of this demo" notice (`src/demo/nav/linkGuard.ts`).
 - **Plan upgrade frame**: `UPGRADE_PLAN_LINK` (`src/lib/plans.ts:16`, `https://govpreneurs.com/membership`) or the `link` of `POST /opportunities/upgradePlan` loads into an `<iframe src>` (`src/components/Hunter/UpgradePlanModal.tsx:149`). A frame load is not a fetch, so nothing blocks it. The Elite member never opens it.
 - **Links to outside sites**: these are anchors, not fetches. `linkGuard` leaves them to the browser. They include `sam.gov`, `dibbs.bsm.dla.mil` and `piee.eb.mil` (`src/components/MicroPurchases/PrereqLine.tsx:61`, `:81`, `:88`), the government links in `src/lib/stayReady.ts`, `src/lib/forecasts/copy.ts:431`, the forecast `sourceLink` and `publisherSite` urls, a prior award `noticeUrl`, a partner `website` (`src/components/Partners/PrimeDetailPanel.tsx:236`), the acquisition-code `citation.url`, and a mentor attachment `url`.
 - **No other transport**: a search of `src/` (without tests) finds no `XMLHttpRequest`, `EventSource`, `WebSocket`, `new Request`, `navigator.sendBeacon` or relative-path `fetch(` in app code. The only `fetch(` is inside `apiFetch` (`src/lib/api.ts:60` and `:63`).
