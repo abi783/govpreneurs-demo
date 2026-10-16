@@ -75,6 +75,14 @@ export const OWNER_WORDS: Record<Ask["owner"], string> = {
   subcontractor: "the company that does part of the work for you",
 };
 
+/** Ava's question about a promise. The promise's own full stop stays inside the
+ *  quotation marks, so the line never ends a quotation with two marks. */
+function promiseLine(text: string): string {
+  const t = text.trim();
+  const inside = /[.!?]$/.test(t) ? t : `${t}.`;
+  return `If you win, you promise this: “${inside}” Can you do it?`;
+}
+
 function lowerFirst(t: string): string {
   return /^[A-Z][a-z]/.test(t) && !/^(Form|Exhibit|Addendum)\b/.test(t)
     ? t.charAt(0).toLowerCase() + t.slice(1)
@@ -109,7 +117,7 @@ export function questionText(bid: AvaBid, s: BidState, q: Question): string {
       return `Next, I need this: ${lowerFirst(a.title)}.${q.goes ? ` It goes into ${q.goes}.` : ""}`;
     }
     case "promise":
-      return `If you win, you promise this: "${q.commitment!.text}". Can you do it?`;
+      return promiseLine(q.commitment!.text);
     case "decision":
       return "One choice I should not make for you. Which is true for you?";
     case "staffing":
@@ -549,7 +557,7 @@ function askedText(bid: AvaBid, s: BidState, key: string): string {
   }
   if (key.startsWith("promise:")) {
     const c = bid.commitments.find((x) => `promise:${x.id}` === key);
-    return c ? `If you win, you promise this: "${c.text}". Can you do it?` : "";
+    return c ? promiseLine(c.text) : "";
   }
   if (key.startsWith("decision:"))
     return "One choice I should not make for you. Which is true for you?";
