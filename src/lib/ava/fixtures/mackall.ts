@@ -24,6 +24,7 @@
 // No section numbers from the federal rulebook are cited: the buyer's own
 // clause text is quoted instead, because the rulebook is mid-overhaul.
 
+import { buyerPeople, REFERENCE_CONTACTS } from "../../../demo/ava/contacts";
 import { getGrantBrief } from "../../../demo/story/grantBriefs";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import { PAST_PERFORMANCE, PERSONA, type PastPerformance } from "../../../demo/story/persona";
@@ -49,6 +50,8 @@ function briefDay(label: string): number {
 }
 
 const DUE_DAYS = STORY.closesInDays;
+/** The Army's contracting officer: the person the opportunity page names. */
+const CO = buyerPeople(MACKALL_ID).primary;
 const QUESTIONS_DAYS = briefDay("Questions due");
 const AWARD_DAYS = briefDay("Expected award");
 /** The notice, its work statement and the old wage rates went up together. */
@@ -210,7 +213,7 @@ const S_EMAIL = doc(
   RFQ,
   "Section 3.6, page 23",
   "§3.6",
-  `Quotes shall be emailed to denise.harper@army.mil with the subject line: RFQ ${MACKALL_ID} – [Offeror Name]. Each volume shall be a separate PDF. Total attachments shall not exceed 10 MB.`,
+  `Quotes shall be emailed to ${CO.email} with the subject line: RFQ ${MACKALL_ID} – [Offeror Name]. Each volume shall be a separate PDF. Total attachments shall not exceed 10 MB.`,
 );
 const S_AWARD = doc(
   RFQ,
@@ -470,7 +473,7 @@ const WINDOW_TEXT =
   "Breakfast at each delivery point by 5:30 AM. Dinner by 5:00 PM, every training day.";
 const WINDOW_TEXT_AMD2 =
   "Breakfast at each delivery point by 5:00 AM. Dinner by 5:00 PM, every training day, weekends included.";
-const STAFF_TEXT = `${PERSONA.employeesW2} cooks, ${DRIVERS} of them also driving, and ${PLAN.partTime.count} part-time cook for the ${OVERLAP_WEEKS} weeks when two rotations overlap. The ${COOKS_WITHOUT} cooks without a food handler certificate finish the course before the first delivery. Each driver is cleared for installation access before the first delivery.`;
+const STAFF_TEXT = `${PERSONA.employeesW2} cooks, ${DRIVERS} of them also driving, and ${PLAN.partTime.count} part-time cook for the ${OVERLAP_WEEKS} weeks when two rotations overlap. The ${COOKS_WITHOUT} cooks without a food handler certificate finish the course before this quote is sent. Each driver is cleared for installation access before the first delivery.`;
 
 // ─── The bid ───
 
@@ -1671,7 +1674,7 @@ export const mackallBid: AvaBid = {
           },
           { text: ", and " },
           {
-            text: `the other ${COOKS_WITHOUT} finish the course before the first delivery`,
+            text: `the other ${COOKS_WITHOUT} finish the course before this quote is sent`,
             claim: { id: "mk-cl-course", tag: "commitment", commitmentId: "mk-c-staff" },
           },
           { text: ". " },
@@ -2052,8 +2055,8 @@ export const mackallBid: AvaBid = {
 
   submission: {
     method: "email",
-    where: "By email to Denise Harper, the Army contracting officer for this quote",
-    account: "denise.harper@army.mil",
+    where: `By email to ${CO.name}, the Army contracting officer for this quote`,
+    account: CO.email,
     source: S_EMAIL,
     limits: "10 MB in total, one PDF per volume, in one email",
     files: [
@@ -2119,7 +2122,7 @@ export const mackallBid: AvaBid = {
       { id: "mk-ck-subject", label: "Copy the email subject line word for word" },
       {
         id: "mk-ck-email",
-        label: "Email the 4 PDF files to Denise Harper before 10:00 AM Eastern Time",
+        label: `Email the 4 PDF files to ${CO.name} before 10:00 AM Eastern Time`,
       },
       { id: "mk-ck-receipt", label: "Save the sent email as your receipt and upload it here" },
     ],
@@ -2370,13 +2373,13 @@ export const mackallBid: AvaBid = {
     estimatedValue: null,
     penalties: null,
     contact: {
-      name: "Denise Harper",
+      name: CO.name,
       role: `Contracting officer, ${STORY.office}`,
-      email: "denise.harper@army.mil",
+      email: CO.email,
       source: S_EMAIL,
     },
     questionsChannel: {
-      text: "By email to Denise Harper, who runs this quote for the Army.",
+      text: `By email to ${CO.name}, who runs this quote for the Army.`,
       source: S_AMD1_QUESTIONS,
     },
     noContact: null,
@@ -2463,10 +2466,10 @@ export const mackallAnswers: Record<string, AskAnswer> = {
     status: "done",
     at: AT(55),
     values: {
-      "fld-ref1-phone": "(910) 555-0171",
-      "fld-ref1-email": "mike.sutton@carolinadininggroup.com",
-      "fld-ref2-phone": "(910) 555-0162",
-      "fld-ref2-email": "janet.reyes@ccs.k12.nc.us",
+      "fld-ref1-phone": REFERENCE_CONTACTS.mikeSutton.phone,
+      "fld-ref1-email": REFERENCE_CONTACTS.mikeSutton.email,
+      "fld-ref2-phone": REFERENCE_CONTACTS.janetReyes.phone,
+      "fld-ref2-email": REFERENCE_CONTACTS.janetReyes.email,
     },
   },
   "mk-ask-temps": { status: "done", at: AT(58), choiceId: "t-probe" },
