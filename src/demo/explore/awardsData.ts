@@ -9,6 +9,7 @@
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING } from "./firms";
 import { calendarDay, daysToDay } from "./dates";
 import { PAST_PERFORMANCE } from "@/demo/story/persona";
+import { getOpportunity, HERO_IDS } from "@/demo/story/opportunities";
 import type { AwardBench, AwardRecord } from "@/lib/awardsApi";
 
 interface Agency {
@@ -83,6 +84,8 @@ interface Seed {
   startedOn?: string;
   /** Days from today that the current period ends (the job comes up for bid again). */
   endsInDays?: number;
+  /** The next contract is already open for bids: the story's Fort Bragg dining notice. */
+  rebidIsOpen?: boolean;
   city: string | null;
   state: string | null;
   naics: string;
@@ -118,6 +121,7 @@ const SEEDS: Seed[] = [
     ceiling: 9_400_000,
     startedOn: "2019-10-01",
     endsInDays: 135,
+    rebidIsOpen: true,
     city: "Fort Bragg",
     state: "NC",
     naics: "722310",
@@ -254,7 +258,7 @@ const SEEDS: Seed[] = [
   },
   {
     id: "N40085-26-P-0212",
-    title: "Community center catering, family housing, MCAS Cherry Point",
+    title: "Family readiness event catering, MCAS Cherry Point",
     winner: 4003,
     agency: "cherryPoint",
     obligated: 540_000,
@@ -301,7 +305,7 @@ const SEEDS: Seed[] = [
     obligated: 1_150_000,
     startedDaysAgo: 760,
     endsInDays: 330,
-    city: "Stem",
+    city: "Butner",
     state: "NC",
     naics: "722310",
     workType: "Training-center dining hall",
@@ -491,7 +495,7 @@ const SEEDS: Seed[] = [
     bench: { distinct: 9, repeat: 4, subs: [[4011, 3], [4007, 1]] },
   },
 
-  // ── Blackwater Dining Group (4009) ─────────────────────────────────────
+  // ── Falling Creek Dining Group (4009) ─────────────────────────────────────
   {
     id: "FA4800-26-P-0007",
     solicitationId: "FA4800-26-Q-0007",
@@ -500,7 +504,8 @@ const SEEDS: Seed[] = [
     agency: "seymour",
     obligated: 180_700,
     startedDaysAgo: 45,
-    endsInDays: 320,
+    // The Seymour Johnson forecast (forecastLocalSeeds.ts) expects the next buy in 230 days.
+    endsInDays: 230,
     city: "Goldsboro",
     state: "NC",
     naics: "722310",
@@ -769,6 +774,12 @@ function benchOf(s: Seed): AwardBench | null {
   };
 }
 
+/** The Army is already taking bids for the next Fort Bragg dining contract. The days come from the story's notice. */
+function openNowNote(): string {
+  const notice = getOpportunity(HERO_IDS.fortBraggDining)!;
+  return `The Army is taking bids for this job again now. Proposals are due in ${notice.closesInDays} days. Grant says to bid as a subcontractor.`;
+}
+
 /** The award as the page reads it, with recency counted from today. */
 export function toAwardRecord(s: Seed): AwardRecord {
   const winner = anyFirmByKey(s.winner)!;
@@ -792,6 +803,7 @@ export function toAwardRecord(s: Seed): AwardRecord {
       justAwarded: days <= 90,
       comingUpAgain: months !== null && months > 0 && months <= 12,
       recompeteAt,
+      ...(s.rebidIsOpen ? { openNowNote: openNowNote() } : {}),
       reportingLagNote: agency.isDefense
         ? "Defense awards are usually published about three months after they are signed, so this job may be older than it looks."
         : "Awards are usually published about a month after they are signed, so this may be a little older than it looks.",

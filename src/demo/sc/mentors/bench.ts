@@ -78,7 +78,7 @@ export const BENCH: BenchMentor[] = [
     title: "State, local and school purchasing · former county purchasing director",
     bio: "Priya ran purchasing for a county school system and sat on bid committees for eight years. She knows how schools and cities score a quote.",
     consultationDescription:
-      "Win state, city and school-district work. Learn how to register, where to find bids, and what buyers read first.",
+      "Sell to state, city and school-district buyers. Learn how to register, where to find bids, and what buyers read first.",
     price: 75,
     hours: { start: 9, end: 16 },
     days: [1, 2, 3, 4, 5],
@@ -91,7 +91,7 @@ export const BENCH: BenchMentor[] = [
     title: "Pricing and cost proposals · former Army contract price analyst",
     bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, food cost and overhead without under-bidding.",
     consultationDescription:
-      "Build a price that wins and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
+      "Build a price that covers your costs and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
     price: 120,
     hours: { start: 11, end: 17 },
     days: [1, 3, 4, 5],

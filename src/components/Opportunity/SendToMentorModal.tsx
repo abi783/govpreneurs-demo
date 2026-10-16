@@ -12,7 +12,8 @@ import {
 
 export const OPPORTUNITY_HELP_OPTIONS: MentorHelpOption[] = [
   { label: "Should I bid on this?" },
-  { label: "Am I eligible?", detail: "(set-aside, licences, bonding, experience)" },
+  // DEMO: "licenses", the US spelling.
+  { label: "Am I eligible?", detail: "(set-aside, licenses, bonding, experience)" },
   { label: "Pricing" },
   { label: "Writing the proposal" },
   { label: "Teaming or subcontracting" },

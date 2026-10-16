@@ -14,8 +14,9 @@ export const Route = createFileRoute("/labor-pricing")({
       { title: "Labor Pricing — Know your market · GovPreneurs" },
       {
         name: "description",
+        // DEMO: "price fairly", not "price to win": the demo never promises a win.
         content:
-          "What the government expects to pay — so you price to win without leaving money on the table.",
+          "What the government expects to pay — so you price fairly without leaving money on the table.",
       },
     ],
   }),
@@ -32,7 +33,7 @@ function LaborPricingPage() {
         <div className="t-label" style={{ marginBottom: "var(--s-3)" }}>Know your market</div>
         <h1 className="t-display-lg">Labor Pricing</h1>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 700 }}>
-          What the government expects to pay — so you price to win without leaving money on the table.
+          What the government expects to pay — so you price fairly without leaving money on the table.
         </p>
       </header>
 

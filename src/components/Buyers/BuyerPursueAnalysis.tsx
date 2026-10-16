@@ -163,7 +163,8 @@ export function BuyerPursueAnalysis({
               <li key={w.company}>
                 <span className="cs-awardee-name">{w.company}</span>
                 <span className="cs-awardee-meta">
-                  <span className="fr-mono">{w.awardsCount}</span> awards ·{" "}
+                  {/* DEMO: "1 award", not "1 awards". */}
+                  <span className="fr-mono">{w.awardsCount}</span> {w.awardsCount === 1 ? "award" : "awards"} ·{" "}
                   <span className="fr-mono">{formatDollars(w.totalDollars)}</span>
                 </span>
                 <Link

@@ -21,6 +21,7 @@ import { chargeWallet } from "@/demo/state/wallet";
 import { easternInstant } from "./time";
 import type { GHLAppointment } from "./types";
 import { PROGRAM_SPECIALIST } from "./people";
+import { ONBOARDING_CALL_DAYS_AGO, POSITIONING_CALL_DAYS_AGO } from "@/demo/sc/timeline";
 
 // ── Appointments ───────────────────────────────────────────────────────────
 
@@ -54,7 +55,7 @@ function initialAppointments(): GHLAppointment[] {
     {
       id: "appt-onboarding",
       title: "Onboarding call",
-      ...slot(-98, 11, 0, 45),
+      ...slot(-ONBOARDING_CALL_DAYS_AGO, 11, 0, 45),
       calendarId: TEAM_CALENDAR_ID,
       calendarName: "Onboarding",
       assignedUserName: PROGRAM_SPECIALIST.name,
@@ -64,7 +65,7 @@ function initialAppointments(): GHLAppointment[] {
     {
       id: "appt-positioning",
       title: `Positioning call with ${MENTOR.name}`,
-      ...slot(-24, 14, 0, 30),
+      ...slot(-POSITIONING_CALL_DAYS_AGO, 14, 0, 30),
       calendarId: calendarIdFor(SARAH_ID),
       calendarName: "Mentor consultation",
       assignedUserName: MENTOR.name,

@@ -17,7 +17,7 @@ export function ResetDemoDialog({
         <AlertDialog.Content className="demo-dialog">
           <AlertDialog.Title className="demo-dialog__title">Reset the demo?</AlertDialog.Title>
           <AlertDialog.Description className="demo-dialog__text">
-            This removes every change you made, such as saved opportunities, tasks you ticked, and
+            This removes every change you made, such as saved opportunities, tasks you checked off, and
             messages you sent. The demo then returns to the Success Center.
           </AlertDialog.Description>
           <div className="demo-dialog__actions">

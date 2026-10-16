@@ -39,7 +39,7 @@ export function cardTakeLine(oppKey: string): string | null {
   const when_ = expectedDays(r) == null ? "" : ` Expected ${weeksOrMonths(Math.max(expectedDays(r) as number, 0))}.`;
   switch (oppKey) {
     case FORT_BRAGG_FORECAST_KEY:
-      return `The follow-on to the Fort Bragg dining contract that ${KEY_PARTNER.name} has held since 2019. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
+      return `The Army's next dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
     case POPE_FORECAST_KEY:
       return `Event catering at Pope and Fort Bragg, planned for women-owned firms. You hold that certificate, and it fits your event work and your size.${when_}`;
     case SEYMOUR_FORECAST_KEY:
@@ -49,7 +49,7 @@ export function cardTakeLine(oppKey: string): string | null {
     case "ce493b6f89e41ddc4ff5b2b7923301d9":
       return `Patient meals at the Fayetteville VA, the same therapeutic diets you served at Womack. Planned for small businesses and 3 miles from your kitchen.${when_}`;
     case "047c3c8aa5dc76e7ccacc984bdff9848":
-      return `Cooks and servers for two Camp Lejeune dining halls. It is in your food-service code and your size, but about 100 miles from your kitchen.${when_}`;
+      return `Cooks and servers for two Camp Lejeune dining halls. It is in your food-service code, but at ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, and it is about 100 miles from your kitchen.${when_}`;
     case "63bc4374632ee3bee7be3c460d51bdad":
       return `The community college plans a food court and catering in Fayetteville. Only a committee note so far, but it is local and your kind of work.${when_}`;
     default:
@@ -157,7 +157,7 @@ export function forecastGrantReply(oppKey: string, message: string): string {
     return `${firstStep(r)} ${when(r)}.`;
   }
   if (has(/\b(mentor|sarah|review)\b/)) {
-    return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She read the Camp Mackall and Fayetteville proposals, so she knows your work.`;
+    return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
     const best = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub") ?? PAST_PERFORMANCE[0];

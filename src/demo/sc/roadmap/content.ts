@@ -138,7 +138,7 @@ export const CONTENT: ContentSub[] = [
     title: "Send to Mentor",
     weeks: 1,
     items: ["Send 5 opportunities you like to your mentor"],
-    why: "Your mentor has seen what wins and what wastes a fortnight. Ask before you commit to one.",
+    why: "Your mentor has seen what works and what wastes two weeks. Ask before you commit to one.",
     phase: "p3",
   },
   {

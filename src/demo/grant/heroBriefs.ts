@@ -131,7 +131,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
     ],
     chips: [
       "Why not as prime?",
-      { label: "Tell me about the prime", kind: "elicit", target: "talked-to-partner" },
+      { label: "Tell Grant about the prime", kind: "elicit", target: "talked-to-partner" },
       { label: `Find ${PARTNER.name}`, kind: "route", target: "/partners" },
     ],
     railAnswers: {
@@ -235,7 +235,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
     chips: ["Why can't I get cleared in time?", "What would put me in range?", "What should I bid instead?"],
     railAnswers: {
       "Why can't I get cleared in time?": `A Secret clearance needs a sponsor, and the Army will not sponsor one for this contract. Even with a sponsor, an investigation takes months. The notice closes in ${mackall.closesInDays} days.`,
-      "What would put me in range?": `Three things, in order: a win at Camp Mackall field meals, so the Army knows your name; a cleared teaming partner or a prime who can sponsor cooks; and a Hunter search that alerts you when a cleared-site dining notice comes out.`,
+      "What would put me in range?": `Three things, in order: work at Camp Mackall, starting with the field meals quote, so the Army knows your name; a cleared teaming partner or a prime who can sponsor cooks; and a Hunter search that alerts you when a cleared-site dining notice comes out.`,
       "What should I bid instead?": `Camp Mackall field meals. It is the same base, it needs no clearance, only woman-owned firms can bid, and it is open for ${fieldMeals.closesInDays} days. Open it from the button on this page.`,
       "Can I win it?": `No. You cannot meet the clearance rule on day one, so the Army could not award it to you.`,
       "Do I have enough time?": `Time is not the problem. The notice is open for ${mackall.closesInDays} days, but a clearance takes months.`,

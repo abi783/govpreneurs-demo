@@ -90,7 +90,7 @@ const fieldMeals: Maker = (f, sol) => {
     gistBold: "only woman-owned firms can bid",
     thesisBold: ["the right first federal prime for you"],
     limitKinds: ["responsibility", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: "the **other woman-owned caterers** near you. Six list your code within 100 miles",
+    competitiveRisk: "the **other woman-owned caterers** near you, six of whom list your code within 100 miles",
     readBold: {
       "Is it your kind of work?": "you delivered 1,100 meals a day for the county schools",
       "Does the size fit?": "about a third of your revenue",
@@ -435,7 +435,7 @@ const fortBraggDining: Maker = (f, sol) => {
     gistBold: "as Carolina Dining Group's subcontractor",
     thesisBold: ["the bond is not", "Bid as a subcontractor under the firm that holds the contract"],
     limitKinds: ["responsibility", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: `**${PARTNER.name}**, which has held this work since 2019. The Army exercised all four options, so it may not want to switch`,
+    competitiveRisk: `**${PARTNER.name}**, which has held this work since 2019 and had all four options exercised, so the Army may not want to switch`,
     readBold: {
       "Is it your kind of work?": `as ${PARTNER.name}'s subcontractor`,
       "Does the size fit?": "more than three times",
@@ -538,8 +538,8 @@ const restrictedSite: Maker = (f, sol) => {
   const days = factsFor(getOpportunity(HERO_IDS.fieldMeals)!).daysLeft;
   const roadmap: RoadmapItem[] = [
     {
-      item: rt("**Win Camp Mackall field meals** first"),
-      whyItMattered: rt("It is the same base. A win there gives the Army a name to trust when a cleared-site contract comes."),
+      item: rt("**Bid on Camp Mackall field meals** first"),
+      whyItMattered: rt("It is the same base. A job there gives the Army a name to trust when a cleared-site contract comes."),
       whatItTakes: rt(`The quote is open now. Answer Ava's questions and certify two more cooks. That fits inside ${days} days.`),
     },
     {
@@ -596,7 +596,7 @@ const restrictedSite: Maker = (f, sol) => {
         "That is a path of months. Nothing you send before the due date changes it.",
       ],
       "Does this move you forward?": [
-        "Camp Mackall field meals is the same base and the same buyer, with no clearance. A win there is the record you need.",
+        "Camp Mackall field meals is the same base and the same buyer, with no clearance. A job there is the record you need.",
       ],
     },
     limiting: "Can you do the work?",

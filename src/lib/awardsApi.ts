@@ -65,6 +65,11 @@ export interface AwardRecency {
   justAwarded: boolean | null;
   comingUpAgain: boolean;
   recompeteAt: string | null;
+  /**
+   * DEMO: the buyer already takes bids for the next contract. The page says so
+   * instead of "comes up for bid again in N months".
+   */
+  openNowNote?: string;
   /** Defense-aware: the 30–90d window sits inside the ~90d defense reporting lag. */
   reportingLagNote: string;
 }
@@ -277,13 +282,16 @@ export function atLeastSubs(bench: AwardBench): string {
  * badge follows.
  */
 export function whatHappensNext(a: AwardRecord): string | null {
+  if (a.recency.openNowNote) return a.recency.openNowNote;
   const months = a.recency.recompeteAt
     ? (new Date(a.recency.recompeteAt).getTime() - Date.now()) / (30 * 86_400_000)
     : null;
   // A known rebid date beats age: it is a real date to prepare for, which is
   // different advice from "go court them now".
   if (months !== null && months > 0 && months <= 18) {
-    return `This job comes up for bid again in about ${Math.round(months)} months. Getting on their radar now is what puts you on the team next time.`;
+    // DEMO: "1 month", not "1 months".
+    const whole = Math.round(months);
+    return `This job comes up for bid again in about ${whole} ${whole === 1 ? "month" : "months"}. Getting on their radar now is what puts you on the team next time.`;
   }
   const days = a.recency.daysSinceAward;
   if (days === null) return null;
@@ -350,12 +358,14 @@ export function whyThisAward(a: AwardRecord): string {
   if (a.recency.justAwarded && ago) {
     return `Won ${ago}. Worth asking who is already on the team.`;
   }
+  if (a.recency.openNowNote) return a.recency.openNowNote;
   if (a.recency.comingUpAgain && a.recency.recompeteAt) {
     const months = Math.max(
       1,
       Math.round((new Date(a.recency.recompeteAt).getTime() - Date.now()) / (30 * 86_400_000)),
     );
-    return `This job comes up for bid again in about ${months} months. Start getting ready and you could bid it.`;
+    // DEMO: "1 month", not "1 months".
+    return `This job comes up for bid again in about ${months} ${months === 1 ? "month" : "months"}. Start getting ready and you could bid it.`;
   }
   if (a.location.state) {
     return `This is your kind of work, in your area. It shows you who pays for it.`;

@@ -393,7 +393,8 @@ export function TaskCard({
 
           {done && task.doneBy && (
             <span className="text-[0.68rem] text-gray-500">
-              {task.doneBy.startsWith("auto:") ? "Ticked automatically" : task.doneBy.startsWith("mentor:") ? "Ticked by your mentor" : "You ticked this"}
+              {/* DEMO: US wording ("checked off", not "ticked"). */}
+              {task.doneBy.startsWith("auto:") ? "Checked off automatically" : task.doneBy.startsWith("mentor:") ? "Checked off by your mentor" : "You checked this off"}
             </span>
           )}
           {dismissed && (
@@ -562,7 +563,8 @@ export function TaskCard({
             imply the member asserted something we are watching for ourselves. */}
         {!done && !dismissed && isAuto && (
           <div className="acts">
-            <span className="text-[0.72rem] text-gray-500">We tick this for you when we see it done.</span>
+            {/* DEMO: US wording ("check off", not "tick"). */}
+            <span className="text-[0.72rem] text-gray-500">We check this off for you when we see it done.</span>
           </div>
         )}
 

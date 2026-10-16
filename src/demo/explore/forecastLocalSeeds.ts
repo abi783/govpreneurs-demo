@@ -7,6 +7,10 @@
 // in Virginia, one of her three states, finds something.
 
 import type { ForecastSeed } from "./forecastSeeds";
+import { HERO_IDS, OPPORTUNITIES } from "@/demo/story/opportunities";
+
+/** The sources sought notice for the next Fort Bragg dining program, from the story. */
+const SOURCES_SOUGHT_ID = OPPORTUNITIES.find((o) => o.noticeType === "Sources Sought")!.id;
 
 /** Forecast key of the Fort Bragg dining program, the one the story points at. */
 export const FORT_BRAGG_FORECAST_KEY = "80e9e92fd343cd7549f92d15374c2885";
@@ -21,7 +25,7 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     oppKey: FORT_BRAGG_FORECAST_KEY,
     hgTitle: "Installation Dining Services, Fort Bragg: FY2027 Program",
     hgText:
-      "Follow-on to the Fort Bragg dining facility food service contract awarded in 2019. Full food service at on-post dining facilities: three meals a day, seven days a week, for about 1,400 soldiers, with a base year and four option years. The Army is running a market study (sources sought notice W912EE-27-S-0004) to decide how much of the work to set aside for small business. The current contract has used all four of its option years.",
+      `The Army's next dining program for Fort Bragg, planned after the two-facility contract that it is bidding now (notice ${HERO_IDS.fortBraggDining}). Full food service at the on-post dining facilities: three meals a day, seven days a week, with a base year and four option years. The Army is running a market study (sources sought notice ${SOURCES_SOUGHT_ID}) to decide how much of the work to set aside for small business.`,
     sourceId: "MICC-FB-FY27-0412",
     postedDaysAgo: 21,
     expectedInDays: 165,
@@ -118,8 +122,10 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     pscCode: "M1FD",
     oppType: "New",
     setAsideCode: "SBA",
-    valLow: 1_100_000,
-    valHigh: 1_600_000,
+    // Above five times her $340K largest job, so the page reads it as a team job like the Fort Bragg one.
+    // The open Camp Lejeune notice (opportunities.ts) is a no-bid as prime for the same reason.
+    valLow: 1_800_000,
+    valHigh: 2_400_000,
     popState: "NC",
     popCity: "Camp Lejeune",
     contactName: null,

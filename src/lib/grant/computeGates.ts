@@ -31,6 +31,11 @@ const CLOSABLE_UNLOCK: Partial<Record<ComplianceRow["category"], { path: string;
     submission: { path: "Complete the submission item", time: "before the deadline" },
   };
 
+// DEMO: "1 day", not "1 days".
+function dayWord(n: number): string {
+  return `${n} ${n === 1 ? "day" : "days"}`;
+}
+
 function plain(row: ComplianceRow): string {
   return row.requirement.map((s) => s.text).join("");
 }
@@ -149,7 +154,7 @@ function submittableLight(
     return {
       question,
       tone: "warn",
-      word: `Tight — ${Math.max(deadline.realRunwayDays, 0)} days`,
+      word: `Tight — ${dayWord(Math.max(deadline.realRunwayDays, 0))}`,
       glyph: "alert-triangle",
       reason: [{ text: "Bonding and reference lead times eat into your window." }],
       evidence: [],
@@ -159,11 +164,11 @@ function submittableLight(
   return {
     question,
     tone: "ok",
-    word: `Yes — ${deadline.realRunwayDays} days`,
+    word: `Yes — ${dayWord(deadline.realRunwayDays)}`,
     glyph: "check",
     reason: [
       { text: "Real runway after the lead times: " },
-      { text: `${deadline.realRunwayDays} days`, bold: true },
+      { text: dayWord(deadline.realRunwayDays), bold: true },
       { text: "." },
     ],
     evidence: [],

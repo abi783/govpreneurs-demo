@@ -206,7 +206,9 @@ export function OppsSummaryRow({
           ) : (
             <>
               <span className="opps-summary__count">
-                <CountTicker value={matchCount} className="opps-summary__count-num" /> {noun}
+                <CountTicker value={matchCount} className="opps-summary__count-num" />{" "}
+                {/* DEMO: singular for one result ("1 opportunity", "1 match"). */}
+                {matchCount === 1 ? noun.replace(/^opportunities$/, "opportunity").replace(/^matches$/, "match") : noun}
               </span>
               {showNewThisWeek && newThisWeek > 0 && (
                 <>

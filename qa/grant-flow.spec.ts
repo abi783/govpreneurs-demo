@@ -191,7 +191,7 @@ test("restricted site: No-bid, the roadmap, a service request, and the way back"
   await expect(page.locator(".gt-conf__dot.is-on")).toHaveCount(5);
   await expect(page.locator(".gt-path--no-go")).toHaveCount(2);
   const roadmap = page.locator(".gt-roadmap");
-  await expect(roadmap).toContainText("Win Camp Mackall field meals");
+  await expect(roadmap).toContainText("Bid on Camp Mackall field meals");
   await expect(roadmap.locator(".gt-roadmap__item")).toHaveCount(4);
 
   // "Have us do it" ends in a success that is kept.

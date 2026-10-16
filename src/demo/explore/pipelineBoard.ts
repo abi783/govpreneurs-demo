@@ -16,14 +16,15 @@ import type { Bid } from "@/lib/mock/bids";
 import type { MentorReviewSummary } from "@/lib/mentorReviewsApi";
 import type { SavedOppDetail } from "@/lib/workspace";
 import { savedDetailToBid } from "@/lib/bids/savedDetailToBid";
-import { relativeTime } from "@/lib/format";
+// The Mentors page counts "12h ago" with this function, so the Pipeline card must use it too.
+import { relTime } from "@/components/Mentors/format";
 
 /** What the demo adds to a card. */
 export interface DemoBidExtra {
   /** The card's next move (the story's own words and route). */
   next?: { label: string; to: string };
-  /** Ava is building this bid: the tag links to her page. */
-  ava?: { to: string };
+  /** Ava worked on this bid: the tag links to her page. The label says what she is doing now. */
+  ava?: { to: string; label: string };
   /** A closed pursuit whose details open in a dialog. */
   closedId?: string;
 }
@@ -39,6 +40,20 @@ function valueRange(o: StoryOpportunity): { text?: string; mid: number } {
   if (o.valueLow == null || o.valueHigh == null) return { mid: 0 };
   const text = o.valueLow === o.valueHigh ? money(o.valueHigh) : `${money(o.valueLow)} – ${money(o.valueHigh)}`;
   return { text: o.valueBasis === "per_year" ? `${text} a year` : text, mid: (o.valueLow + o.valueHigh) / 2 };
+}
+
+/** What the Ava tag says. Ava is not "building" a bid she has finished or paused. */
+function avaTagLabel(ava: NonNullable<StoryOpportunity["ava"]>): string {
+  if (ava.paused) return "Ava paused";
+  if (ava.stage === "ready") return "Ava drafted this";
+  if (ava.stage === "read") return "Ava built this";
+  return "Ava is building";
+}
+
+/** The card prints "Grant: Bid — ", so Grant's own opening words ("Bid it.", "Look closer.", "Skip it.") would say the verdict twice. */
+function withoutVerdictWords(line: string): string {
+  const rest = line.replace(/^(Bid it|Look closer|Skip it|Reply)\.\s+/, "");
+  return rest.charAt(0).toUpperCase() + rest.slice(1);
 }
 
 const VERDICT_WORD = { bid: "Bid", review: "Look closer", no_bid: "Don't bid" } as const;
@@ -59,7 +74,7 @@ function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean
     stage,
     ...(pursuit
       ? { contextOverride: pursuit.note }
-      : { grantVerdict: { verdict: VERDICT_WORD[o.grant.verdict], oneLine: o.grant.oneLine } }),
+      : { grantVerdict: { verdict: VERDICT_WORD[o.grant.verdict], oneLine: withoutVerdictWords(o.grant.oneLine) } }),
     nextAction: { label: pursuit?.next.label ?? "Review with Grant", href: pursuit?.next.to ?? `/opportunities/${o.id}` },
     lastActivityAt: isoDaysFromNow(-(pursuit?.lastActivityDaysAgo ?? 3)),
     daysLeft: outcome ? null : o.closesInDays,
@@ -69,7 +84,7 @@ function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean
     scope: o.scope,
     demo: {
       ...(pursuit ? { next: pursuit.next } : {}),
-      ...(o.ava ? { ava: { to: `/ava/${o.id}` } } : {}),
+      ...(o.ava ? { ava: { to: `/ava/${o.id}`, label: avaTagLabel(o.ava) } } : {}),
     },
   };
 }
@@ -101,9 +116,9 @@ function reviewBid(review: MentorReviewSummary): DemoBid {
   const saved = review.oppKey ? describeSaved(review.oppKey) : null;
   const value = story ? valueRange(story) : { mid: 0 };
   const lastMentorLine = review.unread
-    ? `Mentor replied ${relativeTime(review.lastMessageAt, now)}.`
+    ? `Mentor replied ${relTime(review.lastMessageAt, now)}.`
     : review.lastMessageAuthor === "mentor"
-      ? `Mentor reviewing — replied ${relativeTime(review.lastMessageAt, now)}.`
+      ? `Mentor reviewing — replied ${relTime(review.lastMessageAt, now)}.`
       : "Mentor reviewing — awaiting reply.";
   return {
     id: `mentor_${review.id}`,
@@ -126,7 +141,7 @@ function reviewBid(review: MentorReviewSummary): DemoBid {
       reviewId: review.id,
       primary: review.unread,
     },
-    demo: story?.ava ? { ava: { to: `/ava/${story.id}` } } : undefined,
+    demo: story?.ava ? { ava: { to: `/ava/${story.id}`, label: avaTagLabel(story.ava) } } : undefined,
   };
 }
 

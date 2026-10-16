@@ -173,7 +173,8 @@ export const SUB_STEP_DETAIL: Record<string, SubStepDetail> = {
     },
     items: ["Send 5 opportunities you like to your mentor"],
     note: { label: "Your Mentor's guidance on what to bid", href: "/mentors" },
-    why: "Your mentor has seen what wins and what wastes a fortnight. Ask before you commit to one.",
+    // DEMO: US wording ("two weeks", not "a fortnight"), and no "what wins".
+    why: "Your mentor has seen what works and what wastes two weeks. Ask before you commit to one.",
   },
 
   // ── Execution ─────────────────────────────────────────────────────
