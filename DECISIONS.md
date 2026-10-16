@@ -74,3 +74,8 @@ name its number.
 - D50. **Six Grant reviews are written by hand**, and the other 37 are built from the story facts. Grant's next step on Fort Bragg dining is Partners, not Ava, because its prime path is no-go.
 - D51. **The restricted-site No-bid ends with Grant's "how to be ready next time" list**, including a "Have us do it" request that succeeds. This follows production's rule: no cold No-bid.
 - D52. **Grant's review sections that production shipped without styles** (compliance checklist, reads, red team, section ledger) got demo styles. Production shows them unstyled.
+- D53. **Amira's UEI is `LW1SL1HLED37`**, 12 characters like a real UEI. The prototype's had 11, and production's own check called it wrong.
+- D54. **My Business starts at a score of 47 of 55**, with real gaps: EIN, licenses, key staff, 2 of 5 food-handler certificates, and a health permit and WOSB certification that expire soon. Three suggestions wait for a yes or no. The page shows what to do next.
+- D55. **Facts derived for My Business:** 100% owner share, $75,000 working capital, 2 jobs at once, 30-day payment tolerance, health inspection "Grade A, score 97", NIGP code 96190, health permit expiring in 21 days, WOSB in 48, insurance in 120.
+- D56. **The voice "dictation" in Tell Hunter needs no microphone.** It types a sample sentence, so it works on any call.
+- D57. **A photo or logo uploaded on Success Center home also shows in My Business**, and the Roadmap and My Business share one set of checks.
