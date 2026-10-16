@@ -6,8 +6,7 @@
 // A deadline at 5 PM would read N+1 in the morning. Days are added to the calendar
 // date, never as blocks of 24 hours, so a clock change (1 November) cannot move a date.
 //
-// The same two functions are `deadlineIso` and `postedIso` in story/clock.ts on the
-// main branch. This copy goes when the branches merge.
+// `deadlineIso` and `postedIso` are re-exported from story/clock.ts.
 
 import { DEMO_TODAY } from "@/demo/story/clock";
 
@@ -21,11 +20,12 @@ export function deadlineDate(closesInDays: number): Date {
   return calendarDay(DEMO_TODAY, closesInDays);
 }
 
-export const deadlineIso = (closesInDays: number): string => deadlineDate(closesInDays).toISOString();
+// One implementation for every page: the feed card and this page must agree.
+export { deadlineIso, postedIso } from "@/demo/story/clock";
 
 /** The day an opportunity was posted. */
 export function postedDate(postedDaysAgo: number): Date {
   return calendarDay(DEMO_TODAY, -postedDaysAgo);
 }
 
-export const postedIso = (postedDaysAgo: number): string => postedDate(postedDaysAgo).toISOString();
+

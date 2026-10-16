@@ -70,3 +70,7 @@ name its number.
 - D46. **Every deadline is midnight at the start of its day, counted in calendar days.** All pages then read the same "Closes in N days" at any hour, including after the 1 November clock change.
 - D47. **Value filters hide the Fort Bragg sources sought**, which states no value. Production would keep it. This way a filter such as "Under $25K" never shows a card with no value.
 - D48. **Hunter's chat may move Tim to the All tab** when a question matches nothing on For You (for example "work in Virginia"), and says so.
+- D49. **The Fayetteville cafe and Cumberland County values are per year** ($185K–$235K and $290K–$410K), to match Grant's "about $210K / $350K a year".
+- D50. **Six Grant reviews are written by hand**, and the other 37 are built from the story facts. Grant's next step on Fort Bragg dining is Partners, not Ava, because its prime path is no-go.
+- D51. **The restricted-site No-bid ends with Grant's "how to be ready next time" list**, including a "Have us do it" request that succeeds. This follows production's rule: no cold No-bid.
+- D52. **Grant's review sections that production shipped without styles** (compliance checklist, reads, red team, section ledger) got demo styles. Production shows them unstyled.
