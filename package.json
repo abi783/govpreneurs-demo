@@ -11,9 +11,10 @@
     "check:copy": "node scripts/check-partner-copy.mjs",
     "format": "prettier --write .",
     "test": "vitest run",
-    "qa:crawl": "playwright test",
+    "qa:crawl": "playwright test qa/crawl.spec.ts",
     "check": "tsc --noEmit && vite build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "qa:shots": "QA_SHOTS=1 playwright test qa/shots.spec.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

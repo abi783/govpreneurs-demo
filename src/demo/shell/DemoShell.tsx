@@ -14,6 +14,7 @@ import { ResetDemoDialog } from "./ResetDemo";
 import { DemoNoticeHost } from "./DemoNoticeHost";
 import { ScChatHost } from "../sc/ScChatHost";
 import "./shell.css";
+import "../nav/storySearch";
 
 const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 

@@ -1,8 +1,7 @@
 // The QA crawl visits every route in this list.
 //
-// Page agents: append your deep routes to DEEP_ROUTES (for example a real
-// `/opportunities/<id>`, `/ava/<id>`, `/my-business/<part>`). A route that is not
-// here is not tested.
+// Page agents: append your deep routes to your own file in qa/area-routes/.
+// A route that is not listed is not tested.
 //
 // To test only some routes in a run:   QA_ROUTES=/roadmap,/tasks bun run qa:crawl
 
@@ -23,10 +22,24 @@ export const MENU_ROUTES: string[] = [
   "/mentors",
 ];
 
-/** Routes that are not in the menu: detail pages, tabs, and so on. */
+import { ROUTES as HUNTER } from "./area-routes/hunter";
+import { ROUTES as GRANT } from "./area-routes/grant";
+import { ROUTES as AVA } from "./area-routes/ava";
+import { ROUTES as ROADMAP_TASKS } from "./area-routes/roadmap-tasks";
+import { ROUTES as MY_BUSINESS } from "./area-routes/my-business";
+import { ROUTES as SC_HOME_MENTORS } from "./area-routes/sc-home-mentors";
+import { ROUTES as EXPLORE } from "./area-routes/explore";
+
+/** Routes that are not in the menu: detail pages, tabs, and so on. Each page
+ *  agent owns one file in qa/area-routes/ — append there, not here. */
 export const DEEP_ROUTES: string[] = [
-  "/my-business/profile",
-  "/ava/sample",
+  ...HUNTER,
+  ...GRANT,
+  ...AVA,
+  ...ROADMAP_TASKS,
+  ...MY_BUSINESS,
+  ...SC_HOME_MENTORS,
+  ...EXPLORE,
 ];
 
 /** Every route the harness knows, ignoring QA_ROUTES. A click that moves to one of these is judged by that route's own test. */

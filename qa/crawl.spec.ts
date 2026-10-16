@@ -14,11 +14,15 @@ import { test, type BrowserContext, type Page, type Request } from "@playwright/
 import { allKnownRoutes, crawlRoutes } from "./routes";
 import type { ClickFailure, ClickRecord, RouteResult } from "./crawlTypes";
 
+test.skip(Boolean(process.env.QA_SHOTS), "screenshot run");
+
 const MAX_CLICKS = Number(process.env.QA_MAX_CLICKS ?? 120);
 const SETTLE_MS = 500;
 const IDLE_TIMEOUT_MS = 12_000;
 const BAD_TEXT_PHRASES = /something went wrong|unable to sign in|failed to load|\bundefined\b|\[object Object\]/i;
 const BAD_TEXT_NAN = /\bNaN\b/; // case sensitive on purpose: "Finance" is not an error
+// Leftovers from production's old sample member (a roofer) or the prototype. The demo member is a caterer.
+const OLD_PERSONA_TEXT = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|\bDEMO-[A-Z]+-\d+/i;
 const MIN_MAIN_CHARS = 80;
 const CLICKABLE_SELECTOR = [
   "a[href]",
@@ -186,6 +190,8 @@ interface PageSnapshot {
   blocked: { url: string; method?: string }[];
   mainText: string;
   bodyText: string;
+  /** placeholder, title, aria-label and alt text — not part of innerText. */
+  attrText: string;
   overflow: { doc: number; main: number } | null;
 }
 
@@ -206,6 +212,9 @@ async function snapshot(page: Page): Promise<PageSnapshot> {
       blocked: w.__DEMO_BLOCKED__ ?? [],
       mainText: (main?.innerText ?? "").replace(/\s+/g, " ").trim(),
       bodyText: (document.body.innerText ?? "").replace(/\s+/g, " ").trim(),
+      attrText: Array.from(document.querySelectorAll("[placeholder],[title],[aria-label],img[alt]"))
+        .map((el) => [el.getAttribute("placeholder"), el.getAttribute("title"), el.getAttribute("aria-label"), el.getAttribute("alt")].filter(Boolean).join(" "))
+        .join(" | "),
       overflow: overflowDoc > 1 || overflowMain > 1 ? { doc: overflowDoc, main: overflowMain } : null,
     };
   });
@@ -228,6 +237,12 @@ function problemsFrom(probe: Probe, snap: PageSnapshot, base?: PageSnapshot): st
   if (phrase && !alreadyThere) {
     const at = snap.bodyText.indexOf(phrase[0]);
     out.push(`visible text matches "${phrase[0]}": …${snap.bodyText.slice(Math.max(0, at - 40), at + 60)}…`);
+  }
+  const old = OLD_PERSONA_TEXT.exec(`${snap.bodyText} | ${snap.attrText}`);
+  if (old) {
+    const all = `${snap.bodyText} | ${snap.attrText}`;
+    const at = all.indexOf(old[0]);
+    out.push(`old sample-member text "${old[0]}": …${all.slice(Math.max(0, at - 40), at + 60)}…`);
   }
   return Array.from(new Set(out));
 }
