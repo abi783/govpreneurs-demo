@@ -14,7 +14,7 @@ const CUMBERLAND_SUMMER = "c4bc5f58071250bae50daa744a3df632";
 const EPA_CAFETERIA = "699296af65265448b94b6ce84a4f10ea";
 const ATLANTA_MEALS = "a55390c2bf8b53c9bc7ec54a19b56116";
 const VSU_DINING = "3f95972fa7a051b296e0e902f0a2ccc0";
-const NORFOLK_CATERING = "7cb31bbf7ff5a0ed2b0fb536274fd453";
+const RICHMOND_CATERING = "7cb31bbf7ff5a0ed2b0fb536274fd453";
 
 const OWN: string[] = [
   // Forecasts: the three views, a capture tab, a lane, a filter and a search.
@@ -34,7 +34,7 @@ const OWN: string[] = [
   `/forecasts/${EPA_CAFETERIA}`,
   `/forecasts/${ATLANTA_MEALS}`,
   `/forecasts/${VSU_DINING}`,
-  `/forecasts/${NORFOLK_CATERING}`,
+  `/forecasts/${RICHMOND_CATERING}`,
   // Mentor Reviews: the three written threads.
   "/mentors/rev-fayetteville-proposal",
   "/mentors/rev-mackall-pursue",

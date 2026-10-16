@@ -79,7 +79,8 @@ describe("Grant's read, shown as his", () => {
     const { bid } = onPages(mackallBid, { ...emptyState(), ...mackallSeed } as BidState);
     const sam = bid.hardRequirements.find((r) => r.id === "mk-r-sam")!;
     expect(sam.initial).toBe("meets");
-    expect(sam.evidence).toBe("Grant checked this: Active until 15 April 2027.");
+    // DEMO: the SAM end date is relative to today (persona.ts samActiveUntil).
+    expect(sam.evidence).toMatch(/^Grant checked this: Active until \d{1,2} [A-Z][a-z]+ \d{4}\.$/);
   });
 
   test("with no read from Grant, Ava judges nothing it would have taken from him", () => {

@@ -61,7 +61,7 @@ const rows: [string, string][] = [
   ["Primary NAICS", `${PERSONA.primaryNaics} ${PERSONA.primaryNaicsLabel}`],
   ["Other NAICS", PERSONA.secondaryNaics.map((n) => `${n.code} ${n.label}`).join(" · ")],
   ["Certifications", PERSONA.certifications.join(" · ")],
-  ["SAM", `Active until ${PERSONA.samActiveUntil}`],
+  ["SAM", "Active, renewed every year"],
 ];
 for (const [k, v] of rows) {
   page.drawText(k, { x: 40, y, size: 9, font: bold, color: navy });

@@ -91,3 +91,8 @@ name its number.
 - D67. **Cumberland County asks for a 5% bid bond and, after award, a performance and payment bond of half the first-year price (about $175K).** Grant, Ava and the opportunity page all say the same, and it fits her $200K bonding history.
 - D68. **The Fort Bragg sources-sought reply is due at 3:00 PM Eastern.**
 - D69. **Each Ava bid keeps the due time in its buyer papers** (Camp Mackall 10:00 AM, Fayetteville 2:00 PM, Cumberland 2:00 PM, Fort Bragg reply 3:00 PM, all Eastern). Grant's timeline, documents and instructions show the same time. Every other opportunity is due at 5:00 PM Eastern.
+- D70. **Amira's SAM registration ends 182 days from today**, so it never shows as expired. It was a fixed 15 April 2027 date.
+- D71. **All invented email addresses end in `.example`**, a reserved domain, so no address can belong to a real person.
+- D72. **The Virginia catering forecast is at Defense Supply Center Richmond** (about 170 miles), not Naval Station Norfolk (220 miles). Its "Good fit" label is then true for a 200-mile service area.
+- D73. **Hunter's "Which am I ready for?" answer says "a stretch on your own"** for jobs above her size, such as Fort Bragg dining. Readiness is about bidding alone. The card's priority rating is about fit. Grant's prime no-go agrees.
+- D74. **Copy review:** no text promises a win, US spelling throughout, one timeline for her history (onboarding 218 days ago, positioning call 150, SAM 183), each invented person has one role, and "Blackwater Dining Group" is renamed (it echoed a real contractor). A rule set in `qa/copyRules.ts` checks every page on every crawl.

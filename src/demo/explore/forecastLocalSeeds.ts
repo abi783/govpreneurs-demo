@@ -3,8 +3,8 @@
 // story: the Fort Bragg dining recompete (the sources-sought notice Ava drafted
 // a reply to), the Pope Army Airfield catering she saved, the VA patient meals
 // she saved, the Seymour Johnson breakfast contract she lost by 4%, her
-// 2023 Cumberland County summer meals job, and one Norfolk catering buy so a search
-// in Virginia, one of her three states, finds something.
+// 2023 Cumberland County summer meals job, and one Richmond catering buy (about 170 miles, inside her
+// 200-mile area) so a search in Virginia, one of her three states, finds something.
 
 import type { ForecastSeed } from "./forecastSeeds";
 import { HERO_IDS, OPPORTUNITIES } from "@/demo/story/opportunities";
@@ -225,17 +225,17 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     semanticFit: 0.92,
   },
   {
-    key: "norfolk-event-catering",
+    key: "richmond-event-catering",
     lane: "federal",
     oppKey: "7cb31bbf7ff5a0ed2b0fb536274fd453",
-    hgTitle: "Command Event Catering BPA, Naval Station Norfolk",
+    hgTitle: "Command Event Catering BPA, Defense Supply Center Richmond",
     hgText:
-      "Blanket purchase agreement for catering at command events, change-of-command ceremonies and retirement luncheons at Naval Station Norfolk. Buffet and boxed service for 40 to 300 guests, with setup and clean-up.",
-    sourceId: "N00189-FY27-0140",
+      "Blanket purchase agreement for catering at command events, change-of-command ceremonies and retirement luncheons at Defense Supply Center Richmond. Buffet and boxed service for 40 to 300 guests, with setup and clean-up.",
+    sourceId: "SP4700-FY27-0140",
     postedDaysAgo: 26,
     expectedInDays: 150,
-    agencyName: "Naval Supply Systems Command, Fleet Logistics Center Norfolk",
-    agencyAbbr: "NAVSUP",
+    agencyName: "Defense Logistics Agency, Defense Supply Center Richmond",
+    agencyAbbr: "DLA",
     naicsCode: "722320",
     pscCode: "M1FD",
     oppType: "New",
@@ -243,14 +243,14 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     valLow: 150_000,
     valHigh: 300_000,
     popState: "VA",
-    popCity: "Norfolk",
+    popCity: "Richmond",
     contactName: null,
     contactRole: null,
-    sourceName: "Department of the Navy",
+    sourceName: "Defense Logistics Agency",
     sourceLink: null,
     docKey: null,
     files: null,
-    plainTitle: "Event catering for Naval Station Norfolk commands",
+    plainTitle: "Event catering at Defense Supply Center Richmond",
     semanticFit: 0.88,
   },
 ];

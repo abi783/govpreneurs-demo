@@ -547,7 +547,7 @@ export function readyList(rows: FeedRow[]): Turn {
     parts.push(`Ready now (${groups.ready.length}): ${names(groups.ready)}.`);
   if (groups.stretch.length)
     parts.push(
-      `A stretch (${groups.stretch.length}): ${names(groups.stretch)}. Each has one gap, such as size or distance.`,
+      `A stretch on your own (${groups.stretch.length}): ${names(groups.stretch)}. Each has one gap, such as size or distance, so look at teaming or ask Grant.`,
     );
   if (groups.early.length)
     parts.push(

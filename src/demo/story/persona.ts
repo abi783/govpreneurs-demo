@@ -7,6 +7,8 @@
 // the church is fictional; she has a capability statement, because Hunter's
 // "Why these?" panel needs one.
 
+import { dateDaysFromNow } from "./clock";
+
 export const PERSONA = {
   ownerFirstName: "Amira",
   ownerName: "Amira Haddad",
@@ -27,7 +29,8 @@ export const PERSONA = {
   website: "haddadcateringnc.com",
   uei: "LW1SL1HLED37",
   cage: "16WG0",
-  samActiveUntil: "2027-04-15",
+  /** SAM registration lasts a year; she renewed 183 days ago (sc/timeline.ts). */
+  samActiveUntil: dateDaysFromNow(182),
   primaryNaics: "722310",
   primaryNaicsLabel: "Food Service Contractors",
   secondaryNaics: [

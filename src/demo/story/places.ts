@@ -27,6 +27,7 @@ export const PLACES = {
   cherryPoint: { city: "Havelock", state: "NC", milesFromKitchen: 140 },
   charlotte: { city: "Charlotte", state: "NC", milesFromKitchen: 140 },
   statewideNc: { city: "Multiple districts", state: "NC", milesFromKitchen: 150 },
+  richmond: { city: "Richmond", state: "VA", milesFromKitchen: 170 },
   norfolk: { city: "Norfolk", state: "VA", milesFromKitchen: 220 },
   virginiaBeach: { city: "Virginia Beach", state: "VA", milesFromKitchen: 230 },
   hampton: { city: "Hampton", state: "VA", milesFromKitchen: 210 },

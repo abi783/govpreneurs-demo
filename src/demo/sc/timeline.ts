@@ -18,7 +18,7 @@ export const COMPLIANCE_CALL_DAYS_AGO = 205;
 /** The positioning call with Sarah Mitchell, where she set the targets. */
 export const POSITIONING_CALL_DAYS_AGO = 150;
 
-/** SAM.gov was registered and checked this long ago. A SAM registration lasts one year, so it ends 182 days from now (persona.ts: 15 April 2027). */
+/** SAM.gov was registered and checked this long ago. A SAM registration lasts one year, so it ends 182 days from now (persona.ts samActiveUntil). */
 export const SAM_CHECKED_DAYS_AGO = 183;
 
 /** Her first question to a mentor: the Womack rating (rev-womack-closeout in workspace.ts). It finished the Send to Mentor step. */
