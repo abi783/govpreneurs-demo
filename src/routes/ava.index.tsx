@@ -325,7 +325,6 @@ function BidCard({ id, onOpen }: { id: string; onOpen: (id: string) => void }) {
   );
 }
 
-
 // ─── One bid Ava has been handed but has not read ───
 
 /** A bid whose handoff page the visitor opened. Ava has not read it, so the card
@@ -353,9 +352,12 @@ function HandoffCard({ id, onOpen }: { id: string; onOpen: (id: string) => void 
       className="ava-idx__card is-clickable-card"
       role="link"
       tabIndex={0}
-      aria-label={[opp.title, "Due date not read yet", label, ...(waiting ? ["Needs you"] : [])].join(
-        ". ",
-      )}
+      aria-label={[
+        opp.title,
+        "Due date not read yet",
+        label,
+        ...(waiting ? ["Needs you"] : []),
+      ].join(". ")}
       onClick={open}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

@@ -65,7 +65,10 @@ export function HandoffView({ opp }: { opp: AvaOpportunity }) {
   const [all, setAll] = useDemoState<Record<string, HandoffState>>(HANDOFF_STATE_KEY, {});
   const mine = all[opp.noticeId] ?? NO_HANDOFF;
   const patch = (p: Partial<HandoffState>) =>
-    setAll((prev) => ({ ...prev, [opp.noticeId]: { ...(prev[opp.noticeId] ?? NO_HANDOFF), ...p } }));
+    setAll((prev) => ({
+      ...prev,
+      [opp.noticeId]: { ...(prev[opp.noticeId] ?? NO_HANDOFF), ...p },
+    }));
   // The bid joins "Bids Ava is building" once its handoff page is open.
   useEffect(() => noteHandoff(opp.noticeId), [opp.noticeId]);
   const [talk, setTalk] = useState<Exchange[]>([]);

@@ -97,6 +97,16 @@ export interface Step {
   how: "chip" | "typed" | "fields" | "dialog";
 }
 
+/** Words a person could type in the box that asks for `asks`. */
+function fillFor(asks: string): string {
+  if (/meals/.test(asks)) return "400";
+  if (/percent|%|contingency|profit/.test(asks)) return "5";
+  if (/email/.test(asks)) return "reference@example.com";
+  if (/phone/.test(asks)) return "(910) 555-0100";
+  if (/name|title/.test(asks)) return "Dana Reyes";
+  return "12";
+}
+
 /** Answer questions until Ava says the bid is ready (the "Read my bid" button).
  *  `pick` chooses a chip. `typeEvery`: type the chip's words instead of tapping
  *  it, every n-th question (0: never). Returns every step taken. */
@@ -136,9 +146,7 @@ export async function answerAll(
         ).toLowerCase();
         asked.push(asks.replace(/\s+/g, " ").trim());
         if (await input.inputValue()) continue;
-        await input.fill(
-          /meals/.test(asks) ? "400" : /percent|%|contingency|profit/.test(asks) ? "5" : "12",
-        );
+        await input.fill(fillFor(asks));
       }
       const go = page.locator(".ava2-fields button.btn-primary:not([disabled])");
       if ((await go.count()) > 0) {
@@ -218,7 +226,11 @@ export async function filesOf(w: Watch): Promise<{ name: string; size: number; h
   for (const d of w.downloads) {
     const p = await d.path();
     const buf = fs.readFileSync(p);
-    out.push({ name: d.suggestedFilename(), size: buf.length, head: buf.subarray(0, 4).toString("latin1") });
+    out.push({
+      name: d.suggestedFilename(),
+      size: buf.length,
+      head: buf.subarray(0, 4).toString("latin1"),
+    });
   }
   return out;
 }
@@ -282,7 +294,9 @@ export async function layoutProblems(page: Page): Promise<string[]> {
           const key = `${el.tagName}.${el.className}`;
           if (!seen.has(key)) {
             seen.add(key);
-            out.push(`cut off at the right edge: <${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}"> right=${Math.round(r.right)} > ${vw}`);
+            out.push(
+              `cut off at the right edge: <${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}"> right=${Math.round(r.right)} > ${vw}`,
+            );
           }
         }
         // Text that spills out of its own box.
@@ -296,7 +310,9 @@ export async function layoutProblems(page: Page): Promise<string[]> {
           const key = `clip ${el.tagName}.${el.className}`;
           if (!seen.has(key)) {
             seen.add(key);
-            out.push(`text clipped: <${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}"> "${(el.textContent ?? "").trim().slice(0, 50)}"`);
+            out.push(
+              `text clipped: <${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}"> "${(el.textContent ?? "").trim().slice(0, 50)}"`,
+            );
           }
         }
       }
@@ -306,7 +322,10 @@ export async function layoutProblems(page: Page): Promise<string[]> {
 }
 
 /** The talk box is on screen, inside the window, and takes typing. */
-export async function inputReachable(page: Page, opts: { scroll?: boolean } = {}): Promise<string | null> {
+export async function inputReachable(
+  page: Page,
+  opts: { scroll?: boolean } = {},
+): Promise<string | null> {
   const box = page.getByLabel(/Type to Ava|Ask Ava/i).first();
   if (!(await box.isVisible().catch(() => false))) return "the talk box is not visible";
   // Where the panes stack, the reader's chat sits under the document: it is reached by scrolling.
@@ -314,7 +333,8 @@ export async function inputReachable(page: Page, opts: { scroll?: boolean } = {}
   const r = await box.boundingBox();
   const vp = page.viewportSize();
   if (!r || !vp) return "no box";
-  if (r.y + r.height > vp.height + 1 || r.y < 0) return `the talk box is outside the window (y=${Math.round(r.y)}, h=${Math.round(r.height)}, window ${vp.height})`;
+  if (r.y + r.height > vp.height + 1 || r.y < 0)
+    return `the talk box is outside the window (y=${Math.round(r.y)}, h=${Math.round(r.height)}, window ${vp.height})`;
   if (r.x + r.width > vp.width + 1) return "the talk box is cut off at the right";
   return null;
 }

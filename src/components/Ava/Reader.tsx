@@ -200,7 +200,11 @@ export function aboutSentence(text: string): "why" | "order" | "words" {
   const t = text.trim().toLowerCase();
   if (/\?\s*$/.test(t) || /^(why|what|how|who|when|where|which|is|are|does|do|did)\b/.test(t))
     return "why";
-  if (/^(please\b|can you\b|could you\b|would you\b|make\b|change\b|shorten\b|rewrite\b|reword\b|remove\b|delete\b|fix\b|improve\b|edit\b)/.test(t))
+  if (
+    /^(please\b|can you\b|could you\b|would you\b|make\b|change\b|shorten\b|rewrite\b|reword\b|remove\b|delete\b|fix\b|improve\b|edit\b)/.test(
+      t,
+    )
+  )
     return "order";
   return "words";
 }

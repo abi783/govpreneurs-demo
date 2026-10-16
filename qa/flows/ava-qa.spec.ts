@@ -153,7 +153,6 @@ test.describe("Ava tours (text dumps)", () => {
   });
 });
 
-
 // ─── Layout at four widths ───
 
 const WIDTHS = [1024, 1280, 1440, 1920] as const;
@@ -200,15 +199,27 @@ for (const width of WIDTHS) {
   });
 }
 
-
 // ─── State persists across a reload, and Reset demo restores the start ───
 
 /** What a person sees of the bid's state: the count on the checklist strip, the days left, the step. */
 async function stateOf(page: Page): Promise<string> {
-  const count = await page.locator(".ds-rail__count").first().innerText().catch(() => "");
-  const status = await page.locator('.ava2-stepbar .sr-only').first().innerText().catch(() => "");
+  const count = await page
+    .locator(".ds-rail__count")
+    .first()
+    .innerText()
+    .catch(() => "");
+  const status = await page
+    .locator(".ava2-stepbar .sr-only")
+    .first()
+    .innerText()
+    .catch(() => "");
   const tabs = await page.locator(".ava2-tabs [role=tab]").allInnerTexts();
-  const tail = (await page.locator(".ava2-talk__scroll").innerText().catch(() => ""))
+  const tail = (
+    await page
+      .locator(".ava2-talk__scroll")
+      .innerText()
+      .catch(() => "")
+  )
     .split("\n")
     .filter(Boolean)
     .slice(-6)
@@ -225,7 +236,13 @@ test.describe("reload keeps the state", () => {
     await page.waitForLoadState("networkidle");
     expect(await stateOf(page), "reload before any answer").toBe(before);
     for (let i = 0; i < 12; i++) {
-      if (await page.getByRole("button", { name: "Read my bid" }).isVisible().catch(() => false)) break;
+      if (
+        await page
+          .getByRole("button", { name: "Read my bid" })
+          .isVisible()
+          .catch(() => false)
+      )
+        break;
       await answerAll(page, { max: 2 });
       await page.waitForTimeout(250);
       before = await stateOf(page);
@@ -268,7 +285,10 @@ test.describe("reload keeps the state", () => {
     // Change a lot: answer, download, send, ask the mentor, add files, open the rail.
     await open(page, BIDS.mackall);
     await answerAll(page);
-    await page.getByRole("button", { name: /Build with a mentor|Review with a mentor/ }).first().click();
+    await page
+      .getByRole("button", { name: /Build with a mentor|Review with a mentor/ })
+      .first()
+      .click();
     await page.getByRole("button", { name: /Send for/ }).click();
     await page.getByRole("button", { name: "Done" }).click({ delay: 800 });
     await openRail(page);
@@ -290,7 +310,9 @@ test.describe("reload keeps the state", () => {
     await open(page, "RCSC-2026-09");
     const c2 = page.waitForEvent("filechooser");
     await page.getByText(/Add the county's files/).click();
-    await (await c2).setFiles({ name: "IFB.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
+    await (
+      await c2
+    ).setFiles({ name: "IFB.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
     await page.goto("/ava?fast=1");
     await expect(page.locator(".ava-idx__card")).toHaveCount(6);
     // Reset.
@@ -305,7 +327,6 @@ test.describe("reload keeps the state", () => {
     expect(w.problems).toEqual([]);
   });
 });
-
 
 // ─── Every way into Ava lands on the right bid ───
 
@@ -350,7 +371,9 @@ test.describe("ways into Ava", () => {
       await page.waitForLoadState("networkidle");
       const intro = page.getByRole("button", { name: /Show me the analysis/ });
       if (await intro.isVisible().catch(() => false)) await intro.click();
-      const next = page.getByRole("button", { name: label }).or(page.getByRole("link", { name: label }));
+      const next = page
+        .getByRole("button", { name: label })
+        .or(page.getByRole("link", { name: label }));
       await next.last().scrollIntoViewIfNeeded();
       await next.last().click();
       await landedOn(page, id);
@@ -358,7 +381,9 @@ test.describe("ways into Ava", () => {
     expect(w.problems).toEqual([]);
   });
 
-  test("the Pipeline tags and next moves open the bid, with the same days left", async ({ page }) => {
+  test("the Pipeline tags and next moves open the bid, with the same days left", async ({
+    page,
+  }) => {
     const w = watch(page);
     const ids = ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"];
     for (const id of ids) {
@@ -369,7 +394,9 @@ test.describe("ways into Ava", () => {
       const days = (await card.innerText()).match(/(\d+) days? left/)?.[1];
       await tag.click();
       await landedOn(page, id);
-      expect(await page.locator(".ava2-top__days").innerText(), `days left on ${id}`).toContain(days!);
+      expect(await page.locator(".ava2-top__days").innerText(), `days left on ${id}`).toContain(
+        days!,
+      );
     }
     expect(w.problems).toEqual([]);
   });
@@ -400,7 +427,12 @@ test.describe("ways into Ava", () => {
     await expect(page.getByRole("heading", { name: "Bids Ava is building" })).toBeVisible();
     const cards = page.locator(".ava-idx__card");
     await expect(cards).toHaveCount(4);
-    for (const id of ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"]) {
+    for (const id of [
+      "FAYNC-2026-R-08",
+      "CUMCO-2026-014",
+      "SP4701-26-Q-0021",
+      "W912EE-27-S-0004",
+    ]) {
       await page.goto("/ava?fast=1");
       await page.locator(".ava-idx__card", { hasText: id }).click();
       await landedOn(page, id);
@@ -408,7 +440,6 @@ test.describe("ways into Ava", () => {
     expect(w.problems).toEqual([]);
   });
 });
-
 
 // ─── The mentor button ───
 
@@ -482,6 +513,181 @@ test.describe("the mentor button", () => {
     await expect(page.getByText(/With Sarah since/)).toBeVisible();
     await expect(page.getByRole("button", { name: /Ask a mentor/ })).toHaveCount(0);
     expect(await walletBalance(page)).toBe("$112.00");
+    expect(w.problems).toEqual([]);
+  });
+});
+
+// ─── The prototype controls ───
+
+test.describe("prototype controls", () => {
+  test("are hidden in a fresh session, on every Ava page, and Shift+Alt+A shows and hides them", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    for (const route of [
+      "/ava",
+      ...Object.values(BIDS).map((id) => `/ava/${id}`),
+      "/ava/W912PM-26-Q-0017",
+      "/ava/RCSC-2026-09",
+      "/ava/SP4701-26-R-0078",
+      "/ava/NOT-A-BID-123",
+    ]) {
+      await page.goto(`${route}?fast=1`);
+      await page.waitForLoadState("networkidle");
+      await expect(page.locator(".ava-demo"), `controls on ${route}`).toHaveCount(0);
+      await expect(page.getByText(/Prototype controls/i)).toHaveCount(0);
+    }
+    await open(page, BIDS.mackall);
+    await page.keyboard.press("Shift+Alt+KeyA");
+    await expect(page.locator(".ava-demo")).toHaveCount(1);
+    await page.reload();
+    await expect(page.locator(".ava-demo"), "the choice survives a reload").toHaveCount(1);
+    await page.getByRole("button", { name: "Reset demo" }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "Reset demo" }).click();
+    await page.waitForURL(/\/(\?|$)/);
+    await open(page, BIDS.mackall);
+    await expect(page.locator(".ava-demo"), "Reset demo hides them again").toHaveCount(0);
+    expect(w.problems).toEqual([]);
+  });
+});
+
+import { CASES } from "../../src/lib/ava/cases";
+
+test.describe("prototype screens open without a problem", () => {
+  test.setTimeout(120_000);
+  const chunks = 4;
+  for (let k = 0; k < chunks; k++) {
+    test(`screens, part ${k + 1} of ${chunks}`, async ({ page }) => {
+      const w = watch(page);
+      const mine = CASES.filter((_, i) => i % chunks === k);
+      for (const c of mine) {
+        await page.goto(`/ava/${c.noticeId}?case=${c.id}&fast=1`);
+        await page.waitForLoadState("networkidle");
+        await page.waitForTimeout(250);
+        const text = await cleanText(page, `case-${c.id}`);
+        expect(text.trim().length, `${c.id} is not empty`).toBeGreaterThan(40);
+        expect(w.problems, `after ${c.id}`).toEqual([]);
+      }
+    });
+  }
+});
+
+// ─── Odd text in the boxes and the talk box ───
+
+test.describe("odd text", () => {
+  test.setTimeout(90_000);
+
+  /** Walk Cumberland, after the certificates, to the next box that asks for one thing. */
+  async function toBox(page: Page, label: RegExp): Promise<void> {
+    const chooser = page.waitForEvent("filechooser");
+    await page.getByRole("button", { name: /Upload the certificates/i }).click();
+    await (
+      await chooser
+    ).setFiles({ name: "c.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
+    for (let i = 0; i < 40; i++) {
+      await page.waitForTimeout(120);
+      if (await confirmDialog(page)) continue;
+      const inputs = page.locator(".ava2-fields input");
+      if ((await inputs.count()) > 0) {
+        const first = await inputs.first().locator("xpath=ancestor::label[1]").innerText();
+        if (label.test(first)) return;
+        for (const input of await inputs.all()) {
+          const asks = (await input.locator("xpath=ancestor::label[1]").innerText()).toLowerCase();
+          await input.fill(
+            /meals/.test(asks)
+              ? "400"
+              : /email/.test(asks)
+                ? "ref@example.com"
+                : /phone/.test(asks)
+                  ? "(910) 555-0100"
+                  : /percent|%|contingency|profit/.test(asks)
+                    ? "5"
+                    : "Dana Reyes",
+          );
+        }
+        await page.locator(".ava2-fields button.btn-primary:not([disabled])").first().click();
+        continue;
+      }
+      const buttons = page
+        .locator(".ava2-talk__scroll .ds-replies")
+        .last()
+        .locator("button:not([disabled])");
+      const labels = (await buttons.allInnerTexts()).map((l) => l.trim());
+      if (labels.length === 0) continue;
+      const pick = labels.findIndex((l) => !QUIET_WORDS.test(l));
+      await buttons.nth(Math.max(pick, 0)).click();
+    }
+    throw new Error(`never reached the box ${label}`);
+  }
+  const QUIET_WORDS = /not sure|not yet|I can't|No, I can't|Stop|Ask a mentor|See Grant|Take my/i;
+
+  test("a box that asks for a number refuses words, minus signs and huge numbers", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await open(page, BIDS.cumberland);
+    await toBox(page, /Contingency/i);
+    const box = page.locator(".ava2-fields input").first();
+    for (const bad of ["abc", "-5", "1e9", "5.5.5", "🙂", "101", "99999999999999999999", "five"]) {
+      await box.fill(bad);
+      await expect(
+        page.getByRole("alert").filter({ hasText: "needs a number" }),
+        bad,
+      ).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save it" }), bad).toHaveCount(0);
+    }
+    // The talk box takes numbers only, too, and says what the box needs.
+    const talk = page.getByLabel(/Type to Ava/i).first();
+    await talk.fill("lots");
+    await talk.press("Enter");
+    await expect(page.getByText(/needs a number, like 5\./).last()).toBeVisible();
+    await box.fill("5%");
+    await page.getByRole("button", { name: "Save it" }).click();
+    await expect(page.getByText(/Profit, as a percent/)).toBeVisible();
+    await cleanText(page, "odd-numbers");
+    expect(w.problems).toEqual([]);
+  });
+
+  test("a phone box and an email box refuse a bare number", async ({ page }) => {
+    const w = watch(page);
+    await open(page, BIDS.cumberland);
+    await toBox(page, /Meals a day at Womack/i);
+    const inputs = page.locator(".ava2-fields input");
+    for (const input of await inputs.all()) await input.fill("12");
+    await expect(page.getByRole("alert").first()).toContainText(/needs/);
+    const text = await page.locator(".ava2-fields").innerText();
+    expect(text).toMatch(/phone number|email address/);
+    await expect(page.getByRole("button", { name: "Save it" })).toHaveCount(0);
+    expect(w.problems).toEqual([]);
+  });
+
+  test("odd words in the talk box on a question with answers: empty, emoji, numbers, 2,000 characters", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await open(page, BIDS.mackall);
+    const talk = page.getByLabel(/Type to Ava/i).first();
+    const long = "word ".repeat(400).trim();
+    for (const t of [
+      "",
+      "   ",
+      "🙂🙂🙂",
+      "12345",
+      "$%^&*<script>alert(1)</script>",
+      "x".repeat(2000),
+      long,
+    ]) {
+      await talk.fill(t);
+      await talk.press("Enter");
+      await page.waitForTimeout(120);
+    }
+    const text = await cleanText(page, "odd-talk");
+    expect(text).toContain("I cannot use words for this question yet");
+    expect(await layoutProblems(page)).toEqual([]);
+    // The question is still there, and an answer typed in words still works.
+    await talk.fill("they apply after award");
+    await talk.press("Enter");
+    await expect(page.getByText(/If you win, you promise this/).last()).toBeVisible();
     expect(w.problems).toEqual([]);
   });
 });
