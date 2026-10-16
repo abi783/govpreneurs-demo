@@ -59,6 +59,16 @@ function askForCopy(bid: AvaContext["bid"]): Extra {
   };
 }
 
+/** A line Ava wrote to the member ("You have 3 of 5."), as the member would say
+ *  it to her mentor ("I have 3 of 5."). */
+export function inMyVoice(line: string): string {
+  return line
+    .replace(/\bYou (have|are|cannot|can't|do not|don't|need|must|lose|did|had)\b/g, "I $1")
+    .replace(/\byou (have|are|cannot|can't|do not|don't|need|must|lose|did|had)\b/g, "I $1")
+    .replace(/\bYour\b/g, "My")
+    .replace(/\byour\b/g, "my");
+}
+
 /** How many turns show before "Show earlier messages". */
 const RECENT = 14;
 
@@ -611,7 +621,7 @@ export function Talk({
               note:
                 note ||
                 (pausedRule
-                  ? `I cannot meet this rule: ${pausedRule}. Ava paused the bid. Should I still bid?`
+                  ? `I cannot meet this rule: ${inMyVoice(pausedRule)}. Ava paused the bid. Should I still bid?`
                   : "I cannot meet one rule on this bid, so Ava paused it. Should I still bid?"),
               subject: "paused",
             });

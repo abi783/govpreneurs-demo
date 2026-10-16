@@ -52,6 +52,35 @@ test.describe("Ava tours (text dumps)", () => {
     });
   }
 
+  test("the list, the handoffs, Grant's No Bid and a number that is not found", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    await page.goto("/ava?fast=1");
+    await page.waitForLoadState("networkidle");
+    await cleanText(page, "list");
+    for (const id of [
+      "W912PM-26-Q-0017",
+      "VA247-26-R-0112",
+      "W912EE-26-R-0066",
+      "RCSC-2026-09",
+      "CCSC-2026-22",
+      "NCNG-2026-21",
+      "SP4701-26-R-0078",
+      "NOT-A-BID-123",
+    ]) {
+      await page.goto(`/ava/${id}?fast=1`);
+      await page.waitForLoadState("networkidle");
+      await cleanText(page, `first-${id}`);
+    }
+    // Once the handoffs were opened, the list holds them, soonest closing first.
+    await page.goto("/ava?fast=1");
+    const text = await cleanText(page, "list-with-handoffs");
+    expect(text).toContain("Due date not read yet");
+    expect(text).not.toContain("SP4701-26-R-0078");
+    expect(w.problems).toEqual([]);
+  });
+
   test("mackall: walk with chips, then read, tabs, download, send", async ({ page }) => {
     const w = watch(page);
     await open(page, BIDS.mackall);
