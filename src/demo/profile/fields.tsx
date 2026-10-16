@@ -99,7 +99,7 @@ const SECONDARY = PERSONA.secondaryNaics;
 const CORE_CAPABILITIES = [
   "Contract meal service from one commercial kitchen",
   "Therapeutic diets (renal, diabetic, pureed)",
-  "Halal and allergen-labelled menus",
+  "Halal and allergen-labeled menus",
   "Event and ceremony catering",
 ];
 
@@ -577,7 +577,7 @@ const DEFS: FieldDef[] = [
     edit: { type: "textarea" },
     chatEditable: true,
     whyItMatters:
-      "Place of performance is often the deciding factor — Hunter prioritises opportunities in your reach.",
+      "Place of performance is often the deciding factor — Hunter prioritizes opportunities in your reach.",
   },
   {
     id: "set-aside",
@@ -598,11 +598,11 @@ const DEFS: FieldDef[] = [
     tab: "positioning",
     tier: "T2",
     label: "Target Agencies",
-    helper: "Agencies you most want to work with. Hunter will prioritise their solicitations.",
+    helper: "Agencies you most want to work with. Hunter will prioritize their solicitations.",
     initial: { state: "attested", value: [...PERSONA.targetAgencies], source: told(60), at: iso(60) },
     edit: { type: "multiselect" },
     chatEditable: true,
-    whyItMatters: "Hunter prioritises solicitations from agencies you're hunting, including pre-solicitations.",
+    whyItMatters: "Hunter prioritizes solicitations from agencies you're hunting, including pre-solicitations.",
   },
   {
     id: "notif-cadence",

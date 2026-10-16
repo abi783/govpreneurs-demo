@@ -167,7 +167,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       "A daily cafe is new for you: show the county summer program as proof of daily service.",
       "Addendum 1 moved the due date and added a question on staffing; your answer must cover it.",
     ],
-    wouldChange: ["If the city adds a liquor-licence requirement for events, I'd move this to Needs review."],
+    wouldChange: ["If the city adds a liquor-license requirement for events, I'd move this to Needs review."],
     nextMove: {
       label: "Open the proposal Ava built",
       to: "/ava/FAYNC-2026-R-08",

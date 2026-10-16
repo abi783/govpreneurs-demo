@@ -56,7 +56,7 @@ export const PERSONA = {
   differentiators: [
     "Cooks and delivers 1,100 meals a day from one kitchen",
     "Therapeutic diets (renal, diabetic, pureed) to a dietitian's order",
-    "Halal and allergen-labelled menus as standard",
+    "Halal and allergen-labeled menus as standard",
     "Two refrigerated vans for same-day delivery inside 60 miles",
   ],
   capabilityStatementFile: "/demo-files/haddad-catering-capability-statement.pdf",
@@ -99,7 +99,7 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     totalValue: 198_000,
     naicsCode: "722310",
     scopeDescription:
-      "Cooked and delivered 1,100 breakfasts and lunches a day to nine summer meal sites across Fayetteville. USDA meal-pattern menus, daily temperature logs, allergen-labelled trays.",
+      "Cooked and delivered 1,100 breakfasts and lunches a day to nine summer meal sites across Fayetteville. USDA meal-pattern menus, daily temperature logs, allergen-labeled trays.",
     referenceName: "Janet Reyes",
     referenceTitle: "Child Nutrition Director, Cumberland County Schools",
   },
@@ -157,7 +157,7 @@ export const MENTOR = {
   bio: "Sarah spent 14 years as an Army contracting officer at Fort Bragg and Fort Stewart before joining GovPreneurs. She reviews food-service and facilities bids.",
 } as const;
 
-/** The incumbent and teaming partner at the centre of the Fort Bragg story. */
+/** The incumbent and teaming partner at the center of the Fort Bragg story. */
 export const KEY_PARTNER = {
   name: "Carolina Dining Group",
   contact: "Mike Sutton",

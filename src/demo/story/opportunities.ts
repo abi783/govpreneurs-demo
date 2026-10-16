@@ -706,7 +706,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
   {
     id: "DUR-CO-2026-12",
     title: "Senior Nutrition Program Meals — Two Durham County Centers",
-    plainTitle: "Senior meals at two Durham County centres",
+    plainTitle: "Senior meals at two Durham County centers",
     agency: "Durham County, NC",
     office: "Department of Social Services",
     scope: "sled",
@@ -719,13 +719,13 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     postedDaysAgo: 12,
     closesInDays: 17,
     summary:
-      "Hot lunches for about 150 older adults a day at two senior centres, plus 60 home-delivered meals. One year with two renewals.",
+      "Hot lunches for about 150 older adults a day at two senior centers, plus 60 home-delivered meals. One year with two renewals.",
     hunter: {
       tier: "strong",
       score: 74,
       forYouRank: 12,
       line:
-        "Senior lunches at two Durham County centres: about $210K, and inside your service area, though 85 miles is a long daily drive.",
+        "Senior lunches at two Durham County centers: about $210K, and inside your service area, though 85 miles is a long daily drive.",
       fit: [
         { kind: "valueInRange", says: "about $210K" },
         { kind: "distance", says: "inside your service area" },
@@ -776,7 +776,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
   },
 
   // ── All tab only ──────────────────────────────────────────────────────
-  allOnly("N40085-26-R-0102", "Community Center Catering, Family Housing — MCAS Cherry Point", "Community-centre catering for Cherry Point family housing", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Proposal", "WOSB", "722320", 510_000, 720_000, "cherryPoint", 14, 31, "strong", 76, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. It is woman-owned and your size, but 140 miles is a long way for event catering." }),
+  allOnly("N40085-26-R-0102", "Community Center Catering, Family Housing — MCAS Cherry Point", "Community-center catering for Cherry Point family housing", "Department of the Navy", "NAVFAC Mid-Atlantic", "fed", "Request for Proposal", "WOSB", "722320", 510_000, 720_000, "cherryPoint", 14, 31, "strong", 76, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. It is woman-owned and your size, but 140 miles is a long way for event catering." }),
   allOnly("CCSC-2026-22", "School Nutrition Services — Three Elementary Schools", "Meals for three Cumberland County elementary schools", "Cumberland County Schools, NC", "Child Nutrition Services", "sled", "Request for Proposal", null, "722310", 680_000, 910_000, "fayetteville", 5, 35, "priority", 85, { verdict: "bid", prime: "go", sub: null, oneLine: "Bid it. Your best reference, Janet Reyes, runs this program." }, { saved: true }),
   allOnly("W912PM-26-R-0058", "Full Food Service — XVIII Airborne Corps Dining Complex", "Full food service at the XVIII Airborne Corps dining complex", "Department of the Army", "MICC — Fort Bragg", "fed", "Request for Proposal", "WOSB", "722310", 1_100_000, 1_600_000, "fortBragg", 9, 40, "strong", 72, { verdict: "review", prime: "no_go", sub: "go", oneLine: "Look closer. Twice your annual revenue; better as a subcontractor this year." }),
   allOnly("W912HN-26-Q-0014", "Cafeteria and Catering Services — Army Field Office, Charleston", "Cafeteria and catering at the Army field office in Charleston", "Department of the Army", "USACE Charleston District", "fed", "Request for Quote", "WOSB", "722310", 360_000, 520_000, "charleston", 8, 22, "strong", 66, { verdict: "review", prime: "go", sub: null, oneLine: "Look closer. Charleston is just outside your 200-mile service area." }),
