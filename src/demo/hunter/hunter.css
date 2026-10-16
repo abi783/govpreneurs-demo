@@ -29,3 +29,22 @@
     display: none;
   }
 }
+
+/* The comparison table has a label column and up to four opportunity columns.
+   In a 370 px feed column the columns are too narrow to read, so the table keeps
+   a readable width and the card scrolls sideways. */
+@media (max-width: 1180px) {
+  .stage-card .hunter-compare {
+    overflow-x: auto;
+  }
+  .stage-card .hunter-compare__grid {
+    min-width: 620px;
+  }
+  .stage-card .hunter-compare__grid th,
+  .stage-card .hunter-compare__grid td {
+    padding: 8px 10px;
+  }
+  .stage-card .hunter-compare__grid thead th:first-child {
+    width: 120px;
+  }
+}

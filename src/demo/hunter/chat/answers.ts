@@ -396,7 +396,7 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
     tradeoff: tradeoffText(picked),
   };
   return {
-    reply: `${intro} I compared ${joinList(titles)} on value, distance, who can compete and time left. The table is above your list. I rank fit. ${GO_NO_GO}`,
+    reply: `${intro} I compared ${picked.length === 2 ? joinList(titles) : `these ${picked.length}`} on value, distance, who can compete and time left. The table is above your list. I rank fit. ${GO_NO_GO}`,
     kind: "compare",
     data,
     chips,
