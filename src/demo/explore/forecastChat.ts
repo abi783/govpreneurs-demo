@@ -49,7 +49,7 @@ export function cardTakeLine(oppKey: string): string | null {
     case "ce493b6f89e41ddc4ff5b2b7923301d9":
       return `Patient meals at the Fayetteville VA, the same therapeutic diets you served at Womack. Planned for small businesses and 3 miles from your kitchen.${when_}`;
     case "047c3c8aa5dc76e7ccacc984bdff9848":
-      return `Cooks and servers for two Camp Lejeune dining halls. It is in your food-service code and your size, but about 100 miles from your kitchen.${when_}`;
+      return `Cooks and servers for two Camp Lejeune dining halls. It is in your food-service code, but at ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, and it is about 100 miles from your kitchen.${when_}`;
     case "63bc4374632ee3bee7be3c460d51bdad":
       return `The community college plans a food court and catering in Fayetteville. Only a committee note so far, but it is local and your kind of work.${when_}`;
     default:

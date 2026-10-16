@@ -122,8 +122,10 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     pscCode: "M1FD",
     oppType: "New",
     setAsideCode: "SBA",
-    valLow: 1_100_000,
-    valHigh: 1_600_000,
+    // Above five times her $340K largest job, so the page reads it as a team job like the Fort Bragg one.
+    // The open Camp Lejeune notice (opportunities.ts) is a no-bid as prime for the same reason.
+    valLow: 1_800_000,
+    valHigh: 2_400_000,
     popState: "NC",
     popCity: "Camp Lejeune",
     contactName: null,
