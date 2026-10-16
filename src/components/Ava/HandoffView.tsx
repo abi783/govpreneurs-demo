@@ -43,8 +43,9 @@ import { ReqMark } from "./primitives";
 
 /** Ava's own word for the buyer in a sentence: "the Army's files". */
 export function theirs(opp: AvaOpportunity): string {
-  if (/county/i.test(opp.agency)) return "the county's";
+  // A school system first: "Cumberland County Schools" is a district, not the county.
   if (/school|district|\bisd\b/i.test(opp.agency)) return "the district's";
+  if (/county/i.test(opp.agency)) return "the county's";
   if (/^city\b/i.test(opp.agency)) return "the city's";
   if (/\barmy\b/i.test(opp.agency)) return "the Army's";
   if (/air force/i.test(opp.agency)) return "the Air Force's";

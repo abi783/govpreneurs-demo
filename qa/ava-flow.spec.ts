@@ -317,9 +317,9 @@ test.describe("Ava, one full flow per bid", () => {
   }) => {
     const w = watch(page);
     await open(page, "RCSC-2026-09");
-    await expect(page.getByText(/I need the county's files first. Public Schools/)).toBeVisible();
+    await expect(page.getByText(/I need the district's files first. Public Schools/)).toBeVisible();
     const chooser = page.waitForEvent("filechooser");
-    await page.getByText(/Add the county's files/).click();
+    await page.getByText(/Add the district's files/).click();
     await (
       await chooser
     ).setFiles({

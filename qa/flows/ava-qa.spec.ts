@@ -309,7 +309,7 @@ test.describe("reload keeps the state", () => {
     await page.getByRole("button", { name: "Tell me when you are ready" }).click();
     await open(page, "RCSC-2026-09");
     const c2 = page.waitForEvent("filechooser");
-    await page.getByText(/Add the county's files/).click();
+    await page.getByText(/Add the district's files/).click();
     await (
       await c2
     ).setFiles({ name: "IFB.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
