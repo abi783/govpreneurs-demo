@@ -301,7 +301,7 @@ const SEEDS: Seed[] = [
     obligated: 1_150_000,
     startedDaysAgo: 760,
     endsInDays: 330,
-    city: "Stem",
+    city: "Butner",
     state: "NC",
     naics: "722310",
     workType: "Training-center dining hall",
