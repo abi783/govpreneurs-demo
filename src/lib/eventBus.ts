@@ -25,7 +25,9 @@ export type SliceKey =
   | "microPurchases"
   | "smallOrdersFeed"
   | "smallOrdersSaved"
-  | "smallOrdersFit";
+  | "smallOrdersFit"
+  // DEMO: Ava's bid state, her facts for Grant and the mentor reviews she asks for (src/demo/ava).
+  | "ava";
 
 const listeners: Map<SliceKey, Set<() => void>> = new Map();
 
