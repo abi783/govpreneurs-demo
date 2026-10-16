@@ -2225,3 +2225,79 @@ test.describe("Browser tab titles", () => {
     await healthy(page, w, "tab titles");
   });
 });
+
+// ── 3 (continued). Abuse: every chat answers, whatever it is asked ────────
+
+test.describe("Every chat box answers", () => {
+  const CHATS: { name: string; route: string; open?: (p: Page) => Promise<void>; box: RegExp; rows: string }[] = [
+    { name: "Hunter on the feed", route: "/opportunities", box: /Ask Hunter/, rows: ".hunter-msg-row" },
+    { name: "Hunter on forecasts", route: "/forecasts", box: /Ask Hunter/, rows: ".hunter-msg-row" },
+    {
+      name: "Grant on an opportunity",
+      route: `/opportunities/${CAMP_MACKALL}`,
+      open: (p) => passGrantIntro(p),
+      box: /Ask Grant/,
+      rows: ".grant-dock [class*='grant-msg']",
+    },
+    {
+      name: "Grant on a forecast",
+      route: "/forecasts/80e9e92fd343cd7549f92d15374c2885",
+      open: async (p) => {
+        await passGrantIntro(p);
+        await p.locator("button", { hasText: /^Grant$/ }).click();
+      },
+      box: /Ask Grant/,
+      rows: ".grant-dock [class*='grant-msg']",
+    },
+  ];
+  for (const c of CHATS) {
+    test(c.name, async ({ page, context }) => {
+      test.setTimeout(240_000);
+      const w = await watch(page, context);
+      await open(page, c.route);
+      if (c.open) await c.open(page);
+      const box = page.getByPlaceholder(c.box);
+      await expect(box).toBeVisible();
+      /** The thread as [who, text] pairs, oldest first. */
+      const thread = () =>
+        page.locator(c.rows).evaluateAll((els) =>
+          els.map((e) => ({
+            user: /from-user|grant-msg--user/.test(e.className),
+            typing: /typing/.test(e.className),
+            text: (e as HTMLElement).innerText.trim(),
+          })),
+        );
+      for (const s of NASTY) {
+        const before = (await thread()).length;
+        await box.fill(s.text);
+        await box.press("Enter");
+        if (s.text.trim() === "") {
+          // An empty question is not sent.
+          await page.waitForTimeout(400);
+          expect((await thread()).length, `${c.name}: an empty question was sent`).toBe(before);
+          continue;
+        }
+        // The question shows as the member's turn, and an answer with real words follows it.
+        await expect
+          .poll(
+            async () => {
+              const t = await thread();
+              const lastUser = t.map((m, i) => (m.user ? i : -1)).filter((i) => i >= 0).pop();
+              if (lastUser === undefined) return "no question yet";
+              const after = t.slice(lastUser + 1).filter((m) => !m.typing && !m.user);
+              return after.length > 0 && after[after.length - 1].text.length > 15 ? "answered" : "waiting";
+            },
+            { timeout: 9000, message: `${c.name}: no answer to "${s.name}"` },
+          )
+          .toBe("answered");
+        await settle(page);
+        const t = await thread();
+        const answer = t[t.length - 1].text;
+        expect(answer, `${c.name}: the answer to "${s.name}" shows a code word`).not.toMatch(/undefined|\[object|NaN|\{\{/);
+        await healthy(page, w, `${c.name}: ${s.name}`);
+        const needle = s.text.trim().slice(0, 30);
+        if (needle.length >= 8) expect(await spillOver(page, needle), `${c.name}: the question "${s.name}" spills out of its bubble`).toEqual([]);
+      }
+    });
+  }
+});
