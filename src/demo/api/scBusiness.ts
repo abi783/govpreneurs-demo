@@ -26,6 +26,7 @@
 // file answers every validation key with a pass, so those calls end well too.
 
 import type { DemoRouteDef } from "../runtime/router";
+import { registerSearchEntries } from "../nav/searchIndex";
 import {
   confirmField,
   confirmProposal,
@@ -41,6 +42,17 @@ import {
 } from "../sc/business/ops";
 import { PSC_GROUPS, pscDescriptions, pscGroupCodes, searchPsc } from "../sc/business/data/psc";
 import { addressForPlace, citiesFor, suggestAddresses } from "../sc/business/data/geo";
+
+// The command palette can open every part of My Business.
+registerSearchEntries([
+  { label: "My Business: What you sell", hint: "My Business", to: "/my-business/sell", keywords: ["services", "trade", "naics", "capability statement", "differentiators", "menus"] },
+  { label: "My Business: Work you have done", hint: "My Business", to: "/my-business/jobs", keywords: ["past performance", "references", "jobs", "customers"] },
+  { label: "My Business: Your papers", hint: "My Business", to: "/my-business/papers", keywords: ["insurance", "permits", "licenses", "food handler", "haccp", "w-9", "certificates"] },
+  { label: "My Business: What you can take on", hint: "My Business", to: "/my-business/capacity", keywords: ["capacity", "bonding", "service area", "equipment", "payment terms"] },
+  { label: "My Business: Your legal details", hint: "My Business", to: "/my-business/business", keywords: ["sam", "uei", "cage", "ein", "address", "owners", "certifications", "wosb"] },
+  { label: "My Business: Digital identity", hint: "My Business", to: "/my-business/digital", keywords: ["website", "email", "phone", "a2p", "audit"] },
+  { label: "Tell Hunter everything", hint: "My Business", to: "/my-business/tell", keywords: ["dictate", "voice", "write down", "profile"] },
+]);
 
 const BP = "/api/portal/:locationId/business-profile";
 

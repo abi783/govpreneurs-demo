@@ -1268,7 +1268,10 @@ button.mb-row__box--empty:hover {
   min-width: 0;
 }
 
-@media (min-width: 900px) {
+/* DEMO: 1280px, not 900px. In the Success Center this page fills the browser. In the demo
+   the left menu takes 244px, so the page has about 240px less room. The rail moves
+   above the rows (as on a phone) until the page has room for both. */
+@media (min-width: 1280px) {
   .gpds .mb-page {
     padding-left: var(--s-8);
     padding-right: var(--s-8);
@@ -1411,7 +1414,7 @@ button.mb-row__box--empty:hover {
   white-space: nowrap;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1280px) {
   /* The whole rail column — the score card above the nav now, not the nav
      alone — scrolls with her as one unit. */
   .gpds .mb-rail-col {

@@ -25,6 +25,10 @@ export function ImageUploadCard({ label, helper, currentUrl, round, upload }: {
   const [url, setUrl] = useState(currentUrl);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // DEMO: the button says "Choose a file…" while the file box is open, so the click is
+  // visible on screen. It clears when a file is chosen, when the box is cancelled, or
+  // when the window gets focus back.
+  const [picking, setPicking] = useState(false);
 
   const pick = async (f: File | undefined) => {
     if (!f) return;
@@ -62,10 +66,14 @@ export function ImageUploadCard({ label, helper, currentUrl, round, upload }: {
         {err && <span className="gpds-imgcard__err">{err}</span>}
       </span>
       <input ref={ref} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden"
-        onChange={(e) => void pick(e.target.files?.[0])} />
-      <button onClick={() => ref.current?.click()} disabled={busy}
+        onChange={(e) => { setPicking(false); void pick(e.target.files?.[0]); }} />
+      <button onClick={() => {
+        setPicking(true);
+        window.addEventListener("focus", () => setTimeout(() => setPicking(false), 400), { once: true });
+        ref.current?.click();
+      }} disabled={busy}
         className={`${CONTROL_BUTTON_GHOST} flex-shrink-0`}>
-        {busy ? "Uploading…" : url ? "Replace" : "Upload"}
+        {busy ? "Uploading…" : picking ? "Choose a file…" : url ? "Replace" : "Upload"}
       </button>
     </div>
   );
