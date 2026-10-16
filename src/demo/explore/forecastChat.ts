@@ -39,7 +39,7 @@ export function cardTakeLine(oppKey: string): string | null {
   const when_ = expectedDays(r) == null ? "" : ` Expected ${weeksOrMonths(Math.max(expectedDays(r) as number, 0))}.`;
   switch (oppKey) {
     case FORT_BRAGG_FORECAST_KEY:
-      return `The Army's larger dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
+      return `The Army's next dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
     case POPE_FORECAST_KEY:
       return `Event catering at Pope and Fort Bragg, planned for women-owned firms. You hold that certificate, and it fits your event work and your size.${when_}`;
     case SEYMOUR_FORECAST_KEY:

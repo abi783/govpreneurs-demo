@@ -131,7 +131,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
     ],
     chips: [
       "Why not as prime?",
-      { label: "Tell me about the prime", kind: "elicit", target: "talked-to-partner" },
+      { label: "Tell Grant about the prime", kind: "elicit", target: "talked-to-partner" },
       { label: `Find ${PARTNER.name}`, kind: "route", target: "/partners" },
     ],
     railAnswers: {

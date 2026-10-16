@@ -204,7 +204,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
   {
     oppId: "CUMCO-2026-014",
     confidence: 3,
-    gist: "A price-only sealed bid, in a county where you have fed 1,100 children a day.",
+    gist: "A price-only sealed bid, in a county where you have cooked 1,100 meals a day.",
     thesis:
       "You have already fed this county at volume, and a sealed bid is decided on price. Bid it, once every cook has a food-handler certificate.",
     reads: {

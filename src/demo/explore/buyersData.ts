@@ -271,7 +271,7 @@ export const BUYER_SEED: GovBuyer[] = [
     ],
     analysis: analysis(
       "worth-it",
-      "You fed 1,100 children a day here in 2023, and the person who runs the program is your reference. This is your best local buyer.",
+      "You cooked 1,100 meals a day here in 2023, and the person who runs the program is your reference. This is your best local buyer.",
       spend([5_200_000, 5_600_000, 6_100_000], [
         ["School meal service", 0.7],
         ["Summer meal sites", 0.2],

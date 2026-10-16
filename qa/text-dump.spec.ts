@@ -264,13 +264,18 @@ test("text: search palette", async ({ browser }) => {
     await page.locator(".demo-search").click();
     await page.waitForTimeout(400);
   };
+  const dialogText = async () =>
+    (await page.evaluate(() => (document.querySelector('[role="dialog"]') as HTMLElement | null)?.innerText ?? "(no dialog)"))
+      .split("\n")
+      .map((l) => l.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
   await open();
-  lines.push("", "## EMPTY QUERY", ...(await readText(page)));
+  lines.push("", "## EMPTY QUERY", ...(await dialogText()));
   for (const q of ["fort", "bragg", "mackall", "ava", "sarah", "mentor", "pipeline", "carolina", "womack", "va ", "cafe", "catering", "wosb", "wallet", "capability", "cumberland", "zzzz", "roof", "sam", "naics", "partner", "forecast", "award", "small order", "task", "roadmap"]) {
     const input = page.locator('[role=dialog] input, [cmdk-input], input[placeholder]').first();
     await input.fill(q);
     await page.waitForTimeout(350);
-    lines.push("", `## QUERY "${q}"`, ...(await readText(page)));
+    lines.push("", `## QUERY "${q}"`, ...(await dialogText()));
   }
   fs.writeFileSync(path.join(OUT, "_palette.txt"), lines.join("\n") + "\n");
   await context.close();
