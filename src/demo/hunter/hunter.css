@@ -48,3 +48,18 @@
     width: 120px;
   }
 }
+
+/* A card title is one line with an ellipsis. In the 370 px feed column the pills
+   and the bookmark leave room for about 15 characters, so the title would show
+   only "Field meals for Camp...". Let it wrap, and keep the pills at the top. */
+@media (max-width: 1180px) {
+  .opp-summary-head {
+    align-items: flex-start;
+  }
+  .opp-summary-head .opp-title-compact {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 16px;
+  }
+}
