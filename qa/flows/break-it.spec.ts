@@ -2301,3 +2301,78 @@ test.describe("Every chat box answers", () => {
     });
   }
 });
+
+// ── Coming back to the tab ─────────────────────────────────────────────────
+
+test.describe("Coming back to the tab", () => {
+  test("a typed draft stays and no page flickers when the window loses and regains focus", async ({ page, context }) => {
+    const w = await watch(page, context);
+    // Pretend the visitor switched to another window and came back.
+    const away = async () => {
+      await page.evaluate(() => {
+        window.dispatchEvent(new Event("blur"));
+        Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+        document.dispatchEvent(new Event("visibilitychange"));
+      });
+      await page.waitForTimeout(300);
+      await page.evaluate(() => {
+        Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
+        document.dispatchEvent(new Event("visibilitychange"));
+        window.dispatchEvent(new Event("focus"));
+      });
+    };
+
+    // A reply being typed.
+    await open(page, "/mentors/rev-fayetteville-proposal");
+    await page.locator(".reply-composer__editor").click();
+    await page.keyboard.insertText("Draft that I have not sent yet");
+    const series = await sampleMain(page, away, 2500);
+    expect(flickers(series), `the thread flickers: ${series.filter((_, i) => i % 5 === 0).join(",")}`).toBe(false);
+    await expect(page.locator(".reply-composer__editor")).toContainText("Draft that I have not sent yet");
+
+    // A question being typed to Hunter, and the feed under it.
+    await open(page, "/opportunities");
+    const box = page.getByPlaceholder(/Ask Hunter/);
+    await box.fill("What closes first?");
+    const feed = await sampleMain(page, away, 2500);
+    expect(flickers(feed), `the feed flickers: ${feed.filter((_, i) => i % 5 === 0).join(",")}`).toBe(false);
+    await expect(box).toHaveValue("What closes first?");
+
+    // Every menu page keeps its text.
+    for (const name of ["Roadmap", "Tasks", "Forecasts", "Pipeline", "Success Center"]) {
+      await menu(page, name).click();
+      await settle(page);
+      const s = await sampleMain(page, away, 1800);
+      expect(flickers(s), `${name} flickers when the window returns`).toBe(false);
+    }
+    await healthy(page, w, "coming back to the tab");
+  });
+});
+
+test.describe("Leaving a page open for a while", () => {
+  test("a draft survives two minutes of timers on the mentor thread, and pages keep their text", async ({ page, context }) => {
+    const w = await watch(page, context);
+    await page.clock.install();
+    await open(page, "/mentors/rev-fayetteville-proposal");
+    await page.locator(".reply-composer__editor").click();
+    await page.keyboard.insertText("A draft that waits");
+    const before = (await main(page).innerText()).length;
+    for (let i = 0; i < 4; i++) {
+      await page.clock.fastForward(35_000); // the thread polls every 60 seconds
+      await page.waitForTimeout(250);
+    }
+    await expect(page.locator(".reply-composer__editor")).toContainText("A draft that waits");
+    expect((await main(page).innerText()).length).toBeGreaterThan(before * 0.8);
+    for (const route of ["/opportunities", "/forecasts", "/pipeline", "/", `/opportunities/${CAMP_MACKALL}`]) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      await page.clock.fastForward(5_000);
+      await settle(page);
+      const length = (await main(page).innerText()).length;
+      await page.clock.fastForward(120_000);
+      await page.waitForTimeout(400);
+      const after = (await main(page).innerText()).length;
+      expect(after, `${route} lost its text after two minutes`).toBeGreaterThan(length * 0.8);
+    }
+    await healthy(page, w, "two minutes of timers");
+  });
+});
