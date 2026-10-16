@@ -67,6 +67,8 @@ const FILLER = new Set([
   "ready", "bid", "eligible", "fit", "good", "match", "matches", "qualify", "can", "should", "one", "job",
   "opportunity", "contract", "work", "and", "or", "with", "any", "more", "details", "detail", "info",
   "compare", "save", "open", "who", "when", "where", "deadline", "close", "closes", "value", "worth",
+  "time", "much", "cost", "price", "big", "many", "long", "far", "away", "miles", "number", "list",
+  "chase", "pursue", "worth", "waste", "really", "actually", "right", "now", "please", "think",
 ]);
 
 /** Finds the opportunity by the words that the text shares with its title, agency and place. */
@@ -88,8 +90,11 @@ function byKeywords(text: string): FeedRow | undefined {
   if (!best || best.score < Math.min(2, tokens.length)) return undefined;
   // One word ("the Mackall one") may name several; the higher-ranked one wins.
   // Several words must single one out, or the member did not name an opportunity.
+  // Words that all hit, and name at most three, also go to the higher-ranked one.
   const clear = !second || best.score - second.score >= 1;
-  return clear || tokens.length === 1 ? best.row : undefined;
+  const tied = scored.filter((x) => x.score === best.score).length;
+  const allHit = best.score >= tokens.length && tied <= 3;
+  return clear || tokens.length === 1 || allHit ? best.row : undefined;
 }
 
 /**

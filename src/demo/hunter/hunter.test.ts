@@ -286,6 +286,47 @@ const STARTERS = [
   "Am I eligible for the Meals for three Cumberland County elementary schools?",
 ];
 
+describe("Hunter chat on the Forecasts page", () => {
+  const visibleOpps = [
+    { oppKey: "fc-1", title: "Dining facility food service at Fort Liberty", location: "Fort Liberty, NC" },
+    { oppKey: "fc-2", title: "Hospital patient meal service", location: "Durham, NC" },
+    { oppKey: "fc-3", title: "School nutrition program", location: "Raleigh, NC" },
+  ];
+  const forecast = (message: string) =>
+    handleHunterMessage({ message, tab: "for_you", surface: "forecasts", visibleOpps });
+
+  it("answers the starter buttons and follows its own follow-up buttons without a dead end", () => {
+    const seen = new Set<string>();
+    const queue = [
+      "Why does the Dining facility food service at Fort Liberty match me?",
+      "Am I ready to bid the Dining facility food service at Fort Liberty?",
+      "Compare my top 3 — which should I chase?",
+      "Which of these best fits me?",
+      "Find Food Service Contractors work in NC",
+      "Compare my saved opps — which should I pursue?",
+      "Am I eligible for the Hospital patient meal service?",
+    ];
+    while (queue.length > 0) {
+      const q = queue.shift()!;
+      if (seen.has(q)) continue;
+      seen.add(q);
+      const r = forecast(q);
+      expect(r.chatReply, q).not.toMatch(/not sure what you mean/);
+      expect(r.chatReply, q).not.toMatch(BANNED_WORDS);
+      expect(`${r.chatReply}${JSON.stringify(r.uiPayload)}`, q).not.toMatch(/undefined|NaN/);
+      queue.push(...(r.suggestions ?? []));
+    }
+    expect(seen.size).toBeGreaterThan(8);
+  });
+
+  it("says what a forecast is, and never lists story opportunities there", () => {
+    expect(forecast("what is a forecast").chatReply).toMatch(/plans to buy/);
+    const best = forecast("What should I look at first?");
+    expect(best.chatReply).toContain("Dining facility food service at Fort Liberty");
+    expect(JSON.stringify(best)).not.toContain("Camp Mackall");
+  });
+});
+
 describe("Hunter chat", () => {
   it("answers every starter and opener with a specific reply, never the fallback", () => {
     for (const q of STARTERS) {

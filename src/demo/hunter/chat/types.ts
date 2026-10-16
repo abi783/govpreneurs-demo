@@ -38,6 +38,10 @@ export interface ChatCtx {
   visible: FeedRow[];
   /** What the feed page shows: the member's current filters. */
   feed: FeedContext;
+  /** The page that the member talks from. */
+  surface: "feed" | "forecasts";
+  /** The cards on screen, as the page sent them. On Forecasts these are not story opportunities. */
+  raw: VisibleOpp[];
 }
 
 export interface Rule {

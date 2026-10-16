@@ -6,7 +6,9 @@
 // matched before a filter, so "what is a sources sought" explains the term and
 // "show only sources sought" changes the feed.
 
-import { PERSONA } from "../../story/persona";
+import { HERO_IDS } from "../../story/opportunities";
+import { KEY_PARTNER, PERSONA } from "../../story/persona";
+import { PLACES } from "../../story/places";
 import { allRows, forYouRows, rowById, savedRows, universe, type FeedRow } from "../data";
 import { longDate } from "../dates";
 import {
@@ -31,6 +33,7 @@ import {
   compareTop3,
   howIPick,
   listBy,
+  nameOf,
   profileCard,
   readiness,
   readyList,
@@ -61,7 +64,7 @@ function topOf(ctx: ChatCtx): FeedRow {
 
 // ── Plain conversation ──────────────────────────────────────────────────────
 
-const greeting: Rule = {
+export const greeting: Rule = {
   id: "greeting",
   run: (ctx) => {
     if (ctx.norm.split(" ").length > 5) return null;
@@ -81,7 +84,7 @@ const greeting: Rule = {
   },
 };
 
-const help: Rule = {
+export const help: Rule = {
   id: "help",
   run: (ctx) => {
     if (!has(ctx, /\b(what can you do|what do you do|who are you|what are you|help me|^help$|how (do|can) i use you|what can i ask|what should i ask|capabilit\w+ of hunter)\b/)) return null;
@@ -95,7 +98,7 @@ const help: Rule = {
   },
 };
 
-const grantRule: Rule = {
+export const grantRule: Rule = {
   id: "grant",
   run: (ctx) => {
     if (has(ctx, /\b(will i win|can i win|chance of winning|chances of winning|odds|guarantee|promise|sure thing|likely to win|win it|win this)\b/)) {
@@ -129,7 +132,7 @@ const grantRule: Rule = {
 
 // ── Start over, tabs, saving ────────────────────────────────────────────────
 
-const startOver: Rule = {
+export const startOver: Rule = {
   id: "start-over",
   run: (ctx) => {
     if (!has(ctx, /\b(start over|start again|reset|clear (all|everything|the filters|filters|my filters|them)|remove (all )?(the )?filters|no filters|drop (all )?(the )?filters|undo (that|all))\b/)) return null;
@@ -286,14 +289,15 @@ const compareRule: Rule = {
     if (!has(ctx, /\bcompare\b|\bversus\b|\bvs\b|\bside by side\b|\bwhich (is|one is) better\b|\bwhich should i (chase|pursue|go for|pick)\b/)) return null;
     if (has(ctx, /\bsaved\b|\bbookmarks?\b/)) return compareSaved();
     if (has(ctx, /\btop (3|three)\b|\bmy top\b|\bthree best\b/)) return compareTop3();
-    // Two named opportunities.
+    // Two or more named opportunities: "compare the Pope one and the Fort Bragg dining halls".
     const named: FeedRow[] = [];
-    for (const row of allRows()) {
-      if (ctx.norm.includes(row.o.plainTitle.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " "))) named.push(row);
+    for (const part of ctx.norm.replace(/^compare\s+/, "").split(/\s+(?:and|vs|versus|with|to|or)\s+|,\s*/)) {
+      const hit = part.trim() ? findOpp(part, ctx.visible) : undefined;
+      if (hit && !named.some((n) => n.id === hit.id)) named.push(hit);
     }
     if (named.length >= 2) {
       about(named[0]);
-      return compare(named, "Here are the two you named.", [chip.why(named[0]), chip.ready(named[0]), chip.top3]);
+      return compare(named, `Here are the ${named.length} you named.`, [chip.why(named[0]), chip.ready(named[0]), chip.top3]);
     }
     if (has(ctx, /\b(these|those|them|the two|the remaining|on screen|visible|here)\b/) && ctx.visible.length >= 2) {
       return compare(ctx.visible.slice(0, 3), "Here are the first three on your screen.", [
@@ -321,7 +325,7 @@ const readyListRule: Rule = {
 
 // ── Definitions, profile, method ────────────────────────────────────────────
 
-const definitions: Rule = {
+export const definitions: Rule = {
   id: "definitions",
   run: (ctx) => {
     const def = findDefinition(ctx.norm);
@@ -330,7 +334,7 @@ const definitions: Rule = {
   },
 };
 
-const profileRule: Rule = {
+export const profileRule: Rule = {
   id: "profile",
   run: (ctx) => {
     if (has(ctx, /\b(what do you know about (me|my)|what do you know|tell me about my (business|profile|company)|my profile|my business profile|show (me )?my (profile|business)|what.*on file|who am i)\b/)) {
@@ -340,12 +344,12 @@ const profileRule: Rule = {
   },
 };
 
-const profileUpdateRule: Rule = {
+export const profileUpdateRule: Rule = {
   id: "profile-update",
   run: (ctx) => proposeProfileChange(ctx.text, ctx.norm),
 };
 
-const methodRule: Rule = {
+export const methodRule: Rule = {
   id: "method",
   run: (ctx) => {
     if (has(ctx, /\bhow (do|does|did) (you|hunter) (pick|choose|rank|score|match|decide|sort|find|work)\b|\bhow (are|is) (these|the matches|my matches|they) (picked|chosen|ranked|scored|sorted|made)\b|\bhow does (the )?matching work\b|\bwhat do you (weigh|use|look at)\b|\bwhy these\b|\bhow (do|did) you know\b|\bhow it works\b/)) {
@@ -393,7 +397,7 @@ function aboutRuleFor(strict: boolean): Rule {
       const opp = findOpp(ctx.norm, ctx.visible);
       if (!opp) return null;
       about(opp);
-      const t = titleOf(opp);
+      const t = nameOf(opp);
       if (has(ctx, /\b(when|deadline|due|close|closes)\b/)) {
         return {
           reply: `${t} ${closesText(opp)}. I hide anything with under a week left, because it is too late to answer well.`,
@@ -403,8 +407,11 @@ function aboutRuleFor(strict: boolean): Rule {
         };
       }
       if (has(ctx, /\b(how much|worth|value|price|size|money)\b/)) {
+        const noValue = opp.low === null && opp.high === null;
         return {
-          reply: `${t}: ${valueText(opp)} (${aboutValue(opp)}). Your target range is ${RANGE_TEXT}.${opp.o.valueBasis === "per_year" ? " The buyer states this value per year." : ""}`,
+          reply: noValue
+            ? `${t} states no value. A Sources Sought notice asks who can do the work. It sets no price yet.`
+            : `${t}: ${valueText(opp)} (${aboutValue(opp)}). Your target range is ${RANGE_TEXT}.${opp.o.valueBasis === "per_year" ? " The buyer states this value per year." : ""}`,
           chips: [chip.why(opp), chip.ready(opp), chip.top3],
         };
       }
@@ -440,6 +447,29 @@ function matchRowSafe(row: FeedRow) {
   };
 }
 
+const incumbentRule: Rule = {
+  id: "incumbent",
+  run: (ctx) => {
+    if (!has(ctx, /\bincumbent\b|\bwho (holds|has|runs|owns) (it|the|this)\b|\bcurrent contractor\b|\bwho does it now\b/)) return null;
+    const hero = rowById(HERO_IDS.fortBraggDining)!;
+    const opp = has(ctx, /\bfort bragg\b.*\b(dining|dfac)\b|\b(dining|dfac)\b.*\bfort bragg\b/)
+      ? hero
+      : (findOpp(ctx.norm, ctx.visible) ?? undefined);
+    if (opp && opp.id === hero.id) {
+      about(opp);
+      return {
+        reply: `${KEY_PARTNER.name} holds it now. ${KEY_PARTNER.holds}. They are looking for ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}, and you worked with them on Fort Bragg dining in 2024. Grant can tell you what that means for your options.`,
+        chips: [chip.why(opp), chip.ready(opp), "What is a recompete?"],
+      };
+    }
+    return {
+      reply:
+        "The notice does not name the firm that holds the job now. Open the opportunity and ask Grant. He checks who holds it and what that means for you.",
+      chips: [chip.top3, chip.readyList, chip.best],
+    };
+  },
+};
+
 // ── Filters ─────────────────────────────────────────────────────────────────
 
 const filterRule: Rule = {
@@ -460,6 +490,9 @@ const filterRule: Rule = {
     const said = describeParsed(parsed);
     return applyChange(ctx, delta, {
       said,
+      whenEmpty: delta.dueWindow?.includes("this_week")
+        ? "Nothing closes in the next 7 days. I hide any notice with under a week left, because it is too late to answer well. Try two weeks."
+        : undefined,
       extra: (rows) => {
         const notes: string[] = [];
         if (delta.valueRange && universeRows(ctx).some((r) => r.low === null && r.high === null)) {
@@ -470,6 +503,10 @@ const filterRule: Rule = {
           notes.push(`The nearest is ${titleOf(nearest)}, ${nearest.miles} miles from your kitchen. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`);
         }
         if (delta.setAsides?.includes("WOSB")) notes.push("You qualify for all of them.");
+        if (delta.cities?.length === 1) {
+          const place = Object.values(PLACES).find((p) => p.city === delta.cities![0]);
+          if (place) notes.push(`${place.city} is ${place.milesFromKitchen} miles from your kitchen.`);
+        }
         if (delta.postedWithin) {
           const newest = [...rows].sort((a, b) => a.o.postedDaysAgo - b.o.postedDaysAgo)[0];
           notes.push(`The newest is ${titleOf(newest)}, posted ${newest.o.postedDaysAgo} days ago (${longDate(-newest.o.postedDaysAgo)}).`);
@@ -577,6 +614,7 @@ export const RULES: Rule[] = [
   tabSwitch,
   saveRule,
   listRules,
+  incumbentRule,
   aboutNamed,
   filterRule,
   aboutLoose,

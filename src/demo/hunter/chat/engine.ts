@@ -9,6 +9,7 @@
 import type { HunterTurnResponse } from "../../../lib/hunterChat";
 import { forYouRows } from "../data";
 import { getFeedContext } from "../feedContext";
+import { FORECAST_RULES } from "./forecasts";
 import { RULES, unknown } from "./intents";
 import { normalize, visibleRows } from "./resolve";
 import { readSession, resetSession, updateSession } from "./session";
@@ -26,8 +27,10 @@ export function answer(body: MessageBody): Turn {
     text,
     norm: normalize(text),
     tab,
-    visible: visible.length > 0 ? visible : tab === "for_you" ? forYouRows() : [],
+    visible: visible.length > 0 ? visible : tab === "for_you" && body.surface !== "forecasts" ? forYouRows() : [],
     feed,
+    surface: body.surface === "forecasts" ? "forecasts" : "feed",
+    raw: body.visibleOpps ?? [],
   };
   if (!ctx.norm) {
     return {
@@ -35,7 +38,7 @@ export function answer(body: MessageBody): Turn {
       chips: ["What's out there for me right now?", "What's new this week?", "How do you pick my matches?"],
     };
   }
-  for (const rule of RULES) {
+  for (const rule of ctx.surface === "forecasts" ? FORECAST_RULES : RULES) {
     const turn = rule.run(ctx);
     if (turn) return turn;
   }

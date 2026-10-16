@@ -41,9 +41,23 @@ import type { ChatCtx, Turn } from "./types";
 /** The plain title that the card shows. */
 export const titleOf = (row: FeedRow): string => row.o.plainTitle;
 
+/**
+ * How a button names an opportunity. Most plain titles read as a noun phrase
+ * ("Field meals for Camp Mackall training rotations"). The title of a Sources
+ * Sought notice is a sentence, so the button names it by its place and type.
+ */
+/** The name of an opportunity at the start of a sentence. */
+export function nameOf(row: FeedRow): string {
+  return row.o.noticeType === "Sources Sought" ? `The ${row.city} Sources Sought notice` : titleOf(row);
+}
+
+export function refOf(row: FeedRow): string {
+  return row.o.noticeType === "Sources Sought" ? `${row.city} Sources Sought notice` : titleOf(row);
+}
+
 export const chip = {
-  why: (row: FeedRow) => `Why does the ${titleOf(row)} match me?`,
-  ready: (row: FeedRow) => `Am I ready to bid the ${titleOf(row)}?`,
+  why: (row: FeedRow) => `Why does the ${refOf(row)} match me?`,
+  ready: (row: FeedRow) => `Am I ready to bid the ${refOf(row)}?`,
   top3: "Compare my top 3 — which should I chase?",
   best: "What's out there for me right now?",
   fresh: "What's new this week?",
@@ -87,8 +101,8 @@ export function whyMatch(row: FeedRow): Turn {
     ? fit.map((f) => fitSentence(row, f))
     : fallbackReasons(row);
   const lead = rank
-    ? `${t} is number ${rank} on your list. Here is why:`
-    : `${t} is on the All opportunities tab, not on your For You list. Here is how it fits:`;
+    ? `${nameOf(row)} is number ${rank} on your list. Here is why:`
+    : `${nameOf(row)} is on the All opportunities tab, not on your For You list. Here is how it fits:`;
   const concern = fit?.some((f) => f.kind === "clearanceGap");
   return {
     reply:
@@ -276,7 +290,7 @@ export function readiness(row: FeedRow): Turn {
   if (fails.length > 0) {
     reply = `Not today. ${fails.map((f) => f.value).join(" ")} That is why ${t} sits low on your list. ${GRANT_POINTER}`;
   } else if (early) {
-    reply = `There is nothing to bid yet. ${t} is a Sources Sought notice. You can reply to say that you can do the work. It is free and it puts you on the buyer's list. ${GRANT_POINTER}`;
+    reply = `There is nothing to bid yet. This is a Sources Sought notice. You can reply to say that you can do the work. It is free, and it puts you on the buyer's list. ${GRANT_POINTER}`;
   } else if (range === "above") {
     reply =
       `You meet the set-aside and the work is yours. The problem is size: ${valueText(row)} is above your ${RANGE_TEXT} range` +

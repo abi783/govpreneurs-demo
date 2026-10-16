@@ -65,6 +65,8 @@ function nameThem(rows: FeedRow[], n = 3): string {
 
 export interface ApplyOptions {
   fresh?: boolean;
+  /** Said when nothing fits, instead of the plain "nothing fits" sentence. */
+  whenEmpty?: string;
   /** What the change does, in a sentence that starts the reply. */
   said: string;
   /** Said after the count, when it helps. */
@@ -114,7 +116,9 @@ export function applyChange(ctx: ChatCtx, delta: HunterFilterDelta, opts: ApplyO
   }
   if (rows.length === 0) {
     return {
-      reply: `${cap(opts.said.replace(/^Showing /, "I looked for "))} Nothing fits that, even on All opportunities. I did not change your list. Try a wider size, place or date.`,
+      reply:
+        opts.whenEmpty ??
+        `${cap(opts.said.replace(/^Showing /, "I looked for "))} Nothing fits that, even on All opportunities. I did not change your list. Try a wider size, place or date.`,
       chips: [chip.best, chip.fresh, chip.how],
     };
   }

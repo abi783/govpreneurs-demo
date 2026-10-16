@@ -6,15 +6,23 @@
   flex-wrap: wrap;
   gap: 0 var(--s-1);
 }
+@media (max-width: 1180px) {
+  .opps-viewbar .opps-tabs {
+    gap: 0;
+  }
+}
 .opps-viewbar .opps-tab {
   white-space: nowrap;
 }
 
 @media (max-width: 1180px) {
   .opps-viewbar .opps-tab {
-    padding: 10px 8px;
+    padding: 10px 6px;
     gap: 4px;
-    font-size: 13px;
+    font-size: 12.5px;
+  }
+  .opps-viewbar .opps-tab-count {
+    padding: 1px 5px;
   }
   /* The icons carry no meaning that the labels lack, and they cost 18 px each. */
   .opps-viewbar .opps-tab > svg {
