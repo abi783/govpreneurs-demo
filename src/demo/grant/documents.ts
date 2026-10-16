@@ -5,6 +5,7 @@
 // and the same clauses that the page and Grant use. The library loads on the
 // first download only.
 
+import { dueTimeOf } from "@/demo/story/opportunities";
 import { getOpportunity } from "@/demo/story/opportunities";
 import { domainFor, offerWord, type Domain } from "./domains";
 import { documentsFor, heroDetailFor, solicitationFor, type DocSpec } from "./detail";
@@ -51,7 +52,7 @@ function headerBlocks(f: OppFacts, title: string, subtitle?: string): Block[] {
         ["Buyer", `${f.opp.agency}, ${f.opp.office}`],
         ["Title", f.opp.title],
         ["Issued", longDate(f.posted)],
-        [offer === "bid" ? "Bids due" : offer === "reply" ? "Replies due" : offer === "quote" ? "Quotes due" : "Proposals due", `${longDate(f.closes)}, 5:00 PM Eastern`],
+        [offer === "bid" ? "Bids due" : offer === "reply" ? "Replies due" : offer === "quote" ? "Quotes due" : "Proposals due", `${longDate(f.closes)}, ${dueTimeOf(f.opp)}`],
         ["Set-aside", f.setAsideLabel],
         ["NAICS", `${f.opp.naics} ${naicsLabel(f.opp.naics)}`],
         ["Place of performance", f.placeText],

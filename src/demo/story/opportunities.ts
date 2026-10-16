@@ -112,6 +112,8 @@ export interface StoryOpportunity {
   place: PlaceKey;
   postedDaysAgo: number;
   closesInDays: number;
+  /** Time of day the response is due, as the buyer's papers state it. Default 5:00 PM Eastern. */
+  dueTime?: string;
   /** What the buyer wants, in two plain sentences. */
   summary: string;
   /** Set when the work needs cleared staff. */
@@ -167,6 +169,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     place: "campMackall",
     postedDaysAgo: 3,
     closesInDays: 26,
+    dueTime: "10:00 AM Eastern",
     targetAgency: true,
     summary:
       "Cook, pack and deliver breakfast and dinner to soldiers at Camp Mackall field sites during training rotations, about 18 rotations a year. Insulated delivery to two drop points, a base year and two option years.",
@@ -322,6 +325,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     place: "fayetteville",
     postedDaysAgo: 9,
     closesInDays: 14,
+    dueTime: "2:00 PM Eastern",
     summary:
       "Run the staff cafe at the Public Works campus five days a week and cater about 20 city events a year. A one-year contract with two renewal years, scored on approach, experience and price.",
     hunter: {
@@ -376,6 +380,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     place: "fayetteville",
     postedDaysAgo: 6,
     closesInDays: 20,
+    dueTime: "2:00 PM Eastern",
     summary:
       "Three meals a day for about 240 people at the detention annex, prepared off-site and delivered hot. A sealed bid: the lowest price from a qualified bidder wins.",
     hunter: {
@@ -629,6 +634,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     place: "fortBragg",
     postedDaysAgo: 4,
     closesInDays: 30,
+    dueTime: "3:00 PM Eastern",
     targetAgency: true,
     summary:
       "Not a bid. The Army is asking small businesses whether they could run installation dining before it writes the next contract. Replies are two short parts by email, with no price.",
@@ -853,6 +859,11 @@ function allOnly(
 export const OPPORTUNITY_BY_ID: ReadonlyMap<string, StoryOpportunity> = new Map(
   OPPORTUNITIES.map((o) => [o.id, o]),
 );
+
+/** The time of day a response is due. Ava's buyer papers and Grant's timeline both use it. */
+export function dueTimeOf(o: StoryOpportunity): string {
+  return o.dueTime ?? "5:00 PM Eastern";
+}
 
 export function getOpportunity(id: string): StoryOpportunity | undefined {
   return OPPORTUNITY_BY_ID.get(id);

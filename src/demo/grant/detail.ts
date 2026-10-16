@@ -5,6 +5,7 @@
 // (heroDetails.ts). Every other opportunity is built here from the story facts
 // and the kind of work (domains.ts), so no page is thin.
 
+import { dueTimeOf } from "@/demo/story/opportunities";
 import { findReviewByOppKey } from "@/demo/state/mentorReviews";
 import { getOpportunity, type StoryOpportunity } from "@/demo/story/opportunities";
 import type { DiscoverV2DetailDto } from "@/lib/discoverApi";
@@ -130,13 +131,13 @@ function submissionBullets(f: OppFacts): string[] {
   const c = f.contact;
   if (f.isSourcesSought) {
     return [
-      `Reply by email to ${c.name} at ${c.email} by 5:00 PM Eastern on the due date.`,
+      `Reply by email to ${c.name} at ${c.email} by ${dueTimeOf(f.opp)} on the due date.`,
       "The reply has two short parts: what your firm does, and what you did for past customers.",
       "Do not send a price. This notice is not a request for an offer.",
     ];
   }
   return [
-    `Send the ${offer} by email to ${c.name} at ${c.email}, or through the buyer's portal, by 5:00 PM Eastern on the due date.`,
+    `Send the ${offer} by email to ${c.name} at ${c.email}, or through the buyer's portal, by ${dueTimeOf(f.opp)} on the due date.`,
     offer === "bid"
       ? "Send one document: the signed price schedule. Add proof of insurance and the required certificates."
       : offer === "quote"
@@ -154,7 +155,7 @@ function checklistBullets(f: OppFacts, d: Domain): string[] {
     "Collect certificates, insurance proof and references.",
   ];
   if (!f.isSourcesSought) out.push("Ask your questions before the question deadline.", `Price the ${offer} line by line.`);
-  out.push(`Send the ${offer} before 5:00 PM Eastern on the due date.`);
+  out.push(`Send the ${offer} before ${dueTimeOf(f.opp)} on the due date.`);
   return out;
 }
 

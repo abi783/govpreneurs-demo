@@ -8,6 +8,7 @@
 // The call itself is the story's. The generator never changes it: it builds the
 // reads, limits and next move so they explain that call.
 
+import { dueTimeOf } from "@/demo/story/opportunities";
 import type { GrantCall } from "@/demo/story/opportunities";
 import { PERSONA } from "@/demo/story/persona";
 import type {
@@ -545,7 +546,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
         { glyph: f.setAside ? "ok" : "neutral", text: rt(f.setAside ? `Set-aside: **${f.setAsideLabel.replace(/ set-aside$/, "")}**. You are eligible.` : "No set-aside. Any qualified firm can bid."), source: srcOf("setAside") },
         { glyph: "neutral", text: rt(`Scoring: ${priceOnly ? "**lowest price** from a qualified bidder" : d.scoring.map((s) => `${s.factor.toLowerCase()} ${s.weight}`).join(", ")}.`), source: srcOf("factors") !== "Notice" ? srcOf("factors") : srcOf("evaluate") },
         { glyph: hasBond ? "blocked" : "ok", text: rt(hasBond ? `A **bond near ${usd(annual)}** is required.` : "No bond is required."), source: hasBond ? srcOf("bond") : srcOf("insurance") },
-        { glyph: "neutral", text: rt(`Key dates: due ${longDate(f.closes)}, 5:00 PM Eastern.`), source: "Notice" },
+        { glyph: "neutral", text: rt(`Key dates: due ${longDate(f.closes)}, ${dueTimeOf(f.opp)}.`), source: "Notice" },
       ],
     },
     {

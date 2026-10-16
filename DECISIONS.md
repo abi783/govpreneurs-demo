@@ -90,3 +90,4 @@ name its number.
 - D66. **Sarah's notes on the Fayetteville proposal are about the draft she read.** Ava has already applied them, and the current draft marks two of her edits.
 - D67. **Cumberland County asks for a 5% bid bond and, after award, a performance and payment bond of half the first-year price (about $175K).** Grant, Ava and the opportunity page all say the same, and it fits her $200K bonding history.
 - D68. **The Fort Bragg sources-sought reply is due at 3:00 PM Eastern.**
+- D69. **Each Ava bid keeps the due time in its buyer papers** (Camp Mackall 10:00 AM, Fayetteville 2:00 PM, Cumberland 2:00 PM, Fort Bragg reply 3:00 PM, all Eastern). Grant's timeline, documents and instructions show the same time. Every other opportunity is due at 5:00 PM Eastern.

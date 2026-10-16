@@ -5,6 +5,7 @@
 // Grant review lists its own dates (the story brief, or heroBriefs.ts). Other
 // notices follow a rule of thumb.
 
+import { dueTimeOf } from "@/demo/story/opportunities";
 import { getGrantBrief } from "@/demo/story/grantBriefs";
 import { offerWord } from "./domains";
 import { longDate, type OppFacts } from "./facts";
@@ -36,7 +37,7 @@ export function keyDatesFor(f: OppFacts): KeyDate[] {
     return brief.map((k) => ({
       label: /proposals? due|quotes? due|bids? due/i.test(k.label) ? label : k.label,
       inDays: k.inDays,
-      time: /conference/i.test(k.label) ? "10:00 AM Eastern" : "5:00 PM Eastern",
+      time: /conference/i.test(k.label) ? "10:00 AM Eastern" : /due/i.test(k.label) && !/question/i.test(k.label) ? dueTimeOf(f.opp) : "5:00 PM Eastern",
     }));
   }
   const close = f.opp.closesInDays;
@@ -44,7 +45,7 @@ export function keyDatesFor(f: OppFacts): KeyDate[] {
   if (!f.isSourcesSought) {
     out.push({ label: "Questions due", inDays: Math.max(3, close - Math.max(7, Math.round(close * 0.45))), time: "5:00 PM Eastern" });
   }
-  out.push({ label, inDays: close, time: "5:00 PM Eastern" });
+  out.push({ label, inDays: close, time: dueTimeOf(f.opp) });
   if (!f.isSourcesSought) {
     out.push({ label: "Anticipated award", inDays: close + (f.isFederal ? 21 : 28), time: "" });
   }
