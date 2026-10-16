@@ -14,6 +14,7 @@ export const Route = createFileRoute("/labor-pricing")({
       { title: "Labor Pricing — Know your market · GovPreneurs" },
       {
         name: "description",
+        // DEMO: "price fairly", not "price to win": the demo never promises a win.
         content:
           "What the government expects to pay — so you price fairly without leaving money on the table.",
       },
