@@ -53,7 +53,7 @@ export function getActionPlans(): ActivePlaybook[] {
       title: "Your Fort Bragg and VA plan: the next 30 days",
       description:
         `**From ${MENTOR.name}.** After your positioning call, these are the six things that will move ${PERSONA.businessShortName} toward Fort Bragg dining and the VA.\n\n` +
-        `Work from the top down. Tick each step when it is done. Your **Tasks** page shows the same work, with due dates.\n\n` +
+        `Work from the top down. Check off each step when it is done. Your **Tasks** page shows the same work, with due dates.\n\n` +
         `> Fort Bragg and the VA buy food service on a schedule. Be registered, referenced and ready *before* the solicitation posts.`,
       sourceDocUrl: null,
       sourceDocName: null,
