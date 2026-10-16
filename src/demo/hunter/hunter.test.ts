@@ -284,6 +284,8 @@ const STARTERS = [
   "Am I a good fit for the Drill-weekend meals for the NC National Guard in Hope Mills?",
   "Which of these best fits me?",
   "Am I eligible for the Meals for three Cumberland County elementary schools?",
+  "What's a WOSB set-aside?",
+  "Why does the Fort Bragg Sources Sought notice match me?",
 ];
 
 describe("Hunter chat on the Forecasts page", () => {
@@ -484,6 +486,49 @@ describe("Hunter chat", () => {
     expect(r.uiPayload.kind).toBe("profile_update");
     const card = (r.uiPayload.data as { cards: { proposalId: string; label: string }[] }).cards[0];
     expect(card.label).toBe("Daily meal capacity");
+  });
+
+  it("routes about 40 typed questions to the right kind of answer", () => {
+    const table: [string, string, RegExp?][] = [
+      ["hi", "none"],
+      ["thanks", "none"],
+      ["what can you do", "none"],
+      ["what's the best one for me", "matches"],
+      ["which one should I do first", "matches"],
+      ["anything closing soon", "matches"],
+      ["biggest jobs", "matches"],
+      ["closest to me", "matches"],
+      ["do I need a clearance for any of these", "matches", /Camp Mackall/],
+      ["how many opportunities are there", "none", /14 matches/],
+      ["how many are woman owned", "none", /3 on Opportunities for you/],
+      ["show me what changed", "discovery"],
+      ["any state jobs", "discovery"],
+      ["small business set asides only", "discovery"],
+      ["only open competition", "discovery"],
+      ["show me the army ones", "discovery"],
+      ["VA hospital work", "discovery"],
+      ["food truck jobs", "discovery"],
+      ["boxed meals near Goldsboro", "discovery"],
+      ["in my size range", "discovery"],
+      ["between 300k and 800k", "discovery"],
+      ["what about Virginia", "discovery"],
+      ["is the Pope Army Airfield job a good fit", "eligibility"],
+      ["who is the incumbent for Fort Bragg dining", "none", /Carolina Dining Group/],
+      ["what are my chances", "none", /nobody can promise/],
+      ["who is my competition", "none", /Grant/],
+      ["can you write my proposal", "none", /Ava/],
+      ["I need help with my capability statement", "none", /My Business/],
+      ["how do I get certified", "none", /Roadmap/],
+      ["I also offer halal catering", "profile_update"],
+      ["We now have 7 employees", "profile_update"],
+      ["show me jobs I can actually win", "none", /nobody can promise/],
+      ["tell me a joke", "none", /not sure what you mean/],
+    ];
+    for (const [q, kind, rx] of table) {
+      const r = ask(q);
+      expect(r.uiPayload.kind, `${q}: ${r.chatReply}`).toBe(kind);
+      if (rx) expect(r.chatReply, q).toMatch(rx);
+    }
   });
 
   it("finds a place or topic by a plain search", () => {

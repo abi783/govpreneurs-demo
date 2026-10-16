@@ -183,7 +183,7 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
 
   // Buyer lane
   const search: string[] = [];
-  if (/\b(state and local|state & local|state or local|sled|local government|municipal|county|school district|state agenc\w+)\b/.test(norm)) {
+  if (/\b(state and local|state & local|state or local|sled|local government|municipal|county|school district|state agenc\w+|state (jobs?|work|contracts?|opportunities|buyers?|government))\b/.test(norm)) {
     delta.scope = { fed: false, sled: true };
     mods.push("from state and local buyers");
   } else if (/\b(federal|fed)\b/.test(norm) && !/\bnot federal\b/.test(norm)) {
@@ -237,9 +237,10 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
 
   // Posted date
   if (
-    /\b(new|newest|fresh|just posted|posted|brand new|latest|recent\w*)\b/.test(norm) &&
+    /\b(what (has )?changed|any updates?|anything new|something new|what s different)\b/.test(norm) ||
+    (/\b(new|newest|fresh|just posted|posted|brand new|latest|recent\w*)\b/.test(norm) &&
     /\b(this week|last week|since last week|past week|7 days|seven days|week|recent\w*|new|newest|fresh|latest|today|yesterday|3 days|three days)\b/.test(norm) &&
-    !/\bnew business\b/.test(norm)
+    !/\bnew business\b/.test(norm))
   ) {
     const days = /\btoday\b|\byesterday\b|\b1 day\b|\b24 hours\b/.test(norm)
       ? 1

@@ -79,10 +79,12 @@ function readProposal(text: string, norm: string): Proposal | null {
 
 /** A proposed change that waits for Save, or null when the words propose none. */
 export function proposeProfileChange(text: string, norm: string): Turn | null {
+  // A fact starts with "I" or "We" ("I also offer ...", "We now have 7 employees", "I can now cook ..."),
+  // or it is an order to change the profile ("update my radius to 150 miles").
   const says =
-    /\b(i|we)\s+(also |now |just |recently )?(offer|do|provide|cook|serve|make|run|have|can|hired|added|got)\b/.test(norm) ||
+    /^(also |btw |fyi |by the way )?(i|we) (also |now |just |recently )?(offer|provide|cook|serve|make|run|do|have|hired|added|got|specialize in|can now)\b/.test(norm) ||
     /\b(update|change|set|correct|fix)\s+my\b|\badd\b.*\bto my (profile|capabilit\w+|business)\b|\bmy (radius|capacity|team|staff|employees|revenue|service area)\b.*\b(is|are|now)\b/.test(norm);
-  if (!says) return null;
+  if (!says || /\b(win|chances?|bid|ready|eligible|qualify)\b/.test(norm)) return null;
   // A question about the feed ("can I see ...") is not a fact.
   if (/\?\s*$/.test(text.trim()) && !/\bcan now\b|\bnow\b/.test(norm)) return null;
   const proposal = readProposal(text, norm);

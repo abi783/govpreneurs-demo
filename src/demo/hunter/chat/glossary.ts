@@ -46,7 +46,7 @@ export const DEFINITIONS: Definition[] = [
       return {
         reply:
           "A WOSB set-aside is a contract that only woman-owned small businesses can compete for. WOSB means Women-Owned Small Business.\n" +
-          `You are woman-owned and small, and your SAM.gov registration shows it. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
+          `You are woman-owned and small, and your WOSB status is on file. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
           "Fewer firms can compete for these, so the field is smaller.",
         chips: ["Show only woman-owned set-asides", "Do I qualify for these set-asides?"],
       };

@@ -187,7 +187,8 @@ function loadShowSuggestions(locationId: string | null): boolean {
 
 // Fallback chips shown only when there's nothing personal to key off yet
 // (no profile trade and an empty feed).
-const SUGGESTIONS = ["Why does the top match fit?", "What's an SDVOSB set-aside?"] as const;
+// DEMO: the sample member is woman-owned (WOSB), not a service-disabled veteran.
+const SUGGESTIONS = ["Why does the top match fit?", "What's a WOSB set-aside?"] as const;
 
 /** The user's primary trade as a human-readable label, or null when their
  *  profile has no NAICS or the code has no taxonomy title (naicsLabel returns

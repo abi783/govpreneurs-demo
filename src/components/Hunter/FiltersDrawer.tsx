@@ -43,7 +43,7 @@ import type { StateCityGroup } from "../../lib/mock/govTaxonomy";
 import type { CardOpportunity } from "../../lib/mock/opportunities";
 
 // DEMO: the sample member is a caterer. The trade list puts the trades that hold one of her
-// NAICS codes first, tags them "from your profile", and leaves out the roofing trade.
+// NAICS codes first, tags them "from your profile", and leaves out the trade that the old sample member held.
 const DEMO_HIDDEN_TRADES = new Set(["roofing_and_roof_systems"]);
 function demoTrades(profileNaics: string[]) {
   const own = (id: string) => (WORK_TYPE_TO_NAICS[id] ?? []).some((c) => profileNaics.includes(c));

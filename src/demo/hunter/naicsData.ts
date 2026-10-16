@@ -6,8 +6,8 @@
 // uses, the codes of every trade in the Filters drawer, and the common codes
 // that a visitor may type, so a search always finds something real.
 //
-// The member's own four codes sit first in every result list. No code for roof
-// work is in the list on purpose: it is not part of this member's business.
+// The member's own four codes sit first in every result list. The list leaves out
+// the trade code of the old sample member, because it is not this member's business.
 
 import { PERSONA } from "../story/persona";
 
@@ -113,6 +113,8 @@ const NAICS: CodeRow[] = [
   { code: "238130", description: "Framing Contractors" },
   { code: "238140", description: "Masonry Contractors" },
   { code: "238150", description: "Glass and Glazing Contractors" },
+  { code: "238170", description: "Siding Contractors" },
+  { code: "238190", description: "Other Foundation, Structure, and Building Exterior Contractors" },
   { code: "238210", description: "Electrical Contractors and Other Wiring Installation Contractors" },
   { code: "238220", description: "Plumbing, Heating, and Air-Conditioning Contractors" },
   { code: "238290", description: "Other Building Equipment Contractors" },
@@ -121,6 +123,7 @@ const NAICS: CodeRow[] = [
   { code: "238330", description: "Flooring Contractors" },
   { code: "238340", description: "Tile and Terrazzo Contractors" },
   { code: "238350", description: "Finish Carpentry Contractors" },
+  { code: "238390", description: "Other Building Finishing Contractors" },
   { code: "238910", description: "Site Preparation Contractors" },
   { code: "238990", description: "All Other Specialty Trade Contractors" },
   // Transport, health, education and repair

@@ -295,11 +295,12 @@ export function readiness(row: FeedRow): Turn {
     reply =
       `You meet the set-aside and the work is yours. The problem is size: ${valueText(row)} is above your ${RANGE_TEXT} range` +
       (bondShare(row) !== null ? `, and the bond is more than you have held.` : `.`) +
-      ` A team bid fits better. ${KEY_PARTNER.name} holds the job now and looks for woman-owned subcontractors. ${GRANT_POINTER}`;
+      ` A team bid may fit better. ${KEY_PARTNER.name} holds the job now and looks for woman-owned subcontractors. ${GRANT_POINTER}`;
   } else if (warns.length > 0) {
-    reply =
-      `Yes, you can compete for ${t}. ${rows.length - warns.length - fails.length} checks pass. ${warns.length === 1 ? "One needs care" : `${warns.length} need care`}: ` +
-      `${warns.map((w) => w.field.toLowerCase()).join(" and ")}. ${GRANT_POINTER}`;
+    const care = warns.map((w) =>
+      w.field === "Time to respond" ? `only ${row.o.closesInDays} days are left to respond` : `the ${w.field.toLowerCase()} needs a look`,
+    );
+    reply = `Yes, you can compete for ${t}. ${rows.length - warns.length - fails.length} checks pass. ${cap(joinList(care))}. ${GRANT_POINTER}`;
   } else {
     reply = `Yes. Set-aside, code, place, size and time all fit ${t}. ${GRANT_POINTER}`;
   }
