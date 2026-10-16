@@ -1,7 +1,14 @@
-// Deterministic cap-statement draft generator. Built from Marcus's seeded
-// profile facts — never a blank prompt, never fabricated.
+// Deterministic cap-statement draft generator. Built from Amira's profile facts
+// (the story, plus whatever she has changed on the Business Profile) — never a blank
+// prompt, never fabricated. DEMO: no roofing, no Marcus Williams: every fact below
+// comes from src/demo/story or the profile store.
 
-import type { CurrentMember } from "./mock/currentMember";
+import { useMemo } from "react";
+import { PERSONA } from "../demo/story/persona";
+import { FIELD_DEFS, effectiveField, valueToText } from "../demo/profile/fields";
+import { getFieldOverrides, useFieldOverrides } from "../demo/profile/store";
+import { fmtLong, fmtMonthYear, fmtUsd } from "../demo/profile/dates";
+import { getPastPerformance, usePastPerformance, type PpEntry } from "../demo/profile/pastPerformance";
 import type { PastPerformanceRecord } from "./state/microPurchases";
 import { usd, usablePrice } from "./microPurchases/pricing";
 
@@ -23,100 +30,166 @@ export interface CapSection {
 export interface CapStatementDraft {
   companyName: string;
   tagline: string;
+  /** Two letters for the logo mark. */
+  initials: string;
   sections: CapSection[];
   codes: {
     uei: string | null;
     cage: string | null;
     primaryNaics: string;
     samStatus: string;
-    samVerifiedAt: string | null;
   };
 }
 
-const TAGLINE =
-  "Commercial roofing & building envelope contractor · SDVOSB-eligible · Fayetteville, NC";
-
-function pastPerformanceBody(m: CurrentMember): string {
-  // Seeded NC roofing past performance — matches what the rest of the demo cites.
-  const lines = [
-    `${m.pastPerformanceCount} completed commercial roofing projects across NC and the Fort Bragg area, with single-contract values up to $890,000.`,
-    "• Cumberland County DPW — 24,000 sf TPO re-roof on the County maintenance complex (2024, $612K).",
-    "• Fayetteville Regional Airport — modified-bitumen replacement on Hangar 3 (2023, $431K).",
-    "• Methodist University — multi-building flat-roof recoat and tear-off program (2023, $328K).",
-    "• USACE Wilmington — federal subcontract: barracks moisture remediation at Fort Bragg (2024, sub to KBR, $204K scope).",
-  ];
-  return lines.join("\n");
+/** The facts a draft is built from. */
+export interface CapFacts {
+  businessName: string;
+  ownerName: string;
+  ownerTitle: string;
+  city: string;
+  state: string;
+  address: string;
+  phone: string;
+  email: string;
+  website: string;
+  uei: string | null;
+  cage: string | null;
+  primaryNaics: string;
+  primaryNaicsLabel: string;
+  secondaryNaics: string[];
+  samLine: string;
+  certifications: string[];
+  coreCapabilities: string[];
+  differentiators: string[];
+  employees: number;
+  foodHandlers: number;
+  formedOn: string;
+  states: string[];
+  largestBond: number;
+  pastPerformance: PpEntry[];
+  targetAgencies: string[];
 }
 
-function overviewBody(m: CurrentMember): string {
+function textOf(id: string, overrides = getFieldOverrides()): string {
+  return valueToText(effectiveField(FIELD_DEFS[id], overrides).value);
+}
+function listOf(id: string, overrides = getFieldOverrides()): string[] {
+  const v = effectiveField(FIELD_DEFS[id], overrides).value;
+  return Array.isArray(v) ? v : typeof v === "string" && v ? [v] : [];
+}
+
+function factsFrom(overrides: ReturnType<typeof getFieldOverrides>, pp: PpEntry[]): CapFacts {
+  const naics = textOf("primary-naics", overrides);
+  const m = /^(\d{2,6})\s+(.*)$/.exec(naics);
+  const employees = Number(textOf("employees", overrides)) || PERSONA.employeesW2;
+  return {
+    businessName: textOf("legal-name", overrides) || PERSONA.businessName,
+    ownerName: PERSONA.ownerName,
+    ownerTitle: PERSONA.ownerTitle,
+    city: PERSONA.hqCity,
+    state: PERSONA.hqState,
+    address: textOf("physical-address", overrides) || PERSONA.physicalAddress,
+    phone: textOf("business-phone", overrides) || PERSONA.phone,
+    email: PERSONA.email,
+    website: textOf("website", overrides) || PERSONA.website,
+    uei: textOf("uei", overrides) || null,
+    cage: textOf("cage", overrides) || null,
+    primaryNaics: m ? m[1] : PERSONA.primaryNaics,
+    primaryNaicsLabel: m ? m[2] : PERSONA.primaryNaicsLabel,
+    secondaryNaics: listOf("secondary-naics", overrides),
+    samLine: textOf("sam-status", overrides) || `Active until ${fmtLong(PERSONA.samActiveUntil)}`,
+    certifications: textOf("sba-set-aside", overrides)
+      .split("·")
+      .map((c) => c.trim())
+      .filter(Boolean),
+    coreCapabilities: listOf("core-capabilities", overrides),
+    differentiators: listOf("differentiators", overrides),
+    employees,
+    foodHandlers: Number(textOf("food-handlers", overrides)) || PERSONA.foodHandlerCertified,
+    formedOn: PERSONA.formedOn,
+    states: [...PERSONA.serviceStates],
+    largestBond: PERSONA.largestBond,
+    pastPerformance: pp,
+    targetAgencies: listOf("target-agencies", overrides),
+  };
+}
+
+export function getCapFacts(): CapFacts {
+  return factsFrom(getFieldOverrides(), getPastPerformance());
+}
+
+export function useCapFacts(): CapFacts {
+  const overrides = useFieldOverrides();
+  const pp = usePastPerformance();
+  return useMemo(() => factsFrom(overrides, pp), [overrides, pp]);
+}
+
+const STATE_NAME: Record<string, string> = { NC: "North Carolina", VA: "Virginia", SC: "South Carolina", GA: "Georgia" };
+
+function tagline(m: CapFacts): string {
+  return `Woman-owned food service and catering contractor · Small Business · ${m.city}, ${m.state}`;
+}
+
+function pastPerformanceBody(m: CapFacts): string {
+  return m.pastPerformance
+    .map((e) => {
+      const rating = e.cpars === "Awaiting rating" ? " · performance rating pending" : e.cpars ? ` · rated ${e.cpars}` : "";
+      return `• ${e.title} — ${e.customer} · ${e.role} · ${fmtUsd(e.value)} · ${fmtMonthYear(e.periodStart)} to ${fmtMonthYear(e.periodEnd)}${rating}`;
+    })
+    .join("\n");
+}
+
+function overviewBody(m: CapFacts): string {
+  const places = m.states.map((s) => STATE_NAME[s] ?? s);
+  const list = places.length > 1 ? `${places.slice(0, -1).join(", ")} and ${places[places.length - 1]}` : places[0];
   return [
-    `${m.businessName} is a ${m.naicsDescription.toLowerCase()} based in ${m.hqCity}, ${m.hqState}, founded and operated by Marcus Williams, a U.S. Army veteran.`,
-    `We deliver commercial re-roofing, repair, and building-envelope services to federal, state, and municipal clients across ${m.geographicPreference.states.join(", ")}, with quick mobilization within ${m.geographicPreference.radiusMiles ?? 300} miles of Fayetteville.`,
-    `Annual revenue ${m.annualRevenueBand ?? "—"}; ${m.totalEmployeesW2 ?? 3} W-2 employees plus a vetted roster of NC-licensed subcontract crews for surge capacity.`,
+    `${m.businessName} is a woman-owned small business in ${m.city}, ${m.state}, founded ${m.formedOn}.`,
+    `${m.employees} staff and one commercial kitchen.`,
+    `We cook, pack and deliver meals for government buyers across ${list}.`,
   ].join(" ");
 }
 
-function competenciesBody(): string {
+function competenciesBody(m: CapFacts): string {
   return [
-    "Commercial re-roofing — tear-off and overlay",
-    "Modified-bitumen (mod-bit) systems",
-    "TPO and EPDM single-ply membranes",
-    "Roof repair, leak diagnosis, and preventive maintenance",
-    "Building envelope and weatherproofing",
-    "Storm and moisture remediation",
-    "Roof asset condition surveys and 5-year capital plans",
+    ...m.coreCapabilities,
+    "HACCP food-safety plan, USDA meal-pattern menus and daily temperature logs",
   ].join("\n");
 }
 
-function differentiatorsBody(): string {
-  return [
-    "SDVOSB-eligible — service-disabled veteran-owned ownership and control.",
-    "Fort Bragg-area focus with established familiarity with USACE Wilmington and Savannah district requirements.",
-    "15+ years of hands-on commercial roofing experience under one continuous owner-operator.",
-    "Rapid mobilization within a 300-mile radius of Fayetteville, NC.",
-    "Bonded and insured, with single-contract bonding capacity to ~$890K.",
-  ].join("\n");
+function differentiatorsBody(m: CapFacts): string {
+  return m.differentiators.map((d) => `• ${d}`).join("\n");
 }
 
-function certificationsBody(m: CurrentMember): string {
-  const samDate = m.samVerifiedAt ?? "—";
+function certificationsBody(m: CapFacts): string {
   return [
     `UEI: ${m.uei ?? "—"}`,
     `CAGE: ${m.cage ?? "—"}`,
-    `Primary NAICS: ${m.primaryNaics} — ${m.naicsDescription}`,
-    `Secondary NAICS: ${m.secondaryNaics.join("; ")}`,
-    `SAM.gov: ${m.samStatus} (verified ${samDate})`,
-    "NC General Contractor license — active",
-    "SDVOSB-eligible (pending VetCert filing)",
-  ].join("\n");
+    `Primary NAICS: ${m.primaryNaics} ${m.primaryNaicsLabel}`,
+    m.secondaryNaics.length ? `Other NAICS: ${m.secondaryNaics.join(" · ")}` : "",
+    `SAM.gov: ${m.samLine}`,
+    m.certifications.length ? `Certifications: ${m.certifications.join(" · ")}` : "",
+    `Food-handler certificates: ${m.foodHandlers} of ${m.employees} staff`,
+    `Largest bond carried: ${fmtUsd(m.largestBond)}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
-function contactBody(m: CurrentMember): string {
-  return [
-    `${m.ownerName}, Owner`,
-    `${m.businessName}`,
-    `${m.hqCity}, ${m.hqState}`,
-    "(910) 555-0148 · marcus@williams-construction.com",
-  ].join("\n");
+function contactBody(m: CapFacts): string {
+  return [`${m.ownerName}, ${m.ownerTitle}`, m.businessName, m.address, `${m.phone} · ${m.email} · ${m.website}`].join("\n");
 }
 
-// Section #2 of each — slightly more concise / different framing for "Regenerate".
-const ALTERNATES: Partial<Record<CapSectionId, string>> = {
-  overview: [
-    "Williams Construction LLC is a service-disabled veteran-owned roofing contractor headquartered in Fayetteville, NC. We focus on commercial re-roofing, repair, and building-envelope work for federal and municipal clients in the Fort Bragg corridor and across the Carolinas, Virginia, and Georgia.",
-    "Our small, owner-operated structure means contracting officers get a single point of accountability from kickoff through closeout.",
-  ].join(" "),
-  differentiators: [
-    "• SDVOSB-eligible.",
-    "• Fort Bragg / USACE Wilmington familiarity.",
-    "• 15+ years owner-operated commercial roofing experience.",
-    "• 300-mile rapid-mobilization radius from Fayetteville.",
-    "• Bonded to ~$890K per contract.",
-  ].join("\n"),
-  competencies: [
-    "Re-roofing · Mod-bit · TPO · EPDM · Repair & PM · Envelope · Storm remediation · Roof asset surveys.",
-  ].join("\n"),
-};
+// A second take on some sections — used by "Regenerate".
+function alternates(m: CapFacts): Partial<Record<CapSectionId, string>> {
+  return {
+    overview: [
+      `${m.businessName} is a woman-owned food service contractor based in ${m.city}, ${m.state}.`,
+      `One commercial kitchen and ${m.employees} staff mean a buyer deals with one team from the first menu to the last tray.`,
+    ].join(" "),
+    differentiators: m.differentiators.slice(0, 3).map((d) => `• ${d}.`).join("\n"),
+    competencies: [m.coreCapabilities.join(" · ") + "."].join("\n"),
+  };
+}
 
 const WHY_NOTES: Record<CapSectionId, string> = {
   overview:
@@ -142,8 +215,13 @@ export interface CapStatementOverrides {
   target_work?: string;
 }
 
+function initialsOf(name: string): string {
+  const words = name.replace(/&/g, " ").split(/\s+/).filter((w) => /^[A-Za-z]/.test(w) && w.toUpperCase() !== "LLC");
+  return (words[0]?.[0] ?? "") + (words[1]?.[0] ?? "");
+}
+
 export function buildCapStatementDraft(
-  m: CurrentMember,
+  m: CapFacts,
   overrides: CapStatementOverrides = {},
 ): CapStatementDraft {
   // Apply edited source facts back into the relevant section bodies.
@@ -163,7 +241,7 @@ export function buildCapStatementDraft(
     pastBody = `${overrides.past_performance}\n${pastBody.split("\n").slice(1).join("\n")}`;
   }
 
-  let differentiatorsText = differentiatorsBody();
+  let differentiatorsText = differentiatorsBody(m);
   if (overrides.differentiators) {
     const lines = overrides.differentiators
       .split(/[·\n]/)
@@ -184,7 +262,7 @@ export function buildCapStatementDraft(
       .map((l) => l.trim())
       .filter(Boolean);
     if (extra.length) {
-      certsText = `${certsText}\n${extra.map((l) => l).join("\n")}`;
+      certsText = `${certsText}\n${extra.join("\n")}`;
     }
   }
 
@@ -194,7 +272,7 @@ export function buildCapStatementDraft(
       id: "competencies",
       title: "Core competencies",
       whyItMatters: WHY_NOTES.competencies,
-      body: competenciesBody(),
+      body: competenciesBody(m),
     },
     {
       id: "differentiators",
@@ -218,20 +296,21 @@ export function buildCapStatementDraft(
   ];
   return {
     companyName: m.businessName,
-    tagline: TAGLINE,
+    tagline: tagline(m),
+    initials: initialsOf(m.businessName).toUpperCase() || "HC",
     sections,
     codes: {
       uei: m.uei,
       cage: m.cage,
-      primaryNaics: m.primaryNaics,
-      samStatus: m.samStatus,
-      samVerifiedAt: m.samVerifiedAt,
+      primaryNaics: `${m.primaryNaics} ${m.primaryNaicsLabel}`,
+      samStatus: m.samLine,
     },
   };
 }
 
-export function regenerateSection(id: CapSectionId, m: CurrentMember): string {
-  if (ALTERNATES[id]) return ALTERNATES[id]!;
+export function regenerateSection(id: CapSectionId, m: CapFacts): string {
+  const alt = alternates(m)[id];
+  if (alt) return alt;
   // Fallback: rebuild from scratch.
   switch (id) {
     case "past_performance":
@@ -240,6 +319,10 @@ export function regenerateSection(id: CapSectionId, m: CurrentMember): string {
       return certificationsBody(m);
     case "contact":
       return contactBody(m);
+    case "competencies":
+      return competenciesBody(m);
+    case "differentiators":
+      return differentiatorsBody(m);
     default:
       return overviewBody(m);
   }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, Edit2, Sparkles, X } from "lucide-react";
+import { useEditMode } from "./BusinessProfileMode";
 
 export type PpStatus = "attested" | "needs_review";
 
@@ -8,7 +9,8 @@ export interface PastPerformanceEntry {
   title: string;
   customer: string;
   customerType: string;
-  contractType: string;
+  /** DEMO: the story has no contract type, so the card only shows one when it has one. */
+  contractType?: string;
   periodStart: string;
   periodEnd: string;
   value: number;
@@ -18,17 +20,32 @@ export interface PastPerformanceEntry {
   referenceTitle?: string;
   cpars?: string;
   status: PpStatus;
+  /** DEMO: where a "needs review" entry came from. */
+  extractedFrom?: string;
 }
 
-const log = (action: string, id: string) =>
-  console.log("PastPerformance action:", action, id);
+// DEMO: what the card's buttons do is decided by the tab, which saves in the demo store.
+export interface PastPerformanceActions {
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onConfirm?: (id: string) => void;
+  onNotReal?: (id: string) => void;
+}
 
 function formatValue(n: number) {
   return `$${n.toLocaleString("en-US")}`;
 }
 
-export function PastPerformanceCard({ entry }: { entry: PastPerformanceEntry }) {
+export function PastPerformanceCard({
+  entry,
+  actions = {},
+}: {
+  entry: PastPerformanceEntry;
+  actions?: PastPerformanceActions;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const [askDelete, setAskDelete] = useState(false);
+  const editMode = useEditMode();
   const isNeedsReview = entry.status === "needs_review";
 
   return (
@@ -36,19 +53,19 @@ export function PastPerformanceCard({ entry }: { entry: PastPerformanceEntry }) 
       {isNeedsReview && (
         <div className="pp-extracted-banner">
           <Sparkles size={12} aria-hidden />
-          <span>Extracted from your capability statement draft — review and confirm?</span>
+          <span>{entry.extractedFrom ?? "Added from a file"} — review and confirm?</span>
         </div>
       )}
 
       <header className="pp-card-header">
         <h3 className="pp-card-title">{entry.title}</h3>
-        {!isNeedsReview && (
+        {!isNeedsReview && editMode && (
           <div className="pp-card-icons">
             <button
               type="button"
               className="pp-card-icon-btn"
               aria-label="Edit project"
-              onClick={() => log("edit", entry.id)}
+              onClick={() => actions.onEdit?.(entry.id)}
             >
               <Edit2 size={16} />
             </button>
@@ -56,7 +73,7 @@ export function PastPerformanceCard({ entry }: { entry: PastPerformanceEntry }) 
               type="button"
               className="pp-card-icon-btn"
               aria-label="Delete project"
-              onClick={() => log("delete", entry.id)}
+              onClick={() => setAskDelete(true)}
             >
               <X size={16} />
             </button>
@@ -64,8 +81,30 @@ export function PastPerformanceCard({ entry }: { entry: PastPerformanceEntry }) 
         )}
       </header>
 
+      {askDelete && (
+        <div className="pp-extracted-banner" role="alertdialog" aria-label="Delete this project?">
+          <span>Delete this project from your profile?</span>
+          <div className="pp-needs-review-actions">
+            <button
+              type="button"
+              className="pp-btn-primary pp-btn-sm"
+              onClick={() => {
+                actions.onDelete?.(entry.id);
+                setAskDelete(false);
+              }}
+            >
+              Yes, delete it
+            </button>
+            <button type="button" className="pp-btn-secondary pp-btn-sm" onClick={() => setAskDelete(false)}>
+              Keep it
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="pp-card-sub">
-        {entry.customer} · {entry.customerType} · {entry.contractType}
+        {entry.customer} · {entry.customerType}
+        {entry.contractType ? ` · ${entry.contractType}` : ""}
       </div>
       <div className="pp-card-meta">
         {entry.periodStart} – {entry.periodEnd} · {formatValue(entry.value)} · NAICS {entry.naics}
@@ -93,26 +132,26 @@ export function PastPerformanceCard({ entry }: { entry: PastPerformanceEntry }) 
       )}
       {entry.cpars && <div className="pp-card-cpars">CPARS: {entry.cpars}</div>}
 
-      {isNeedsReview && (
+      {isNeedsReview && editMode && (
         <div className="pp-needs-review-actions">
           <button
             type="button"
             className="pp-btn-primary pp-btn-sm"
-            onClick={() => log("confirm", entry.id)}
+            onClick={() => actions.onConfirm?.(entry.id)}
           >
             Confirm this
           </button>
           <button
             type="button"
             className="pp-btn-secondary pp-btn-sm"
-            onClick={() => log("edit-details", entry.id)}
+            onClick={() => actions.onEdit?.(entry.id)}
           >
             Edit details
           </button>
           <button
             type="button"
             className="pp-btn-tertiary pp-btn-sm"
-            onClick={() => log("not-a-real-project", entry.id)}
+            onClick={() => actions.onNotReal?.(entry.id)}
           >
             This isn't a real project
           </button>

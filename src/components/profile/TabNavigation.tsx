@@ -3,6 +3,13 @@
 // renders a grouped vertical rail rather than horizontal tabs.
 import { Link, useSearch } from "@tanstack/react-router";
 import { Check, Star } from "lucide-react";
+import { essentialsFor, type ProfileTab } from "../../demo/profile/fields";
+import { useFieldOverrides } from "../../demo/profile/store";
+import { usePastPerformance } from "../../demo/profile/pastPerformance";
+import { useSledRegistrations } from "../../demo/profile/sled";
+import { useMentorSessions } from "../../demo/profile/mentor";
+import { useKnowledgeHub } from "../../lib/knowledgeHub";
+import { computeStatus, useStayReady } from "../../lib/stayReady";
 
 export const TAB_SLUGS = [
   "positioning",
@@ -41,26 +48,47 @@ export const SECTION_GROUPS: { label: string; slugs: TabSlug[] }[] = [
   { label: "Ongoing", slugs: ["stay-ready", "mentor-history"] },
 ];
 
-// Mocked completeness for Marcus Williams / Williams Construction (NC roofing).
-export const SECTION_COMPLETENESS: Record<TabSlug, "complete" | "needs-input"> = {
-  positioning: "complete",
-  identity: "complete",
-  capabilities: "complete",
-  digital: "complete",
-  certifications: "needs-input",
-  sled: "needs-input",
-  "bidder-profile": "needs-input",
-  "past-performance": "needs-input",
-  knowledge: "needs-input",
-  "stay-ready": "complete",
-  "mentor-history": "complete",
-};
+// DEMO: whether a section is complete is worked out from the profile, so the dot
+// beside it changes as the visitor fills things in.
+export type SectionStatus = "complete" | "needs-input";
+
+export function useSectionCompleteness(): Record<TabSlug, SectionStatus> {
+  const overrides = useFieldOverrides();
+  const pp = usePastPerformance();
+  const sled = useSledRegistrations();
+  const hub = useKnowledgeHub();
+  const stay = useStayReady();
+  const sessions = useMentorSessions();
+  const fields = (tab: ProfileTab): SectionStatus => {
+    const { done, total } = essentialsFor(tab, overrides);
+    return done === total ? "complete" : "needs-input";
+  };
+  const urgent = stay.some((i) => {
+    const s = computeStatus(i);
+    return s === "urgent" || s === "overdue";
+  });
+  return {
+    positioning: fields("positioning"),
+    identity: fields("identity"),
+    capabilities: fields("capabilities"),
+    certifications: fields("certifications"),
+    digital: fields("digital"),
+    sled: sled.every((r) => r.status === "registered") ? "complete" : "needs-input",
+    "bidder-profile": fields("bidder-profile"),
+    "past-performance":
+      pp.length >= 3 && pp.every((e) => e.status === "attested") ? "complete" : "needs-input",
+    knowledge: hub.files.length > 0 && hub.conflicts.length === 0 ? "complete" : "needs-input",
+    "stay-ready": urgent ? "needs-input" : "complete",
+    "mentor-history": sessions.every((s) => Boolean(s.takeaway)) ? "complete" : "needs-input",
+  };
+}
 
 export const PRIORITY_SECTIONS = new Set<TabSlug>(["past-performance"]);
 
 export function TabNavigation() {
   const search = useSearch({ from: "/business-profile" }) as { tab: TabSlug };
   const active = search.tab;
+  const completeness = useSectionCompleteness();
 
   return (
     <nav className="bp-section-nav" role="tablist" aria-label="Business Profile sections">
@@ -68,7 +96,7 @@ export function TabNavigation() {
         <div className="bp-nav-group" key={group.label}>
           <div className="bp-nav-group-label">{group.label}</div>
           {group.slugs.map((slug) => {
-            const status = SECTION_COMPLETENESS[slug];
+            const status = completeness[slug];
             const isPriority = PRIORITY_SECTIONS.has(slug);
             const isActive = active === slug;
             return (

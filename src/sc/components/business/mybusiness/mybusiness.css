@@ -1,0 +1,2906 @@
+/* mybusiness.css — everything the /[locationId]/business record needs, and
+ * nothing that anything else needs.
+ *
+ * FILLED BY F12.
+ *
+ * ── WHY THIS FILE EXISTS ──────────────────────────────────────────────────
+ * `src/components/business/ds.css` is shared by /[locationId]/business,
+ * /[locationId]/tasks, /[locationId]/tasks-v1 and /intake. It gains ZERO LINES
+ * in this whole build: `git diff --stat -- src/components/business/ds.css` and
+ * `-- src/design-system/ds.css` must both report 0 changed lines, and F12's
+ * criterion checks it. A rule added there to fix one row on this page restyles
+ * four surfaces, three of which nobody in this build is looking at.
+ *
+ * The precedent is the control-center journey board's co-located
+ * `journey/journey.css`: scoped, code-split to its one route. PAGES.md
+ * documents the pattern — "extend ds.css for anything shared; start a scoped
+ * co-located file when a route's styling is large and used nowhere else."
+ *
+ * ── THE RULES ─────────────────────────────────────────────────────────────
+ * · Every selector is nested under `.gpds` (the page wraps its subtree in
+ *   `.gpds` and opens with the 3px `.gpds-stripe`). Unscoped rules here would
+ *   collide with ~120 production classNames.
+ * · Use DS v4.1 tokens only — var(--n-1), var(--blue-7), var(--s-4),
+ *   var(--r-md), var(--sh-rest). They are global; no import is needed. Never a
+ *   legacy portal variable (--bg-base, --green, --gold) — a page is either DS
+ *   or legacy, never both.
+ * · No horizontal scroll at 390px or at 1440px.
+ * · No progress bar, no streak, no percentage, and no badge that scores her —
+ *   WITH ONE RECORDED EXCEPTION. The rail's `.mb-rail__n` pill is still a
+ *   COUNT of what is open, no total beside it, no colour that changes with
+ *   how high it goes — the same distinction `queue.ts` draws, unchanged. But
+ *   the 2026-09 redesign added a genuine fraction in exactly three places:
+ *   `.mb-stat__*` (the header's stat tiles), `.mb-sc__*` (the rail's score
+ *   card) and `.mb-brk__*` (the section-by-section breakdown) — all three
+ *   read `score.ts`'s `readyScore`/`sectionScore`, and nowhere else on this
+ *   page shows one. See `score.ts`'s own header for why this line was
+ *   deliberately moved, not just missed.
+ * · The three header tiles carry three grounds — `--pos-*` for what she has
+ *   answered, `--blue-*` for the parts at rest, and a warm NEUTRAL for extras,
+ *   which takes no status colour because none of them means "answers beyond
+ *   the core" (see the tile block's own note). These are TILE IDENTITY, fixed
+ *   per tile: none changes with how high the figure goes, and none is an error
+ *   state. `--ai-*` is not among them and must not be — this system reserves
+ *   the amber for AI-authored surfaces, and none of these three is one. Colour
+ *   is never the only carrier: each tile also has its own icon, label and
+ *   figure.
+ * · `tone: "problem"` (rowContract.ts) is the ONLY place an error colour may be
+ *   used. Nothing missing gets one.
+ *
+ * Imported by the route's layout, beside ds.css. Update PAGES.md's
+ * /[locationId]/business row in the same commit — a stale inventory is worse
+ * than none.
+ */
+
+/* ── the size of a button on this page ─────────────────────────────────────
+ * `.gpds-btn` in ds.css is a COLOUR MODIFIER, not a whole button: it sets a
+ * background, a colour, a radius and a weight, and no padding, no size and no
+ * border at all. Every caller that predates this page pairs it with Tailwind
+ * utilities for the rest — `px-4 py-2 text-sm font-bold rounded-lg gpds-btn`
+ * in `controlStyles.ts`, the same six classes on `/intake` — and this page's
+ * components wear it alone, so they shipped as boxes hugging their text.
+ *
+ * ds.css cannot supply the missing half: it is shared with /[locationId]/tasks,
+ * /[locationId]/tasks-v1 and /intake, and gains ZERO LINES in this build. So
+ * the size lives here, once, instead of as six copies of the same six
+ * utilities across five components.
+ *
+ * IT IS OPTED INTO, NOT IMPOSED. Styling `.gpds-btn` itself would also have
+ * caught every `CONTROL_BUTTON` the shared editors render inside this page —
+ * unlayered CSS outranks a Tailwind utility whatever its specificity — and
+ * silently resized a control `/intake` owns. A class the callers ask for
+ * cannot reach anything that did not ask. `.mb-row__btn`, whose own size is
+ * part of the summary row, therefore does not carry it.
+ *
+ * The numbers are the prototype's `.btn`: 13px at weight 500 on 9px/13px.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-1);
+  padding: 9px 13px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ── and its label is never broken mid-word ────────────────────────────────
+ * "Sav / e" on the Save button of any open text editor, at 1440px as readily
+ * as at 390px. The width is not the cause: F8 gives `.mb-row__value`
+ * `overflow-wrap: anywhere` so a long stored answer cannot push the row
+ * sideways, that property INHERITS into the editor the row opens, and it drops
+ * an element's MIN-CONTENT SIZE TO ONE CHARACTER. A control is an input and a
+ * button on one flex line, the `w-full` input claims the line, and the button
+ * is then free to be shrunk below its own word.
+ *
+ * `white-space: nowrap` rather than `overflow-wrap: normal`, because it also
+ * makes the button's min-content size its WHOLE label: the input gives way and
+ * the button keeps its size, instead of the reverse.
+ *
+ * SCOPED TO `.gpds-btn` INSIDE THE OPEN EDITOR, and it cannot be widened to
+ * `button`: `TradePicker` and `ServiceArea` render fifty option buttons
+ * carrying a state name and a hint, `.mb-prompt` carries a whole sentence, and
+ * those are MEANT to wrap — nowrap on them is a sideways scroll at 390px.
+ * `/intake` renders the same editors and never loads this stylesheet, so
+ * nothing it owns is resized.
+ *
+ * `.mb-ask` opens the same editors and is deliberately NOT listed: it is a
+ * top-level card, so `anywhere` never reaches it, the button stops at its own
+ * min-content and the label cannot break. Its own decline button is `.mb-btn`
+ * and is covered by the first selector. Measured at 1440px and 390px: Save,
+ * Cancel, "Add another", a proposal's Yes/No pair and the tell page's submit all
+ * sit on one line, and no button overflows its box.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-btn,
+.gpds .mb-edit .gpds-btn {
+  white-space: nowrap;
+}
+
+/* The weight is the ONE property ds.css already sets on these two, so it is
+   the one that has to out-specify it rather than out-order it — which class of
+   stylesheet loads second is not something a component should depend on. */
+.gpds .gpds-btn.mb-btn,
+.gpds .gpds-btn-ghost.mb-btn {
+  font-weight: 500;
+}
+
+/* The solid one has no border of its own and a `<button>` brings one. Set
+   apart so `.gpds-btn-ghost`, whose border IS its whole shape, keeps the one
+   ds.css gives it. */
+.gpds .gpds-btn.mb-btn {
+  border: 1px solid transparent;
+}
+
+/* ── the summary list · F8 ─────────────────────────────────────────────────
+ * Label, value, one action. The value column wraps; the action never does, so
+ * there is no horizontal scroll at 390px or at 1440px.
+ *
+ * STACKED ON A PHONE, THREE COLUMNS FROM 900px. Label-over-value is correct at
+ * 390px and wrong at 1440, where it cost height on every row while a third of
+ * the viewport sat unused beside a narrow column. Forty rows of that is more
+ * than a viewport of pure stacking.
+ *
+ * Provenance sits under the VALUE at both widths — the empty first column above
+ * it in the desktop template is deliberate. It is a fact about the answer, not
+ * about the question.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Stacked on a phone: the question, then its answer box, then the provenance.
+   There is no third column any more — the box IS the control, so nothing has
+   to sit beside it. */
+.gpds .mb-row {
+  /* THE ROW IS A LINK TARGET. "Answer the next one" sends her to `#row-<key>`,
+     and without this the browser puts that row hard against the top edge with
+     its own section heading scrolled off — she arrives at a question with no
+     idea which part she is in. A comfortable margin lands it under the heading
+     that frames it. */
+  scroll-margin-top: var(--s-8, 2rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "label"
+    "value"
+    "foot";
+  gap: var(--s-2);
+  padding: var(--s-4) 0;
+  border-top: 1px solid var(--n-4);
+  min-width: 0;
+}
+
+.gpds .mb-row:first-child {
+  border-top: 0;
+}
+
+/* The question, then the government's own word for it, on one baseline. */
+.gpds .mb-row__label {
+  grid-area: label;
+  padding-top: 10px;
+  display: block;
+  font-size: 14.5px;
+  letter-spacing: -0.005em;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--n-11);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.gpds .mb-row__value {
+  grid-area: value;
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--n-11);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* While the editor is open the cell carries no box: the control below it is
+   the thing to look at, and a second border around it reads as a second field. */
+.gpds .mb-row__open {
+  min-width: 0;
+}
+
+/* THE ANSWER IS THE CONTROL. The whole box opens the editor, so the target for
+   a one-word correction is the value itself rather than a "Change" link at the
+   far side of the row — five letters that used to repeat down every answered
+   row and said the same thing on each. 44px tall, the height this page holds
+   everywhere. */
+.gpds .mb-row__box {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: 100%;
+  min-height: 44px;
+  padding: 10px var(--s-4);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-2);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--n-11);
+  text-align: left;
+}
+
+button.mb-row__box {
+  cursor: pointer;
+}
+
+button.mb-row__box {
+  transition:
+    background var(--d-fast) var(--ease-out),
+    border-color var(--d-fast) var(--ease-out);
+}
+
+button.mb-row__box:hover {
+  border-color: var(--n-6);
+  background: var(--n-3);
+}
+
+button.mb-row__box:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+
+button.mb-row__box:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* EMPTY IS BLUE, ANSWERED IS GREY. A dashed grey ghost is the web's
+   disabled-and-drop-zone convention, so the row that most needed a click looked
+   the most inert while the finished rows beside it looked heavier and more
+   real — exactly backwards. Blue is this system's one interactive colour, so
+   the invitation costs no new colour: scanning a part, the blue IS what is
+   left. */
+.gpds .mb-row__box--empty {
+  border-color: var(--blue-6);
+  background: var(--blue-1);
+  color: var(--blue-8);
+  font-weight: 500;
+}
+
+button.mb-row__box--empty:hover {
+  border-color: var(--blue-6);
+  background: var(--blue-2);
+}
+
+.gpds .mb-row__val {
+  flex: 1;
+  min-width: 0;
+}
+
+.gpds .mb-row__mark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ── the editor's own controls ───────────────────────────────────────────
+ * `ControlFor` renders a Save and nothing else, so the way OUT of an editor
+ * and the honest "I am not sure" both live here, on one line under it. They
+ * are quieter than the Save they sit beside: leaving a question alone and
+ * saying you do not know are both smaller acts than answering it.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* ONE ROW WITH THE SAVE. `ControlFor` renders its own Save inside the control,
+   so these two were a block underneath it and the three read as two rows of
+   controls for one question. Flexing the editor puts the control and this pair
+   on one line; `flex-end` keeps them level with the Save at the bottom of a
+   tall control (a radio list, a set of entries) rather than floating against
+   its middle, and both wrap on a narrow column. */
+.gpds .mb-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-2) var(--s-3);
+}
+
+/* A LONG ANSWER, NOT AN ESSAY. `LongText` asks for `rows={4}`, which on a
+   full-width row is a box big enough to imply the answer should fill it — and
+   the question it usually asks ("what does a win look like in the next 90
+   days?") wants a sentence.
+
+   Three lines: `text-sm` at this file's 1.5 line-height is 21px a line, plus
+   `py-2` top and bottom and the two borders. It keeps `resize-y`, so anyone
+   with more to say can still drag it open.
+
+   Capped HERE rather than in the control, because `/intake` renders the same
+   control and is a different surface with its own review. */
+.gpds .mb-edit textarea {
+  height: calc((21px * 3) + 16px + 2px);
+  min-height: calc((21px * 3) + 16px + 2px);
+}
+
+/* SAVE JOINS THEM, AND NOTHING ELSE IS ON THAT ROW.
+ *
+ * `ControlFor` renders the Save inside the control, usually in a row with the
+ * field it saves — so the three controls for one question were spread over two
+ * rows, and on a composite control the pair ended up beside a validation line.
+ *
+ * Lifting the Save out would mean changing twenty controls that `/intake` also
+ * renders, several of which report no draft value, so the editor cannot render
+ * a Save on their behalf. Flattening its wrappers does the same job from here:
+ * every div between the editor and the Save becomes `display: contents`, so the
+ * button itself becomes a flex child of the editor and sits with the pair.
+ * Everything else the control renders — its fields, its options — is given a
+ * full row, so the last row holds the three controls and nothing else.
+ *
+ * `:has()` is what makes this safe to state: it selects the ancestors OF THE
+ * SAVE only, so a control with no Save of its own (a radio, which commits on
+ * choice) is untouched. */
+/* THE SAVE'S OWN PARENT, AND NOTHING ABOVE IT.
+ *
+ * This read `div:has(button.gpds-btn)` — a DESCENDANT match, so every wrapper
+ * up the chain from the Save lost its box, not just the one holding it. The
+ * control's whole body came out with it: a checkbox list, a radio group and a
+ * "States you cover" tree each ended up as a flex sibling OF THE SAVE, so Save
+ * sat on the same line as the last option instead of below the list. `>` flattens
+ * exactly one div — the one the Save is a direct child of. */
+.gpds .mb-edit div:has(> button.gpds-btn) {
+  display: contents;
+}
+
+/* Fields and options take whole rows; the Save and the pair do not, so they
+   fall together onto the last one. */
+.gpds .mb-edit > *:not(.mb-edit__acts):not(button) {
+  flex: 1 1 100%;
+}
+
+/* THE SAME RULE FOR WHAT CAME OUT OF THE FLATTENED WRAPPER. Those are
+   grandchildren of `.mb-edit`, so the child selector above never reached them —
+   they fell back to `flex: 0 1 auto` and lined up beside the Save. Everything
+   that is not a button takes a whole row, which leaves the Save and the pair
+   alone on the last one: three controls in a row, nothing else on it. */
+.gpds .mb-edit div:has(> button.gpds-btn) > *:not(button) {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.gpds .mb-edit > :first-child {
+  /* A basis small enough that the control and this pair still fit on one
+     line in the value column; the input inside it is `w-full` and shrinks
+     with it. */
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.gpds .mb-edit__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+}
+
+.gpds .mb-edit__unsure,
+.gpds .mb-edit__cancel {
+  min-height: 32px;
+  padding: 0 var(--s-2);
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Blue: it is an answer, and answers are the interactive colour here. */
+.gpds .mb-edit__unsure {
+  color: var(--blue-7);
+}
+
+.gpds .mb-edit__unsure:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Grey: leaving is not an answer, so it does not compete with one. */
+.gpds .mb-edit__cancel {
+  color: var(--n-9);
+}
+
+.gpds .mb-edit__cancel:hover {
+  color: var(--n-11);
+}
+
+.gpds .mb-edit__unsure:disabled,
+.gpds .mb-edit__cancel:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* THE CONFIRM PAIR, under the box: what we read it from, and one button that
+   agrees with it. The origin is the reason the button exists — "Yes" to
+   nothing is not an answer — so the two are one line, not two. */
+.gpds .mb-row__ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin: var(--s-2) 0 0;
+}
+
+.gpds .mb-row__origin {
+  font-size: 12.5px;
+  color: var(--n-9);
+}
+
+.gpds .mb-row__yes {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-5);
+  border-radius: var(--r-sm);
+  background: var(--n-0);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-11);
+  cursor: pointer;
+}
+
+.gpds .mb-row__yes:hover {
+  border-color: var(--n-7);
+  background: var(--n-1);
+}
+
+.gpds .mb-row__yes:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* Settled: a filled sage disc and a check. Sage, because this is a thing that
+   is right — not the blue that means "do something here". */
+.gpds .mb-row__tick {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  background: var(--pos-7);
+  color: var(--n-0);
+}
+
+.gpds .mb-row__foot {
+  grid-area: foot;
+  margin: 3px 0 0;
+}
+
+/* THE QUESTION BESIDE ITS ANSWER, NOT ABOVE IT. The label takes a fixed
+   measure and the answer takes the rest, so forty rows share one edge and can
+   be scanned down instead of read in pairs. The dot is the label column, left
+   empty on purpose: provenance is a fact about the ANSWER, so it sits under
+   the answer. */
+@media (min-width: 900px) {
+  .gpds .mb-row {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-areas:
+      "label  value"
+      ".      foot";
+    align-items: start;
+    column-gap: var(--s-6);
+  }
+
+  /* "Your trade", OPEN: the sources table takes the whole row, under the
+     question, so each code has room for its name (Shyam, 9 Oct 2026). The
+     table exists only while that editor is open, so the closed row and every
+     other row keep the two columns. */
+  .gpds .mb-row:has(.mb-naics__table) {
+    grid-template-areas:
+      "label label"
+      "value value"
+      "foot  foot";
+  }
+}
+
+/* ── the value ──────────────────────────────────────────────────────────── */
+
+.gpds .mb-val {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+/* The acronym rule, first half: her sentence above, the government's own word
+   beside it, small and set back. It sits with the QUESTION, not with the
+   answer — it is what the question is called, not what she said. */
+.gpds .mb-term {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--n-8);
+}
+
+/* The other half: what the fact does for her. Earned by an empty row or by a
+   term, and never by an ordinary settled row — see `whyToShow`. */
+.gpds .mb-row__q {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.gpds .mb-why {
+  display: block;
+  margin: 4px 0 0;
+  max-width: 44ch;
+  font-size: 13px;
+  /* NOT INHERITED — neither of them. It sits inside the label cell, which is
+     600 and tracked tight for a heading; a bold, tightly-set explanation under
+     a bold question reads as two headings. */
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.gpds .mb-lines {
+  margin: 0;
+  min-width: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--n-11);
+}
+
+/* Ours until she confirms it — set back a shade, never greyed to look off. */
+.gpds .mb-lines--muted {
+  color: var(--n-9);
+  font-style: italic;
+}
+
+/* A LIST LOOKS LIKE A LIST. Several unlabelled pieces are the things she
+   listed — her services, her codes — and joining them with commas made three
+   answers read as one sentence. The marker sits in its own gutter so the text
+   of a wrapped item stays aligned under the first line rather than under the
+   bullet. */
+.gpds .mb-lines--bullets {
+  list-style: disc;
+  padding-left: 1.1em;
+}
+
+.gpds .mb-lines--bullets .mb-line {
+  margin-left: 0;
+}
+
+.gpds .mb-lines--bullets::marker,
+.gpds .mb-lines--bullets .mb-line::marker {
+  color: var(--n-7);
+}
+
+.gpds .mb-line {
+  margin: 0;
+}
+
+.gpds .mb-line + .mb-line {
+  margin-top: var(--s-1);
+}
+
+.gpds .mb-line__label {
+  display: block;
+  font-size: 11px;
+  color: var(--n-8);
+}
+
+/* Our failure, and the only place an error colour may be used. */
+.gpds .mb-note {
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  color: var(--brand-9);
+}
+
+/* ── the prompt on an unanswered row ────────────────────────────────────────
+ * SHAPED LIKE THE FIELD IT OPENS. A page of read rows with a small link in each
+ * reads as a document, so the half of it she can act on does not look
+ * actionable. A field's shape says "you can answer this here" without a word of
+ * instruction — and it is a door, not a live input: one tap and the correct
+ * typed editor opens in place.
+ *
+ * Dashed, because the boundary is real but the field is not filled — the same
+ * distinction a drop target draws. Neutral, and inviting. Nothing missing is
+ * ever an error, so nothing here touches a brand token.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* THE BOX AROUND IT IS THE FRAME NOW. This used to draw its own dashed border
+   and grey fill; inside `.mb-row__box--empty` that was a box within a box, two
+   edges saying one thing. It keeps its own words, its plus and its height, and
+   lets the row's box carry the shape and the blue. */
+.gpds .mb-prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  width: 100%;
+  min-height: 24px;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--blue-7);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gpds .mb-prompt::before {
+  content: "+";
+  font-size: 15px;
+  line-height: 1;
+  color: var(--n-8);
+}
+
+.gpds .mb-prompt:hover {
+  border-color: var(--n-7);
+  background: var(--n-3);
+  color: var(--blue-8);
+}
+
+.gpds .mb-prompt:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Nothing to open, so nothing that looks like it opens. */
+.gpds .mb-prompt--flat {
+  display: block;
+  min-height: 0;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--n-8);
+  cursor: default;
+}
+
+.gpds .mb-prompt--flat::before {
+  content: none;
+}
+
+/* ── two answers that disagree ──────────────────────────────────────────── */
+
+.gpds .mb-conflict {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.gpds .mb-conflict__side {
+  border-left: 2px solid var(--ai-4);
+  padding-left: var(--s-3);
+  min-width: 0;
+}
+
+.gpds .mb-conflict__origin {
+  margin: 0 0 2px;
+  font-size: 11px;
+  color: var(--n-8);
+}
+
+.gpds .mb-conflict__ask {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--n-10);
+}
+
+/* ── origin · source · freshness ────────────────────────────────────────── */
+
+.gpds .mb-prov {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--n-8);
+}
+
+.gpds .mb-prov__src {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-8);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.gpds .mb-prov__src:hover {
+  color: var(--blue-7);
+}
+
+/* ── the state chip ─────────────────────────────────────────────────────────
+ * `attested`, `verified` and `missing` render no chip at all, so there is no
+ * rule for them here. `problem` is the ONLY error colour on the page and it
+ * belongs to `error`, which is our failure and never hers.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-chip {
+  display: inline-block;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  padding: 2px var(--s-2);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gpds .mb-chip--neutral {
+  background: var(--n-2);
+  border-color: var(--n-5);
+  color: var(--n-9);
+}
+
+.gpds .mb-chip--good {
+  background: var(--blue-2);
+  border-color: var(--blue-4);
+  color: var(--blue-8);
+}
+
+.gpds .mb-chip--attention {
+  background: var(--ai-2);
+  border-color: var(--ai-4);
+  color: var(--ai-8);
+}
+
+.gpds .mb-chip--problem {
+  background: var(--brand-1);
+  border-color: var(--brand-3);
+  color: var(--brand-9);
+}
+
+/* ── "Your trade": where her codes came from · Shyam, 9 Oct 2026 ─────────────
+ * `TradeSourcesTable` lists every code on her profile, one row each, with one
+ * column per source. A source is a plain tick, never a colour, so nothing here
+ * needs a key; the only blue is the checkbox, the one thing she can click. Sized
+ * to the tree's 12px scale so the table fits the editor column. */
+
+.gpds .mb-naics__title {
+  margin: 0 0 var(--s-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+
+.gpds .mb-naics__table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+  /* The row's value cell breaks words anywhere, for long answers; a header
+     must only break between words ("Capability / statement"), never "Us / e". */
+  overflow-wrap: normal;
+}
+
+.gpds .mb-naics__table th {
+  padding: 0 var(--s-1) var(--s-1);
+  border-bottom: 1px solid var(--n-6);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--n-9);
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.gpds .mb-naics__table td {
+  padding: 5px var(--s-1);
+  border-bottom: 1px solid var(--n-3);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.gpds .mb-naics__col-use {
+  width: 40px;
+}
+
+.gpds .mb-naics__table .mb-naics__use {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.gpds .mb-naics__table .mb-naics__code {
+  text-align: left;
+}
+
+/* Four source columns of one width, so a tick lines up down the table whether
+ * or not the code names have loaded. The code column takes the rest. The
+ * longest header, "Capability statement", wraps to two lines. */
+.gpds .mb-naics__col-src {
+  width: 76px;
+}
+
+.gpds .mb-naics__check {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.gpds .mb-naics__check:focus-visible {
+  border-radius: var(--r-sm);
+  box-shadow: var(--ring-focus);
+  outline: none;
+}
+
+/* The code takes a fixed measure so the names start on one edge. */
+.gpds .mb-naics__num {
+  display: inline-block;
+  min-width: 7ch;
+  margin-right: var(--s-2);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--n-10);
+}
+
+.gpds .mb-naics__name {
+  color: var(--n-11);
+}
+
+.gpds .mb-naics__tick {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--n-10);
+}
+
+.gpds .mb-naics__dash {
+  color: var(--n-6);
+}
+
+/* An unticked code stays in its row, struck through, so nothing she unticks
+ * disappears before she saves. */
+.gpds .mb-naics__table tr.is-off .mb-naics__num,
+.gpds .mb-naics__table tr.is-off .mb-naics__name {
+  color: var(--n-8);
+  text-decoration: line-through;
+  text-decoration-color: var(--n-7);
+}
+
+.gpds .mb-naics__add {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  color: var(--n-9);
+}
+
+/* ── the shell · F12 ────────────────────────────────────────────────────────
+ * Two named regions, each labelled: the rail, and the part she opened. One
+ * column on a phone, rail beside main from 900px up. Every grid child carries
+ * `min-width: 0` — without it a long value in a `1fr` track sets the track to
+ * its own content width and the whole page scrolls sideways.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--s-6) var(--s-4) var(--s-16);
+  min-width: 0;
+}
+
+/* ── the readiness header ───────────────────────────────────────────────
+ * Replaces `RecordLede`'s single "we know n things" line — one of the three
+ * places on the page a fraction is deliberately shown; see this file's own
+ * header for why. Three tiles side by side on a desktop, stacked on a phone.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* ── the record's subject ────────────────────────────────────────────────
+ * The mark, the name, what she does and where, and the address a mentor
+ * replies to — the record's own heading, above the figures that count it.
+ * Every line is a stored answer; a line she has not given is not rendered,
+ * so this card never invents a name or a town.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4);
+  margin: 0 0 var(--s-5);
+  min-width: 0;
+}
+
+.gpds .mb-id__mark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--r-pill);
+  background: var(--n-3);
+  box-shadow: 0 0 0 1px var(--n-5);
+  color: var(--n-8);
+}
+
+.gpds .mb-id__logo {
+  border-radius: var(--r-pill);
+}
+
+/* The way to change it, on the thing it changes. A round target pinned to the
+   mark's corner, ringed in the page's own ground so it reads as sitting on top
+   of the image rather than inside it. */
+.gpds .mb-id__edit {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--blue-7);
+  color: var(--n-0);
+  cursor: pointer;
+  box-shadow: 0 0 0 2px var(--n-1);
+}
+
+.gpds .mb-id__edit:hover {
+  background: var(--blue-8);
+}
+
+.gpds .mb-id__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* `min-width: 0` or a long trading name drops this column to one character —
+   the same min-content trap the summary rows carry a note about. */
+.gpds .mb-id__text {
+  min-width: 0;
+}
+
+.gpds .mb-id__acts {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.gpds .mb-id__name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  color: var(--blue-11);
+  overflow-wrap: anywhere;
+}
+
+.gpds .mb-id__meta {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--n-9);
+  overflow-wrap: anywhere;
+}
+
+.gpds .mb-id__mail {
+  margin: 1px 0 0;
+  font-size: 13.5px;
+  color: var(--n-8);
+  overflow-wrap: anywhere;
+}
+
+/* Three across, as wide as the record beneath them. `1fr` each rather than
+   `auto-fit`, so the three keep equal width instead of the last one shrinking
+   to its own content; they stack below 640px. */
+.gpds .mb-stats {
+  margin: 0 0 var(--s-6);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-4);
+}
+
+@media (max-width: 640px) {
+  .gpds .mb-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Each tile is its own card on its own tinted ground, so the three read as
+   three facts rather than one grey block of figures.
+
+   COLOUR IS NEVER THE ONLY CARRIER. Every tile also has its own icon, its own
+   label and its own figure, so they stay apart in greyscale and for a reader
+   who cannot separate the hues. The tint only tints what the other three
+   already say.
+
+   THE THREE ROLES. Positive sage for what she has answered, Federal Blue for
+   the parts at rest, and a warm NEUTRAL for extras.
+
+   EXTRAS TAKES NO STATUS COLOUR, AND THAT IS THE POINT. Every coloured family
+   here is spoken for and none of them means what this tile means: `--ai-*` is
+   AI-authored output, `--warn-*` is "pending, medium-confidence", `--insight-*`
+   is a read-only inference, `--brand-*` is a brand moment. Extras are none of
+   those — they are answers beyond the core, and the header's own rule is that
+   their ABSENCE must never read as missing work. A quiet tile says that; a
+   status tint would say she is behind on something optional. (It was ochre
+   until `--warn-*` moved to mauve on hue 326; going back toward amber is
+   forbidden by tokens.css, and mauve would mislabel a plain count as a
+   caution.) */
+.gpds .mb-stat {
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+}
+
+.gpds .mb-stat__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: var(--s-3);
+  border-radius: var(--r-pill);
+  color: var(--n-0);
+  background: var(--n-8);
+}
+
+.gpds .mb-stat__icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.gpds .mb-stat--answered {
+  border-color: var(--pos-3);
+  background: var(--pos-2);
+}
+
+.gpds .mb-stat--answered .mb-stat__icon {
+  background: var(--pos-7);
+}
+
+.gpds .mb-stat--parts {
+  border-color: var(--blue-3);
+  background: var(--blue-2);
+}
+
+.gpds .mb-stat--parts .mb-stat__icon {
+  background: var(--blue-7);
+}
+
+/* THE THIRD TILE IS AMBER, AND THAT IS A DELIBERATE DEPARTURE.
+   `tokens.css` reserves `--ai-*` for AI-authored surfaces, and "Extras added"
+   is not one. The prototype tiles this trio green / blue / amber and we are
+   matching it: neutral gave the third tile no identity of its own, so it read
+   as an unstyled tile beside two coloured ones rather than as the third of
+   three. Recorded here so the next reader knows it was decided, not missed.
+   If the reservation is to hold everywhere, this trio needs a fourth hue
+   rather than a quiet revert to neutral. */
+.gpds .mb-stat--extras {
+  border-color: var(--ai-3);
+  background: var(--ai-2);
+}
+
+/* `--ai-7` measures 2.79:1 against its own track, under the 3:1 a graphic
+   needs. One step darker clears it at 4.21:1 — the prototype's own note. */
+.gpds .mb-stat--extras .mb-stat__icon {
+  background: var(--ai-8);
+}
+
+.gpds .mb-stat--extras .mb-stat__label {
+  color: var(--ai-8);
+}
+
+.gpds .mb-stat--extras .mb-stat__fig {
+  color: var(--ai-10);
+}
+
+.gpds .mb-stat__label {
+  margin: 0 0 var(--s-1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--n-9);
+}
+
+.gpds .mb-stat__fig {
+  margin: 0 0 var(--s-3);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--n-11);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The denominator takes the tile's OWN colour, set back — it is the same
+   fact as the numerator beside it, not a neutral aside. */
+.gpds .mb-stat__of {
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+  opacity: 0.62;
+}
+
+.gpds .mb-stat__bar {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--n-3);
+  overflow: hidden;
+}
+
+/* Geometry only — every tile's tone rule below supplies the colour. */
+.gpds .mb-stat__fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+}
+
+/* The fill and the pips take the tile's own role colour, so the bar belongs
+   to the figure above it rather than to the page.
+
+   THE EMPTY TRACK IS TINTED TOO. On a tinted card the neutral `--n-3` track
+   measured 1.02:1 against its own ground — not dim, gone — so the DENOMINATOR
+   vanished while the numerator stayed. On "Parts done" that is fatal: the
+   pips ARE the denominator, so five-of-which-two would have read as two. Each
+   family's own `-3` step keeps the track visible on its own ground. */
+.gpds .mb-stat--answered .mb-stat__fill {
+  background: var(--pos-7);
+}
+
+.gpds .mb-stat--answered .mb-stat__bar {
+  background: var(--pos-3);
+}
+
+/* The words and the number take the tile's colour too, or the tint is a
+   background behind a neutral tile rather than the tile's own identity. */
+.gpds .mb-stat--answered .mb-stat__label {
+  color: var(--pos-7);
+}
+
+.gpds .mb-stat--answered .mb-stat__fig {
+  color: var(--pos-9);
+}
+
+.gpds .mb-stat--parts .mb-stat__label {
+  color: var(--blue-8);
+}
+
+.gpds .mb-stat--parts .mb-stat__fig {
+  color: var(--blue-10);
+}
+
+.gpds .mb-stat--parts .mb-stat__pip {
+  background: var(--blue-3);
+}
+
+.gpds .mb-stat--parts .mb-stat__pip--on {
+  background: var(--blue-7);
+}
+
+.gpds .mb-stat--extras .mb-stat__fill {
+  background: var(--ai-8);
+}
+
+.gpds .mb-stat--extras .mb-stat__bar {
+  background: var(--ai-3);
+}
+
+.gpds .mb-stat__pips {
+  display: flex;
+  gap: var(--s-1);
+}
+
+.gpds .mb-stat__pip {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--n-3);
+}
+
+.gpds .mb-stat__pip--on {
+  background: var(--blue-7);
+}
+
+/* ── the one AI hatch ───────────────────────────────────────────────────────
+ * It sits in the page header, level with the heading, because it is a
+ * page-level action — "what can I do to all of it" — and not a destination.
+ * Pinned above the rail's links it read as one object with the part heading
+ * beside it, and it mixed two kinds of thing in one list.
+ *
+ * Amber, and nothing else on this page is: the DS reserves that lane for
+ * AI-authored surfaces, and this one opens Hunter. A bordered pill on a pale
+ * ground rather than a solid block — the loudest thing on the screen must stay
+ * the answer she is being asked for.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-tell {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--ai-3);
+  border-radius: var(--r-md);
+  background: var(--ai-1);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ai-9);
+  text-decoration: none;
+}
+
+.gpds .mb-tell:hover {
+  border-color: var(--ai-5);
+  background: var(--ai-2);
+}
+
+.gpds .mb-tell svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.gpds .mb-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-6);
+  align-items: start;
+}
+
+.gpds .mb-main {
+  min-width: 0;
+}
+
+/* DEMO: 1280px, not 900px. In the Success Center this page fills the browser. In the demo
+   the left menu takes 244px, so the page has about 240px less room. The rail moves
+   above the rows (as on a phone) until the page has room for both. */
+@media (min-width: 1280px) {
+  .gpds .mb-page {
+    padding-left: var(--s-8);
+    padding-right: var(--s-8);
+  }
+
+  .gpds .mb-shell {
+    grid-template-columns: minmax(240px, 30%) minmax(0, 1fr);
+    gap: var(--s-8);
+  }
+}
+
+/* ── the rail ───────────────────────────────────────────────────────────────
+ * A column of destinations on a desktop; a wrapping row of the same links on a
+ * phone, so the backbone stays above the fold without pushing the part six rows
+ * down. It WRAPS rather than scrolls — a rail you have to swipe is a rail whose
+ * last two parts do not exist.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* The score card and the nav, as one column. */
+.gpds .mb-rail-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.gpds .mb-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.gpds .mb-rail__group {
+  margin: var(--s-3) 0 var(--s-1);
+  padding-left: var(--s-3);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--n-8);
+}
+
+.gpds .mb-rail__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.gpds .mb-rail__item {
+  min-width: 0;
+}
+
+.gpds .mb-rail__link {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-sm);
+  background: var(--n-0);
+  color: var(--n-10);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.gpds .mb-rail__link:hover {
+  border-color: var(--n-6);
+  background: var(--n-2);
+}
+
+/* Where she is. Federal blue, the one interactive colour on the page. */
+.gpds .mb-rail__link[aria-current="page"] {
+  background: var(--blue-1);
+  border-color: var(--blue-3);
+  color: var(--blue-9);
+}
+
+/* The label and its done tick, as one flex line — WITHOUT this, an inline
+   `<svg>` sitting after the label text lays out as a block and drops onto its
+   own line under the label, the same layout break the redesign's own rail
+   hit and fixed at the source. `.mb-rail__link` is already flex, but that
+   only lays out ITS direct children (this row and `.mb-rail__n`) — the label
+   and the tick inside this row need the same declaration to sit level with
+   each other. */
+.gpds .mb-rail__row {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.gpds .mb-rail__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Every core question in the part, settled. Federal blue, the one
+   interactive colour on the page — same rule the count pill follows, and the
+   same reason: this is progress made, never an error or a warning. */
+/* A FILLED DISC, not a bare glyph: it is the same "at rest" mark the stat
+   tile's icon is, and at 18px it survives beside a wrapping label. */
+.gpds .mb-rail__done {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  background: var(--blue-7);
+  color: var(--n-0);
+}
+
+/* What is still open, as ONE number, and nothing at all when nothing is. A
+   count, never a score: there is no total beside it, no bar behind it and no
+   colour that changes with how high it is. The same Federal Blue every other
+   "this is waiting for you" mark on the page uses — never red, because nothing
+   missing is an error. */
+.gpds .mb-rail__n {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--blue-3);
+  border-radius: var(--r-pill);
+  background: var(--blue-1);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--blue-9);
+  white-space: nowrap;
+}
+
+@media (min-width: 1280px) {
+  /* The whole rail column — the score card above the nav now, not the nav
+     alone — scrolls with her as one unit. */
+  .gpds .mb-rail-col {
+    position: sticky;
+    top: var(--s-4);
+  }
+
+  .gpds .mb-rail__list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 1px;
+  }
+
+  /* A destination, not an entry in a table of contents: full-size type and a
+     44px target, with the border and fill only on the one she is on. */
+  .gpds .mb-rail__link {
+    align-items: center;
+    min-height: 44px;
+    border-color: transparent;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  .gpds .mb-rail__link[aria-current="page"] {
+    font-weight: 600;
+  }
+}
+
+/* ── the main column ───────────────────────────────────────────────────── */
+
+.gpds .mb-sec {
+  min-width: 0;
+}
+
+.gpds .mb-sec__h {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--n-11);
+}
+
+/* What a heading is about. NOT `.mb-note`, which is F8's line for OUR failure
+   and is the one place on this page an error colour is allowed. */
+.gpds .mb-sub {
+  margin: var(--s-1) 0 var(--s-4);
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.gpds .mb-sub--after {
+  margin-top: var(--s-3);
+}
+
+.gpds .mb-open__h {
+  margin: var(--s-8) 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-11);
+}
+
+/* ── the breakdown ───────────────────────────────────────────────────────
+ * Closed by default, and ONE COMPACT ROW PER PART — name, track, `n/total` —
+ * not a stacked tile per part. A gauge is for one figure against a target;
+ * the moment you want to COMPARE several you switch to a row per item, and
+ * five stacked tiles read as five headlines rather than as the parts of one.
+ *
+ * It renders ONCE, under the header's tiles, beside the total it explains. It
+ * used to render a second time inside the rail's `ScoreCard`, which put the
+ * same disclosure twice on one screen.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* Inside the rail's score card, under the figure it breaks down and ruled off
+   from it — the disclosure is a different question from the headline. */
+.gpds .mb-brk {
+  margin-top: var(--s-3);
+  border-top: 1px solid var(--n-4);
+}
+
+.gpds .mb-brk__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--blue-7);
+  list-style: none;
+}
+
+/* The default triangle is replaced by a chevron of our own, at the far end. */
+.gpds .mb-brk__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.gpds .mb-brk__toggle::after {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform var(--d-fast) var(--ease-out);
+}
+
+.gpds .mb-brk[open] .mb-brk__toggle::after {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.gpds .mb-brk__toggle:hover {
+  color: var(--blue-8);
+}
+
+.gpds .mb-brk__list {
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+/* Name, track, fraction — one line per part, so five parts can be compared by
+   eye instead of read one headline at a time. */
+/* Name and fraction on one line, the track spanning both columns beneath them.
+   Three columns on one line wraps "What you can take on" onto three lines in a
+   rail this narrow. */
+.gpds .mb-brk__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px var(--s-3);
+  font-size: 14px;
+}
+
+.gpds .mb-brk__track {
+  grid-column: 1 / -1;
+}
+
+.gpds .mb-brk__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  color: var(--n-11);
+}
+
+.gpds .mb-brk__track {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--n-3);
+  overflow: hidden;
+}
+
+/* BLUE, BECAUSE THESE ARE PARTS — the same family the "Parts done" tile uses.
+   Sage is the headline's colour and would say these rows sum to it twice. */
+.gpds .mb-brk__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--blue-7);
+}
+
+.gpds .mb-brk__val {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--n-9);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── the rail's score card ──────────────────────────────────────────────
+ * The Success Center's own card shape, with a count in it: a caption, a big
+ * figure over a `/ total`, a bar, and a way on. NOT the header's small tile
+ * repeated — a member who has seen that card elsewhere should not have to
+ * learn a second visual language for the same kind of fact.
+ *
+ * The way on is a real control, bordered and tall enough to hit, because a
+ * count is only motivating if moving it is one click. It points at the first
+ * unsettled question — `blocking` first, then `open` — so it keeps pointing
+ * somewhere while ANY core question is unanswered, and disappears only when
+ * the record is whole. Sits above the rail's own list of destinations.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-sc {
+  margin-bottom: var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+}
+
+/* The caption, then the figure, then the track — the Success Center's own
+   card shape, so a member meets one visual language for "where I stand". */
+.gpds .mb-sc__cap {
+  margin: 0 0 var(--s-1);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+
+.gpds .mb-sc__n {
+  margin: 0 0 var(--s-3);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--blue-11);
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds .mb-sc__of {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--n-8);
+}
+
+.gpds .mb-sc__bar {
+  display: block;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--n-3);
+  overflow: hidden;
+}
+
+.gpds .mb-sc__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--pos-7);
+}
+
+/* A FILLED BUTTON, NOT A TINTED PANEL. It wore the status treatment — a sage
+   fill inside a sage hairline — which is the same visual language as a verified
+   chip, so the one action on the card read as a label about her progress. Solid
+   fill, white text and the CTA shadow are what separate "this is a thing that
+   happened" from "press this".
+
+   BLUE, NOT SAGE, and the reason is the three-colour discipline: blue is the
+   interactive family and `--pos-*` is status. Sage read as a button once it was
+   filled, but it would have been the only sage button in the product, on a page
+   where sage already means "answered". */
+.gpds .mb-sc__next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+  padding: 0 var(--s-3);
+  min-height: 44px;
+  border: 1px solid var(--blue-8);
+  border-radius: var(--r-sm);
+  background: linear-gradient(180deg, var(--blue-7) 0%, var(--blue-8) 100%);
+  box-shadow: var(--sh-cta-rest);
+  font-size: 13.5px;
+  font-weight: 650;
+  color: var(--n-0);
+  text-decoration: none;
+}
+
+.gpds .mb-sc__next:hover {
+  background: linear-gradient(180deg, var(--blue-8) 0%, var(--blue-9) 100%);
+  box-shadow: var(--sh-cta-hover);
+}
+
+.gpds .mb-sc__next:active {
+  box-shadow: var(--sh-press);
+}
+
+.gpds .mb-sc__next svg {
+  flex: none;
+}
+
+/* Review-and-confirm: what the check read off her document, stated as one
+   fact she can say yes to. Same tone as the rest of the card — the check is
+   ours, the answer is hers. */
+.gpds .mb-llc__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: var(--s-2) 0 0;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-sm);
+  background: var(--n-1);
+  max-width: 62ch;
+}
+
+.gpds .mb-llc__fact-k {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--n-8);
+}
+
+.gpds .mb-llc__fact-v {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+
+/* The part's own heading, ruled off from the sections under it — a title and
+   its one line of why, then a line, then the cards. Without the rule the
+   heading sat at the same weight as the first section band beneath it. */
+.gpds .mb-pane__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3) var(--s-5);
+  padding-bottom: var(--s-5);
+  margin-bottom: var(--s-6);
+  border-bottom: 1px solid var(--n-4);
+}
+
+.gpds .mb-pane__text {
+  min-width: 0;
+}
+
+/* The part's title is the biggest thing on its screen — 22px at 600, the ink
+   the system keeps for headings, not the 18px/700 a section band uses. */
+.gpds .mb-pane__head .mb-sec__h {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--blue-11);
+}
+
+.gpds .mb-pane__head .mb-sub {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.gpds .mb-pane__head .mb-sub {
+  margin-top: var(--s-1);
+}
+
+/* ── a section of a screen, as a card ───────────────────────────────────
+ * A tinted band carrying the group's name and its one line of why, then the
+ * rows on white. THE LEVELS DIFFER ON TWO AXES, NEVER ONE — the band's tint
+ * and the heading's weight both separate it from the questions under it. A
+ * single axis is what produces a flat list where a heading and a question read
+ * as the same thing.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-secs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+
+.gpds .mb-fsec {
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  overflow: hidden;
+}
+
+.gpds .mb-fsec__head {
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--n-4);
+  background: var(--n-2);
+}
+
+.gpds .mb-fsec__h {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 680;
+  letter-spacing: -0.01em;
+  color: var(--blue-11);
+}
+
+.gpds .mb-fsec__note {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* The rows carry their own vertical padding, so the body only closes the gap
+   under the last one. */
+.gpds .mb-fsec__body {
+  padding: 0 var(--s-5) var(--s-2);
+}
+
+/* THE BAND SUPPLIES THE TOP SPACE, so the first row stops supplying it too. */
+.gpds .mb-fsec__body .mb-row:first-child {
+  border-top: 0;
+}
+
+/* ── the empty-part ghost ────────────────────────────────────────────────
+ * The shape of an answer that is not there yet — never a plausible fake
+ * value, always the honest "nothing here" line underneath. Plain shapes on a
+ * pale ground, not an animated skeleton: this is a description of a state,
+ * not a loading spinner, and it must not read as one.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-ghost {
+  margin-bottom: var(--s-6);
+  padding: var(--s-4);
+  border: 1px dashed var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-1);
+}
+
+.gpds .mb-ghost__shape {
+  list-style: none;
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+/* The field's own label, shown so she knows what would go here — never a
+   value, so it is set back a shade and given a dashed rule rather than the
+   solid one a real answer gets. */
+.gpds .mb-ghost__line {
+  padding-bottom: var(--s-1);
+  border-bottom: 1px dashed var(--n-4);
+  font-size: 13px;
+  color: var(--n-7);
+}
+
+.gpds .mb-ghost__note {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-8);
+}
+
+.gpds .mb-tier {
+  margin-top: var(--s-6);
+  min-width: 0;
+}
+
+.gpds .mb-tier__h {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--n-10);
+}
+
+.gpds .mb-tier__note {
+  margin: 2px 0 var(--s-2);
+  max-width: 62ch;
+  font-size: 12px;
+  color: var(--n-8);
+}
+
+/* ── the handoff · F14 ──────────────────────────────────────────────────────
+ * Three modes, one block: the fourteen while she is `filling`, the same list
+ * with a send button when she is `ready`, and a receipt once it is `sent`.
+ *
+ * There is no CSS here for a completion state, because there is no badge, no
+ * streak and no score to style. The send is a plain `.gpds-btn` — Federal Blue,
+ * the one interactive colour on the page — and a failed save or send reuses
+ * F8's `.mb-note`, the single place an error colour is allowed. Nothing here
+ * introduces a second one.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* How far through her mentor's questions she is, as a card rather than as a
+   sentence: it is the first thing in the main column and it was reading as a
+   caption on the list below it. A COUNT, and the count is the whole of it —
+   there is no bar behind it, no percentage, no badge and no colour that changes
+   as it fills. */
+.gpds .mb-intake {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: var(--s-6);
+  padding: 16px 18px;
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  min-width: 0;
+}
+
+/* When it is wanted, in the words above the number rather than beside it. */
+.gpds .mb-intake__eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+
+.gpds .mb-intake__count {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--n-11);
+}
+
+.gpds .mb-intake__count b {
+  font-weight: 700;
+}
+
+/* The deadline, when a booked call has set one. It renders nothing at all
+   otherwise, so this rule is often about no element. */
+.gpds .mb-intake .mb-due {
+  font-size: 13.5px;
+}
+
+.gpds .mb-check {
+  margin-bottom: var(--s-8);
+  min-width: 0;
+}
+
+/* Why the button exists, then the button. The note leads because the send is
+   low-stakes and has to read that way — her answers are already saved. */
+.gpds .mb-send {
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--n-4);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.gpds .mb-send__note {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* ── it is with your mentor ─────────────────────────────────────────────── */
+
+.gpds .mb-sent {
+  margin-bottom: var(--s-8);
+  min-width: 0;
+}
+
+/* On every visit after the one she sent on, this line IS the whole mode. */
+.gpds .mb-sent__receipt {
+  margin: 0 0 var(--s-6);
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.gpds .mb-sent .mb-sent__receipt {
+  margin-bottom: 0;
+}
+
+/* ── she keeps some of it · F5b ─────────────────────────────────────────────
+ * The picker REUSES `.gpds-picks` and `.gpds-pick` from the design system —
+ * those are the tick boxes every other multi-answer control on this app draws,
+ * and `.gpds-picks` already resets a fieldset's border, margin and padding. The
+ * two rules below are only what a fieldset adds that a div does not: a legend
+ * with browser padding, and the running count under the list.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* Not all of it fits, and how many she keeps. A legend so the tick boxes below
+   are named by it for a screen reader, rather than by nothing. */
+.gpds .mb-queue__pick {
+  padding: 0;
+  margin: 0 0 var(--s-2);
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--n-9);
+}
+
+/* How many she has kept. Quiet, because it reports rather than asks. */
+.gpds .mb-queue__kept {
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  color: var(--n-8);
+}
+
+/* ── the one ask · F15 ──────────────────────────────────────────────────────
+ * One question, outside what `queue.ts` counts — the queue is what needs her,
+ * and an unanswered question is not that. Its own block rather than a queue
+ * class: a card wearing the queue's name would be read as part of a
+ * count it is deliberately not in, and F12 already shipped that class of bug
+ * once with `.mb-note`.
+ *
+ * Nothing here is red, nothing here is a badge, and the decline is a plain
+ * `.gpds-btn-ghost` — a permanent refusal must not be made to look harder to
+ * press than the answer.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-ask {
+  margin-bottom: var(--s-8);
+  padding: var(--s-4);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  box-shadow: var(--sh-rest);
+  min-width: 0;
+}
+
+.gpds .mb-ask__q {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+
+/* Why she only has to do this once. It is the reason the decline can be
+   permanent, so it sits with the question and not under the button. */
+.gpds .mb-ask__note {
+  margin: var(--s-1) 0 var(--s-3);
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.gpds .mb-ask__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  min-width: 0;
+}
+
+/* ── F12b · changing an answer in place ─────────────────────────────────────
+ * The editor is `ControlFor`, the same one `/intake` uses, so it brings its own
+ * styling and needs none from here. This gives it the whole row: `.mb-val` is a
+ * baseline flex line built for a value and a chip, and a control dropped into
+ * it as a third item would be squeezed into whatever was left.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-edit {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+/* ── F20 · the deadline and the way out of this page ────────────────────────
+ * The two page-level things the old goal banner carried. They sit in the
+ * header, under the lede, on one line at any width the line fits.
+ *
+ * `.mb-due` is a NEW block, not `.mb-sub` or `.mb-lede`: it is a sentence about
+ * a date that is often not there at all, and both of those already carry
+ * spacing decided for something else. Nothing here is red and nothing here
+ * counts down — a deadline is a fact about her call, not a warning.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-due {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  width: 100%;
+  margin: 0 0 var(--s-6);
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--warn-3);
+  border-left: 4px solid var(--warn-7);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+}
+
+.gpds .mb-due__i {
+  flex: none;
+  margin-top: 1px;
+  color: var(--warn-9);
+}
+
+.gpds .mb-due__t {
+  min-width: 0;
+}
+
+.gpds .mb-due__when {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--warn-9);
+}
+
+/* The clause that answers "how much of it is left", set off from the urgency
+   it belongs to by a rule rather than by another line. */
+.gpds .mb-due__of {
+  margin-left: var(--s-2);
+  padding-left: var(--s-2);
+  border-left: 1px solid var(--warn-7);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds .mb-due__what {
+  margin: 3px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--warn-11);
+}
+
+/* ── F20 · the LLC paperwork ────────────────────────────────────────────────
+ * Its own block rather than `.mb-ask`: that is a card a member is being ASKED
+ * something in, and this one mostly reports where
+ * a document stands. A card wearing another feature's name inherits that
+ * feature's spacing the next time it changes — F12 shipped that bug once, with
+ * `.mb-note` silently overriding F8's error colour.
+ *
+ * Not having an LLC yet is the ordinary starting position for this cohort, so
+ * there is no error colour, no badge and no tick-count here.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-llc {
+  margin-bottom: var(--s-8);
+  padding: var(--s-4);
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  box-shadow: var(--sh-rest);
+  min-width: 0;
+}
+
+.gpds .mb-llc__h {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--n-11);
+}
+
+.gpds .mb-llc__body {
+  margin: var(--s-1) 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* On file. A statement of fact in the same tone as everything else — the tick
+   is the whole of the difference. */
+.gpds .mb-llc__done {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin: var(--s-2) 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+.gpds .mb-llc__tick {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--blue-8);
+}
+
+/* Taking back "I do not have one yet" — inline in her own sentence, so it is a
+   link in a paragraph rather than a third button. */
+.gpds .mb-llc__undo {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--blue-8);
+  cursor: pointer;
+}
+
+.gpds .mb-llc__undo:hover {
+  text-decoration: underline;
+}
+
+.gpds .mb-llc__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  min-width: 0;
+}
+
+/* ── F19 · the photo and the logo ───────────────────────────────────────────
+ * The two VIRTUAL catalog rows, which have no `ProfileField` key and so no
+ * `.mb-row`. `ImageUploadCard` is shared verbatim with `/intake` and brings its
+ * own styling; all this owns is how the two cards sit beside each other, and
+ * that they stack rather than scroll at 390px.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/* Inside the first section's card, above that section's questions. */
+.gpds .mb-fsec__images {
+  padding-top: var(--s-4);
+}
+
+.gpds .mb-media {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-3);
+  margin: 0;
+  min-width: 0;
+}
+
+@media (min-width: 620px) {
+  .gpds .mb-media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── "Tell Hunter everything" · the box, and the account of what it became ──
+ * The launcher itself is `.mb-tell` above — unchanged by this feature, because
+ * only its destination changed. Everything here belongs to the destination.
+ *
+ * NAMING: `mb-say` for the box and `mb-said` for the review. NOT `mb-tell__*`:
+ * that block is the launcher in the page header, and a rule written for the
+ * destination would reach the button too — which is the mistake `.mb-note`
+ * already made on this page once.
+ *
+ * `.mb-said__list` REUSES nothing from a card block: a card carries an action,
+ * and these are a read-back of what just happened, with no action at all.
+ * Confirming happens elsewhere, one fact at a time.
+ *
+ * Nothing here is red and nothing here scores her: no count of how many of her
+ * sentences landed as a proportion, no bar, no badge. The three groups say what
+ * happened in words.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-say {
+  min-width: 0;
+}
+
+/* The question on the left, the other way to answer it on the right. They sit
+   together because speaking FILLS this box — it is not a second submit. Wraps
+   to two lines before the button is allowed to squeeze the question. */
+.gpds .mb-say__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+
+.gpds .mb-say__ask {
+  min-width: 0;
+  flex: 1 1 20rem;
+}
+
+.gpds .mb-say__label {
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-11);
+}
+
+/* The box she talks into. `CONTROL_INPUT` carries the border, the radius and
+   the padding — the same field the record's own editors use — so this only
+   says how tall it starts and that it never overflows its column. */
+.gpds .mb-say__box {
+  min-height: 180px;
+  line-height: 1.55;
+}
+
+.gpds .mb-say__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  min-width: 0;
+}
+
+/* ── speaking, and the fact that it is happening ───────────────────────────
+ * Recording used to be announced by the button's LABEL and nothing else, which
+ * is the one state on this page a member must never be unsure about: a live
+ * microphone that looks exactly like an idle one is how someone talks for two
+ * minutes into a control they never started, or leaves one running.
+ *
+ * It is also a BUTTON now rather than a link. It shared `.mb-say__out` with
+ * "Not now", so the second way to answer the question looked exactly like the
+ * way to leave without answering it.
+ *
+ * The dot is the only red on this page and it is not a warning: red means "this
+ * is recording" on every device she owns, which is the one place the "never red"
+ * rule does not apply because the colour is the meaning.
+ * ──────────────────────────────────────────────────────────────────────── */
+.gpds .mb-say__speak {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 9px 13px;
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-sm);
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--n-11);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.gpds .mb-say__speak:hover:not(:disabled) {
+  border-color: var(--n-6);
+}
+
+.gpds .mb-say__speak:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.gpds .mb-say__speak.is-recording {
+  border-color: var(--red-6);
+  background: var(--red-1);
+  color: var(--red-9);
+}
+
+/* The elapsed time, tabular so the row does not twitch every second. */
+.gpds .mb-say__clock {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.gpds .mb-say__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red-7);
+  animation: mb-say-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes mb-say-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* A blinking dot is exactly what someone with vestibular sensitivity turns
+   motion off for. Still red, still there, just not pulsing. */
+@media (prefers-reduced-motion: reduce) {
+  .gpds .mb-say__dot { animation: none; }
+}
+
+/* How much room is left. Silent until it matters — a counter that is always
+   there reads as a limit she is being measured against, and 5,000 characters
+   is not a limit anyone approaches by accident. */
+.gpds .mb-say__count {
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  color: var(--n-8);
+}
+
+.gpds .mb-say__count.is-close {
+  color: var(--red-8);
+  font-weight: 600;
+}
+
+/* The way out without sending. A link in the row of actions rather than a
+   third button, so the only button is the thing she came to do. */
+.gpds .mb-say__out {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--n-9);
+  text-decoration: none;
+}
+
+.gpds .mb-say__out:hover {
+  text-decoration: underline;
+}
+
+.gpds .mb-said {
+  min-width: 0;
+}
+
+.gpds .mb-said__h {
+  margin: var(--s-6) 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--n-11);
+}
+
+.gpds .mb-said__h:first-child {
+  margin-top: 0;
+}
+
+.gpds .mb-said__list {
+  display: grid;
+  gap: var(--s-2);
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+}
+
+.gpds .mb-said__item {
+  border: 1px solid var(--n-4);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  padding: var(--s-3);
+  min-width: 0;
+}
+
+.gpds .mb-said__label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--n-9);
+}
+
+.gpds .mb-said__v {
+  margin: var(--s-1) 0 0;
+  font-size: 15px;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+
+/* Why we left it where it was. Neutral: a fact she already answered herself is
+   the record working, not a failure. */
+.gpds .mb-said__why {
+  margin: var(--s-1) 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--n-9);
+}
+
+/* Her own words, in her own words. Quiet and italic, so they read as her
+   sentence said back to her and not as our claim. */
+.gpds .mb-said__heard {
+  margin: var(--s-2) 0 0;
+  max-width: 62ch;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--n-9);
+  overflow-wrap: anywhere;
+}
+
+/* Everything she sent, kept on the screen that reports on it. */
+.gpds .mb-said__sent {
+  margin: var(--s-2) 0 0;
+  max-width: 62ch;
+  padding: var(--s-3);
+  border-left: 2px solid var(--n-4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--n-10);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ── digital identity ─────────────────────────────────────────────────────
+   The Digital Compliance Audit Form and its findings — the one part that is a
+   form rather than the record. Shares the page's own type and spacing, and
+   borrows only the shared `.badge` classes from ds.css for the verdicts, so
+   the results read the same here as they do on the roadmap without pulling any
+   roadmap CSS onto a Design System page. */
+
+.gpds .mb-di {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+}
+
+.gpds .mb-di__lede {
+  margin: var(--s-1) 0 var(--s-5);
+  max-width: 62ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--n-9);
+}
+
+/* ── what we found ── */
+
+.gpds .mb-di__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.gpds .mb-di__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: 12px 0;
+  border-top: 1px solid var(--n-4);
+  min-width: 0;
+}
+
+.gpds .mb-di__row:first-child {
+  border-top: 0;
+}
+
+.gpds .mb-di__main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gpds .mb-di__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--n-11);
+  overflow-wrap: anywhere;
+}
+
+/* Why it matters, on a gap she has not closed. */
+.gpds .mb-di__note {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--n-9);
+  max-width: 58ch;
+}
+
+/* What the check actually saw — quoted back, so a verdict is never bare. */
+.gpds .mb-di__ev {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--n-9);
+  overflow-wrap: anywhere;
+}
+
+.gpds .mb-di__when {
+  margin: var(--s-3) 0 0;
+  font-size: 12px;
+  color: var(--n-8);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── the form ── */
+
+.gpds .mb-di__fields {
+  display: grid;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+}
+
+@media (min-width: 900px) {
+  .gpds .mb-di__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-5);
+  }
+}
+
+.gpds .mb-di__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* A REAL LABEL, ALWAYS VISIBLE. The placeholder is an example of the answer,
+   not the question — it disappears the moment she types, and twelve boxes
+   whose questions vanish is twelve boxes she cannot check. */
+.gpds .mb-di__label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--n-11);
+}
+
+.gpds .mb-di__req {
+  color: var(--urg-7);
+}
+
+.gpds .mb-di__error {
+  margin: 0 0 var(--s-4);
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--urg-9);
+}
+
+/* The N/A / REFUSE opt-out callout on the Digital identity form. Louder than
+   the lede on purpose — members missed it in body grey and left blank fields
+   they meant to opt out of. */
+.gpds .mb-di__optout {
+  margin: var(--s-2) 0 var(--s-5);
+  max-width: 62ch;
+  background: var(--warn-2);
+  border: 1px solid var(--warn-3);
+  color: var(--warn-11);
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* What the member answered for an audit item, with links clickable. */
+.gpds .mb-di__prov {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--n-10);
+  overflow-wrap: anywhere;
+}
+.gpds .mb-di__prov a {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── jobs, one entry each ───────────────────────────────────────────────────
+ * Buyers ask for past performance STRUCTURED — a school-district solicitation
+ * wants five references, two from accounts of similar size — and a joined
+ * string cannot answer that. `formatValue` flattens a job into one line and
+ * several into one joined with "; "; these are the same facts, laid out.
+ *
+ * NO BOX PER ENTRY. The value cell is already a filled box, so a background on
+ * each job would be a box inside a box — the same thing "Your legal details"
+ * was doing with its extras. Space separates the entries; the card is the row's.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-jobs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.gpds .mb-job {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* The buyer's name leads, the kind of buyer sits at the far edge — so the
+   names line up down the list and the categories line up down the other side.
+   Wrapping keeps a long name from squeezing the tag into a column of letters. */
+.gpds .mb-job__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+.gpds .mb-job__customer {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--n-11);
+}
+
+/* The kind of buyer, set as a quiet tag rather than a sentence — it is a
+   category, and it repeats down the list where a sentence would not. */
+.gpds .mb-job__type {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+
+.gpds .mb-job__scope {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--n-10);
+}
+
+.gpds .mb-job__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--n-9);
+}
+
+.gpds .mb-job__worth {
+  font-variant-numeric: tabular-nums;
+  color: var(--n-11);
+}
+
+.gpds .mb-job__sep {
+  color: var(--n-7);
+}
+
+/* A reference we may pass on is a green fact — it is the field a buyer phones.
+   One we may not is not an error, so it is neutral, not red: she simply has
+   not told us yet, and the line says exactly that. */
+.gpds .mb-job__ref {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--pos-9);
+}
+
+.gpds .mb-job__ref--held {
+  color: var(--n-9);
+}
+
+.gpds .mb-job__tick {
+  flex: none;
+}
+
+/* ── the Basic Info gate ────────────────────────────────────────────────────
+ * A locked part is a reason, not a door. Quieter than a live row — but NOT
+ * greyed to the point of looking broken, because nothing is: it is a door with
+ * a date on it, and the words say which. No error colour and no warning glyph;
+ * this page reserves those for our own failures.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-rail__link--locked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: var(--n-1);
+  border-style: dashed;
+  color: var(--n-9);
+  cursor: default;
+}
+
+/* It shares `.mb-rail__link`, so the hover the real rows carry has to be taken
+   back off — a row that lights up under the cursor reads as pressable. */
+.gpds .mb-rail__link--locked:hover {
+  border-color: var(--n-4);
+  background: var(--n-1);
+}
+
+.gpds .mb-rail__lock {
+  flex: none;
+  color: var(--n-7);
+}
+
+/* The reason, on the row itself. Text rather than a `title` tooltip, which is
+   unreadable on a phone and invisible to touch. */
+.gpds .mb-rail__why {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--n-8);
+}
+
+/* The part screen she reached by URL. */
+.gpds .mb-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+  max-width: 46ch;
+  margin: var(--s-6) 0;
+  padding: var(--s-6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+}
+
+.gpds .mb-locked__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--n-2);
+  color: var(--n-8);
+}
+
+.gpds .mb-locked__h {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--n-11);
+}
+
+.gpds .mb-locked__p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--n-9);
+}
+
+/* The only thing here to press, so it is the only thing that looks pressable. */
+.gpds .mb-locked__go {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--s-2) var(--s-4);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+/* ── something a channel proposed, waiting on her yes or no ─────────────────
+ * On the row that asks the question, because that is where the question is.
+ * These were answered on a separate queue until it was removed, after which
+ * they were still written and still counted and could not be accepted at all.
+ *
+ * NOT AN ALERT. Nothing is wrong and neither answer is the dangerous one, so
+ * there is no warning colour and no icon — a quiet inset that says where the
+ * value came from, what it says, and her own words behind it.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+.gpds .mb-prop {
+  margin: var(--s-2) 0 0;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--n-1);
+}
+
+/* Where it came from. Mono, like every other provenance line on this page. */
+.gpds .mb-prop__from {
+  margin: 0 0 var(--s-1);
+  font-size: 11px;
+  color: var(--n-8);
+}
+
+.gpds .mb-prop__val {
+  font-size: 14px;
+  color: var(--n-11);
+}
+
+/* Her own sentence, which is what makes "yes" answerable — she is agreeing
+   with a reading of something she said, not with a value from nowhere. */
+.gpds .mb-prop__heard {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--n-9);
+}
+
+.gpds .mb-prop__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin: var(--s-3) 0 0;
+}
+
+/* "No, leave it" is a real answer, not a destructive one — the row keeps what
+   it already had. So it reads as the quieter of a pair, never as a warning. */
+.gpds .mb-prop__no {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--n-9);
+}
+
+.gpds .mb-prop__no:hover:not(:disabled) {
+  color: var(--n-11);
+}
+
+.gpds .mb-prop__no:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* The button says "Parsing…" and this turns beside it. Motion only — the words
+   carry the meaning, so a reader who has reduced motion loses nothing. */
+.gpds .mb-spin {
+  flex: none;
+  margin-right: var(--s-2);
+  animation: mb-spin 900ms linear infinite;
+}
+
+@keyframes mb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds .mb-spin {
+    animation: none;
+  }
+}
+
+/* The send button holds a glyph and a word now, so it has to lay them out. */
+.gpds .mb-say__send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

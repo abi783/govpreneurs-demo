@@ -1,11 +1,27 @@
-// Knowledge Hub — in-memory store layered on top of knowledgeBase events.
-// Models simulated connector sync, file processing, conflicts, and gap prompts.
-// Demo only — no real OAuth, no persistence; resets on reload.
+// Knowledge Hub — the view the Knowledge tab reads, built on the one list of files in
+// knowledgeBase.ts. DEMO: nothing here is a separate copy. Sources and files come from
+// the knowledge store; "Needs your eye" and "Still missing" come from the Business
+// Profile fields, so fixing a field anywhere fixes it here too.
 
-import { useSyncExternalStore } from "react";
-import { bus } from "./eventBus";
+import { useMemo } from "react";
+import {
+  beginConnect,
+  beginSync,
+  disconnectSource as disconnectBase,
+  finishConnect,
+  removeFile as removeBase,
+  syncSource,
+  useKnowledge,
+  type ConnectorId,
+  type KnowledgeSource,
+} from "./knowledgeBase";
+import { wait } from "../demo/profile/delay";
+import { FIELD_DEFS, effectiveField } from "../demo/profile/fields";
+import { patchField, useFieldOverrides } from "../demo/profile/store";
+import { usePastPerformance } from "../demo/profile/pastPerformance";
+import { fmtShort } from "../demo/profile/dates";
 
-export type SourceId = "gdrive" | "gdocs" | "dropbox";
+export type SourceId = ConnectorId;
 export type SourceStatus = "not-connected" | "connecting" | "connected";
 
 export interface HubSource {
@@ -25,212 +41,154 @@ export interface HubFile {
   status: FileStatus;
   // Concrete value moment — what Hunter pulled out of this file.
   filledFields: string[];
+  source: KnowledgeSource;
 }
 
 export interface HubConflict {
   id: string;
-  field: string;            // human-readable label
+  field: string; // human-readable label
   docValue: string;
   profileValue: string;
   sourceFileName: string;
+  /** The profile field that holds this fact. */
+  fieldId: string;
 }
 
 export interface MissingItem {
   key: string;
-  label: string;            // matches readiness "Could match better with…" copy
+  label: string; // matches readiness "Could match better with…" copy
+  /** The Business Profile tab where the visitor adds it. */
+  tab: "identity" | "certifications" | "past-performance" | "positioning";
 }
 
-interface HubState {
+export interface HubState {
   sources: Record<SourceId, HubSource>;
   files: HubFile[];
   conflicts: HubConflict[];
   missing: MissingItem[];
 }
 
-const now = () => new Date().toISOString();
-const hoursAgo = (h: number) =>
-  new Date(Date.now() - h * 3600_000).toISOString();
-
-function seed(): HubState {
-  return {
-    sources: {
-      gdrive: {
-        id: "gdrive",
-        label: "Google Drive",
-        status: "connected",
-        syncedAt: hoursAgo(2),
-        filesUsed: 4,
-      },
-      gdocs: {
-        id: "gdocs",
-        label: "Google Docs",
-        status: "not-connected",
-        syncedAt: null,
-        filesUsed: 0,
-      },
-      dropbox: {
-        id: "dropbox",
-        label: "Dropbox",
-        status: "not-connected",
-        syncedAt: null,
-        filesUsed: 0,
-      },
-    },
-    files: [
-      {
-        id: "f_capstmt",
-        name: "Capability Statement v2.pdf",
-        ext: "pdf",
-        status: "read",
-        filledFields: ["NAICS", "past projects", "certifications"],
-      },
-      {
-        id: "f_sam",
-        name: "SAM Registration.pdf",
-        ext: "pdf",
-        status: "read",
-        filledFields: ["UEI", "CAGE", "registration expiry"],
-      },
-      {
-        id: "f_ftbragg",
-        name: "Fort Bragg job photos.zip",
-        ext: "zip",
-        status: "processing",
-        filledFields: [],
-      },
-    ],
-    conflicts: [
-      {
-        id: "c_bonding",
-        field: "Bonding capacity",
-        docValue: "$2M",
-        profileValue: "$1M",
-        sourceFileName: "Capability Statement v2.pdf",
-      },
-    ],
-    // Mirror ReadinessHeader's COULD_HELP_DEFAULT phrasing.
-    missing: [
-      { key: "dsbs", label: "a DSBS profile export" },
-      { key: "cpars", label: "past-performance references (CPARS)" },
-    ],
-  };
-}
-
-let state: HubState = seed();
-
-function commit(next: HubState) {
-  state = next;
-  bus.publish("knowledge");
-}
-
-const snapshot = (): HubState => state;
-
-export function useKnowledgeHub(): HubState {
-  return useSyncExternalStore(
-    (cb) => bus.subscribe("knowledge", cb),
-    snapshot,
-    snapshot,
-  );
-}
-
-// ─── actions ──────────────────────────────────────────────────────────
-
-export function simulateConnect(id: SourceId) {
-  const src = state.sources[id];
-  if (src.status === "connected" || src.status === "connecting") return;
-
-  commit({
-    ...state,
-    sources: { ...state.sources, [id]: { ...src, status: "connecting" } },
-  });
-
-  window.setTimeout(() => {
-    const cur = state.sources[id];
-    if (cur.status !== "connecting") return;
-    const filesUsed = id === "gdrive" ? 4 : id === "gdocs" ? 3 : 2;
-    commit({
-      ...state,
-      sources: {
-        ...state.sources,
-        [id]: { ...cur, status: "connected", syncedAt: now(), filesUsed },
-      },
-    });
-  }, 850);
-}
-
-export function simulateSync(id: SourceId) {
-  const src = state.sources[id];
-  if (src.status !== "connected") return;
-  commit({
-    ...state,
-    sources: { ...state.sources, [id]: { ...src, status: "connecting" } },
-  });
-  window.setTimeout(() => {
-    commit({
-      ...state,
-      sources: {
-        ...state.sources,
-        [id]: { ...src, status: "connected", syncedAt: now() },
-      },
-    });
-  }, 650);
-}
-
-export function disconnectSource(id: SourceId) {
-  commit({
-    ...state,
-    sources: {
-      ...state.sources,
-      [id]: {
-        ...state.sources[id],
-        status: "not-connected",
-        syncedAt: null,
-        filesUsed: 0,
-      },
-    },
-  });
-}
+const LABELS: Record<SourceId, string> = { gdrive: "Google Drive", gdocs: "Google Docs", dropbox: "Dropbox" };
 
 function inferExt(name: string): HubFile["ext"] {
   const ext = name.split(".").pop()?.toLowerCase() ?? "";
   if (ext === "pdf") return "pdf";
   if (ext === "doc" || ext === "docx") return "docx";
   if (ext === "zip") return "zip";
-  if (["png", "jpg", "jpeg", "webp"].includes(ext)) return "image";
+  if (["png", "jpg", "jpeg", "webp", "gif"].includes(ext)) return "image";
   return "other";
 }
 
-export function simulateUpload(name: string) {
-  const id = `f_${Math.random().toString(36).slice(2, 9)}`;
-  const file: HubFile = {
-    id,
-    name,
-    ext: inferExt(name),
-    status: "processing",
-    filledFields: [],
-  };
-  commit({ ...state, files: [file, ...state.files] });
+/** The SAM file that holds the mailing address the conflict is about. */
+const SAM_FILE_NAME = "SAM.gov registration — active.pdf";
 
-  window.setTimeout(() => {
-    commit({
-      ...state,
-      files: state.files.map((f) =>
-        f.id === id ? { ...f, status: "read" } : f,
-      ),
-    });
-  }, 1200);
+export function useKnowledgeHub(): HubState {
+  const knowledge = useKnowledge();
+  const overrides = useFieldOverrides();
+  const pp = usePastPerformance();
+
+  return useMemo<HubState>(() => {
+    const ids: SourceId[] = ["gdrive", "gdocs", "dropbox"];
+    const sources = Object.fromEntries(
+      ids.map((id) => {
+        const c = knowledge.connectors[id];
+        const status: SourceStatus = c.connecting ? "connecting" : c.connected ? "connected" : "not-connected";
+        return [
+          id,
+          {
+            id,
+            label: LABELS[id],
+            status,
+            syncedAt: c.connected ? (c.connectedAt ?? null) : null,
+            filesUsed: c.connected ? knowledge.files.filter((f) => f.connectorId === id).length : 0,
+          } satisfies HubSource,
+        ];
+      }),
+    ) as Record<SourceId, HubSource>;
+
+    const files: HubFile[] = knowledge.files.map((f) => ({
+      id: f.id,
+      name: f.name,
+      ext: inferExt(f.name),
+      status: f.status,
+      filledFields: f.filledFields,
+      source: f,
+    }));
+
+    // "Needs your eye": a profile fact that a document and the profile say differently.
+    const conflicts: HubConflict[] = [];
+    const mailing = FIELD_DEFS["mailing-address"];
+    const m = effectiveField(mailing, overrides);
+    if (m.state === "conflict" && mailing.conflict && mailing.conflict.length >= 2) {
+      conflicts.push({
+        id: "c_mailing",
+        fieldId: mailing.id,
+        field: "Mailing address",
+        docValue: mailing.conflict[0].value,
+        profileValue: mailing.conflict[1].value,
+        sourceFileName: SAM_FILE_NAME,
+      });
+    }
+
+    // "Still missing": things Hunter matches better with. Each leaves when it is filled in.
+    const missing: MissingItem[] = [];
+    const state = (id: string) => effectiveField(FIELD_DEFS[id], overrides).state;
+    if (state("dsbs") === "missing") {
+      missing.push({ key: "dsbs", label: "a DSBS profile (so federal buyers can find you)", tab: "certifications" });
+    }
+    if (pp.some((e) => e.cpars === "Awaiting rating")) {
+      const w = pp.find((e) => e.cpars === "Awaiting rating")!;
+      missing.push({
+        key: "cpars",
+        label: `the performance rating (CPARS) for your ${w.customer.split(" ")[0]} job`,
+        tab: "past-performance",
+      });
+    }
+    if (state("ein") === "missing") {
+      missing.push({ key: "ein", label: "your EIN, for invoices and tax forms", tab: "identity" });
+    }
+    if (state("win-themes") === "missing") {
+      missing.push({ key: "win-themes", label: "your win themes, so Ava drafts in your voice", tab: "positioning" });
+    }
+
+    return { sources, files, conflicts, missing };
+  }, [knowledge, overrides, pp]);
+}
+
+// ─── actions ──────────────────────────────────────────────────────────
+
+export async function simulateConnect(id: SourceId) {
+  beginConnect(id);
+  await wait(850);
+  finishConnect(id);
+}
+
+export async function simulateSync(id: SourceId) {
+  beginSync(id);
+  await wait(650);
+  syncSource(id);
+}
+
+export function disconnectSource(id: SourceId) {
+  disconnectBase(id);
 }
 
 export function removeFile(id: string) {
-  commit({ ...state, files: state.files.filter((f) => f.id !== id) });
+  removeBase(id);
 }
 
-export function resolveConflict(id: string, _choice: "doc" | "profile") {
-  commit({ ...state, conflicts: state.conflicts.filter((c) => c.id !== id) });
-}
-
-export function dismissMissing(key: string) {
-  commit({ ...state, missing: state.missing.filter((m) => m.key !== key) });
+/** Keep the document's value (`doc`) or the profile's value (`profile`). The profile field is updated. */
+export function resolveConflict(id: string, choice: "doc" | "profile") {
+  if (id !== "c_mailing") return;
+  const def = FIELD_DEFS["mailing-address"];
+  const pick = choice === "doc" ? def.conflict?.[0] : def.conflict?.[1];
+  if (!pick) return;
+  patchField(def.id, {
+    state: "attested",
+    value: pick.value,
+    source: `You chose this in your knowledge hub on ${fmtShort(new Date())}`,
+    at: new Date().toISOString(),
+  });
 }
 
 // ─── formatting helper ────────────────────────────────────────────────

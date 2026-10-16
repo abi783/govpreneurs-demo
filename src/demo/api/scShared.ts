@@ -5,7 +5,8 @@
 import type { DemoRouteDef } from "../runtime/router";
 import { getWalletBalance } from "../state/wallet";
 import { homeUpload } from "./scHome";
-import { roadmapUpload } from "./scRoadmap";
+import { roadmapUpload, roadmapVerify, ROADMAP_VERIFY_KEYS } from "./scRoadmap";
+import { storeMedia, verify as businessVerify } from "../sc/business/ops";
 
 const P = "/api/portal/:locationId";
 
@@ -28,9 +29,30 @@ export const routes: DemoRouteDef[] = [
     // One upload address, several pages: the form's `type` field says which.
     method: "POST",
     path: `${P}/upload`,
-    handler: (ctx) => {
+    handler: async (ctx) => {
       const type = ctx.body instanceof FormData ? String(ctx.body.get("type") ?? "") : "";
-      return type === "contact" || type === "logo" ? homeUpload(ctx) : roadmapUpload(ctx);
+      if (type === "contact" || type === "logo") {
+        // The photo and logo show on Success Center home and in My Business: keep both in step.
+        await storeMedia(ctx.body);
+        return homeUpload(ctx);
+      }
+      return roadmapUpload(ctx);
+    },
+  },
+  {
+    // One check address for the Roadmap, Tasks and My Business. The key says whose check it is.
+    method: "POST",
+    path: `${P}/verify`,
+    handler: async (ctx) => {
+      const key = String(ctx.body?.validationKey ?? "");
+      const action = String(ctx.body?.action ?? "");
+      if (key === "digital_compliance_intake") {
+        // Both pages show the audit: record it in both, answer with My Business's fuller result.
+        await roadmapVerify(ctx);
+        return businessVerify(ctx.body);
+      }
+      if (ROADMAP_VERIFY_KEYS.includes(key) && !(key === "llc" && action === "confirm")) return roadmapVerify(ctx);
+      return businessVerify(ctx.body);
     },
   },
 ];

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, Check, Pencil, X } from "lucide-react";
-import type { CurrentMember } from "../../lib/mock/currentMember";
+import type { CapFacts } from "../../lib/capStatementBuilder";
 import type { KnowledgeSource } from "../../lib/knowledgeBase";
+import { fmtMoneyShort, fmtUsd } from "../../demo/profile/dates";
 
 export type FactKey =
   | "company"
@@ -23,15 +24,16 @@ interface SourceFact {
   editable?: boolean;
 }
 
-function pickFacts(m: CurrentMember, knowledge: KnowledgeSource[]): SourceFact[] {
-  const hasPastProjects = knowledge.some((f) => f.name.toLowerCase().includes("past projects"));
-  const hasInsurance = knowledge.some((f) => f.name.toLowerCase().includes("insurance"));
-  const hasLicense = knowledge.some((f) => f.name.toLowerCase().includes("nc gc license"));
+// DEMO: every fact comes from the profile (the story plus the visitor's changes).
+function pickFacts(m: CapFacts, knowledge: KnowledgeSource[]): SourceFact[] {
+  const samFile = knowledge.find((f) => f.name.toLowerCase().includes("sam.gov registration"));
+  const jobs = m.pastPerformance;
+  const biggest = jobs.reduce((n, e) => Math.max(n, e.value), 0);
   return [
     {
       key: "company",
       label: "Company",
-      value: `${m.businessName} · ${m.hqCity}, ${m.hqState}`,
+      value: `${m.businessName} · ${m.city}, ${m.state}`,
       source: "Profile · Identity",
       editable: true,
     },
@@ -39,53 +41,45 @@ function pickFacts(m: CurrentMember, knowledge: KnowledgeSource[]): SourceFact[]
       key: "uei_cage",
       label: "UEI / CAGE",
       value: m.uei && m.cage ? `${m.uei} · ${m.cage}` : null,
-      source: "SAM.gov",
+      source: samFile ? samFile.name : "SAM.gov",
       missingTab: "identity",
     },
     {
       key: "naics",
       label: "Primary NAICS",
-      value: `${m.primaryNaics} — ${m.naicsDescription}`,
+      value: `${m.primaryNaics} — ${m.primaryNaicsLabel}`,
       source: "SAM.gov",
     },
     {
       key: "past_performance",
       label: "Past performance",
-      value: hasPastProjects
-        ? `${m.pastPerformanceCount} commercial roofing projects · up to $890K`
-        : `${m.pastPerformanceCount} projects in your profile`,
-      source: hasPastProjects
-        ? "Williams Construction — Past Projects.docx"
-        : "Profile · Past Performance",
-      editable: true,
+      value: jobs.length ? `${jobs.length} jobs in your profile · up to ${fmtMoneyShort(biggest)}` : null,
+      source: "Profile · Past Performance",
+      missingTab: "past-performance",
+      editable: jobs.length > 0,
     },
     {
       key: "bonding",
-      label: "Bonding capacity",
-      value: hasInsurance ? "Up to ~$890K per contract" : null,
-      source: hasInsurance ? "Insurance & Bonding.pdf" : "Add to knowledge base",
-      editable: hasInsurance,
+      label: "Bonding",
+      value: `Largest bond carried: ${fmtUsd(m.largestBond)}`,
+      source: "Profile · Bidder Profile",
+      editable: true,
     },
     {
       key: "certifications",
       label: "Certifications",
       value:
-        [
-          m.samBusinessTypes.includes("sdvosb_eligible") ? "SDVOSB-eligible" : null,
-          hasLicense ? "NC GC license (active)" : null,
-        ]
-          .filter(Boolean)
-          .join(" · ") || null,
-      source: hasLicense ? "NC GC License.pdf · Profile" : "Profile · Certifications",
+        [...m.certifications, `${m.foodHandlers} of ${m.employees} staff food-handler certified`].join(" · ") || null,
+      source: "Profile · Certifications",
       editable: true,
     },
     {
       key: "differentiators",
       label: "Differentiators",
-      value:
-        "Fort Bragg-area focus · 15+ yrs commercial roofing · 300-mile mobilization radius",
+      value: m.differentiators.join(" · ") || null,
       source: "Profile · Capabilities",
-      editable: true,
+      missingTab: "capabilities",
+      editable: m.differentiators.length > 0,
     },
     {
       key: "target_work",
@@ -108,7 +102,7 @@ export function SourceFactsList({
   confirmed,
   onConfirmedChange,
 }: {
-  member: CurrentMember;
+  member: CapFacts;
   knowledge: KnowledgeSource[];
   overrides: FactOverrides;
   onOverrideChange: (key: FactKey, value: string | null) => void;
@@ -192,6 +186,7 @@ export function SourceFactsList({
                   value={draft}
                   rows={Math.max(2, draft.split("\n").length)}
                   onChange={(e) => setDraft(e.target.value)}
+                  aria-label={`Edit ${f.label}`}
                   autoFocus
                 />
                 <div className="cs-fact-edit-actions">

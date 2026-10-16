@@ -5,6 +5,7 @@ import { ConnectedSourcesList } from "../../Knowledge/ConnectedSourcesList";
 import { YourFilesList } from "../../Knowledge/YourFilesList";
 import { ConflictCallout } from "../../Knowledge/ConflictCallout";
 import { StillMissing } from "../../Knowledge/StillMissing";
+import { WhatWeLearned } from "../../Knowledge/WhatWeLearned";
 
 export function KnowledgeTab() {
   return (
@@ -20,12 +21,13 @@ export function KnowledgeTab() {
       <IntroStrip />
       <ConnectedSourcesList />
       <YourFilesList />
+      <WhatWeLearned />
       <ConflictCallout />
       <StillMissing />
 
       <div className="kh-tab-foot">
         <Link to="/cap-statement/builder" className="kh-tab-foot-link">
-          Don't have a capability statement yet? Build it with Ava
+          Want a fresh capability statement? Build it with Ava
           <ArrowUpRight size={13} />
         </Link>
       </div>

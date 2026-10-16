@@ -341,30 +341,6 @@ export const routes: DemoRouteDef[] = [
   // ── Member-run checks ─────────────────────────────────────────────────────
   {
     method: "POST",
-    path: `${P}/verify`,
-    handler: (ctx) => {
-      const b = ctx.body as {
-        validationKey?: string;
-        inputs?: Record<string, unknown>;
-        action?: string;
-      } | null;
-      const key = b?.validationKey ?? "";
-      if (key === "digital_compliance_intake") {
-        const inputs = Object.fromEntries(
-          Object.entries(b?.inputs ?? {}).map(([k, v]) => [k, String(v ?? "")]),
-        );
-        setForm(key, { inputs, submittedAt: new Date().toISOString() });
-        return { result: { status: "pass", message: "We have your answers.", data: {} } };
-      }
-      if (!VERIFY_KEYS.includes(key as VerifyKey))
-        return demoResponse(400, { error: "Unknown check." });
-      const result = runVerification(key as VerifyKey, b?.inputs ?? {});
-      setVerification(key, result);
-      return { result: { status: result.status, message: result.message, data: result.data } };
-    },
-  },
-  {
-    method: "POST",
     path: `${P}/verify-reset`,
     handler: (ctx) => {
       const key = (ctx.body as { validationKey?: string } | null)?.validationKey ?? "";
@@ -414,3 +390,28 @@ export const roadmapUpload = (ctx: DemoRequestContext) => {
       setUpload(kind, saved);
       return { url, name: file.name };
     };
+
+
+/** Roadmap checks (llc, sam, sbs, capability, sled, cmmc, digital compliance). Dispatched from scShared.ts. */
+export const roadmapVerify = (ctx: DemoRequestContext) => {
+      const b = ctx.body as {
+        validationKey?: string;
+        inputs?: Record<string, unknown>;
+        action?: string;
+      } | null;
+      const key = b?.validationKey ?? "";
+      if (key === "digital_compliance_intake") {
+        const inputs = Object.fromEntries(
+          Object.entries(b?.inputs ?? {}).map(([k, v]) => [k, String(v ?? "")]),
+        );
+        setForm(key, { inputs, submittedAt: new Date().toISOString() });
+        return { result: { status: "pass", message: "We have your answers.", data: {} } };
+      }
+      if (!VERIFY_KEYS.includes(key as VerifyKey))
+        return demoResponse(400, { error: "Unknown check." });
+      const result = runVerification(key as VerifyKey, b?.inputs ?? {});
+      setVerification(key, result);
+      return { result: { status: result.status, message: result.message, data: result.data } };
+    };
+
+export const ROADMAP_VERIFY_KEYS: readonly string[] = VERIFY_KEYS;

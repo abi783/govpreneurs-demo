@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { API_BASE_URL, apiFetch } from "./api";
 import { useGhlUser } from "./ghlUser";
+import { subscribeDemoState } from "../demo/runtime/store";
 
 /**
  * Real business profile returned by `GET /business-profile?locationId=`.
@@ -150,6 +151,23 @@ export function weightingDimensions(profile: BusinessProfile): {
   return { scopeFit: naicsLabelsFor(profile), location, certEligibility };
 }
 
+// DEMO: the profile the app shows follows what the visitor changes on the Business
+// Profile page (a legal name, an EIN, a new capability statement). This counter goes
+// up on each change, and the provider loads the profile again.
+function useProfileStoreVersion(): number {
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setVersion((v) => v + 1);
+    const offFields = subscribeDemoState("profile.fields", bump);
+    const offCap = subscribeDemoState("profile.capStatement", bump);
+    return () => {
+      offFields();
+      offCap();
+    };
+  }, []);
+  return version;
+}
+
 /** Fetches the caller's real business profile. `locationId` is server-derived
  *  in prod (via the GHL token) and overridden by `?locationId=` in mock/staging. */
 export async function fetchBusinessProfile(locationId: string): Promise<BusinessProfile> {
@@ -180,6 +198,7 @@ export function BusinessProfileProvider({ children }: { children: ReactNode }) {
   // "no profile" CTA during the initial fetch (avoids a flash before data).
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const version = useProfileStoreVersion();
 
   useEffect(() => {
     const locationId = session?.locationId;
@@ -188,7 +207,8 @@ export function BusinessProfileProvider({ children }: { children: ReactNode }) {
       return;
     }
     let cancelled = false;
-    setLoading(true);
+    // DEMO: a reload after a change keeps what is on screen; only the first load shows loading.
+    if (version === 0) setLoading(true);
     setError(null);
     fetchBusinessProfile(locationId)
       .then((p) => {
@@ -203,7 +223,7 @@ export function BusinessProfileProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [session?.locationId]);
+  }, [session?.locationId, version]);
 
   // Keep consumers in a loading state while the GHL session itself is still
   // resolving, so the "no profile" CTA never flashes before we can fetch.

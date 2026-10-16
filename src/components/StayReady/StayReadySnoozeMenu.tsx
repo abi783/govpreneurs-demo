@@ -27,6 +27,7 @@ export function StayReadySnoozeMenu({ itemId }: { itemId: string }) {
             <button
               key={o.days}
               type="button"
+              role="menuitem"
               className="sr-snooze-opt"
               onClick={() => {
                 snoozeItem(itemId, o.days);
