@@ -11973,3 +11973,8 @@ button.ava-p3b-m--blank {
     scroll-margin-bottom: 130px;
   }
 }
+
+/* A number typed into the address bar can be as long as anyone likes: it wraps. */
+.ava-notfound .mono {
+  overflow-wrap: anywhere;
+}

@@ -14,7 +14,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Bell, BellOff, Check, FileUp } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Check, FileUp, List } from "lucide-react";
 import { AgentAvatar } from "../Companion/AgentAvatar";
 import {
   AgentMsg,
@@ -134,7 +134,7 @@ export function HandoffView({ opp }: { opp: AvaOpportunity }) {
           </p>
         </div>
         <Link to="/ava" className="btn btn-ghost btn-sm ava2-top__bids">
-          Your bids
+          <List size={16} aria-hidden /> Your bids
         </Link>
         <div
           className={`ava2-top__days${dueOpen ? " is-open" : ""}`}
