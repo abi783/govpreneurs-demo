@@ -28,7 +28,7 @@ import {
   stateOptions,
   type ForecastSort,
 } from "@/lib/forecasts/filters";
-import { isPastGrace, matchesSearch, FORECASTS_TODAY } from "@/lib/forecasts/engine";
+import { byBestFit, isPastGrace, matchesSearch, FORECASTS_TODAY } from "@/lib/forecasts/engine";
 import type { ForecastWatchEvent, ForecastWatchForecast } from "@/lib/forecasts/watch";
 import type { ForecastGrantMessage } from "@/lib/forecasts/grantChatApi";
 import {
@@ -142,9 +142,17 @@ function listForecasts(query: URLSearchParams): ForecastListResponseDto {
 
   const matching = afterDrawer.filter((r) => inTab(r, tab));
   const sortKey = sortOf(view, query.get("sort"));
-  const ordered = sortForecasts(matching.map((r) => r.scored), sortKey);
-  const rowById = new Map(matching.map((r) => [r.scored.id, r]));
-  const pageRows = ordered.slice((page - 1) * limit, page * limit).map((s) => rowById.get(s.id) as ScoredRow);
+  // Best match orders by the member's match score (Hunter's own), then by the engine's fit.
+  const ordered: ScoredRow[] =
+    sortKey === "match"
+      ? [...matching].sort(
+          (a, b) => (b.match?.finalScore ?? -1) - (a.match?.finalScore ?? -1) || byBestFit(a.scored, b.scored),
+        )
+      : (() => {
+          const byId = new Map(matching.map((r) => [r.scored.id, r]));
+          return sortForecasts(matching.map((r) => r.scored), sortKey).map((s) => byId.get(s.id) as ScoredRow);
+        })();
+  const pageRows = ordered.slice((page - 1) * limit, page * limit);
 
   const response: ForecastListResponseDto = {
     member: FORECAST_MEMBER,

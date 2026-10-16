@@ -120,7 +120,7 @@ function tierOf(score: number): ForecastMatchRead["tier"] {
 }
 
 /** Hunter's own score for the forecast the story points at: the incumbent partner makes it a team bid worth chasing. */
-const SCORE_OVERRIDE: Record<string, number> = { [FORT_BRAGG_FORECAST_KEY]: 93 };
+const SCORE_OVERRIDE: Record<string, number> = { [FORT_BRAGG_FORECAST_KEY]: 100 };
 
 export interface ScoredRow {
   record: ForecastRecordDto;

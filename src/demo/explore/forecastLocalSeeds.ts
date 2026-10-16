@@ -197,7 +197,7 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
       "The Child Nutrition committee asked staff to prepare a request for proposals for the 2027 summer meals program: breakfast and lunch at nine sites for about 11 weeks, about 1,100 meals a day, meeting USDA meal-pattern rules.",
     sourceId: null,
     postedDaysAgo: 14,
-    expectedInDays: 95,
+    expectedInDays: 40,
     agencyName: "Cumberland County Board of Education",
     agencyAbbr: null,
     naicsCode: "722310",
