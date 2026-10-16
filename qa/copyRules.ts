@@ -13,7 +13,7 @@ export const COPY_RULES: { rule: string; pattern: RegExp }[] = [
   },
   {
     rule: "not US English",
-    pattern: /\b(centres?|licences?|labelled|prioriti[sz]es?|colour\w*|organis(?:e|es|ed|ation)|fortnight|programme)\b/i,
+    pattern: /\b(centres?|licences?|labelled|prioritis(?:e|es|ed|ing)|colour\w*|organis(?:e|es|ed|ation)|fortnight|programme)\b/i,
   },
   {
     rule: "reads as unfinished",
