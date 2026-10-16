@@ -11954,3 +11954,22 @@ button.ava-p3b-m--blank {
     order: 5;
   }
 }
+
+/* Stacked (below 1100px): the page scrolls as one, so the talk box would sit far
+   below the conversation. It stays at the bottom of the window while the chat is
+   on screen, so a visitor can always type to Ava. */
+@media (max-width: 1100px) {
+  .ava2-work {
+    overflow: visible;
+  }
+  .ava2-talk__composer {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    background: var(--surface);
+  }
+  /* The newest message comes into view above the talk box, never under it. */
+  .ava2-talk .ava2-thread {
+    scroll-margin-bottom: 130px;
+  }
+}
