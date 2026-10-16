@@ -26,6 +26,7 @@ import { usePostHog } from "posthog-js/react";
 import { API_BASE_URL } from "../../lib/api";
 import { useGhlUser } from "../../lib/ghlUser";
 import { JargonGloss } from "../Hunter/JargonGloss";
+import "../Grant/grant-demo.css";
 
 /** Icon per Key-information label (matches the labels from buildKeyInfo). */
 const KEY_INFO_ICONS: Record<string, LucideIcon> = {
@@ -71,19 +72,13 @@ function ContactGrid({ contact }: { contact: ContactInfo }) {
           <span className="key-info__label">Phone</span>
         </dt>
         <dd className="key-info-value">
-          {(() => {
-            const phone = contact.phone?.trim();
-            if (!phone) return <span className="key-info-value--muted">Not listed on the notice</span>;
-            const digits = phone.replace(/[^\d]/g, "");
-            // A placeholder-scrubbed value ("NA") has no dialable digits — show it as plain text.
-            return digits ? (
-              <a className="contact-link contact-link--mono" href={`tel:${digits}`}>
-                {phone}
-              </a>
-            ) : (
-              <span>{phone}</span>
-            );
-          })()}
+          {/* DEMO: the contact is a made-up person. A tel: link would open a phone app, so
+              the number is plain text. */}
+          {contact.phone?.trim() ? (
+            <span className="contact-link contact-link--mono contact-link--plain">{contact.phone.trim()}</span>
+          ) : (
+            <span className="key-info-value--muted">Not listed on the notice</span>
+          )}
         </dd>
       </div>
       <div className="key-info-row">
@@ -93,9 +88,7 @@ function ContactGrid({ contact }: { contact: ContactInfo }) {
         </dt>
         <dd className="key-info-value">
           {contact.email?.trim() ? (
-            <a className="contact-link" href={`mailto:${contact.email}`}>
-              {contact.email}
-            </a>
+            <span className="contact-link contact-link--plain">{contact.email}</span>
           ) : (
             <span className="key-info-value--muted">Not listed on the notice</span>
           )}

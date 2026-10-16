@@ -2,7 +2,6 @@
 // (PRD 96 §3, §11.2). A hard fail fills and dominates — no pillar theater on a
 // job the firm legally cannot bid. Hard gates never sell (§12.6): an unclosable
 // block offers only the exit, never a service.
-import { ArrowRight } from "lucide-react";
 import type {
   GateLight,
   GateStrip as GateStripT,
@@ -44,11 +43,11 @@ function LightRow({
       </p>
       {light.blocker ? (
         light.blocker.closableInWindow ? (
-          <a className="grant-light__unlock" href="#">
+          // DEMO: this was a link to "#" that did nothing. It is plain text now.
+          <p className="grant-light__unlock-note">
             {light.blocker.unlockPath}{" "}
             <span className="grant-light__time mono">{light.blocker.timeToClear}</span>
-            <ArrowRight size={14} strokeWidth={2} aria-hidden />
-          </a>
+          </p>
         ) : (
           <p className="grant-light__noexit">Not something you can clear this cycle.</p>
         )

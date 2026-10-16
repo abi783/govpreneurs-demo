@@ -8,6 +8,7 @@ import {
   HandCoins,
   Package,
   Send,
+  Sparkles,
   Zap,
 } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
@@ -59,6 +60,8 @@ import { summaryCaption, summaryText } from "../lib/summaryProvenance";
 import { JargonGloss } from "../components/Hunter/JargonGloss";
 import { matchTierToVerdict, scoreToVerdict, type Verdict } from "../lib/verdict";
 import { TIER_MAP, type DiscoverTier } from "../lib/discoverMapper";
+// DEMO: the story knows which opportunities Ava builds. The header action reads it.
+import { getOpportunity as getStoryOpportunity } from "../demo/story/opportunities";
 
 export const Route = createFileRoute("/opportunities/$noticeId")({
   head: () => ({
@@ -347,7 +350,11 @@ function OpportunityDetailContent() {
   // the member or the opportunity changes.
   const [metGrant, setMetGrant] = useState(false);
   useEffect(() => {
-    setMetGrant(hasMetGrant(session?.locationId, noticeId));
+    // DEMO: `?met=1` passes the introduction without remembering it. The QA crawl
+    // uses it, because the crawl clears storage before every load and would
+    // otherwise only ever see the introduction.
+    const skip = new URLSearchParams(window.location.search).get("met") === "1";
+    setMetGrant(skip || hasMetGrant(session?.locationId, noticeId));
   }, [session?.locationId, noticeId]);
   // Stable "today" for the live deadline countdown — computed once so the
   // GrantCanvas deadline memo doesn't churn on every render (day-granularity, so
@@ -691,6 +698,17 @@ function OpportunityDetailContent() {
 
   const mentorPill = mentorPillFromStatus(sentStatus);
 
+  // DEMO: Ava builds the bid. The header offers it where the story has Ava on the
+  // bid, or where Grant says Bid as the prime. Fort Bragg dining is a Bid as a
+  // subcontractor, so its next move is Partners and the header has no Ava action.
+  const story = getStoryOpportunity(noticeId);
+  const avaHref =
+    story && (story.ava || (story.grant.verdict === "bid" && story.grant.prime === "go"))
+      ? `/ava/${noticeId}`
+      : null;
+  const avaLabel = story?.ava?.kind === "reply" ? "Open your reply with Ava" : "Build this bid with Ava";
+  const mentorBtn = avaHref ? "btn btn-sm btn-secondary detail-actions__icon" : "btn btn-sm btn-primary detail-actions__icon";
+
   // "View in Mentor" — open this opp's specific mentor conversation. The Mentors
   // page is a DIFFERENT GHL custom-menu-link, and this app runs inside a GHL
   // iframe. Setting window.location.href here would load GHL *nested inside the
@@ -764,6 +782,11 @@ function OpportunityDetailContent() {
                 {/* The agency's own posting link lives at the bottom of the page
                     (EvidenceBlock's "Reference links" section) rather than up
                     here too — one place for it, not two. */}
+                {avaHref ? (
+                  <a className="btn btn-sm btn-primary detail-actions__icon opp-ava-btn" href={avaHref}>
+                    <Sparkles size={14} aria-hidden /> {avaLabel}
+                  </a>
+                ) : null}
                 {SHOW_SEND_TO_MENTOR &&
                   (hydrated && canSendToMentor && mentorPill ? (
                     <button
@@ -777,7 +800,7 @@ function OpportunityDetailContent() {
                     <span title={MENTOR_DEADLINE_TOO_CLOSE_MESSAGE}>
                       <button
                         type="button"
-                        className="btn btn-sm btn-primary detail-actions__icon"
+                        className={mentorBtn}
                         disabled
                       >
                         <Send size={14} /> Review with Mentor
@@ -786,7 +809,7 @@ function OpportunityDetailContent() {
                   ) : hydrated && canSendToMentor ? (
                     <button
                       type="button"
-                      className="btn btn-sm btn-primary detail-actions__icon"
+                      className={mentorBtn}
                       onClick={handleSendClick}
                     >
                       <Send size={14} /> Review with Mentor
@@ -794,7 +817,7 @@ function OpportunityDetailContent() {
                   ) : hydrated ? (
                     <button
                       type="button"
-                      className="btn btn-sm btn-primary detail-actions__icon"
+                      className={mentorBtn}
                       onClick={() => setUpsellOpen(true)}
                     >
                       <Send size={14} /> Review with Mentor
@@ -862,7 +885,21 @@ function OpportunityDetailContent() {
               />
             )}
 
-            {oppAdapter && <OpportunityTimeline opp={oppAdapter} keyDates={opp?.keyDates ?? []} />}
+            {oppAdapter && (
+              <OpportunityTimeline
+                opp={oppAdapter}
+                keyDates={opp?.keyDates ?? []}
+                dueNoun={
+                  /sources sought/i.test(opp.noticeType)
+                    ? "reply"
+                    : /quote/i.test(opp.noticeType)
+                      ? "quote"
+                      : /invitation for bid/i.test(opp.noticeType)
+                        ? "bid"
+                        : "proposal"
+                }
+              />
+            )}
 
             {detail && (
               <EvidenceBlock

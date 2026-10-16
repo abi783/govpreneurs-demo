@@ -1,0 +1,169 @@
+/* DEMO: styles for the parts of Grant's take that the demo adds to production's page:
+   the "I would change this call if" list, the post-No-Bid roadmap, and the Ava action. */
+
+.gt-change__ifs {
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border-soft);
+}
+.gt-change__ifslabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.gt-change__ifs ul {
+  list-style: none;
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gt-change__ifs li {
+  position: relative;
+  padding-left: 1.1em;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.gt-change__ifs li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 2px;
+  background: var(--text-3);
+}
+
+/* Post-No-Bid roadmap: an ordered list of what to fix. */
+.gt-roadmap {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--warn-7);
+  background: var(--surface);
+}
+.gt-roadmap__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.gt-roadmap__item {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.gt-roadmap__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.gt-roadmap__n {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--warn-9);
+  background: var(--warn-2);
+}
+.gt-roadmap__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.gt-roadmap__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.gt-roadmap__line {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.gt-roadmap__label {
+  display: inline-block;
+  margin-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.gt-roadmap__body .btn {
+  margin-top: var(--s-2);
+}
+.gt-roadmap__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pos-9);
+}
+
+/* Header action: build this bid with Ava. */
+.opp-ava-btn {
+  gap: 6px;
+}
+
+.grant-light__unlock-note {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* A contact line that is text, not a link. It keeps the look of the contact grid. */
+.contact-link--plain {
+  color: var(--text);
+  text-decoration: none;
+  cursor: text;
+}
+
+/* "Show N more" under the strengths. */
+.gt-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-2);
+  padding: 4px 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-7);
+  cursor: pointer;
+}
+.gt-more:hover {
+  text-decoration: underline;
+}
+.gt-more__chev {
+  transition: transform var(--d-fast) var(--ease);
+}
+.gt-more__chev.is-open {
+  transform: rotate(90deg);
+}

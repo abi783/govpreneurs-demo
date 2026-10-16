@@ -54,6 +54,8 @@ export interface GrantTake {
   counts: { strengths: number; blockers: number; risks: number };
   changes: ChangeLine[];
   thesis: RichLine[];
+  /** DEMO: lines that say what would change the call. */
+  wouldChange: RichLine[];
   competitiveRisk: RichLine | null;
   next: { title: string; body: RichLine | null } | null;
 }
@@ -137,7 +139,8 @@ export function buildTake(
         kind: "strength",
         tone: "ok",
         title: itemTitle(plain(r.requirement)),
-        body: [t("You meet this requirement.")],
+        // DEMO: say what meets it ("Active until April 2027"), not the same line seven times.
+        body: [t(r.firmValue && r.firmValue !== "—" ? `${r.firmValue.replace(/\s*✓\s*$/, "").replace(/\.$/, "")}.` : "You meet this requirement.")],
         evidence: r.sourceClause ? [r.sourceClause] : undefined,
       })),
   ];
@@ -247,7 +250,8 @@ export function buildTake(
     tone: TONE[verdict.value],
     confidence: {
       level: verdict.confidence.level,
-      filled: DOTS[verdict.confidence.level],
+      // DEMO: a story review can light 4 of the 5 dots.
+      filled: Math.min(5, Math.max(1, verdict.confidence.dots ?? DOTS[verdict.confidence.level])),
       of: 5,
     },
     paths,
@@ -257,6 +261,7 @@ export function buildTake(
     counts,
     changes,
     thesis: verdict.headline ?? [],
+    wouldChange: verdict.wouldChange ?? [],
     competitiveRisk: verdict.competitiveRisk ?? null,
     next: action.primary ? { title: action.primary.label, body: action.rationale ?? null } : null,
   };

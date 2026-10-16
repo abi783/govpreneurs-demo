@@ -419,12 +419,16 @@ export interface VerdictCard {
   /** Diana evolution: typed warnings, each rendered in a distinct treatment (§C1). */
   warnings?: TypedWarning[];
   headline: RichLine[]; // 2–3 sentences, one bold clause each
+  /** DEMO: what would change the call, one condition per line ("If … I would move this to …"). */
+  wouldChange?: RichLine[];
   /** Diana evolution: the named primary competitive risk — replaces the win-% / "real
    *  shot". Rendered as "Your profile aligns with the stated evaluation factors and the
    *  historical award environment. Your primary competitive risk is [risk]." (§C3) */
   competitiveRisk?: RichLine;
   confidence: {
     level: "high" | "medium" | "low";
+    /** DEMO: how many of the five dots to light (1–5). The level alone gives 5, 3 or 1. */
+    dots?: number;
     openQuestions: number;
     remedy: RichLine; // "Answer the bonding one and I can call it."
     softCap?: Verdict; // "I can't call this above Review until I know your bonding" (§10)

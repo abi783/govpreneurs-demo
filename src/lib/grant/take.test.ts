@@ -39,7 +39,8 @@ describe("buildTake — bid verdict (fortBragg fixture)", () => {
 });
 
 describe("buildTake — capture-path go/no-go across every verdict.path value", () => {
-  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+  // The Camp Mackall field meals review has no blocking row, so the path alone decides.
+  const base = GRANT_FIXTURES["SP4701-26-Q-0021"](OPPORTUNITIES.find((o) => o.noticeId === "SP4701-26-Q-0021") ?? bidOpp);
 
   it('path "prime": both prime and sub are go — prime is a strictly higher bar, so clearing it clears sub too', () => {
     const analysis = { ...base, verdict: { ...base.verdict, path: "prime" as const } };
@@ -135,9 +136,10 @@ describe("buildTake — no-bid verdict with an unclosable blocker (campMackall f
     expect(prime.headline).toBe("Locked at no-go for this solicitation");
   });
 
-  it("counts every compliance-matrix row that reads a strength", () => {
+  it("counts every compliance-matrix row that reads a strength, and every read that scored strong", () => {
     const haveRows = analysis.complianceMatrix.filter((r) => r.status === "have").length;
-    expect(t.counts.strengths).toBe(haveRows);
+    const strongReads = analysis.reads.filter((r) => r.status === "strong").length;
+    expect(t.counts.strengths).toBe(haveRows + strongReads);
   });
 });
 
