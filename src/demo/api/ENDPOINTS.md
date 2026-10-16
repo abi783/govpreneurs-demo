@@ -455,3 +455,270 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Response: `PscSearchResult[]` (`src/lib/pscApi.ts:12`): `[{ code, description }]`. The production backend returns at most 20 rows.
 - Errors the UI handles: the facet shows that the lookup is down.
 - Notes: none.
+
+## opportunity
+
+Area file: `src/demo/api/opportunity.ts`. This area owns the detail of one opportunity and the document link. The detail page is `/opportunities/$noticeId` (`src/routes/opportunities.$noticeId.tsx`). Its other calls belong to other areas: `workspace` (save), `grant` (analysis and rail), `mentorReviews` (send to mentor), `wallet` (balance).
+
+### GET /opportunities/discover/v2/:oppKey
+- Area file: opportunity
+- Called from: `fetchOpportunityV2` `src/lib/discoverApi.ts:168` (apiFetch at :174). Call site `src/routes/opportunities.$noticeId.tsx:360` `fetchOpportunityV2`. It runs when the detail page loads and again when `noticeId` or the session location changes. A Pilot-plan member never reaches it, because the route shows an upsell wall first (`OpportunityDetail`, same file). The code puts `oppKey` in the path without URL encoding.
+- Query: `locationId` (string). This caller always sets it.
+- Request body: none
+- Response: `DiscoverV2DetailDto` (`src/lib/discoverApi.ts:41`). The page reads: `id`, `title`, `geminiPlainEnglishTitle`, `scope`, `agency.name`, `noticeType`, `postedDate`, `responseDeadline`, `setAside`, `naicsCode`, `classificationCode`, `solNumber`, `placeOfPerformance` (`city`, `state`), `pointOfContact`, `secondaryContact`, `quickSummary`, `summarySource`, `summaryRewritePending`, `category`, `dibbs`, `keyDates`, `accordions`, `valEstLow`, `valEstHigh`, `finalScore`, `tier`, `matchReasons`, `matchBreakdown` (keys `fitPoints`, `setAsidePoints`, `eligible`, `certifiable`), `documents`, `sourcePath`, `mentorReviewStatus`, `mentorReviewId`. The page dereferences `placeOfPerformance` and `agency.name` without a check.
+- Errors the UI handles: any non-2xx (404 included) shows the card "Error loading opportunity" with the `message` of the body (default "Failed to fetch opportunity") and a link back to the feed. A 501 shows "Demo has no handler for GET ...".
+- Notes:
+  - `tier` (`priority` or `strong` = Bid, `stretch` = Review, `low` = No Bid) and `finalScore` drive the verdict. Without a score, the page derives a verdict itself.
+  - `mentorReviewStatus` is `discuss`, `reject`, `pursue`, `pending` or null. Null shows the "Send to mentor" button. `pending` shows "Mentor reviewing". The other values show "Mentor responded". `mentorReviewId` is the id for `GET /mentor-reviews/:id`. Keep both in step with the mentor review list.
+  - `accordions` is `Record<string, string[]> | null` (bullet lists per accordion). Null hides the AI summary sections.
+  - `documents` is `[{ fileName, downloadUrl, fileSize? }]`. Each row becomes an anchor (see the next endpoint). Return `[]` if the demo cannot serve files.
+  - Use the same record for the id as in the feed rows, so the detail matches the card.
+
+### GET /opportunities/discover/v2/:oppKey/documents (href, not fetch)
+- Area file: opportunity
+- Called from: this URL is built for an anchor and is never fetched.
+  - `src/components/Opportunity/EvidenceBlock.tsx:399` `API_BASE_URL`: the "Reference documents" list on the detail page. Opens in a new tab on click.
+  - `src/lib/microPurchases/paperHref.ts:35` `API_BASE_URL`: the order paper link of a small order. Call site `src/routes/small-orders.$orderId.tsx:187` `paperHref`, drawn at `:1064`. The path has the same shape. This caller URL-encodes `oppKey`.
+- Query: `fileName` (string, URL-encoded)
+- Request body: none
+- Response: production answers with a redirect (HTTP 302 to a fresh file URL). It is not JSON.
+- Errors the UI handles: none.
+- Notes: a click on an anchor is not a fetch. `fetchInterceptor` never sees it, and `linkGuard` (`src/demo/nav/linkGuard.ts:43`) leaves `/__demo_api/` links to the browser. A handler cannot answer it. The static host answers with the app page or a 404. The safe choice is to give the page no document: return `documents: []` from the detail call and `paper: null` on small orders. Then no link renders (`EvidenceBlock.tsx:392` and `paperHref.ts:33`). A real download needs a static file or a click guard, which is outside this file.
+
+## grant
+
+Area file: `src/demo/api/grant.ts`. This area owns `/grants-take/*`. The demo session has `grantV2: true` (`src/demo/session.ts`), so the detail page uses the live canvas and rail, and does not call `POST /grants-take/opportunity`.
+
+### POST /grants-take/opportunity
+- Area file: grant
+- Called from: `fetchGrantsTake` `src/lib/grantsTakeApi.ts:51` (apiFetch at :52). Call site `src/routes/opportunities.$noticeId.tsx:377` `fetchGrantsTake`. It runs only when `session.grantV2` is not true (`:373` returns early). So it does not run in the demo. The old card's retry button (`:861`) would call it again.
+- Query: none
+- Request body: `{ oppKey: string }`
+- Response: `{ take: GrantTake | null }` (`GrantsTakeResponse`, `src/lib/grantsTakeApi.ts:46`; `GrantTake`, `:27`). The wrapper returns `take ?? null`. Null shows a compact "Grant is still analyzing" card (`src/components/Opportunity/GrantsTakeCard.tsx:94`).
+- Errors the UI handles: the card shows the error and a retry.
+- Notes: none.
+
+### POST /grants-take/analysis
+- Area file: grant
+- Called from: `fetchGrantAnalysis` `src/lib/grantAnalysisApi.ts:13` (apiFetch at :14), through `loadGrantAnalysis` (`src/lib/grant/index.ts:55`). Call site `src/routes/opportunities.$noticeId.tsx:403` `loadGrantAnalysis`. It runs after the opportunity detail has loaded. It runs again each time `grantAnalysisReload` changes, which happens after the member answers an open question in the rail (`src/components/Grant/GrantRail.tsx:385` `onAnswered`).
+- Query: none
+- Request body: `{ oppKey: string }`
+- Response: `{ analysis: GrantAnalysis | null }` (`GrantAnalysis`, `src/lib/grant/types.ts:593`). The wrapper returns `analysis ?? null`.
+- Errors the UI handles: a null analysis or any failure makes the page use `unanalyzed(opp)` (`src/lib/grant/index.ts:83`). The canvas then says "Not analyzed yet" and the rail still opens. The canvas shows a skeleton until the call ends (`:854`).
+- Notes: `complianceMatrix` must be an array, because `resolveComplianceAgainstFirm(live.complianceMatrix)` runs on the result (`src/lib/grant/index.ts:59`). `getGrantAnalysis(opp)` (`src/lib/grant/index.ts:26`) already builds a full analysis from a fixture or from the opportunity's own facts. A handler can reuse it with an `Opportunity` (`src/lib/mock/opportunities.ts:21`). Production answers 403 for a location outside the grant_v2 cohort. The demo must always answer with an analysis. The rail mounts only after an analysis exists (`:928`).
+
+### POST /grants-take/rail
+- Area file: grant
+- Called from: `fetchRailReply` `src/lib/grant/rail.ts:135` (apiFetch at :147). Call site `src/components/Grant/GrantRail.tsx:363` `fetchRailReply`, in `send`. It runs when the member sends a chat message, clicks an "ask" chip, or answers an open-question card (then `openQuestion` is set). The wrapper gives up after 60000 ms (`RAIL_TIMEOUT_MS`, `:28`).
+- Query: none
+- Request body: `{ oppKey: string; message: string; openQuestion?: string }`. The message is at most 2000 characters (`MAX_RAIL_MESSAGE`, `:31`); the rail refuses to send a longer one.
+- Response: `RailReply` (`src/lib/grant/rail.ts:5`): `{ kind, reply, fact?, sources?, cta? }`. `kind` is `interrogate`, `supply`, `draft_request`, `offscope`, `unavailable` or `pending`. The wrapper turns a body without a string `reply` or a known `kind` into the "unavailable" reply. `cta: "mentor"` shows a mentor button. `sources` is `Pin[]` (`src/lib/grant/types.ts:293`).
+- Errors the UI handles: any non-2xx or timeout becomes the reply "Grant is unavailable right now — try again in a moment." The thread keeps working.
+- Notes: only the kinds `interrogate` and `supply` count as accepted (`GrantRail.tsx:38`). With `openQuestion` set, an accepted reply makes the page call `POST /grants-take/analysis` again. Any other kind restores the question card.
+
+### POST /grants-take/rail/session
+- Area file: grant
+- Called from: `fetchRailSession` `src/lib/grant/rail.ts:69` (apiFetch at :71). Call site `src/components/Grant/GrantRail.tsx:309` `fetchRailSession`. It runs when the rail mounts (after the analysis loads) and each time `oppKey` changes.
+- Query: none
+- Request body: `{ oppKey: string }`
+- Response: `RailSession` (`src/lib/grant/rail.ts:55`): `{ messages: { role: "user" | "grant", text, at }[], skipped: Record<string, number> }`. The wrapper drops a message without a string `text` or a valid `role`.
+- Errors the UI handles: any failure gives an empty session (a new thread).
+- Notes: return `{ messages: [], skipped: {} }` for a fresh opportunity. Keep the thread that `POST /grants-take/rail` builds, so a reload shows it.
+
+### POST /grants-take/rail/skip
+- Area file: grant
+- Called from: `recordRailSkip` `src/lib/grant/rail.ts:114` (apiFetch at :119). Call site `src/components/Grant/GrantRail.tsx:419` `recordRailSkip`. It runs when the member skips an open question.
+- Query: none
+- Request body: `{ oppKey: string; questionId: string }`
+- Response: ignored. Return `{ ok: true }`.
+- Errors the UI handles: none. The call is fire and forget.
+- Notes: store the skip, and include it in `skipped` of the session call.
+
+### POST /grants-take/rail/reset
+- Area file: grant
+- Called from: `resetRailSession` `src/lib/grant/rail.ts:101` (apiFetch at :103). Call site `src/components/Grant/GrantRail.tsx:435` `resetRailSession`. It runs when the member clicks "Start over" in the rail.
+- Query: none
+- Request body: `{ oppKey: string }`
+- Response: only the status matters. Return `{ ok: true }`.
+- Errors the UI handles: a non-2xx keeps the thread and shows "Couldn't start over just now — try again in a moment."
+- Notes: clear the stored messages and skips for that `oppKey`.
+
+## workspace
+
+Area file: `src/demo/api/workspace.ts`. This area owns the member's saved list and saved searches. Several areas read the same list: the feed Saved tab (`POST /opportunities/saved`), the pipeline page, the forecast Track control and the small orders Save control. They must share one state.
+
+### GET /workspace
+- Area file: workspace
+- Called from: `fetchWorkspace` `src/lib/workspace.ts:30` (apiFetch at :34).
+  - `src/routes/opportunities.index.tsx:1094` `fetchWorkspace`: feed page load. It fills the bookmarks and the saved-search chips.
+  - `src/routes/opportunities.$noticeId.tsx:547` `fetchWorkspace`: detail page load. It sets the bookmark from `savedOpps.includes(noticeId)`.
+  - `src/lib/trackedForecasts.ts:44` `fetchWorkspace`: once per session, through `useTrackedForecasts` on `/forecasts` and `/forecasts/$forecastId`. A failure clears the cache so a later mount retries.
+  - `src/lib/microPurchases/savedOrders.ts:34` `fetchWorkspace`: once per session, through `loadSavedOrders` on `/small-orders` and `/small-orders/$orderId`.
+- Query: none
+- Request body: none
+- Response: `{ savedOpps: string[]; savedSearches: SavedSearch[] }`. `savedOpps` holds the keys of every kind of saved record: contracts, forecasts and small orders. `SavedSearch` is `src/lib/workspace.ts:22`: `{ id, name, filters, createdAt }`. `filters` is an `OpportunityFilters` object where `prefilled` is an array (the page turns it back into a Set with `reviveSavedFilters`, `src/routes/opportunities.index.tsx:177`).
+- Errors the UI handles: the feed logs "Failed to load saved opportunities" and shows no bookmarks. The detail page logs and shows an unsaved bookmark. The forecast and small order lists stay empty.
+- Notes: none.
+
+### GET /workspace/saved-opps/details
+- Area file: workspace
+- Called from: `fetchSavedOppDetails` `src/lib/workspace.ts:45` (apiFetch at :46). Call site `src/routes/pipeline.tsx:103` `fetchSavedOppDetails`. It runs when `/pipeline` loads.
+- Query: none
+- Request body: none
+- Response: `SavedOppDetail[]` (`src/lib/workspace.ts:11`): `[{ oppKey, title, agency, dueDate: ISO | null, sourceType: string | null }]`. `sourceType` `dibbs` makes a small order card. `sourceType` `forecast` or `sled_forecast` (`src/lib/forecasts/sourceType.ts:5`) makes a forecast card. A forecast card has no countdown.
+- Errors the UI handles: the page logs "Failed to load saved opportunities" and shows the board with the mentor review cards only. With no card at all, it shows the empty board.
+- Notes: the rows must be the same records as `savedOpps` from `GET /workspace`.
+
+### POST /workspace/saved-opps
+- Area file: workspace
+- Called from: `addSavedOpp` `src/lib/workspace.ts:54` (apiFetch at :55).
+  - `src/routes/opportunities.index.tsx:1122` `addSavedOpp`: the member clicks the bookmark on a feed card.
+  - `src/routes/opportunities.$noticeId.tsx:502` `addSavedOpp`: the bookmark on the detail page (and the command bar "save" event).
+  - `src/lib/trackedForecasts.ts:76` `addSavedOpp`: the Track control on a forecast card or page.
+  - `src/lib/microPurchases/savedOrders.ts:72` `addSavedOpp`: the Save control on a small order, and `keepOrder` after a quote.
+- Query: none
+- Request body: `{ oppKey: string }`
+- Response: ignored. Production returns `{ ok: true }`.
+- Errors the UI handles: every caller shows the bookmark at once and puts it back on failure. The feed also corrects the badge count.
+- Notes: the call is idempotent. After a successful forecast Track or Untrack, the page calls `GET /forecast-watch` again (`src/lib/trackedForecasts.ts:79`).
+
+### DELETE /workspace/saved-opps/:oppKey
+- Area file: workspace
+- Called from: `removeSavedOpp` `src/lib/workspace.ts:66` (apiFetch at :67). Call sites: `src/routes/opportunities.index.tsx:1122` `removeSavedOpp`, `src/routes/opportunities.$noticeId.tsx:502` `removeSavedOpp`, `src/lib/trackedForecasts.ts:76` `removeSavedOpp`, `src/lib/microPurchases/savedOrders.ts:72` `removeSavedOpp`. The member clicks a saved bookmark.
+- Query: none
+- Request body: none
+- Response: ignored. Production returns `{ ok: true }`.
+- Errors the UI handles: same as the add call.
+- Notes: the call is idempotent. The `oppKey` is URL-encoded.
+
+### POST /workspace/saved-searches
+- Area file: workspace
+- Called from: `addSavedSearch` `src/lib/workspace.ts:77` (apiFetch at :85). Call site `src/routes/opportunities.index.tsx:1515` `addSavedSearch`, in `handleSaveSearch`. It runs when the member saves a search from the filters drawer footer or from the summary row.
+- Query: none
+- Request body: `{ name: string; filters: OpportunityFilters }` where `prefilled` is sent as an array (`src/lib/workspace.ts:84`). `OpportunityFilters` is `src/lib/opportunityFilters.ts`.
+- Response: `SavedSearch`. The page reads `id`, `name` and `filters`. Echo the `filters` of the request and add `id` and `createdAt`.
+- Errors the UI handles: the page logs "Failed to save search" and adds no chip.
+- Notes: none.
+
+### DELETE /workspace/saved-searches/:id
+- Area file: workspace
+- Called from: `removeSavedSearch` `src/lib/workspace.ts:97` (apiFetch at :98). Call site `src/routes/opportunities.index.tsx:1548` `removeSavedSearch`. It runs when the member confirms the delete dialog. The page has already removed the chip.
+- Query: none
+- Request body: none
+- Response: ignored.
+- Errors the UI handles: the page logs "Failed to remove saved search" and keeps the chip removed.
+- Notes: none.
+
+## pipeline
+
+Area file: `src/demo/api/pipeline.ts`. None: it reads workspace + mentorReviews. The `/pipeline` page (`src/routes/pipeline.tsx`) calls these endpoints, which other areas own:
+- `GET /workspace/saved-opps/details` at page load (`pipeline.tsx:103`).
+- `GET /mentor-reviews` at page load, only if the shared store has not loaded yet (`pipeline.tsx:117`).
+- `GET /forecast-watch` once per session, only when a saved record is a forecast (the `WatchMarker` on the card, `src/components/Bids/BidCard.tsx:166`).
+
+## mentorReviews
+
+Area file: `src/demo/api/mentorReviews.ts`. This area owns `/mentor-reviews/*` and `POST /opportunities/send-for-review`. A shared store (`src/lib/mentorReviewsApi.ts:244`) caches the list, and callers share one in-flight request.
+
+### GET /mentor-reviews
+- Area file: mentorReviews
+- Called from: `fetchMentorReviews` `src/lib/mentorReviewsApi.ts:152` (call at :153 through `fetchWithNetworkRetry`, `:137`, which retries once after 250 ms when the browser rejects with a network `TypeError`). Most callers use `refreshMentorReviews` (`:287`).
+  - `src/routes/mentors.index.tsx:36` `refreshMentorReviews`: `/mentors` page load. The page opens the first review when the list is not empty.
+  - `src/routes/mentors.$reviewId.tsx:52` `refreshMentorReviews`: `/mentors/$reviewId` page load.
+  - `src/routes/mentors.$reviewId.tsx:80` `refreshMentorReviews`: every 60000 ms while the browser tab is visible (`POLL_INTERVAL_MS`, `:18`), and on window focus (`:93`).
+  - `src/routes/pipeline.tsx:117` `refreshMentorReviews`: `/pipeline` page load, if the store has not loaded.
+  - `src/lib/microPurchases/mentorSent.ts:42` and `:91` `refreshMentorReviews`: the small order page (`useOrderMentorSent`) and the forecast page (`useMentorReviewFor`), on load, if the store has not loaded.
+  - `src/lib/mentorReviewsApi.ts:327` `refreshMentorReviews`: inside `useMentorUnread`, used by `src/routes/home.tsx:66`. The old sidebar (`src/components/Layout/Sidebar.tsx:118`) also uses it, but the demo shell does not render that sidebar.
+  - After a send to a mentor: `src/routes/opportunities.$noticeId.tsx:680`, `src/lib/mentorSend.ts:119`, `src/components/MicroPurchases/OrderMentor.tsx:162`.
+  - `src/lib/mentorReviewsApi.ts:204` `fetchMentorReviews`: a fresh read in `attachFileToSentReview`, after a send with a file.
+- Query: none
+- Request body: none
+- Response: `{ reviews: MentorReviewSummary[] }` (`MentorReviewSummary`, `src/lib/mentorReviewsApi.ts:36`). Fields: `id`, `oppKey`, `oppResolved`, `sourceType?`, `solNumber`, `title`, `status` (`pending`, `responded` or `closed`), `recommendation` (`discuss`, `pursue`, `pass` or null), `mentorName`, `createdAt`, `lastMessageAt`, `lastMessageAuthor`, `lastMessagePreview`, `unread`.
+- Errors the UI handles: callers log and keep the old list. On `/mentors` an empty list shows the empty state.
+- Notes: `oppKey` must equal the key of the record that was sent. The forecast page, the small order page and the file attach step find the review by `oppKey`. `oppResolved: true` makes the review title link to the record. `unread` drives the badge on `/home`.
+
+### GET /mentor-reviews/:id
+- Area file: mentorReviews
+- Called from: `fetchMentorReviewThread` `src/lib/mentorReviewsApi.ts:162` (call at :163, through `fetchWithNetworkRetry`). Call site `src/routes/mentors.$reviewId.tsx:63` `fetchMentorReviewThread`, in `loadThread`. It runs on page load, every 60000 ms while the tab is visible, on window focus, and 2000 ms after a reply (`RECONCILE_DELAY_MS`, `:19`).
+- Query: none
+- Request body: none
+- Response: `MentorReviewThread` (`src/lib/mentorReviewsApi.ts:73`): the summary fields plus `messages: MentorThreadMessage[]` and `emptyReason?`. It is the object itself, not wrapped. A message is `{ id, author: "member" | "mentor", authorName, bodyHtml, at, attachments: { name, url: string | null }[] }` (`:26`). The page draws `bodyHtml` as HTML.
+- Errors the UI handles: any failure sets "not found" and shows "Review not found". This includes a failed poll.
+- Notes: the 2000 ms refresh replaces the whole thread, so the thread must already contain a message that `POST /mentor-reviews/:id/reply` stored. Use `url: null` for an attachment so it draws as plain text. A non-null `url` becomes an anchor (href, not fetch), which production fills with `<host>/mentor-reviews/attachments/<id>`.
+
+### POST /mentor-reviews/:id/reply
+- Area file: mentorReviews
+- Called from: `replyToMentorReview` `src/lib/mentorReviewsApi.ts:173` (through `apiFetchForm`, `:124`, which calls `apiFetch` at :125).
+  - `src/components/Mentors/ConversationView.tsx:70` `replyToMentorReview`: the member sends a reply.
+  - `src/lib/mentorReviewsApi.ts:211` `replyToMentorReview`: `attachFileToSentReview`, after a send with a file. Callers: `src/routes/opportunities.$noticeId.tsx:671`, `src/lib/mentorSend.ts:110`, `src/components/MicroPurchases/OrderMentor.tsx:150`. The body text is the fixed sentence "Here is a supporting file for my question." (`MENTOR_ATTACHMENT_NOTE`, `:215`).
+- Query: none
+- Request body: multipart `FormData` (no `Content-Type` header). Field `body` holds a string (editor HTML, or an empty string). Field `attachments` repeats once for each `File`. The router passes a `FormData` object in `ctx.body`.
+- Response: `{ message: MentorThreadMessage }`. The wrapper returns `message`.
+- Errors the UI handles: the composer shows the error text and keeps the draft. For the file attach step, a failure shows "Sent to a mentor, but the file didn't attach. Add it to the conversation in Mentors." (`MENTOR_ATTACH_FAILED`, `:218`).
+- Notes: store the message in the thread. The attach step finds the review in a fresh `GET /mentor-reviews` by `oppKey`, so the review must exist already.
+
+### POST /mentor-reviews/:id/viewed
+- Area file: mentorReviews
+- Called from: `markMentorReviewViewed` `src/lib/mentorReviewsApi.ts:227` (call at :228, through `fetchWithNetworkRetry`). Call site `src/components/Mentors/ConversationView.tsx:53` `markMentorReviewViewed`. It runs once for each thread load (review id plus message count).
+- Query: none
+- Request body: none
+- Response: ignored. Return `{ ok: true }`.
+- Errors the UI handles: the page logs the error. On success it clears `unread` in the cached list.
+- Notes: set `unread: false` for that review in later list reads.
+
+### POST /opportunities/send-for-review
+- Area file: mentorReviews
+- Called from: `sendForReview` `src/lib/mentorApi.ts:24` (apiFetch at :32).
+  - `src/routes/opportunities.$noticeId.tsx:659` `sendForReview`: the member confirms the "Send to mentor" dialog on the detail page.
+  - `src/lib/mentorSend.ts:99` `sendForReview`: the same dialog on the forecast page (`src/routes/forecasts.$forecastId.tsx:112`).
+  - `src/components/MicroPurchases/OrderMentor.tsx:138` `sendForReview`: the same dialog on a small order page.
+- Query: none
+- Request body: `{ userId: string; locationId: string; solNumbers: string[]; opportunityIds: string[]; message: string }`. Headers: `Content-Type: application/json` and `X-GHL-User-Token: demo-token`. `opportunityIds[0]` is the `oppKey` of the record.
+- Response: `{ success?: boolean; updatedCount?: number; message?: string }`. The UI reads none of the fields.
+- Errors the UI handles: the dialog shows the `message` of the body (default "Failed to send for review"). The detail page puts the status pill back.
+- Notes: after success the UI calls `GET /mentor-reviews`, and `POST /mentor-reviews/:id/reply` if a file was chosen. To keep the demo true, the handler should add a review whose `oppKey` is `opportunityIds[0]`, with status `pending`, and lower the wallet balance by `chargeAmount`. Production answers 400 when the `X-GHL-User-Token` header is missing.
+
+## wallet
+
+Area file: `src/demo/api/wallet.ts`. This area owns `/wallet/*`, `GET /opportunities/get-credit` and `POST /opportunities/upgradePlan`.
+
+### GET /wallet/balance
+- Area file: wallet
+- Called from: `fetchWalletBalance` `src/lib/walletApi.ts:22` (apiFetch at :25).
+  - `src/routes/wallet.tsx:40` `fetchWalletBalance`: `/wallet` page load.
+  - `src/routes/opportunities.$noticeId.tsx:527` `fetchWalletBalance`: detail page load, only for a plan that can send to a mentor.
+  - `src/lib/mentorSend.ts:75` `fetchWalletBalance`: forecast page load, same condition.
+  - `src/components/MicroPurchases/OrderMentor.tsx:113` `fetchWalletBalance`: small order page load, same condition.
+  - `src/lib/useWalletBalancePolling.ts:43` `fetchWalletBalance`: a poll every 1000 ms (`POLL_INTERVAL_MS`, `:10`). It runs only while the Send to mentor dialog is open and the balance is below `chargeAmount` (`src/components/Mentors/MentorSendModal.tsx:148`). It stops when a reply shows `balance >= chargeAmount`. A slow call makes the next tick wait.
+- Query: `locationId` (string)
+- Request body: none
+- Response: `WalletBalance` (`src/lib/walletApi.ts:16`): `{ balance: number; chargeAmount: number }`, in dollars.
+- Errors the UI handles: the wallet page shows its error state. The send dialog shows the error text. The poll ignores errors and tries again.
+- Notes: keep `balance >= chargeAmount` for the persona. Then the dialog is ready to send and the 1000 ms poll never starts. The mock wallet uses 97 for the charge (`MENTOR_REVIEW_COST`, `src/lib/wallet.ts:35`).
+
+### GET /wallet/ledger
+- Area file: wallet
+- Called from: `fetchWalletLedger` `src/lib/walletApi.ts:46` (apiFetch at :47). No call site.
+- Query: none
+- Request body: none
+- Response: `{ entries: LedgerTx[] }` (`LedgerTx` is `Tx`, `src/lib/wallet.ts:8`).
+- Errors the UI handles: not applicable.
+- Notes: none.
+
+### GET /opportunities/get-credit
+- Area file: wallet
+- Called from: `getCredit` `src/lib/billing.ts:34` (apiFetch at :36). Call site `src/components/Hunter/UpgradePlanModal.tsx:52` `getCredit`, in a query that runs when the upgrade modal opens (cached for 60000 ms). An Elite member never opens that modal.
+- Query: `userId` (string), `locationId` (string)
+- Request body: none
+- Response: `CreditDetails | null` (`CreditDetails`, `src/lib/billing.ts:7`): `{ planCharges: number, perDayCharge: string, creditAmount: string }`. The two amounts are strings such as "14.75". Null means no trade-in credit.
+- Errors the UI handles: the modal shows the full price with no credit.
+- Notes: production answers 404 when `userId` is missing.
+
+### POST /opportunities/upgradePlan
+- Area file: wallet
+- Called from: `upgradePlan` `src/lib/billing.ts:44` (apiFetch at :49). Call site `src/components/Hunter/UpgradePlanModal.tsx:59` `upgradePlan`, in a mutation that runs when the member picks a plan.
+- Query: none
+- Request body: `{ userId: string; productId: string; altId: string }`
+- Response: `UpgradePlanResponse` (`src/lib/billing.ts:22`): `{ link?: string }`. The modal loads `link` (or `UPGRADE_PLAN_LINK`, `src/lib/plans.ts:16`) into an `<iframe src>` (`UpgradePlanModal.tsx:149`).
+- Errors the UI handles: the modal shows the `message` of the body, or "Couldn't start the upgrade. Please try again."
+- Notes: an iframe load is not a fetch, so the demo does not block it. An outside link would load a live site in the frame. If this call is ever reached, return a link on this origin.

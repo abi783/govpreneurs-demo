@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
+@source "../src/sc";
 /* DEMO: the design-system folder holds docs and preview pages, not components. */
 @source not "../src/sc/design-system";
 

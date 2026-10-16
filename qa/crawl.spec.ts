@@ -74,12 +74,14 @@ async function lockNetwork(context: BrowserContext, getPage: () => Page, probe: 
       return route.fulfill({ status: 200, contentType: "font/woff2", body: "" });
     }
     // A popup the visitor opened on purpose (target=_blank). It is not an error.
-    const frame = request.frame();
+    // For the first request of a new popup the frame does not exist yet, and frame() throws.
+    let frame: ReturnType<Request["frame"]> | null = null;
     let page: Page | null = null;
     try {
+      frame = request.frame();
       page = frame.page();
     } catch {
-      page = null;
+      return route.fulfill({ status: 200, contentType: "text/html", body: "<html><body>popup</body></html>" });
     }
     if (page && page !== getPage()) {
       return route.fulfill({ status: 200, contentType: "text/html", body: "<html><body>popup</body></html>" });
@@ -237,6 +239,8 @@ interface Clickable {
   selector: string;
   /** href when the element is a link, so a link to the current page is not a dead click. */
   href: string | null;
+  /** True for a tab, radio or toggle that is already selected. Clicking it again changes nothing. */
+  selected: boolean;
 }
 
 /** List the visible, enabled clickables in the menu and the main area. Same order on every load. */
@@ -304,8 +308,18 @@ async function collectClickables(page: Page): Promise<Clickable[]> {
         const details = el.closest("details");
         if (details && !details.open && el.tagName !== "SUMMARY" && !el.closest("summary")) continue;
         const role = el.getAttribute("role") ?? (el.tagName === "A" ? "link" : el.tagName.toLowerCase());
+        const cls = ` ${el.getAttribute("class") ?? ""} `;
+        const selected =
+          el.getAttribute("aria-selected") === "true" ||
+          el.getAttribute("aria-pressed") === "true" ||
+          (role === "radio" && el.getAttribute("aria-checked") === "true") ||
+          (el instanceof HTMLInputElement && el.type === "radio" && el.checked) ||
+          el.hasAttribute("aria-current") ||
+          (role === "tab" && el.getAttribute("data-state") === "active") ||
+          /\s(is-active|is-on|is-selected|is-current|active|selected)\s/.test(cls);
         list.push({
           index: list.length,
+          selected,
           role,
           name: accessibleName(el),
           selector: shortSelector(el),
@@ -533,7 +547,8 @@ for (const route of routes) {
           probe.popups > 0 ||
           probe.downloads > 0 ||
           probe.nativeDialogs > 0 ||
-          selfLink;
+          selfLink ||
+          target.selected;
 
         if (!after) {
           // The page reloaded or closed under us. That is an effect.

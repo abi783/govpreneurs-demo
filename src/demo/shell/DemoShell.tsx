@@ -84,7 +84,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
             Reset demo
           </button>
         </div>
-        <div className="demo-main" id="demo-main">
+        <div className="demo-main" id="demo-main" data-scroll-restoration-id="demo-main">
           {children}
         </div>
       </div>

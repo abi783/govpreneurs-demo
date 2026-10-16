@@ -14,6 +14,8 @@ export const router = createRouter({
   basepath,
   context: { queryClient },
   scrollRestoration: true,
+  // DEMO: the main area of the shell scrolls, not the window. Reset it on each navigation.
+  scrollToTopSelectors: ["#demo-main"],
   defaultPreloadStaleTime: 0,
 });
 
