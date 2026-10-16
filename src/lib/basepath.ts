@@ -8,8 +8,8 @@
 // the basepath (e.g. ToolShell's plain anchors) would otherwise import the
 // router module, which imports the route tree, which imports them — a cycle
 // that surfaces as "Cannot access 'basepath' before initialization".
-const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
-export const basepath = pathname === "/v2/ui" || pathname.startsWith("/v2/ui/") ? "/v2/ui" : "/";
+// DEMO: the demo is a static site served from the root, so the basepath is always "/".
+export const basepath = "/";
 
 /**
  * Build an in-app href. ALWAYS use this instead of `${basepath}${path}`.

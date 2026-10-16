@@ -6,7 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  base: "/v2/ui",
+  // DEMO: static site served from the root.
+  base: "/",
   server: {
     host: "::",
     port: 8080,
