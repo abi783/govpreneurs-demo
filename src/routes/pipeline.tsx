@@ -26,7 +26,7 @@ import {
 function openOpportunitiesFeed(e: React.MouseEvent) {
   if (!isEmbeddedInGhl()) return;
   e.preventDefault();
-  requestCrossPageNav("opportunities", "/");
+  requestCrossPageNav("opportunities", "/opportunities");
 }
 
 /**

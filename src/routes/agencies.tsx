@@ -4,6 +4,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 // Keep this route so inbound links/bookmarks redirect cleanly.
 export const Route = createFileRoute("/agencies")({
   beforeLoad: () => {
-    throw redirect({ to: "/government-buyers" });
+    throw redirect({ to: "/government-buyers", search: { q: "", near: "nc", buys: "roofing" } });
   },
 });

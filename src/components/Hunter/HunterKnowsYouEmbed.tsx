@@ -200,8 +200,6 @@ export function HunterKnowsYouEmbed({
                   {session?.locationId ? (
                     <a
                       href={capabilityStatementUrl(session.locationId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="ky-btn-primary ky-btn-icon"
                       onClick={() => setModal(null)}
                     >

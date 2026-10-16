@@ -233,7 +233,7 @@ function HomePage() {
             <Target size={15} />
             <span>Opportunities</span>
           </Link>
-          <Link to="/business-profile" className="home2-jump-item">
+          <Link to="/my-business" className="home2-jump-item">
             <UserSquare size={15} />
             <span>My Business</span>
           </Link>

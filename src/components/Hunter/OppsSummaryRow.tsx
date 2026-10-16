@@ -121,7 +121,7 @@ function WhyReasoning({ profile, loading }: { profile: BusinessProfile | null; l
       <p className="opps-summary__reasoning">
         Matches use general scope only right now.{" "}
         {href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="chip-inline-link">
+          <a href={href} className="chip-inline-link">
             Add a capability statement
           </a>
         ) : (

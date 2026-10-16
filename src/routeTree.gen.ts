@@ -12,54 +12,44 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WhosWinningRouteImport } from './routes/whos-winning'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as VehiclesRouteImport } from './routes/vehicles'
-import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SmallOrdersRouteImport } from './routes/small-orders'
-import { Route as RedirectRouteImport } from './routes/redirect'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as PartnersRouteImport } from './routes/partners'
 import { Route as PartnerFinderRouteImport } from './routes/partner-finder'
 import { Route as OpportunitiesRouteImport } from './routes/opportunities'
+import { Route as MyBusinessRouteImport } from './routes/my-business'
 import { Route as MentorsRouteImport } from './routes/mentors'
-import { Route as MentorDirectoryRouteImport } from './routes/mentor-directory'
 import { Route as LaborPricingRouteImport } from './routes/labor-pricing'
-import { Route as InternalRouteImport } from './routes/internal'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as GovernmentBuyersRouteImport } from './routes/government-buyers'
 import { Route as ForecastsRouteImport } from './routes/forecasts'
+import { Route as FindAMentorRouteImport } from './routes/find-a-mentor'
 import { Route as BusinessProfileRouteImport } from './routes/business-profile'
 import { Route as AwardsRouteImport } from './routes/awards'
+import { Route as AvaRouteImport } from './routes/ava'
 import { Route as AgenciesRouteImport } from './routes/agencies'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as StayReadyIndexRouteImport } from './routes/stay-ready.index'
 import { Route as SmallOrdersIndexRouteImport } from './routes/small-orders.index'
 import { Route as OpportunitiesIndexRouteImport } from './routes/opportunities.index'
+import { Route as MyBusinessIndexRouteImport } from './routes/my-business.index'
 import { Route as MentorsIndexRouteImport } from './routes/mentors.index'
 import { Route as ForecastsIndexRouteImport } from './routes/forecasts.index'
 import { Route as AwardsIndexRouteImport } from './routes/awards.index'
-import { Route as ToolsScorecardRouteImport } from './routes/tools.scorecard'
-import { Route as ToolsRegistrationChecklistRouteImport } from './routes/tools.registration-checklist'
-import { Route as ToolsNaicsRouteImport } from './routes/tools.naics'
-import { Route as ToolsHubzoneRouteImport } from './routes/tools.hubzone'
-import { Route as ToolsDemandRouteImport } from './routes/tools.demand'
-import { Route as ToolsCoChecklistRouteImport } from './routes/tools.co-checklist'
-import { Route as ToolsCapabilityStatementRouteImport } from './routes/tools.capability-statement'
+import { Route as AvaIndexRouteImport } from './routes/ava.index'
 import { Route as StayReadyItemIdRouteImport } from './routes/stay-ready.$itemId'
 import { Route as SmallOrdersRestrictedRouteImport } from './routes/small-orders.restricted'
 import { Route as SmallOrdersOrderIdRouteImport } from './routes/small-orders.$orderId'
 import { Route as OpportunitiesNoticeIdRouteImport } from './routes/opportunities.$noticeId'
+import { Route as MyBusinessPartRouteImport } from './routes/my-business.$part'
 import { Route as MentorsReviewIdRouteImport } from './routes/mentors.$reviewId'
 import { Route as ForecastsForecastIdRouteImport } from './routes/forecasts.$forecastId'
-import { Route as DevWarmStartRouteImport } from './routes/dev.warm-start'
-import { Route as DevUiRouteImport } from './routes/dev.ui'
-import { Route as DevProfileStatesRouteImport } from './routes/dev.profile-states'
 import { Route as CapStatementBuilderRouteImport } from './routes/cap-statement.builder'
 import { Route as AwardsAwardIdRouteImport } from './routes/awards.$awardId'
-import { Route as ToolsDemandNaicsRouteImport } from './routes/tools.demand_.$naics'
+import { Route as AvaNoticeIdRouteImport } from './routes/ava.$noticeId'
 import { Route as OpportunitiesAwardedContractIdRouteImport } from './routes/opportunities.awarded.$contractId'
-import { Route as ToolsDemandCategorySlugRouteImport } from './routes/tools.demand_.category.$slug'
 
 const WhosWinningRoute = WhosWinningRouteImport.update({
   id: '/whos-winning',
@@ -76,11 +66,6 @@ const VehiclesRoute = VehiclesRouteImport.update({
   path: '/vehicles',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsRoute = ToolsRouteImport.update({
-  id: '/tools',
-  path: '/tools',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -91,9 +76,9 @@ const SmallOrdersRoute = SmallOrdersRouteImport.update({
   path: '/small-orders',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RedirectRoute = RedirectRouteImport.update({
-  id: '/redirect',
-  path: '/redirect',
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PipelineRoute = PipelineRouteImport.update({
@@ -116,24 +101,19 @@ const OpportunitiesRoute = OpportunitiesRouteImport.update({
   path: '/opportunities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyBusinessRoute = MyBusinessRouteImport.update({
+  id: '/my-business',
+  path: '/my-business',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MentorsRoute = MentorsRouteImport.update({
   id: '/mentors',
   path: '/mentors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MentorDirectoryRoute = MentorDirectoryRouteImport.update({
-  id: '/mentor-directory',
-  path: '/mentor-directory',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LaborPricingRoute = LaborPricingRouteImport.update({
   id: '/labor-pricing',
   path: '/labor-pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InternalRoute = InternalRouteImport.update({
-  id: '/internal',
-  path: '/internal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -151,6 +131,11 @@ const ForecastsRoute = ForecastsRouteImport.update({
   path: '/forecasts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FindAMentorRoute = FindAMentorRouteImport.update({
+  id: '/find-a-mentor',
+  path: '/find-a-mentor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BusinessProfileRoute = BusinessProfileRouteImport.update({
   id: '/business-profile',
   path: '/business-profile',
@@ -161,25 +146,20 @@ const AwardsRoute = AwardsRouteImport.update({
   path: '/awards',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AvaRoute = AvaRouteImport.update({
+  id: '/ava',
+  path: '/ava',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgenciesRoute = AgenciesRouteImport.update({
   id: '/agencies',
   path: '/agencies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsIndexRoute = ToolsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ToolsRoute,
 } as any)
 const StayReadyIndexRoute = StayReadyIndexRouteImport.update({
   id: '/stay-ready/',
@@ -196,6 +176,11 @@ const OpportunitiesIndexRoute = OpportunitiesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OpportunitiesRoute,
 } as any)
+const MyBusinessIndexRoute = MyBusinessIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MyBusinessRoute,
+} as any)
 const MentorsIndexRoute = MentorsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -211,43 +196,11 @@ const AwardsIndexRoute = AwardsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AwardsRoute,
 } as any)
-const ToolsScorecardRoute = ToolsScorecardRouteImport.update({
-  id: '/scorecard',
-  path: '/scorecard',
-  getParentRoute: () => ToolsRoute,
+const AvaIndexRoute = AvaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AvaRoute,
 } as any)
-const ToolsRegistrationChecklistRoute =
-  ToolsRegistrationChecklistRouteImport.update({
-    id: '/registration-checklist',
-    path: '/registration-checklist',
-    getParentRoute: () => ToolsRoute,
-  } as any)
-const ToolsNaicsRoute = ToolsNaicsRouteImport.update({
-  id: '/naics',
-  path: '/naics',
-  getParentRoute: () => ToolsRoute,
-} as any)
-const ToolsHubzoneRoute = ToolsHubzoneRouteImport.update({
-  id: '/hubzone',
-  path: '/hubzone',
-  getParentRoute: () => ToolsRoute,
-} as any)
-const ToolsDemandRoute = ToolsDemandRouteImport.update({
-  id: '/demand',
-  path: '/demand',
-  getParentRoute: () => ToolsRoute,
-} as any)
-const ToolsCoChecklistRoute = ToolsCoChecklistRouteImport.update({
-  id: '/co-checklist',
-  path: '/co-checklist',
-  getParentRoute: () => ToolsRoute,
-} as any)
-const ToolsCapabilityStatementRoute =
-  ToolsCapabilityStatementRouteImport.update({
-    id: '/capability-statement',
-    path: '/capability-statement',
-    getParentRoute: () => ToolsRoute,
-  } as any)
 const StayReadyItemIdRoute = StayReadyItemIdRouteImport.update({
   id: '/stay-ready/$itemId',
   path: '/stay-ready/$itemId',
@@ -268,6 +221,11 @@ const OpportunitiesNoticeIdRoute = OpportunitiesNoticeIdRouteImport.update({
   path: '/$noticeId',
   getParentRoute: () => OpportunitiesRoute,
 } as any)
+const MyBusinessPartRoute = MyBusinessPartRouteImport.update({
+  id: '/$part',
+  path: '/$part',
+  getParentRoute: () => MyBusinessRoute,
+} as any)
 const MentorsReviewIdRoute = MentorsReviewIdRouteImport.update({
   id: '/$reviewId',
   path: '/$reviewId',
@@ -277,21 +235,6 @@ const ForecastsForecastIdRoute = ForecastsForecastIdRouteImport.update({
   id: '/$forecastId',
   path: '/$forecastId',
   getParentRoute: () => ForecastsRoute,
-} as any)
-const DevWarmStartRoute = DevWarmStartRouteImport.update({
-  id: '/dev/warm-start',
-  path: '/dev/warm-start',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevUiRoute = DevUiRouteImport.update({
-  id: '/dev/ui',
-  path: '/dev/ui',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevProfileStatesRoute = DevProfileStatesRouteImport.update({
-  id: '/dev/profile-states',
-  path: '/dev/profile-states',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const CapStatementBuilderRoute = CapStatementBuilderRouteImport.update({
   id: '/cap-statement/builder',
@@ -303,10 +246,10 @@ const AwardsAwardIdRoute = AwardsAwardIdRouteImport.update({
   path: '/$awardId',
   getParentRoute: () => AwardsRoute,
 } as any)
-const ToolsDemandNaicsRoute = ToolsDemandNaicsRouteImport.update({
-  id: '/demand_/$naics',
-  path: '/demand/$naics',
-  getParentRoute: () => ToolsRoute,
+const AvaNoticeIdRoute = AvaNoticeIdRouteImport.update({
+  id: '/$noticeId',
+  path: '/$noticeId',
+  getParentRoute: () => AvaRoute,
 } as any)
 const OpportunitiesAwardedContractIdRoute =
   OpportunitiesAwardedContractIdRouteImport.update({
@@ -314,350 +257,279 @@ const OpportunitiesAwardedContractIdRoute =
     path: '/awarded/$contractId',
     getParentRoute: () => OpportunitiesRoute,
   } as any)
-const ToolsDemandCategorySlugRoute = ToolsDemandCategorySlugRouteImport.update({
-  id: '/demand_/category/$slug',
-  path: '/demand/category/$slug',
-  getParentRoute: () => ToolsRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
+  '/ava': typeof AvaRouteWithChildren
   '/awards': typeof AwardsRouteWithChildren
   '/business-profile': typeof BusinessProfileRoute
+  '/find-a-mentor': typeof FindAMentorRoute
   '/forecasts': typeof ForecastsRouteWithChildren
   '/government-buyers': typeof GovernmentBuyersRoute
   '/home': typeof HomeRoute
-  '/internal': typeof InternalRoute
   '/labor-pricing': typeof LaborPricingRoute
-  '/mentor-directory': typeof MentorDirectoryRoute
   '/mentors': typeof MentorsRouteWithChildren
+  '/my-business': typeof MyBusinessRouteWithChildren
   '/opportunities': typeof OpportunitiesRouteWithChildren
   '/partner-finder': typeof PartnerFinderRoute
   '/partners': typeof PartnersRoute
   '/pipeline': typeof PipelineRoute
-  '/redirect': typeof RedirectRoute
+  '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
   '/tasks': typeof TasksRoute
-  '/tools': typeof ToolsRouteWithChildren
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
   '/whos-winning': typeof WhosWinningRoute
+  '/ava/$noticeId': typeof AvaNoticeIdRoute
   '/awards/$awardId': typeof AwardsAwardIdRoute
   '/cap-statement/builder': typeof CapStatementBuilderRoute
-  '/dev/profile-states': typeof DevProfileStatesRoute
-  '/dev/ui': typeof DevUiRoute
-  '/dev/warm-start': typeof DevWarmStartRoute
   '/forecasts/$forecastId': typeof ForecastsForecastIdRoute
   '/mentors/$reviewId': typeof MentorsReviewIdRoute
+  '/my-business/$part': typeof MyBusinessPartRoute
   '/opportunities/$noticeId': typeof OpportunitiesNoticeIdRoute
   '/small-orders/$orderId': typeof SmallOrdersOrderIdRoute
   '/small-orders/restricted': typeof SmallOrdersRestrictedRoute
   '/stay-ready/$itemId': typeof StayReadyItemIdRoute
-  '/tools/capability-statement': typeof ToolsCapabilityStatementRoute
-  '/tools/co-checklist': typeof ToolsCoChecklistRoute
-  '/tools/demand': typeof ToolsDemandRoute
-  '/tools/hubzone': typeof ToolsHubzoneRoute
-  '/tools/naics': typeof ToolsNaicsRoute
-  '/tools/registration-checklist': typeof ToolsRegistrationChecklistRoute
-  '/tools/scorecard': typeof ToolsScorecardRoute
+  '/ava/': typeof AvaIndexRoute
   '/awards/': typeof AwardsIndexRoute
   '/forecasts/': typeof ForecastsIndexRoute
   '/mentors/': typeof MentorsIndexRoute
+  '/my-business/': typeof MyBusinessIndexRoute
   '/opportunities/': typeof OpportunitiesIndexRoute
   '/small-orders/': typeof SmallOrdersIndexRoute
   '/stay-ready/': typeof StayReadyIndexRoute
-  '/tools/': typeof ToolsIndexRoute
   '/opportunities/awarded/$contractId': typeof OpportunitiesAwardedContractIdRoute
-  '/tools/demand/$naics': typeof ToolsDemandNaicsRoute
-  '/tools/demand/category/$slug': typeof ToolsDemandCategorySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
   '/business-profile': typeof BusinessProfileRoute
+  '/find-a-mentor': typeof FindAMentorRoute
   '/government-buyers': typeof GovernmentBuyersRoute
   '/home': typeof HomeRoute
-  '/internal': typeof InternalRoute
   '/labor-pricing': typeof LaborPricingRoute
-  '/mentor-directory': typeof MentorDirectoryRoute
   '/partner-finder': typeof PartnerFinderRoute
   '/partners': typeof PartnersRoute
   '/pipeline': typeof PipelineRoute
-  '/redirect': typeof RedirectRoute
+  '/roadmap': typeof RoadmapRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
   '/whos-winning': typeof WhosWinningRoute
+  '/ava/$noticeId': typeof AvaNoticeIdRoute
   '/awards/$awardId': typeof AwardsAwardIdRoute
   '/cap-statement/builder': typeof CapStatementBuilderRoute
-  '/dev/profile-states': typeof DevProfileStatesRoute
-  '/dev/ui': typeof DevUiRoute
-  '/dev/warm-start': typeof DevWarmStartRoute
   '/forecasts/$forecastId': typeof ForecastsForecastIdRoute
   '/mentors/$reviewId': typeof MentorsReviewIdRoute
+  '/my-business/$part': typeof MyBusinessPartRoute
   '/opportunities/$noticeId': typeof OpportunitiesNoticeIdRoute
   '/small-orders/$orderId': typeof SmallOrdersOrderIdRoute
   '/small-orders/restricted': typeof SmallOrdersRestrictedRoute
   '/stay-ready/$itemId': typeof StayReadyItemIdRoute
-  '/tools/capability-statement': typeof ToolsCapabilityStatementRoute
-  '/tools/co-checklist': typeof ToolsCoChecklistRoute
-  '/tools/demand': typeof ToolsDemandRoute
-  '/tools/hubzone': typeof ToolsHubzoneRoute
-  '/tools/naics': typeof ToolsNaicsRoute
-  '/tools/registration-checklist': typeof ToolsRegistrationChecklistRoute
-  '/tools/scorecard': typeof ToolsScorecardRoute
+  '/ava': typeof AvaIndexRoute
   '/awards': typeof AwardsIndexRoute
   '/forecasts': typeof ForecastsIndexRoute
   '/mentors': typeof MentorsIndexRoute
+  '/my-business': typeof MyBusinessIndexRoute
   '/opportunities': typeof OpportunitiesIndexRoute
   '/small-orders': typeof SmallOrdersIndexRoute
   '/stay-ready': typeof StayReadyIndexRoute
-  '/tools': typeof ToolsIndexRoute
   '/opportunities/awarded/$contractId': typeof OpportunitiesAwardedContractIdRoute
-  '/tools/demand/$naics': typeof ToolsDemandNaicsRoute
-  '/tools/demand/category/$slug': typeof ToolsDemandCategorySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
+  '/ava': typeof AvaRouteWithChildren
   '/awards': typeof AwardsRouteWithChildren
   '/business-profile': typeof BusinessProfileRoute
+  '/find-a-mentor': typeof FindAMentorRoute
   '/forecasts': typeof ForecastsRouteWithChildren
   '/government-buyers': typeof GovernmentBuyersRoute
   '/home': typeof HomeRoute
-  '/internal': typeof InternalRoute
   '/labor-pricing': typeof LaborPricingRoute
-  '/mentor-directory': typeof MentorDirectoryRoute
   '/mentors': typeof MentorsRouteWithChildren
+  '/my-business': typeof MyBusinessRouteWithChildren
   '/opportunities': typeof OpportunitiesRouteWithChildren
   '/partner-finder': typeof PartnerFinderRoute
   '/partners': typeof PartnersRoute
   '/pipeline': typeof PipelineRoute
-  '/redirect': typeof RedirectRoute
+  '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
   '/tasks': typeof TasksRoute
-  '/tools': typeof ToolsRouteWithChildren
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
   '/whos-winning': typeof WhosWinningRoute
+  '/ava/$noticeId': typeof AvaNoticeIdRoute
   '/awards/$awardId': typeof AwardsAwardIdRoute
   '/cap-statement/builder': typeof CapStatementBuilderRoute
-  '/dev/profile-states': typeof DevProfileStatesRoute
-  '/dev/ui': typeof DevUiRoute
-  '/dev/warm-start': typeof DevWarmStartRoute
   '/forecasts/$forecastId': typeof ForecastsForecastIdRoute
   '/mentors/$reviewId': typeof MentorsReviewIdRoute
+  '/my-business/$part': typeof MyBusinessPartRoute
   '/opportunities/$noticeId': typeof OpportunitiesNoticeIdRoute
   '/small-orders/$orderId': typeof SmallOrdersOrderIdRoute
   '/small-orders/restricted': typeof SmallOrdersRestrictedRoute
   '/stay-ready/$itemId': typeof StayReadyItemIdRoute
-  '/tools/capability-statement': typeof ToolsCapabilityStatementRoute
-  '/tools/co-checklist': typeof ToolsCoChecklistRoute
-  '/tools/demand': typeof ToolsDemandRoute
-  '/tools/hubzone': typeof ToolsHubzoneRoute
-  '/tools/naics': typeof ToolsNaicsRoute
-  '/tools/registration-checklist': typeof ToolsRegistrationChecklistRoute
-  '/tools/scorecard': typeof ToolsScorecardRoute
+  '/ava/': typeof AvaIndexRoute
   '/awards/': typeof AwardsIndexRoute
   '/forecasts/': typeof ForecastsIndexRoute
   '/mentors/': typeof MentorsIndexRoute
+  '/my-business/': typeof MyBusinessIndexRoute
   '/opportunities/': typeof OpportunitiesIndexRoute
   '/small-orders/': typeof SmallOrdersIndexRoute
   '/stay-ready/': typeof StayReadyIndexRoute
-  '/tools/': typeof ToolsIndexRoute
   '/opportunities/awarded/$contractId': typeof OpportunitiesAwardedContractIdRoute
-  '/tools/demand_/$naics': typeof ToolsDemandNaicsRoute
-  '/tools/demand_/category/$slug': typeof ToolsDemandCategorySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/agencies'
+    | '/ava'
     | '/awards'
     | '/business-profile'
+    | '/find-a-mentor'
     | '/forecasts'
     | '/government-buyers'
     | '/home'
-    | '/internal'
     | '/labor-pricing'
-    | '/mentor-directory'
     | '/mentors'
+    | '/my-business'
     | '/opportunities'
     | '/partner-finder'
     | '/partners'
     | '/pipeline'
-    | '/redirect'
+    | '/roadmap'
     | '/small-orders'
     | '/tasks'
-    | '/tools'
     | '/vehicles'
     | '/wallet'
     | '/whos-winning'
+    | '/ava/$noticeId'
     | '/awards/$awardId'
     | '/cap-statement/builder'
-    | '/dev/profile-states'
-    | '/dev/ui'
-    | '/dev/warm-start'
     | '/forecasts/$forecastId'
     | '/mentors/$reviewId'
+    | '/my-business/$part'
     | '/opportunities/$noticeId'
     | '/small-orders/$orderId'
     | '/small-orders/restricted'
     | '/stay-ready/$itemId'
-    | '/tools/capability-statement'
-    | '/tools/co-checklist'
-    | '/tools/demand'
-    | '/tools/hubzone'
-    | '/tools/naics'
-    | '/tools/registration-checklist'
-    | '/tools/scorecard'
+    | '/ava/'
     | '/awards/'
     | '/forecasts/'
     | '/mentors/'
+    | '/my-business/'
     | '/opportunities/'
     | '/small-orders/'
     | '/stay-ready/'
-    | '/tools/'
     | '/opportunities/awarded/$contractId'
-    | '/tools/demand/$naics'
-    | '/tools/demand/category/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/agencies'
     | '/business-profile'
+    | '/find-a-mentor'
     | '/government-buyers'
     | '/home'
-    | '/internal'
     | '/labor-pricing'
-    | '/mentor-directory'
     | '/partner-finder'
     | '/partners'
     | '/pipeline'
-    | '/redirect'
+    | '/roadmap'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
     | '/whos-winning'
+    | '/ava/$noticeId'
     | '/awards/$awardId'
     | '/cap-statement/builder'
-    | '/dev/profile-states'
-    | '/dev/ui'
-    | '/dev/warm-start'
     | '/forecasts/$forecastId'
     | '/mentors/$reviewId'
+    | '/my-business/$part'
     | '/opportunities/$noticeId'
     | '/small-orders/$orderId'
     | '/small-orders/restricted'
     | '/stay-ready/$itemId'
-    | '/tools/capability-statement'
-    | '/tools/co-checklist'
-    | '/tools/demand'
-    | '/tools/hubzone'
-    | '/tools/naics'
-    | '/tools/registration-checklist'
-    | '/tools/scorecard'
+    | '/ava'
     | '/awards'
     | '/forecasts'
     | '/mentors'
+    | '/my-business'
     | '/opportunities'
     | '/small-orders'
     | '/stay-ready'
-    | '/tools'
     | '/opportunities/awarded/$contractId'
-    | '/tools/demand/$naics'
-    | '/tools/demand/category/$slug'
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/agencies'
+    | '/ava'
     | '/awards'
     | '/business-profile'
+    | '/find-a-mentor'
     | '/forecasts'
     | '/government-buyers'
     | '/home'
-    | '/internal'
     | '/labor-pricing'
-    | '/mentor-directory'
     | '/mentors'
+    | '/my-business'
     | '/opportunities'
     | '/partner-finder'
     | '/partners'
     | '/pipeline'
-    | '/redirect'
+    | '/roadmap'
     | '/small-orders'
     | '/tasks'
-    | '/tools'
     | '/vehicles'
     | '/wallet'
     | '/whos-winning'
+    | '/ava/$noticeId'
     | '/awards/$awardId'
     | '/cap-statement/builder'
-    | '/dev/profile-states'
-    | '/dev/ui'
-    | '/dev/warm-start'
     | '/forecasts/$forecastId'
     | '/mentors/$reviewId'
+    | '/my-business/$part'
     | '/opportunities/$noticeId'
     | '/small-orders/$orderId'
     | '/small-orders/restricted'
     | '/stay-ready/$itemId'
-    | '/tools/capability-statement'
-    | '/tools/co-checklist'
-    | '/tools/demand'
-    | '/tools/hubzone'
-    | '/tools/naics'
-    | '/tools/registration-checklist'
-    | '/tools/scorecard'
+    | '/ava/'
     | '/awards/'
     | '/forecasts/'
     | '/mentors/'
+    | '/my-business/'
     | '/opportunities/'
     | '/small-orders/'
     | '/stay-ready/'
-    | '/tools/'
     | '/opportunities/awarded/$contractId'
-    | '/tools/demand_/$naics'
-    | '/tools/demand_/category/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
   AgenciesRoute: typeof AgenciesRoute
+  AvaRoute: typeof AvaRouteWithChildren
   AwardsRoute: typeof AwardsRouteWithChildren
   BusinessProfileRoute: typeof BusinessProfileRoute
+  FindAMentorRoute: typeof FindAMentorRoute
   ForecastsRoute: typeof ForecastsRouteWithChildren
   GovernmentBuyersRoute: typeof GovernmentBuyersRoute
   HomeRoute: typeof HomeRoute
-  InternalRoute: typeof InternalRoute
   LaborPricingRoute: typeof LaborPricingRoute
-  MentorDirectoryRoute: typeof MentorDirectoryRoute
   MentorsRoute: typeof MentorsRouteWithChildren
+  MyBusinessRoute: typeof MyBusinessRouteWithChildren
   OpportunitiesRoute: typeof OpportunitiesRouteWithChildren
   PartnerFinderRoute: typeof PartnerFinderRoute
   PartnersRoute: typeof PartnersRoute
   PipelineRoute: typeof PipelineRoute
-  RedirectRoute: typeof RedirectRoute
+  RoadmapRoute: typeof RoadmapRoute
   SmallOrdersRoute: typeof SmallOrdersRouteWithChildren
   TasksRoute: typeof TasksRoute
-  ToolsRoute: typeof ToolsRouteWithChildren
   VehiclesRoute: typeof VehiclesRoute
   WalletRoute: typeof WalletRoute
   WhosWinningRoute: typeof WhosWinningRoute
   CapStatementBuilderRoute: typeof CapStatementBuilderRoute
-  DevProfileStatesRoute: typeof DevProfileStatesRoute
-  DevUiRoute: typeof DevUiRoute
-  DevWarmStartRoute: typeof DevWarmStartRoute
   StayReadyItemIdRoute: typeof StayReadyItemIdRoute
   StayReadyIndexRoute: typeof StayReadyIndexRoute
 }
@@ -685,13 +557,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VehiclesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools': {
-      id: '/tools'
-      path: '/tools'
-      fullPath: '/tools'
-      preLoaderRoute: typeof ToolsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tasks': {
       id: '/tasks'
       path: '/tasks'
@@ -706,11 +571,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SmallOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/redirect': {
-      id: '/redirect'
-      path: '/redirect'
-      fullPath: '/redirect'
-      preLoaderRoute: typeof RedirectRouteImport
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pipeline': {
@@ -741,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpportunitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-business': {
+      id: '/my-business'
+      path: '/my-business'
+      fullPath: '/my-business'
+      preLoaderRoute: typeof MyBusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mentors': {
       id: '/mentors'
       path: '/mentors'
@@ -748,25 +620,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MentorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mentor-directory': {
-      id: '/mentor-directory'
-      path: '/mentor-directory'
-      fullPath: '/mentor-directory'
-      preLoaderRoute: typeof MentorDirectoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/labor-pricing': {
       id: '/labor-pricing'
       path: '/labor-pricing'
       fullPath: '/labor-pricing'
       preLoaderRoute: typeof LaborPricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/internal': {
-      id: '/internal'
-      path: '/internal'
-      fullPath: '/internal'
-      preLoaderRoute: typeof InternalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -790,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForecastsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/find-a-mentor': {
+      id: '/find-a-mentor'
+      path: '/find-a-mentor'
+      fullPath: '/find-a-mentor'
+      preLoaderRoute: typeof FindAMentorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/business-profile': {
       id: '/business-profile'
       path: '/business-profile'
@@ -804,18 +669,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AwardsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ava': {
+      id: '/ava'
+      path: '/ava'
+      fullPath: '/ava'
+      preLoaderRoute: typeof AvaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agencies': {
       id: '/agencies'
       path: '/agencies'
       fullPath: '/agencies'
       preLoaderRoute: typeof AgenciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -824,13 +689,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/tools/': {
-      id: '/tools/'
-      path: '/'
-      fullPath: '/tools/'
-      preLoaderRoute: typeof ToolsIndexRouteImport
-      parentRoute: typeof ToolsRoute
     }
     '/stay-ready/': {
       id: '/stay-ready/'
@@ -853,6 +711,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpportunitiesIndexRouteImport
       parentRoute: typeof OpportunitiesRoute
     }
+    '/my-business/': {
+      id: '/my-business/'
+      path: '/'
+      fullPath: '/my-business/'
+      preLoaderRoute: typeof MyBusinessIndexRouteImport
+      parentRoute: typeof MyBusinessRoute
+    }
     '/mentors/': {
       id: '/mentors/'
       path: '/'
@@ -874,54 +739,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AwardsIndexRouteImport
       parentRoute: typeof AwardsRoute
     }
-    '/tools/scorecard': {
-      id: '/tools/scorecard'
-      path: '/scorecard'
-      fullPath: '/tools/scorecard'
-      preLoaderRoute: typeof ToolsScorecardRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/registration-checklist': {
-      id: '/tools/registration-checklist'
-      path: '/registration-checklist'
-      fullPath: '/tools/registration-checklist'
-      preLoaderRoute: typeof ToolsRegistrationChecklistRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/naics': {
-      id: '/tools/naics'
-      path: '/naics'
-      fullPath: '/tools/naics'
-      preLoaderRoute: typeof ToolsNaicsRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/hubzone': {
-      id: '/tools/hubzone'
-      path: '/hubzone'
-      fullPath: '/tools/hubzone'
-      preLoaderRoute: typeof ToolsHubzoneRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/demand': {
-      id: '/tools/demand'
-      path: '/demand'
-      fullPath: '/tools/demand'
-      preLoaderRoute: typeof ToolsDemandRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/co-checklist': {
-      id: '/tools/co-checklist'
-      path: '/co-checklist'
-      fullPath: '/tools/co-checklist'
-      preLoaderRoute: typeof ToolsCoChecklistRouteImport
-      parentRoute: typeof ToolsRoute
-    }
-    '/tools/capability-statement': {
-      id: '/tools/capability-statement'
-      path: '/capability-statement'
-      fullPath: '/tools/capability-statement'
-      preLoaderRoute: typeof ToolsCapabilityStatementRouteImport
-      parentRoute: typeof ToolsRoute
+    '/ava/': {
+      id: '/ava/'
+      path: '/'
+      fullPath: '/ava/'
+      preLoaderRoute: typeof AvaIndexRouteImport
+      parentRoute: typeof AvaRoute
     }
     '/stay-ready/$itemId': {
       id: '/stay-ready/$itemId'
@@ -951,6 +774,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpportunitiesNoticeIdRouteImport
       parentRoute: typeof OpportunitiesRoute
     }
+    '/my-business/$part': {
+      id: '/my-business/$part'
+      path: '/$part'
+      fullPath: '/my-business/$part'
+      preLoaderRoute: typeof MyBusinessPartRouteImport
+      parentRoute: typeof MyBusinessRoute
+    }
     '/mentors/$reviewId': {
       id: '/mentors/$reviewId'
       path: '/$reviewId'
@@ -964,27 +794,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/forecasts/$forecastId'
       preLoaderRoute: typeof ForecastsForecastIdRouteImport
       parentRoute: typeof ForecastsRoute
-    }
-    '/dev/warm-start': {
-      id: '/dev/warm-start'
-      path: '/dev/warm-start'
-      fullPath: '/dev/warm-start'
-      preLoaderRoute: typeof DevWarmStartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/ui': {
-      id: '/dev/ui'
-      path: '/dev/ui'
-      fullPath: '/dev/ui'
-      preLoaderRoute: typeof DevUiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/profile-states': {
-      id: '/dev/profile-states'
-      path: '/dev/profile-states'
-      fullPath: '/dev/profile-states'
-      preLoaderRoute: typeof DevProfileStatesRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/cap-statement/builder': {
       id: '/cap-statement/builder'
@@ -1000,12 +809,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AwardsAwardIdRouteImport
       parentRoute: typeof AwardsRoute
     }
-    '/tools/demand_/$naics': {
-      id: '/tools/demand_/$naics'
-      path: '/demand/$naics'
-      fullPath: '/tools/demand/$naics'
-      preLoaderRoute: typeof ToolsDemandNaicsRouteImport
-      parentRoute: typeof ToolsRoute
+    '/ava/$noticeId': {
+      id: '/ava/$noticeId'
+      path: '/$noticeId'
+      fullPath: '/ava/$noticeId'
+      preLoaderRoute: typeof AvaNoticeIdRouteImport
+      parentRoute: typeof AvaRoute
     }
     '/opportunities/awarded/$contractId': {
       id: '/opportunities/awarded/$contractId'
@@ -1014,15 +823,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OpportunitiesAwardedContractIdRouteImport
       parentRoute: typeof OpportunitiesRoute
     }
-    '/tools/demand_/category/$slug': {
-      id: '/tools/demand_/category/$slug'
-      path: '/demand/category/$slug'
-      fullPath: '/tools/demand/category/$slug'
-      preLoaderRoute: typeof ToolsDemandCategorySlugRouteImport
-      parentRoute: typeof ToolsRoute
-    }
   }
 }
+
+interface AvaRouteChildren {
+  AvaNoticeIdRoute: typeof AvaNoticeIdRoute
+  AvaIndexRoute: typeof AvaIndexRoute
+}
+
+const AvaRouteChildren: AvaRouteChildren = {
+  AvaNoticeIdRoute: AvaNoticeIdRoute,
+  AvaIndexRoute: AvaIndexRoute,
+}
+
+const AvaRouteWithChildren = AvaRoute._addFileChildren(AvaRouteChildren)
 
 interface AwardsRouteChildren {
   AwardsAwardIdRoute: typeof AwardsAwardIdRoute
@@ -1064,6 +878,20 @@ const MentorsRouteChildren: MentorsRouteChildren = {
 const MentorsRouteWithChildren =
   MentorsRoute._addFileChildren(MentorsRouteChildren)
 
+interface MyBusinessRouteChildren {
+  MyBusinessPartRoute: typeof MyBusinessPartRoute
+  MyBusinessIndexRoute: typeof MyBusinessIndexRoute
+}
+
+const MyBusinessRouteChildren: MyBusinessRouteChildren = {
+  MyBusinessPartRoute: MyBusinessPartRoute,
+  MyBusinessIndexRoute: MyBusinessIndexRoute,
+}
+
+const MyBusinessRouteWithChildren = MyBusinessRoute._addFileChildren(
+  MyBusinessRouteChildren,
+)
+
 interface OpportunitiesRouteChildren {
   OpportunitiesNoticeIdRoute: typeof OpportunitiesNoticeIdRoute
   OpportunitiesIndexRoute: typeof OpportunitiesIndexRoute
@@ -1096,62 +924,30 @@ const SmallOrdersRouteWithChildren = SmallOrdersRoute._addFileChildren(
   SmallOrdersRouteChildren,
 )
 
-interface ToolsRouteChildren {
-  ToolsCapabilityStatementRoute: typeof ToolsCapabilityStatementRoute
-  ToolsCoChecklistRoute: typeof ToolsCoChecklistRoute
-  ToolsDemandRoute: typeof ToolsDemandRoute
-  ToolsHubzoneRoute: typeof ToolsHubzoneRoute
-  ToolsNaicsRoute: typeof ToolsNaicsRoute
-  ToolsRegistrationChecklistRoute: typeof ToolsRegistrationChecklistRoute
-  ToolsScorecardRoute: typeof ToolsScorecardRoute
-  ToolsIndexRoute: typeof ToolsIndexRoute
-  ToolsDemandNaicsRoute: typeof ToolsDemandNaicsRoute
-  ToolsDemandCategorySlugRoute: typeof ToolsDemandCategorySlugRoute
-}
-
-const ToolsRouteChildren: ToolsRouteChildren = {
-  ToolsCapabilityStatementRoute: ToolsCapabilityStatementRoute,
-  ToolsCoChecklistRoute: ToolsCoChecklistRoute,
-  ToolsDemandRoute: ToolsDemandRoute,
-  ToolsHubzoneRoute: ToolsHubzoneRoute,
-  ToolsNaicsRoute: ToolsNaicsRoute,
-  ToolsRegistrationChecklistRoute: ToolsRegistrationChecklistRoute,
-  ToolsScorecardRoute: ToolsScorecardRoute,
-  ToolsIndexRoute: ToolsIndexRoute,
-  ToolsDemandNaicsRoute: ToolsDemandNaicsRoute,
-  ToolsDemandCategorySlugRoute: ToolsDemandCategorySlugRoute,
-}
-
-const ToolsRouteWithChildren = ToolsRoute._addFileChildren(ToolsRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
   AgenciesRoute: AgenciesRoute,
+  AvaRoute: AvaRouteWithChildren,
   AwardsRoute: AwardsRouteWithChildren,
   BusinessProfileRoute: BusinessProfileRoute,
+  FindAMentorRoute: FindAMentorRoute,
   ForecastsRoute: ForecastsRouteWithChildren,
   GovernmentBuyersRoute: GovernmentBuyersRoute,
   HomeRoute: HomeRoute,
-  InternalRoute: InternalRoute,
   LaborPricingRoute: LaborPricingRoute,
-  MentorDirectoryRoute: MentorDirectoryRoute,
   MentorsRoute: MentorsRouteWithChildren,
+  MyBusinessRoute: MyBusinessRouteWithChildren,
   OpportunitiesRoute: OpportunitiesRouteWithChildren,
   PartnerFinderRoute: PartnerFinderRoute,
   PartnersRoute: PartnersRoute,
   PipelineRoute: PipelineRoute,
-  RedirectRoute: RedirectRoute,
+  RoadmapRoute: RoadmapRoute,
   SmallOrdersRoute: SmallOrdersRouteWithChildren,
   TasksRoute: TasksRoute,
-  ToolsRoute: ToolsRouteWithChildren,
   VehiclesRoute: VehiclesRoute,
   WalletRoute: WalletRoute,
   WhosWinningRoute: WhosWinningRoute,
   CapStatementBuilderRoute: CapStatementBuilderRoute,
-  DevProfileStatesRoute: DevProfileStatesRoute,
-  DevUiRoute: DevUiRoute,
-  DevWarmStartRoute: DevWarmStartRoute,
   StayReadyItemIdRoute: StayReadyItemIdRoute,
   StayReadyIndexRoute: StayReadyIndexRoute,
 }

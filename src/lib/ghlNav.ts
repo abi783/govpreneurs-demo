@@ -1,4 +1,5 @@
 import { basepath } from "./basepath";
+import { demoNavigate } from "../demo/nav/navigate";
 
 /** Cross-page navigation intent relayed via the GHL parent frame. */
 export type GhlNavIntent = {
@@ -68,15 +69,17 @@ export function readFreshIntent(raw: string | null, now: number): GhlNavIntent |
  * a single SPA and an in-app router navigation reaches every route directly.
  */
 export function isEmbeddedInGhl(): boolean {
-  return typeof window !== "undefined" && window.parent !== window;
+  // DEMO: the demo is never inside a GHL frame, so nothing relays to a parent.
+  return false;
 }
 
 /** The Mentors page's GoHighLevel custom-menu-link id. */
 export const MENTORS_MENU_LINK_ID = "16ced954-8fdc-4f9a-91eb-97d3b9c6922b";
 
 /** The Mentors page for one location, as a top-level GoHighLevel URL. */
-export function mentorsPageUrl(locationId: string): string {
-  return `https://app.govpreneurs.com/v2/location/${encodeURIComponent(locationId)}/custom-menu-link/${MENTORS_MENU_LINK_ID}`;
+export function mentorsPageUrl(_locationId?: string): string {
+  // DEMO: the Mentors menu link (16ced954) is the in-app mentor directory.
+  return "/find-a-mentor";
 }
 
 /**
@@ -88,16 +91,9 @@ export function mentorsPageUrl(locationId: string): string {
  * browser goes to that same menu-link URL. With no location id either, the
  * caller's in-app fallback runs.
  */
-export function openMentorsPage(locationId: string | null | undefined, fallback: () => void): void {
-  if (isEmbeddedInGhl()) {
-    requestCrossPageNav("mentors", "/mentors");
-    return;
-  }
-  if (locationId) {
-    window.location.assign(mentorsPageUrl(locationId));
-    return;
-  }
-  fallback();
+export function openMentorsPage(_locationId: string | null | undefined, _fallback?: () => void): void {
+  // DEMO: go to the mentor directory inside the app.
+  demoNavigate(mentorsPageUrl());
 }
 
 /**
@@ -132,10 +128,9 @@ export function pageKeyForRoute(route: string): string | null {
  * switch the top-level page. Fire-and-forget: the parent navigation tears this
  * iframe down, so there is no response to await.
  */
-export function requestCrossPageNav(page: string, route: string): void {
-  const intent = buildNavIntent(page, route, Date.now());
-  window.localStorage.setItem(NAV_INTENT_KEY, JSON.stringify(intent));
-  window.parent.postMessage({ message: NAV_MESSAGE, payload: intent }, "*");
+export function requestCrossPageNav(_page: string, route: string): void {
+  // DEMO: there is no parent frame. Move to the route inside the app.
+  demoNavigate(route);
 }
 
 /** A click event, as far as the relay needs one. */
@@ -153,6 +148,8 @@ export function relayWhenEmbedded(page: string, route: string) {
     requestCrossPageNav(page, route);
   };
 }
+// DEMO: `isEmbeddedInGhl()` is always false, so this handler does nothing and
+// the <Link> it sits on navigates inside the app.
 
 /** The in-app route this iframe shows now, without the router basepath. */
 export function currentAppPath(): string {
@@ -162,12 +159,11 @@ export function currentAppPath(): string {
 }
 
 /**
- * The GHL page that shows `path`. The app root ("/") is the opportunities feed,
- * which the Opportunities menu link loads, so a link from the feed to an
- * opportunity stays in-app.
+ * The GHL page that shows `path`.
+ * DEMO: the opportunities feed is `/opportunities`, so the leading segment is enough.
  */
 function currentPageKey(path: string): string | null {
-  return path.split("?")[0] === "/" ? "opportunities" : pageKeyForRoute(path);
+  return pageKeyForRoute(path);
 }
 
 /**
@@ -279,8 +275,12 @@ export function storeOppDeepLink(
   opportunityId: string,
   kind: OppDeepLinkKind = "opportunity",
 ): void {
-  const link = buildOppDeepLink(opportunityId, Date.now(), kind);
-  window.localStorage.setItem(OPP_DEEPLINK_KEY, JSON.stringify(link));
+  // DEMO: no GHL page load sits in between. Open the target inside the app.
+  demoNavigate(
+    kind === "small-order"
+      ? `/small-orders/${encodeURIComponent(opportunityId)}`
+      : `/opportunities/${encodeURIComponent(opportunityId)}`,
+  );
 }
 
 /**
@@ -374,8 +374,8 @@ export function readFreshReviewDeepLink(raw: string | null, now: number): Review
 
 /** Persist a mentor-review deep-link before a full-page redirect into the GHL menu page. */
 export function storeReviewDeepLink(reviewId: string): void {
-  const link = buildReviewDeepLink(reviewId, Date.now());
-  window.localStorage.setItem(REVIEW_DEEPLINK_KEY, JSON.stringify(link));
+  // DEMO: no GHL page load sits in between. Open the review inside the app.
+  demoNavigate(`/mentors/${encodeURIComponent(reviewId)}`);
 }
 
 /**

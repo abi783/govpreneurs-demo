@@ -4,6 +4,7 @@
 // UX-first) with Grant's identity, the opening briefing, the pinned analysis
 // summary, the open-question card, chips, and composer. The live conversation
 // loop (classify → retrieve/elicit/re-run + the delta choreography) is Phase 7.
+import { demoNavigate } from "../../demo/nav/navigate";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUp,
@@ -489,7 +490,8 @@ export function GrantRail({
       const qs = chip.search
         ? "?" + new URLSearchParams(chip.search as Record<string, string>)
         : "";
-      window.location.assign(to + qs);
+      // DEMO: move inside the app without a page load.
+      demoNavigate(to + qs);
       return;
     }
     // Send the PINNED original wording (query), not the reworded display label —

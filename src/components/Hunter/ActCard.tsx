@@ -64,8 +64,6 @@ function SelfServeCta({
   return (
     <a
       href={roadmapUrl(locationId)}
-      target="_blank"
-      rel="noopener noreferrer"
       className="hunter-act__cta"
     >
       Get started

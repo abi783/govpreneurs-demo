@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { registerNavigator } from "./demo/nav/navigate";
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,13 @@ export const router = createRouter({
   context: { queryClient },
   scrollRestoration: true,
   defaultPreloadStaleTime: 0,
+});
+
+// DEMO: code outside React (ghlNav.ts, the Success Center shims) moves the app
+// through this function. See src/demo/nav/navigate.ts.
+registerNavigator((to, opts) => {
+  if (opts?.replace) router.history.replace(to);
+  else router.history.push(to);
 });
 
 declare module "@tanstack/react-router" {

@@ -83,8 +83,6 @@ export function ReadinessHeader() {
                   {locationId ? (
                     <a
                       href={roadmapUrl(locationId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="rh-status-link"
                     >
                       {item}
@@ -123,8 +121,6 @@ export function ReadinessHeader() {
           {locationId && (
             <a
               href={roadmapUrl(locationId)}
-              target="_blank"
-              rel="noopener noreferrer"
               className="rh-btn-primary"
             >
               Open Roadmap
