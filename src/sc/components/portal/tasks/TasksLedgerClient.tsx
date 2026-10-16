@@ -139,6 +139,12 @@ export function TasksLedgerClient({
   iframeOnly: boolean;
 }) {
   const [data, setData] = useState<TasksPayload>(initial);
+  // DEMO: in production `router.refresh()` re-reads the server page, and this state
+  // keeps the list it started with until a reload. The demo's refresh builds a new
+  // `initial`, so take it: a call booked from here, or on the Roadmap, then ticks its task.
+  useEffect(() => {
+    setData(initial);
+  }, [initial]);
   /* ONE LIST OPEN AT A TIME, AND IT CAN BE SHUT. The headings are the control:
      opening one closes whatever was open, and clicking the open one shuts it,
      so the page can reach a state that is just the three headings.

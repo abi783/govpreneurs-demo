@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DemoPlaceholder } from "../demo/ui/DemoPlaceholder";
+import { TasksPage } from "../demo/sc/tasks/TasksPage";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({ meta: [{ title: "Tasks · GovPreneurs" }] }),
-  component: () => <DemoPlaceholder title="Tasks" owner="the Tasks page agent" />,
+  component: TasksPage,
 });
