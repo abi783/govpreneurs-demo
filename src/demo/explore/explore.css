@@ -28,3 +28,13 @@ button.bid-card__title {
   cursor: pointer;
   font-family: inherit;
 }
+
+/* Lists inside a mentor's message show their numbers and bullets. */
+.mentors-msg__bubble ol {
+  list-style: decimal outside;
+  margin: 6px 0;
+  padding-left: 22px;
+}
+.mentors-msg__bubble ul {
+  list-style: disc outside;
+}
