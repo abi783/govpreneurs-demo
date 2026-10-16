@@ -17,9 +17,9 @@ export function DemoNoticeHost() {
     <Dialog.Root open={notice !== null} onOpenChange={(o) => !o && setNotice(null)}>
       <Dialog.Portal>
         <Dialog.Overlay className="demo-overlay" />
-        <Dialog.Content className="demo-dialog" aria-describedby="demo-notice-text">
+        <Dialog.Content className="demo-dialog">
           <Dialog.Title className="demo-dialog__title">{notice?.title}</Dialog.Title>
-          <Dialog.Description id="demo-notice-text" className="demo-dialog__text">
+          <Dialog.Description className="demo-dialog__text">
             {notice?.message}
           </Dialog.Description>
           <div className="demo-dialog__actions">
