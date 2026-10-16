@@ -306,7 +306,7 @@ export function HowToSend({ ctx }: { ctx: AvaContext }) {
             <>
               <h5>Your steps, in order</h5>
               <p className="ds-note">
-                Only you can do these. Ava never sends anything for you. Tick each one as you do it.
+                Only you can do these. Ava never sends anything for you. Check off each one as you do it.
               </p>
               <TodoList
                 items={todo.map((t) => ({ ...t, done: !!s.checklist[t.id] }))}

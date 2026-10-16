@@ -14,7 +14,7 @@ export interface Vehicle {
   ceilingValue: number; // total ceiling in USD
   setAside: "Unrestricted" | "Total SB" | "SDVOSB" | "8(a)" | "WOSB" | "HUBZone";
   scope: string; // plain-English what it covers
-  openToNewEntrants: "Open now" | "Closed — next on-ramp TBD" | "On-ramp expected" | "Closed";
+  openToNewEntrants: "Open now" | "Closed — next on-ramp not announced" | "On-ramp expected" | "Closed";
   recompeteWindow?: string; // human readable, e.g. "FY27 Q2"
   /** True when the vehicle buys the kind of work Amira does (food service and catering). */
   fitsFood: boolean;
@@ -65,7 +65,7 @@ export const VEHICLES: Vehicle[] = [
     setAside: "Total SB",
     scope:
       "Pool of pre-approved firms that compete for galley, mess attendant and dining hall task orders at Camp Lejeune, New River, Cherry Point and other Mid-Atlantic bases.",
-    openToNewEntrants: "Closed — next on-ramp TBD",
+    openToNewEntrants: "Closed — next on-ramp not announced",
     recompeteWindow: "FY28 Q1",
     fitsFood: true,
     fitReason:
