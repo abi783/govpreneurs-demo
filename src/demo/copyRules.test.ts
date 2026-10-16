@@ -18,6 +18,7 @@ describe("copy rules", () => {
       ["1 awards · $11.9M", "wrong plural"],
       ["Almost all their work is in Stem and nearby, in North Carolina.", "odd place name"],
       ["Hunter will prioritise their solicitations.", "not US English"],
+      ["We tick this for you when we see it done.", "not US English"],
       ["Aramark runs the incumbent contract.", "a real company"],
     ];
     for (const [text, rule] of bad) expect(copyProblem(text)?.rule, text).toContain(rule);
