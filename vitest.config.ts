@@ -27,6 +27,6 @@ export default defineConfig({
     // The forecast tests read forecasts recorded on this day, so their clock is pinned
     // to it. The app itself counts from today (lib/forecasts/engine.ts, FORECASTS_TODAY).
     env: { VITE_FORECASTS_TODAY: "2026-09-16" },
-    exclude: [...configDefaults.exclude, "e2e/**/*.spec.ts"],
+    exclude: [...configDefaults.exclude, "qa/**"],
   },
 });

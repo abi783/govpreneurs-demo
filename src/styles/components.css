@@ -28,7 +28,12 @@ html, body {
   text-rendering: optimizeLegibility;
   font-feature-settings: "cv11" 1, "ss01" 1, "ss03" 1;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* DEMO: in the `base` layer so Tailwind utilities (p-4, m-2) in the lifted Success Center
+   code can win. An unlayered `*` rule would beat every layered utility. Nothing changes for
+   frontend-v2 pages: unlayered class rules beat a layered rule, as they beat this one before. */
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+}
 
 /* Tabular numerals on any data-bearing class */
 .mono, .tnum, .num, table td, th {
