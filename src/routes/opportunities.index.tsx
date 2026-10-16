@@ -88,6 +88,9 @@ import { BuyerLaneSwitch } from "../components/Hunter/BuyerLaneSwitch";
 import { laneFromScope, laneOnlyFilters, withLane, type BuyerLane } from "../lib/buyerLane";
 import { daysUntil } from "../lib/format";
 import { FACET_DEBOUNCE_MS, SEARCH_DEBOUNCE_MS } from "../lib/feedDebounce";
+// DEMO: the demo's chat and facet counts read what the page shows (src/demo/hunter/feedContext.ts).
+import { publishFeedContext } from "../demo/hunter/feedContext";
+import "../demo/hunter/hunter.css";
 import {
   applyProfileDefaults,
   countActive,
@@ -250,6 +253,8 @@ function defaultTabSlice(tab: OppTab): TabScopedState {
 type Action =
   | { type: "set-filters"; filters: OpportunityFilters }
   | { type: "clear-all-filters" }
+  // DEMO: Hunter's "Start over" also clears the filters that the other tabs hold.
+  | { type: "clear-other-tabs" }
   | { type: "set-sort"; sort: SortKey }
   | { type: "set-tab"; tab: OppTab }
   | { type: "set-lane"; lane: BuyerLane }
@@ -307,6 +312,8 @@ export function reducer(state: State, action: Action): State {
       // should still drop an active search — mirrors HunterChatOverlay's onReset,
       // which already dispatches clear-all-filters + set-search("") together.
       return { ...state, filters: emptyFilters(), searchValue: "" };
+    case "clear-other-tabs":
+      return { ...state, tabStash: {} };
     case "set-sort":
       return { ...state, sort: action.sort };
     case "set-tab": {
@@ -624,6 +631,20 @@ export function OpportunitiesFeed() {
       state.lane,
     ],
   );
+
+  // DEMO: tell the demo handlers what the page shows. The chat applies a change to
+  // these filters and counts the result; the drawer's counts follow this tab.
+  useEffect(() => {
+    const { filters, sort } = toServerFilters(state.filters, state.sort);
+    const laned = withLane(filters, state.lane);
+    const q = state.searchValue.trim();
+    publishFeedContext({
+      tab: state.tab,
+      lane: state.lane,
+      filters: q ? { ...laned, search: q } : laned,
+      sort,
+    });
+  }, [state.tab, state.lane, state.filters, state.sort, state.searchValue]);
 
   // Sample the offset passively while the member scrolls; see scrollYRef.
   useEffect(() => {
@@ -1165,9 +1186,17 @@ export function OpportunitiesFeed() {
 
   const applyHunterFilters = useCallback(
     (p: DiscoveryPayload) => {
+      // DEMO: Hunter may open another tab first, when the filters leave nothing on this one.
+      // The target tab's own filters are the base then, because `set-tab` restores them.
+      const switching = p.tab !== undefined && p.tab !== state.tab;
+      if (switching) dispatch({ type: "set-tab", tab: p.tab! });
       // Fresh queries (match-my-profile, "clear filters and show me X") replace the
       // client filters wholesale; refinements merge onto the current set.
-      const base = p.fresh ? emptyFilters() : state.filters;
+      const base = p.fresh
+        ? emptyFilters()
+        : switching
+          ? (state.tabStash[p.tab!]?.filters ?? emptyFilters())
+          : state.filters;
       if (p.filters.search !== undefined) {
         // Drives the existing searchValue effect → backend keyword search
         // across title / agency / place of performance.
@@ -1208,7 +1237,7 @@ export function OpportunitiesFeed() {
       const lane = laneFromScope(p.filters.scope);
       if (lane) dispatch({ type: "set-lane", lane });
     },
-    [state.filters],
+    [state.filters, state.tab, state.tabStash],
   );
 
   /* Has he met Hunter? Read live, so dismissing swaps the hero for the strip in
@@ -1906,6 +1935,7 @@ export function OpportunitiesFeed() {
         onApplyFilters={applyHunterFilters}
         onReset={() => {
           dispatch({ type: "clear-all-filters" });
+          dispatch({ type: "clear-other-tabs" });
           dispatch({ type: "set-search", value: "" });
         }}
         onSaveChange={handleHunterSaveChange}

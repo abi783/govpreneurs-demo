@@ -2,7 +2,7 @@
 // chips. Ported from govpreneurs-v2/src/components/Hunter/AppliedFiltersStrip.tsx
 // (Phase 2), adapted to live's OpportunityFilters model.
 //
-// The reference diffs against `defaultFiltersForMarcus()` — a baseline where
+// The reference diffs against `the prototype's default-filters function` — a baseline where
 // profile values are PRE-SELECTED — so it can show "N profile filters off" /
 // "+N added". Live's `applyProfileDefaults` only TAGS matching options as
 // "from your profile" (via `filters.prefilled`); it never auto-selects them

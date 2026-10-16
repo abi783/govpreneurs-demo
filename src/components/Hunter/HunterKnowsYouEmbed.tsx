@@ -33,7 +33,7 @@ function selectGap(m: ReturnType<typeof useCurrentMember>, dismissCount: number)
       primaryModal: "tell_value_range",
     };
   }
-  // Default Marcus gap
+  // Default gap
   if (!m.capabilityStatementUploaded) {
     return {
       id: "capability_statement",

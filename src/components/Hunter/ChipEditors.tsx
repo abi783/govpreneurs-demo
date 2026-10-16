@@ -1,13 +1,14 @@
 import { useState, type ChangeEvent } from "react";
 import { Input } from "@/components/ui";
 
+// DEMO: work types for Haddad Catering, a food-service contractor.
 export const WORK_TYPE_OPTIONS = [
-  "Roofing & re-roofing",
-  "Building envelope / weatherproofing",
-  "Siding & exterior",
-  "Roof repair & PM",
-  "Facility repair & minor construction",
-  "Specialty trades",
+  "Food service contracts",
+  "Event and ceremony catering",
+  "Mobile food service",
+  "Therapeutic and patient diets",
+  "School and community meals",
+  "Specialty food production",
   "Other",
 ];
 

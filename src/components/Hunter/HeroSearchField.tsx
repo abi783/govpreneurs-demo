@@ -2,11 +2,12 @@ import { useEffect, useRef, useState, forwardRef } from "react";
 import { Search, Sparkles, X } from "lucide-react";
 // `Command` icon was only used by the Ctrl+K badge (disabled below).
 
+// DEMO: the examples are true for Haddad Catering, a woman-owned caterer in Fayetteville, NC.
 const ROTATING_PLACEHOLDERS = [
-  "Roofing under $1M in NC…",
-  "USACE Wilmington opportunities…",
-  "Open to first-time SDVOSB primes…",
-  "Re-roof projects closing in 30 days…",
+  "Catering under $500K near Fayetteville…",
+  "Fort Bragg dining and field meals…",
+  "Woman-owned set-asides closing this month…",
+  "School and hospital meal programs in NC…",
 ];
 
 export const HeroSearchField = forwardRef<

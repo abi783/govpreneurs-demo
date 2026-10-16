@@ -1,8 +1,9 @@
+// DEMO: examples for Haddad Catering, a woman-owned caterer in Fayetteville, NC.
 const PICKS = [
-  "Roofing NC $250K–$1M",
-  "SDVOSB set-asides closing in 30 days",
-  "Fort Bragg roofing & envelope work",
-  "VA roof replacements I qualify for",
+  "Catering NC $250K–$1M",
+  "Woman-owned set-asides closing in 30 days",
+  "Fort Bragg dining and field meals",
+  "VA patient meals I qualify for",
   "Partner opportunities — local NC primes",
 ];
 
