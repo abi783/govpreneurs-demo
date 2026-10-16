@@ -691,3 +691,49 @@ test.describe("odd text", () => {
     expect(w.problems).toEqual([]);
   });
 });
+
+
+// ─── Something the visitor adds finishes without a hidden control ───
+
+test.describe("an addendum the visitor adds", () => {
+  test.setTimeout(90_000);
+  for (const [name, id] of [
+    ["fayetteville", BIDS.fayetteville],
+    ["cumberland", BIDS.cumberland],
+  ] as const) {
+    test(`${name}: Ava reads it and goes on to its acknowledgment, at the pace of a call`, async ({
+      page,
+    }) => {
+      const w = watch(page);
+      // No ?fast=1: Ava takes her pause.
+      await page.goto(`/ava/${id}`);
+      await page.waitForLoadState("networkidle");
+      if (id === BIDS.cumberland) {
+        const chooser = page.waitForEvent("filechooser");
+        await page.getByRole("button", { name: /Upload the certificates/i }).click();
+        await (await chooser).setFiles({ name: "c.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
+        await page.getByRole("button", { name: "Read my bid" }).waitFor({ timeout: 1 }).catch(() => undefined);
+        await page.goto(`/ava/${id}?fast=1`);
+        await answerAll(page);
+        await page.getByRole("button", { name: "Read my bid" }).click();
+        await settleHolds(page);
+      }
+      const add = page.getByRole("button", { name: "Add an addendum" });
+      if (!(await add.isVisible().catch(() => false))) {
+        const dl = page.getByRole("button", { name: /Download your (bid|reply)/ });
+        await dl.click();
+        await expect.poll(() => w.downloads.length).toBeGreaterThan(0);
+      }
+      await add.scrollIntoViewIfNeeded();
+      const chooser = page.waitForEvent("filechooser");
+      await add.click();
+      await (await chooser).setFiles({ name: "Addendum_3.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n") });
+      await expect(page.getByText(/Reading Addendum_3\.pdf/).first()).toBeVisible();
+      await expect(page.getByText(/Addendum_3\.pdf needs your acknowledgment/).first()).toBeVisible({
+        timeout: 15_000,
+      });
+      await cleanText(page, `${name}-addendum`);
+      expect(w.problems).toEqual([]);
+    });
+  }
+});

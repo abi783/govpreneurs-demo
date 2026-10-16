@@ -11,7 +11,7 @@ const PORT = Number(process.env.QA_PORT ?? 4371);
 
 export default defineConfig({
   testDir: ".",
-  testMatch: ["ava-flow.spec.ts", "flows/ava-qa.spec.ts"],
+  testMatch: ["ava-*.spec.ts", "flows/ava-*.spec.ts"],
   fullyParallel: true,
   workers: Number(process.env.QA_WORKERS ?? 2),
   timeout: 5 * 60_000,

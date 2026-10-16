@@ -409,9 +409,13 @@ function AvaIndexPage() {
 
   // The four bids in the story, soonest due first (the story sorts them).
   const ids = STORY_BIDS.map((b) => b.id);
-  // Then the bids she was handed and Ava has not read, in the order she opened them.
+  // Then the bids she was handed and Ava has not read, soonest closing first.
   const [seen] = useDemoState<string[]>(HANDOFF_SEEN_KEY, []);
-  const handed = seen.filter((id) => !ids.includes(id));
+  const handed = seen
+    .filter((id) => !ids.includes(id))
+    .sort(
+      (a, b) => (findOpportunity(a)?.closesInDays ?? 0) - (findOpportunity(b)?.closesInDays ?? 0),
+    );
 
   const openBid = (id: string) => {
     void navigate({ to: "/ava/$noticeId", params: { noticeId: id } });
@@ -442,7 +446,7 @@ function AvaIndexPage() {
 
       <ul
         className="ava-idx__list"
-        aria-label="Your bids, soonest due first. Bids whose deadline passed are last."
+        aria-label="Your bids, soonest due first. Bids Ava has not read yet are last."
       >
         {ids.map((id) => (
           <li key={id}>
