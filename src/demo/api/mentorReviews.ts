@@ -12,7 +12,7 @@ import {
   markReviewViewed,
 } from "../state/mentorReviews";
 import { chargeWallet, MENTOR_REVIEW_PRICE } from "../state/wallet";
-import { describeSaved } from "../state/workspace";
+import { describeSaved, setSaved } from "../state/workspace";
 
 export const routes: DemoRouteDef[] = [
   {
@@ -53,6 +53,8 @@ export const routes: DemoRouteDef[] = [
       const title = detail?.title ?? oppKey;
       createReview({ oppKey, title, message: String(body?.message ?? ""), sourceType: detail?.sourceType ?? null });
       chargeWallet(`Mentor review — ${title}`, MENTOR_REVIEW_PRICE);
+      // DEMO: production saves a record when it is sent to a mentor, so it shows as saved afterwards.
+      setSaved(oppKey, true);
       return { success: true, updatedCount: 1 };
     },
   },

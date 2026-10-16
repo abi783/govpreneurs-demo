@@ -5,7 +5,9 @@ import * as Switch from "@radix-ui/react-switch";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { expiredBidCount, pickHunterNudge, type Bid } from "../lib/mock/bids";
 import { relativeTime } from "../lib/format";
-import { savedDetailToBid } from "../lib/bids/savedDetailToBid";
+// DEMO: the board shows every story pursuit, once each (src/demo/explore/pipelineBoard.ts).
+import { buildDemoBoard, pickDemoNudge } from "../demo/explore/pipelineBoard";
+import type { SavedOppDetail } from "../lib/workspace";
 import { useDismissibleHint } from "../lib/uiState";
 import { useGhlUser } from "../lib/ghlUser";
 import { crossPageClick, isEmbeddedInGhl, requestCrossPageNav } from "../lib/ghlNav";
@@ -94,14 +96,14 @@ function MyBidsPage() {
   const [showExpired, setShowExpired] = useState(false);
   const { dismissed: hunterDismissed, dismiss: dismissHunter } = useDismissibleHint("bids.hunter");
   const { session } = useGhlUser();
-  const [savedBids, setSavedBids] = useState<Bid[]>([]);
+  const [savedDetails, setSavedDetails] = useState<SavedOppDetail[]>([]);
   const [mentorReviews, setMentorReviews] =
     useState<MentorReviewSummary[]>(getMentorReviewsSnapshot);
 
   useEffect(() => {
     if (!session?.locationId) return;
     fetchSavedOppDetails()
-      .then((details) => setSavedBids(details.map(savedDetailToBid)))
+      .then((details) => setSavedDetails(details))
       .catch((err) => console.error("Failed to load saved opportunities", err));
   }, [session?.locationId]);
 
@@ -125,14 +127,14 @@ function MyBidsPage() {
   // the remaining stages (reviewing, drafting, outcomes) stay empty until
   // they get a real backend source — the board's other columns show their
   // empty state.
+  // DEMO: the board is built from the saved list, the story's pursuits and the reviews.
   const bids = useMemo(
-    () => [...savedBids, ...mentorReviewsToBids(mentorReviews)],
-    [savedBids, mentorReviews],
+    () => buildDemoBoard({ saved: savedDetails, reviews: mentorReviews }) as Bid[],
+    [savedDetails, mentorReviews],
   );
-  const nudge = useMemo(() => pickHunterNudge(bids), [bids]);
-  // "N hidden" counts the saved items the "Show expired" switch hides. Only a
-  // saved item can expire: a mentor-review card carries no deadline.
-  const hiddenExpired = useMemo(() => expiredBidCount(savedBids), [savedBids]);
+  const nudge = useMemo(() => pickHunterNudge(bids) ?? pickDemoNudge(bids), [bids]);
+  // "N hidden" counts the cards the "Show expired" switch hides.
+  const hiddenExpired = useMemo(() => expiredBidCount(bids), [bids]);
 
   if (bids.length === 0) {
     return (

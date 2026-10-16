@@ -554,14 +554,15 @@ export function SendToDla({ order: o, now }: { order: MicroOrder; now: Date | nu
             <div className="mp-send__btns">
               <a
                 className="btn btn-primary"
-                href="/home"
+                // DEMO: the registration checklist lives on the board (/small-orders).
+                href="/small-orders"
                 onClick={(e) => {
                   // Client navigation on purpose: a full page load would wipe
                   // the registrations she came here to finish, since this
                   // surface holds them in memory.
                   if (!router) return;
                   e.preventDefault();
-                  void router.navigate({ to: "/home" });
+                  void router.navigate({ to: "/small-orders" });
                 }}
               >
                 Get registered to sell
@@ -883,7 +884,7 @@ function WonChecklist({
         You won it. Here is what happens now.
       </p>
       <ol className="mp-won__steps">
-        <li>Buy the parts.</li>
+        <li>Buy the items.</li>
         <li>Pack them the way the order paper says.</li>
         {/* The same null guard as the send block 130 lines up, and the same
             one the order page applies three times. Missing it here rendered

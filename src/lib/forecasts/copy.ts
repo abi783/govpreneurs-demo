@@ -120,7 +120,7 @@ export const FILTERS = {
   naicsGloss:
     "NAICS is the industry code the buyer chose for the work. A forecast is shown only when its code is exactly one you choose.",
   naicsNote:
-    "While you choose a code, a forecast with no industry code is not shown. A code matches exactly, so 2381 does not show 238160. These codes and Kind of work both apply.",
+    "While you choose a code, a forecast with no industry code is not shown. A code matches exactly, so 7223 does not show 722310. These codes and Kind of work both apply.",
   naicsSearch: "Search a code or an industry",
   noNaics: "No forecast carries an industry code",
   place: { any: "Anywhere", served: "States you serve" },

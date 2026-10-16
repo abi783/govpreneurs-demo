@@ -1,0 +1,1359 @@
+// The 40 recorded forecasts of the Forecasts page, as the demo serves them.
+//
+// Source: the Forecasts prototype branch (40 real forecast records pulled on
+// 16 September 2026: 20 federal, 20 state and local). The government text is
+// copied as published, including its spellings. Three changes:
+//   1. Dates are not fixed. The record keeps how many days ago the buyer posted
+//      it and in how many days the buyer expects the bid request, counted from
+//      the day of the pull. forecastData.ts turns these into dates from today.
+//   2. Contact e-mail addresses are removed, so no sample click can write to a
+//      real official.
+//   3. Hunter's plain title and work fit (scopeFit) for Amira come from the
+//      prototype's hand-set read of each record.
+// Types only come from production; this file holds data.
+
+import type { SourceFile, SourceLink } from "@/lib/forecasts/records";
+
+export interface ForecastSeed {
+  /** Stable name inside the demo. */
+  key: string;
+  lane: "federal" | "sled";
+  /** The record's id in the forecasts store; also its page address. */
+  oppKey: string;
+  hgTitle: string | null;
+  hgText: string | null;
+  sourceId: string | null;
+  /** Days before today that the buyer posted the record. */
+  postedDaysAgo: number | null;
+  /** Days from today to the buyer's expected date. Negative = already passed. */
+  expectedInDays: number | null;
+  agencyName: string;
+  agencyAbbr: string | null;
+  naicsCode: string | null;
+  pscCode: string | null;
+  oppType: string | null;
+  setAsideCode: string | null;
+  valLow: number | null;
+  valHigh: number | null;
+  popState: string | null;
+  popCity: string | null;
+  contactName: string | null;
+  contactRole: string | null;
+  sourceName: string | null;
+  sourceLink: SourceLink | null;
+  docKey: string | null;
+  files: SourceFile[] | null;
+  /** Hunter's plain-English title. */
+  plainTitle: string;
+  /** How well the described work fits Amira's, 0 to 1. */
+  semanticFit: number | null;
+}
+
+export const RECORDED_SEEDS: ForecastSeed[] = 
+[
+  {
+    key: "fed-detainee-meals-atlanta",
+    lane: "federal",
+    oppKey: "a55390c2bf8b53c9bc7ec54a19b56116",
+    hgTitle: "Detainee Meals",
+    hgText: "To provide box lunches to the Atlanta Field Office three times per day 7 days a week (breakfast, lunch and dinner) for up to 72 detainees daily to the Atlanta Field Office, Detention Intake processing Unit. This proposal must provide financially sound, scalable, and fully compliant GSA Federal Supply Schedule meals to support detainee feeding requirements for U.S. Immigration and Customs Enforcement (ICE).",
+    sourceId: "F2026075039",
+    postedDaysAgo: 21,
+    expectedInDays: 13,
+    agencyName: "Enforcement and Removals",
+    agencyAbbr: "ERO",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "New",
+    setAsideCode: null,
+    valLow: 2000000,
+    valHigh: 5000000,
+    popState: "GA",
+    popCity: "Atlanta",
+    contactName: "Hilton James",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/75039/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Boxed meals at the immigration office, Atlanta",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-cg-yard-galley-baltimore",
+    lane: "federal",
+    oppKey: "c0ed6de8dcf953d1b29089dcffab9e2d",
+    hgTitle: "CG Yard Full Galley Food Service",
+    hgText: "The contractor shall provide all food, personal supervision, materials and other items or services necessary to perform Full Food Services in the Galley at U.S. Coast Guard Yard, Baltimore MD 21226. This is a required sources of service and a direct award to the state of Maryland, Blind Rehabilitative services will be executed in accordance with The Randolph-Sheppard Act.",
+    sourceId: "F2026074535",
+    postedDaysAgo: 29,
+    expectedInDays: 14,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Recompete",
+    setAsideCode: null,
+    valLow: 2000000,
+    valHigh: 5000000,
+    popState: "MD",
+    popCity: "Baltimore",
+    contactName: "Corinne Jacobson",
+    contactRole: "Lieutenant (LT)",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/74535/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Galley food service at the Coast Guard Yard, Baltimore",
+    semanticFit: 0.8
+  },
+  {
+    key: "fed-mess-attendants-new-orleans",
+    lane: "federal",
+    oppKey: "99819134f8015107ae5dd0ac337b4e15",
+    hgTitle: "BASE New Orleans Mess Attendant Services",
+    hgText: "Mess Attendant Services in support of Dining Facility operations to include, but not limited, to dishwashing, sanitization of all mess/meeting spaces, serving line items to patrons, inventory of all cleaning supplies/disposable products, securing utensils/tableware after meal service, cashier duties, hosting special functions, etc.",
+    sourceId: "F2026072539",
+    postedDaysAgo: 191,
+    expectedInDays: 20,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 1000000,
+    valHigh: 2000000,
+    popState: "LA",
+    popCity: "New Orleans",
+    contactName: "John Ross",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/72539/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Dining hall helpers at the Coast Guard base, New Orleans",
+    semanticFit: 0.6
+  },
+  {
+    key: "fed-galley-diffusers-navfac",
+    lane: "federal",
+    oppKey: "1c85c1b4073854039f142e9e92c7f7c3",
+    hgTitle: "(C) OC-520 GALLEY CEILING DEFUSER REFRESH",
+    hgText: "THERE ARE 13 LARGE ROUND AIR DEFUSERS IN THE MAIN DINNING ROOM THAT LOOK REALLY BAD, (MOST) SOME CAN JUST BE CLEANED UP, OTHERS WILL NEED A LITTLE MORE ATTENTION; MINOR REPAIRS AND OR PAINTING. **GENERATED FROM XO ZONE INSPECTION**",
+    sourceId: null,
+    postedDaysAgo: 268,
+    expectedInDays: 15,
+    agencyName: "Naval Facilities Engineering Command",
+    agencyAbbr: "NAVFAC",
+    naicsCode: null,
+    pscCode: null,
+    oppType: "New",
+    setAsideCode: "8AN",
+    valLow: 0,
+    valHigh: 2000000,
+    popState: null,
+    popCity: null,
+    contactName: "Navfac Osbp",
+    contactRole: "Procurement Officer",
+    sourceName: "Naval Facilities Engineering Command",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Clean and repair air vents in a Navy dining room",
+    semanticFit: 0.05
+  },
+  {
+    key: "fed-full-food-service-kodiak",
+    lane: "federal",
+    oppKey: "6b1a8a1b22e357d499fb11ea49d162cd",
+    hgTitle: "Full Food Service at U.S. Coast Guard Base Kodiak Alaska",
+    hgText: "Contractor to provide comprehensive, full-service food service operations at the U.S. Coast Guard Base Kodiak, Alaska galley dining facility. The contractor shall provide all necessary food products, supplies, qualified personnel, expert management, supervision, inventory control, materials and any other items essential for the successful execution of this full food-services operations.  The core objective is to deliver high-quality dining services for all authorized patrons, ensuring meals are available seven days a week, including all federal holidays.",
+    sourceId: "F2026073321",
+    postedDaysAgo: 194,
+    expectedInDays: 47,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 5000000,
+    valHigh: 10000000,
+    popState: "AK",
+    popCity: "Kodiak",
+    contactName: "James Ferguson",
+    contactRole: "Chief Storekeeper",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/73321/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Full food service at the Coast Guard base, Kodiak, Alaska",
+    semanticFit: 0.8
+  },
+  {
+    key: "fed-full-food-service-cape-may",
+    lane: "federal",
+    oppKey: "71c0127eb5855b0f8b7bdd17230d4d60",
+    hgTitle: "TRACEN Cape May Military Full Food Service Contracting",
+    hgText: "The Contractor shall furnish all food, personnel, management, supervision, materials, supplies, transportation, and other items or services (except as stated herein) necessary to provide full food service, in accordance with all items and conditions in the contract. The services shall be performed at the U.S. Coast Guard Training Center, Cape May, NJ. Contractor tasks shall include but are not limited to, the following: dining facility management; cooking; food preparation; stocking; serving and replenishing; cleaning facilities, equipment, and utensils; preparing vegetables and fruits for the salad bar; bussing tables in specified dining areas; performing cashier services; maintaining quality control; and ensuring minor operator maintenance of food service equipment.",
+    sourceId: "F2026073972",
+    postedDaysAgo: 107,
+    expectedInDays: 80,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 50000000,
+    valHigh: 100000000,
+    popState: "NJ",
+    popCity: "Cape May",
+    contactName: "Shane Archer",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/73972/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Full food service at the Coast Guard training center, Cape May",
+    semanticFit: 0.8
+  },
+  {
+    key: "fed-inspection-charleston",
+    lane: "federal",
+    oppKey: "2a1f8cf3c09254049d51dd83f52551bb",
+    hgTitle: "Construction Inspection Services for Base Charleston Shore Construction at U.S. Coast Guard Base Charleston, Charleston, SC",
+    hgText: "Provide construction inspection services for Design-Build an industrial complex, including Unaccompanied Personnel Housing (UPH), Galley, Gym, Coast Guard Exchange Facility, parking structure, and all related infrastructure at USCG Base Charleston, North Charleston, SC.",
+    sourceId: "F2026073130",
+    postedDaysAgo: 126,
+    expectedInDays: 86,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "541330",
+    pscCode: "R425",
+    oppType: "New",
+    setAsideCode: "TBD",
+    valLow: 500000,
+    valHigh: 1000000,
+    popState: "SC",
+    popCity: "Charleston",
+    contactName: "Lauren Bossingham",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/73130/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Building inspection for new Coast Guard buildings, Charleston",
+    semanticFit: 0.05
+  },
+  {
+    key: "fed-army-food-service-order",
+    lane: "federal",
+    oppKey: "28e3c96dfa6357489a5cc8457bde954e",
+    hgTitle: "PR 12371032 FFS NON CST",
+    hgText: null,
+    sourceId: "PANMCC-26-P-0000 035572",
+    postedDaysAgo: 252,
+    expectedInDays: 93,
+    agencyName: "Army Materiel Command",
+    agencyAbbr: "AMC",
+    naicsCode: "722310",
+    pscCode: "S203",
+    oppType: "New",
+    setAsideCode: null,
+    valLow: 250000,
+    valHigh: 1000000,
+    popState: null,
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: "Army Materiel Command",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Army food service order, few details shared",
+    semanticFit: 0
+  },
+  {
+    key: "fed-usmma-food-services",
+    lane: "federal",
+    oppKey: "6c7e08238bdd54a1a6c4dea54e856843",
+    hgTitle: "USMMA Food Services",
+    hgText: "USMMA requires a contractor to provide high-quality, comprehensive food services for all authorized patrons across multiple dining halls to include catering requests campus-wide. To qualify, the Contractor or Representative must comply with the Randolph-Sheppard Act and must possess a minimum of 10 years of certified or equivalent culinary experience.",
+    sourceId: "AG47357_1781642684",
+    postedDaysAgo: 77,
+    expectedInDays: 107,
+    agencyName: "Department of Transportation",
+    agencyAbbr: "DOT",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 5000000,
+    valHigh: 9999999,
+    popState: "NY",
+    popCity: null,
+    contactName: "Andrew McCarthy",
+    contactRole: "Procurement Officer",
+    sourceName: null,
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Dining halls and catering at the Merchant Marine Academy, New York",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-utilities-kodiak",
+    lane: "federal",
+    oppKey: "a0b9ad6329165847bcd09ab7aab9666a",
+    hgTitle: "Replace Utilities Barracks/Windrider Drives (PN 5729612)",
+    hgText: "Replace water, sanitary sewer, and storm drain systems which serve the area adjacent to the northwestern end of Nymans Peninsula including the barracks, galley, personnel activities center, Billiken movie theater and MWR boathouse.",
+    sourceId: "*F2024067210",
+    postedDaysAgo: 103,
+    expectedInDays: 121,
+    agencyName: "Department of Homeland Security",
+    agencyAbbr: "DHS",
+    naicsCode: "236220",
+    pscCode: "Y1JZ",
+    oppType: "New",
+    setAsideCode: "SBA",
+    valLow: 10000000,
+    valHigh: 20000000,
+    popState: "AK",
+    popCity: "Kodiak",
+    contactName: "Bill Boger",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/67210/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Replace water and sewer pipes at the Coast Guard base, Kodiak",
+    semanticFit: 0.02
+  },
+  {
+    key: "fed-galley-hvac-barbers-point",
+    lane: "federal",
+    oppKey: "1e1bc00171365b60b7d43f7259bd8dd1",
+    hgTitle: "Replace Galley and Ready Crew Berthing Heating Ventilation Air Conditioning, U.S. Coast Guard Air Station Barbers Point, Kapolei, Hawaii, Project #27135031",
+    hgText: "Replace Galley and Ready Crew Berthing Heating Ventilation Air Conditioning, U.S. Coast Guard Air Station Barbers Point, Kapolei, Hawaii, Project #27135031",
+    sourceId: "*F2025070454",
+    postedDaysAgo: 6,
+    expectedInDays: 180,
+    agencyName: "Coast Guard",
+    agencyAbbr: "USCG",
+    naicsCode: "238220",
+    pscCode: "Z2JZ",
+    oppType: "New",
+    setAsideCode: "8A",
+    valLow: 2000000,
+    valHigh: 5000000,
+    popState: "HI",
+    popCity: "Kapolei",
+    contactName: "Tammy Kao",
+    contactRole: "Contracting Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/70454/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Replace heating and cooling for a Coast Guard galley, Hawaii",
+    semanticFit: 0.03
+  },
+  {
+    key: "fed-boxed-meals-des-moines",
+    lane: "federal",
+    oppKey: "bdbc8f2fba8858719848af64876de3cb",
+    hgTitle: "DES MOINES BOXED NOON MEALS - SUPPLY",
+    hgText: "DES MOINES BOXED NOON MEALS - SUPPLY",
+    sourceId: null,
+    postedDaysAgo: 5,
+    expectedInDays: 197,
+    agencyName: "Defense Human Resources Activity",
+    agencyAbbr: "DHRA",
+    naicsCode: "722320",
+    pscCode: "S203",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 0,
+    valHigh: 250000,
+    popState: "IA",
+    popCity: "Des Moines",
+    contactName: null,
+    contactRole: null,
+    sourceName: "Department of Defense",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Boxed lunches for new recruits, Des Moines",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-boxed-meals-oklahoma-city",
+    lane: "federal",
+    oppKey: "932723aa6542577b86993e9b57e016e1",
+    hgTitle: "OKLAHOMA CITY BOXED NOON MEALS - SUPPLY",
+    hgText: "OKLAHOMA CITY BOXED NOON MEALS - SUPPLY",
+    sourceId: null,
+    postedDaysAgo: 5,
+    expectedInDays: 197,
+    agencyName: "Defense Human Resources Activity",
+    agencyAbbr: "DHRA",
+    naicsCode: "722320",
+    pscCode: "S203",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 250000,
+    valHigh: 1000000,
+    popState: "OK",
+    popCity: "Oklahoma City",
+    contactName: null,
+    contactRole: null,
+    sourceName: "Department of Defense",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Boxed lunches for new recruits, Oklahoma City",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-boxed-meals-charlotte",
+    lane: "federal",
+    oppKey: "2b7fc9393b5754ef8fca3bfc3330ee61",
+    hgTitle: "CHARLOTTE BOXED NOON MEALS - SUPPLY",
+    hgText: "CHARLOTTE BOXED NOON MEALS - SUPPLY",
+    sourceId: null,
+    postedDaysAgo: 5,
+    expectedInDays: 227,
+    agencyName: "Defense Human Resources Activity",
+    agencyAbbr: "DHRA",
+    naicsCode: "722320",
+    pscCode: "S203",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 0,
+    valHigh: 250000,
+    popState: null,
+    popCity: "Charlotte",
+    contactName: null,
+    contactRole: null,
+    sourceName: "Department of Defense",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Boxed lunches for new recruits, Charlotte",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-boxed-meals-amarillo",
+    lane: "federal",
+    oppKey: "4e69a927917659a9bf95bbb6986c9269",
+    hgTitle: "AMARILLO BOXED NOON MEAS - SUPPLY",
+    hgText: "AMARILLO BOXED NOON MEALS - SUPPLY",
+    sourceId: null,
+    postedDaysAgo: 5,
+    expectedInDays: 258,
+    agencyName: "Defense Human Resources Activity",
+    agencyAbbr: "DHRA",
+    naicsCode: "722320",
+    pscCode: "S203",
+    oppType: "Recompete",
+    setAsideCode: "TBD",
+    valLow: 0,
+    valHigh: 250000,
+    popState: "TX",
+    popCity: "Amarillo",
+    contactName: null,
+    contactRole: null,
+    sourceName: "Department of Defense",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Boxed lunches for new recruits, Amarillo",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-galley-chiller-yorktown",
+    lane: "federal",
+    oppKey: "68249a992b3c5ff39cefceb167668e5b",
+    hgTitle: "Replace Chiller Galley",
+    hgText: "Replace the #2 Chiller at the galley at Coast Guard Training Center Yorktown",
+    sourceId: "F2026074573",
+    postedDaysAgo: 6,
+    expectedInDays: 291,
+    agencyName: "Coast Guard",
+    agencyAbbr: "USCG",
+    naicsCode: "236220",
+    pscCode: "Y1JZ",
+    oppType: "New",
+    setAsideCode: "TBD",
+    valLow: 500000,
+    valHigh: 1000000,
+    popState: "VA",
+    popCity: "Yorktown",
+    contactName: "Robert Spangler",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/74573/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Replace a kitchen cooling unit, Yorktown",
+    semanticFit: 0.05
+  },
+  {
+    key: "fed-galley-barracks-first-district",
+    lane: "federal",
+    oppKey: "f6c1595d091b5d4db3b069badd81b2ce",
+    hgTitle: "OBS- Galley and Barracks Keepers",
+    hgText: "Provide galley and barracks support services at multiple U.S. Coast Guard First District locations in Massachusetts, New York, and Maine. The Contractor shall provide qualified cooks, dishwashers, quarters keepers, and a project manager to augment Coast Guard personnel and support daily galley, mess deck, barracks, and lodging operations.\n\nCook services include menu development, food preparation and service, inventory control, meal sales, housekeeping, customer service, and quality control. Dishwasher services support galley operations through cleaning and sanitation of food-service equipment and work areas. Quarters keeper services include barracks room cleaning and turnover, deep cleaning of galleys and restrooms, janitorial services, laundry services, linen handling, refuse removal, and maintaining facilities in a safe, sanitary, clean, and inspection-ready condition.\n\nThe Contractor shall provide supervision, staffing continuity, quality control, and trained personnel who meet applicable food-service, sanitation, safety, access, and health requirements. Services shall be performed in accordance with contract requirements, local Government direction, and applicable Coast Guard policies and procedures.",
+    sourceId: "F2026075570",
+    postedDaysAgo: 5,
+    expectedInDays: 318,
+    agencyName: "Coast Guard",
+    agencyAbbr: "USCG",
+    naicsCode: "561210",
+    pscCode: "M1JZ",
+    oppType: "New",
+    setAsideCode: "TBD",
+    valLow: 2000000,
+    valHigh: 5000000,
+    popState: null,
+    popCity: null,
+    contactName: "Daryl Walton",
+    contactRole: "Procurement Officer",
+    sourceName: "Department of Homeland Security",
+    sourceLink: {
+      url: "https://apfs-cloud.dhs.gov/record/75570/public-print/",
+      opens: "forecast"
+    },
+    docKey: null,
+    files: null,
+    plainTitle: "Cooks and cleaners for Coast Guard kitchens and barracks in the Northeast",
+    semanticFit: 0.55
+  },
+  {
+    key: "fed-messman-camp-wilson",
+    lane: "federal",
+    oppKey: "7ac6d8bd9a78563aad7c3d778f818016",
+    hgTitle: "Camp Wilson Messman",
+    hgText: "Mess Hall Services in support of Camp Wilson",
+    sourceId: null,
+    postedDaysAgo: 614,
+    expectedInDays: 380,
+    agencyName: "Marine Corps Installations Command",
+    agencyAbbr: "MCICOM",
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: null,
+    setAsideCode: null,
+    valLow: 0,
+    valHigh: 2000000,
+    popState: "CA",
+    popCity: "29 Palms",
+    contactName: "Willaim Gearhart",
+    contactRole: "Procurement Officer",
+    sourceName: "Marine Corps Installations and Logistics",
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Mess hall help at Camp Wilson, California",
+    semanticFit: 0.65
+  },
+  {
+    key: "fed-epa-cafeteria-rtp",
+    lane: "federal",
+    oppKey: "699296af65265448b94b6ce84a4f10ea",
+    hgTitle: null,
+    hgText: "Research Triangle Park Cafeteria contract management fee to operate cafeteria",
+    sourceId: "FY 2025 - 15383",
+    postedDaysAgo: 366,
+    expectedInDays: 563,
+    agencyName: "Environmental Protection Agency",
+    agencyAbbr: "EPA",
+    naicsCode: "722310",
+    pscCode: "M1FD",
+    oppType: "Unknown",
+    setAsideCode: "TBD",
+    valLow: 500000,
+    valHigh: 1000000,
+    popState: "NC",
+    popCity: null,
+    contactName: "Dylan Taylor",
+    contactRole: "Procurement Officer",
+    sourceName: null,
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Staff cafeteria at the EPA campus, Research Triangle Park",
+    semanticFit: 0.85
+  },
+  {
+    key: "fed-food-service-training-norfolk",
+    lane: "federal",
+    oppKey: "e63ac409984856c0b298a3a0f140e924",
+    hgTitle: "Supply Food Service Training (C)",
+    hgText: "Provides Supply Food Service Training to the MSC Fleet and employees.",
+    sourceId: null,
+    postedDaysAgo: 263,
+    expectedInDays: 928,
+    agencyName: "Military Sealift Command",
+    agencyAbbr: "MSC",
+    naicsCode: null,
+    pscCode: null,
+    oppType: "Unknown",
+    setAsideCode: null,
+    valLow: 2000000,
+    valHigh: 7500000,
+    popState: "VA",
+    popCity: "Norfolk",
+    contactName: "Jordan Castellat",
+    contactRole: "Contracting Officer",
+    sourceName: null,
+    sourceLink: null,
+    docKey: null,
+    files: null,
+    plainTitle: "Food service training for ship crews, Norfolk",
+    semanticFit: 0.4
+  },
+  {
+    key: "sled-san-bruno-senior-meals",
+    lane: "sled",
+    oppKey: "5a26ef22f01157d78e96e177f5374e8e",
+    hgTitle: "Senior Nutrition Program Operating Model Shift and Meal Service Procurement",
+    hgText: "The City of San Bruno held a study session to review the Senior Nutrition and Transportation Programs, including alternative models for discussion and direction, because the City is approaching a decision point on whether to enter into year 1 of a new four-year grant cycle with San Mateo County or move to an alternative City-operated model. The staff report states that the Senior Center has operated these programs since 2004 under a County grant-funded model, but that costs are rising and the City projects the General Fund annual subsidy will exceed $750,000 by the end of the grant cycle in 2030. For FY 2026-27, the County grant reimbursement for both programs is estimated at a not-to-exceed $198,491, while total expenditures are projected to exceed $800,000.\n\nA future contracting opportunity is most clearly indicated under the independent City-funded alternatives. Under Model 2, the City would opt out of the four-year County grant commitment and instead operate the programs independently, without County funding or oversight. The report expressly notes that this would give the City greater control over program structure, fees, eligibility, resident and non-resident participation, menus, staffing, branding, and service delivery. It also specifically contemplates flexibility during the upcoming Senior Center renovation closure, including boxed meal options, alternate meal locations, multiple community-based sites, and other service delivery models. Those elements indicate possible future purchases or service contracts relating to meal catering, food service operations, boxed meal fulfillment, temporary alternate-site operations, and program support during renovation.\n\nThe report provides detailed program volumes and cost information that could support a future solicitation. In FY 2025-26, the program averaged approximately 2,084 meals per month, totaling just over 25,000 meals annually. The fiscal table for FY 2026-27 shows annual catered meals cost of $325,104 under Model 1 and Model 2, plus $200,064 for produce and miscellaneous supplies. Under Model 2, the total expenditure is projected at $696,328 with a General Fund subsidy of approximately $374,051. The report also notes the City incurs approximately $8 per meal in supplemental costs including milk, fresh produce, and other supplies. Since the current and alternative models rely on catered meals and related supplies, food service vendors, commissary operators, senior meal specialists, or nonprofit nutrition partners could potentially be relevant if the City moves away from the County structure.\n\nThe report further states that staff seeks Council feedback on how the programs should be structured during the upcoming Senior Center renovation closure, and whether affordability protections such as sponsorships, partnerships, a dedicated assistance fund, or a free/reduced meal option should be built into a fee-based model. This is not yet an award, but it is a concrete policy discussion of future service delivery and alternative operating arrangements that could lead to contracted meal services or related program support.",
+    sourceId: "08-25-2026-special-agenda-packet-pdf-ad057f",
+    postedDaysAgo: 22,
+    expectedInDays: 15,
+    agencyName: "San Bruno",
+    agencyAbbr: null,
+    naicsCode: "722320",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 696328,
+    valHigh: 696328,
+    popState: "CA",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://www.sanbruno.ca.gov/AgendaCenter/",
+      opens: "meetings"
+    },
+    docKey: "5a26ef22f01157d78e96e177f5374e8e",
+    files: [
+      {
+        fileName: "08.25.2026 Special Agenda Packet.pdf",
+        sizeBytes: 1818199
+      }
+    ],
+    plainTitle: "Meals for the senior center, San Bruno",
+    semanticFit: 0.75
+  },
+  {
+    key: "sled-miami-board-event-food",
+    lane: "sled",
+    oppKey: "acec416a749055d699e69d1eedf2cce4",
+    hgTitle: "Food and Beverage Sponsorship or Hospitality Services for Meet-the-Board Event",
+    hgText: "The Board discussed a future 'Meet the Board' event to connect through community partner NiDo. The minutes explicitly state that this event will require sponsorship for food and beverages. Members also discussed a potential contact at the Gale Hotel, which owns a restaurant, noting that this arrangement could help the business and would involve less lifting while offering greater capacity for food and beverage services. Possible dates discussed were September 24, October 8, or October 15, with an additional idea to host in September to help promote October events.\n\nThis is a clear forward-looking event concept with identified external needs that could involve hospitality, catering, venue partnership, sponsorship coordination, and event services. Although framed partly as sponsorship, the need for food and beverage services and potential outside-host location support may create an opportunity for a vendor to approach the City or affiliated organizers with event packages, reception services, or community engagement support. The discussion contains specific dates, a likely service scope, and a concrete event objective, though no award or budget information was given.",
+    sourceId: "2026-08-05-lesbian-gay-bisexual-transgender-queer-lgbtq-advisory-board-full-minutes-3641-pdf-ae674f",
+    postedDaysAgo: 22,
+    expectedInDays: 29,
+    agencyName: "City of Miami",
+    agencyAbbr: null,
+    naicsCode: "722320",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "FL",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://miamifl.iqm2.com/Citizens/Calendar.aspx",
+      opens: "meetings"
+    },
+    docKey: "acec416a749055d699e69d1eedf2cce4",
+    files: [
+      {
+        fileName: "2026-08-05 Advisory Board - Full Minutes-3641.pdf",
+        sizeBytes: 365045
+      }
+    ],
+    plainTitle: "Food and drinks for a community board event, Miami",
+    semanticFit: 0.4
+  },
+  {
+    key: "sled-wallingford-canteen",
+    lane: "sled",
+    oppKey: "3ab8d663a88f516591a908760feaec3a",
+    hgTitle: "Saturday Operations Expansion and Possible Canteen Services",
+    hgText: "Program and executive staff discussed expanding the Senior Center to be fully open on Saturdays from 9:00 a.m. to 1:00 p.m., with a soft open planned for August 22 and regular Saturday hours starting in September. The planned Saturday operations would include use of the library, gym, and great room.\n\nThe minutes state that the organization intends to 'hire three staff' for programming, front desk, and general assistance. While direct staff hiring itself is not a vendor opportunity, the same discussion also notes that there would be no food or transportation services 'but possibly Canteen.' This creates a potential outside service opportunity for vending, food service, or concession support tied to the Saturday expansion.\n\nBecause the Saturday opening is a near-term operational change with a specific start window, a contractor providing snack vending, beverage service, micro-market, or similar canteen-related support may be able to approach the agency. The opportunity is not yet formalized, but the minutes explicitly identify possible outsourced canteen service connected to the expanded public hours.",
+    sourceId: "conservationcommcancellation-may142026-a-2-pdf-3192d3",
+    postedDaysAgo: 31,
+    expectedInDays: 14,
+    agencyName: "Town of Wallingford",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "CT",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://www.wallingfordct.gov/minutes-and-agendas/",
+      opens: "meetings"
+    },
+    docKey: "3ab8d663a88f516591a908760feaec3a",
+    files: [
+      {
+        fileName: "ConservationCommCancellation-May142026 a (2).pdf",
+        sizeBytes: 297168
+      }
+    ],
+    plainTitle: "Possible snack sales at a senior center on Saturdays, Wallingford",
+    semanticFit: 0.3
+  },
+  {
+    key: "sled-terrebonne-resilience-centers",
+    lane: "sled",
+    oppKey: "246d399141c35191b6f1b95dde4a1ec6",
+    hgTitle: "CDBG-DR Community Resilience Centers Phase II Buildout",
+    hgText: "The Budget and Finance Committee agenda includes discussion and possible action on the \"CDBG-DR Community Resilience Center priority list,\" with administration stating it \"needs to know the priority list of the presented resilience centers for the application to be submitted to OCD.\" The supporting materials lay out a detailed Phase 1 implementation recommendation and costed concepts for multiple resilience center projects, indicating a likely future pipeline of construction, renovation, site work, furnishings, communications, and resiliency infrastructure procurements.\n\nThe proposed facilities include: New Isle Community Resilience Center ($1,181,947), Dumas Community Resilience Center ($1,127,950), Hope Extreme Community Resilience Center ($1,166,552), Ward 7 Citizens Club Community Resilience Center ($1,051,045), and either Village East Pavilion Plus ($900,000 / opinion of probable cost $914,609) or Village East Community Resilience Center ($3,870,992). The materials repeatedly state that \"CDBG-DR funds will be used to improve the facility\" or, for Village East, that this would be \"a brand new facility built.\" Scope elements across the sites include exterior building upgrades, interior improvements, interior furnishings, utilities, drainage, parking, sidewalks, landscaping, benches, lights, trash cans, cisterns, communications beacons, Starlink, commercial kitchens, computer lab/classrooms, covered walkways, pavilions, and site amenities.\n\nThe New Isle concept specifies materials and labor of $882,050, including exterior building upgrades ($289,400), interior furnishings ($16,000), utilities ($129,200), site improvements ($270,450), and site amenities ($177,000), plus contractor costs and contingency. It also notes additional backup solar power for the community resilience center and pavilion valued at $300,000 through a FEMA grant. The Dumas concept includes exterior building upgrades, interior building upgrades, computer tables and computers, plumbing, electrical, irrigation, drainage, parking, landscaping, a communications beacon, Starlink, and an add alternate of $131,881 for solar panels and an overhang retrofit. Hope Extreme and Ward 7 similarly include pavilion construction, utilities, continuous solar power, parking and drainage upgrades, ADA upgrades, and communications infrastructure.\n\nThe resilience center program materials further describe these facilities as functioning as traditional community centers in normal times and as post-disaster hubs providing supplies, food, power, communications, FEMA intake, Wi-Fi, charging stations, and recovery information. Because the application requires prioritization and submission to OCD, and because significant scopes, costs, and implementation recommendations are already defined, this appears to be a strong indicator of upcoming construction, specialty trades, technology/communications, solar/generator, furnishings, and related professional services opportunities.",
+    sourceId: "093b5c1b-2918-11f1-bb28-005056a89546-b3d95b34-65a2-4f53-ba44-a1804f849cbb-1787248499-pdf-0908f3",
+    postedDaysAgo: 24,
+    expectedInDays: 29,
+    agencyName: "Terrebonne Parish Consolidated Government",
+    agencyAbbr: null,
+    naicsCode: "236220",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 3638882,
+    valHigh: 3638882,
+    popState: "LA",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://tpcg.granicus.com/ViewPublisher.php?view_id=1",
+      opens: "meetings"
+    },
+    docKey: "246d399141c35191b6f1b95dde4a1ec6",
+    files: [
+      {
+        fileName: "093b5c1b-2918-11f1-bb28-005056a89546-b3d95b34-65a2-4f53-ba44-a1804f849cbb-1787248499.pdf",
+        sizeBytes: 32223349
+      }
+    ],
+    plainTitle: "Build community shelters with kitchens, Terrebonne Parish, Louisiana",
+    semanticFit: 0.08
+  },
+  {
+    key: "sled-arlington-isd-breakfast",
+    lane: "sled",
+    oppKey: "284c3029dd7d57dba19c8c09679fc514",
+    hgTitle: "Potential Meal Service Model Change to Increase Breakfast Participation",
+    hgText: "Within the district’s differentiated support matrix for 2026-2027 priority campuses, the Food & Nutrition section includes “Attendance Incentives” and “Increase Breakfast Participation Through Potential Meal Service Model Change.” This language indicates consideration of a future operational change in how meal service is delivered, likely requiring planning, implementation support, equipment, food service consulting, or contracted cafeteria or meal distribution modifications.\n\nThe same section also references ongoing oversight by Area Supervisors, with monthly check-ins for some campuses and bi-weekly check-ins for higher priority campuses. For highest priority campuses, the plan further notes that starting in October, staff will work with Family Liaison/Campus Admin to telephone families who have not completed the Household Income Form or Meal Benefits Form. While some portions of this effort are staff-driven, the explicit reference to a “potential meal service model change” creates a possible future procurement opportunity around food service operations, service design, logistics, or supporting products.\n\nBecause the presentation stops short of identifying a selected vendor or approved scope, this is best viewed as an early-stage opportunity rather than an awarded contract. Still, it is a future-facing operational initiative with enough specificity to suggest a potentially contractable food service or program support requirement.",
+    sourceId: "8-b-2-priority-update-2026-2027-priority-campus-identification-and-support-report-09-10-26-pdf-127e6d",
+    postedDaysAgo: 6,
+    expectedInDays: 85,
+    agencyName: "Arlington Independent School District",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "TX",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://meetings.boardbook.org/public/Organization/2978",
+      opens: "meetings"
+    },
+    docKey: "284c3029dd7d57dba19c8c09679fc514",
+    files: [
+      {
+        fileName: "8.B.2 Priority Update - 2026-2027 Priority Campus Identification and Support Report 09.10.26.pdf",
+        sizeBytes: 454653
+      }
+    ],
+    plainTitle: "A possible new way to serve school breakfast, Arlington, Texas",
+    semanticFit: 0.45
+  },
+  {
+    key: "sled-killeen-isd-supper",
+    lane: "sled",
+    oppKey: "5353c793fdfc52f3be4d159f0ab8408c",
+    hgTitle: "Districtwide Supper Program Expansion to All Campuses",
+    hgText: "Killeen ISD's proposed FY 2027 budget states that the Supper Program (CACFP) will be expanded 'to all campuses with 40% student participation goal.' In the School Nutrition Fund section, the materials further note that the Community Child and Adult Care Food Program (Supper Program) 'will be offered at 45 locations' and references approximately 472 cafeteria staff and 33 central office staff. This indicates a substantial expansion of school nutrition operations that may require outside vendor support for food service supplies, food products, distribution, equipment, or related operational services.\n\nThe districtwide nature of the expansion suggests possible procurement needs tied to meal production, delivery logistics, kitchen or serving equipment, packaging, point-of-service support, or other nutrition program infrastructure necessary to support broader CACFP supper availability. Even where staffing is internal, a program expansion to all campuses commonly creates vendor opportunities in food purchasing and ancillary services.\n\nNo separate contract value is listed, and no procurement date is stated. However, the expansion is presented as part of the FY 2026-27 proposed budget and includes a clear implementation objective—expanding the supper program to all campuses and targeting 40% student participation.",
+    sourceId: "public-hearing-for-2027-budget-and-tax-rate-a2-pdf-06c4f2",
+    postedDaysAgo: 16,
+    expectedInDays: 75,
+    agencyName: "Killeen Independent School District",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "TX",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://meetings.boardbook.org/Public/Organization/1051",
+      opens: "meetings"
+    },
+    docKey: "5353c793fdfc52f3be4d159f0ab8408c",
+    files: [
+      {
+        fileName: "Public Hearing for 2027 Budget and Tax Rate - A2.pdf",
+        sizeBytes: 1348640
+      }
+    ],
+    plainTitle: "Supper at every school, Killeen, Texas",
+    semanticFit: 0.45
+  },
+  {
+    key: "sled-wayne-concessions",
+    lane: "sled",
+    oppKey: "2c3d9b902d9d51e3943055d642862bed",
+    hgTitle: "Summer Refreshment Concession Services to Be Re-Bid After Specification Revisions",
+    hgText: "The Township rejected bids received for “2026 Summer Season Refreshment Concession Services – RFP #2410A.” The resolution states that the Assistant Director of Parks and Recreation determined that substantial revisions to the bid specifications are required and recommended that the bids be rejected and the contract be re-bid after those revisions are made.\n\nThe Council formally rejected the bids and authorized the Director of Purchasing “to re-bid RFP #2410A for the sought-after provision or performance of goods or services after substantial revisions to the specifications are made.” This is a direct indication of an upcoming re-solicitation for concession-related services tied to the 2026 summer season. Vendors providing concession operations, food service, seasonal recreation support, and related staffing or equipment may have a future opportunity once revised specifications are issued.",
+    sourceId: "2026-05-20-adopted-resolutions-pdf-e72fbb",
+    postedDaysAgo: 10,
+    expectedInDays: 81,
+    agencyName: "Wayne Township",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "NJ",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://waynetownship.com/township-council/council-meetings-agendas/",
+      opens: "meetings"
+    },
+    docKey: "2c3d9b902d9d51e3943055d642862bed",
+    files: [
+      {
+        fileName: "2026-05-20-Adopted-Resolutions.pdf",
+        sizeBytes: 355608
+      }
+    ],
+    plainTitle: "Summer food and drink stands, Wayne Township parks",
+    semanticFit: 0.6
+  },
+  {
+    key: "sled-cleveland-auditorium-concession",
+    lane: "sled",
+    oppKey: "915a22bae4ed5ff8bfb42e62eefe915c",
+    hgTitle: "Public Auditorium Food and Beverage Concession",
+    hgText: "Ordinance 912-2026 authorizes the Director of Parks and Recreation to enter into \"one or more concession agreements for the operation of a first-class food and beverage service in the Public Auditorium,\" for a period not to exceed three years, with two one-year options to renew.\n\nThis is a clear upcoming service opportunity for concessionaires, hospitality operators, food service vendors, and event-support providers. The ordinance specifically contemplates one or more agreements and defines the service area as first-class food and beverage operations in a City venue.\n\nPotential work may include concession management, staffing, catering-style service, point-of-sale operations, equipment provisioning, menu planning, inventory management, and event-day operations. The term structure of up to three years with two one-year renewal options makes this a meaningful procurement opportunity with a defined service period.",
+    sourceId: "agenda-2026-08-19-pdf-8cd3da",
+    postedDaysAgo: 28,
+    expectedInDays: 64,
+    agencyName: "City of Cleveland",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "OH",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://cityofcleveland.legistar.com/Calendar.aspx",
+      opens: "meetings"
+    },
+    docKey: "915a22bae4ed5ff8bfb42e62eefe915c",
+    files: [
+      {
+        fileName: "agenda_2026-08-19.pdf",
+        sizeBytes: 211700
+      }
+    ],
+    plainTitle: "Food and drinks at the Public Auditorium, Cleveland",
+    semanticFit: 0.6
+  },
+  {
+    key: "sled-nye-county-jail-meals",
+    lane: "sled",
+    oppKey: "3b3f09c3039056b8bf32bba3e345286b",
+    hgTitle: "Nye County Jail Food Services Contract Award",
+    hgText: "The Board is scheduled for discussion and deliberation regarding proposals received for RFP No. 2026-02 Jail Food Services. The agenda expressly states the County will discuss the proposals received, consider award to one of several named proposers, approve or amend and approve the contract with the selected bidder, fund the contract from 10236, Nye County Jail Fund, or reject proposals and provide direction to staff on how to proceed with the project.\n\nThe listed proposers and pricing structures are: Get Fresh Sales LLC at $7.85 per meal and 0% commissary revenue; Summit Correctional Services at $2.05 per meal and 42.5% commissary revenue; Summit Correctional Services at $2.08 per meal and 42.5% commissary revenue; Trinity Services Group at $1.91 per meal and 40% commissary revenue; Trinity Services Group at $1.84 per meal and 38% commissary revenue; or Victus Food Service at $1.66 per meal and 38% commissary revenue.\n\nThis is a clear outside procurement for food service operations at the Nye County Jail, and the item is at the contract award stage. Related vendor opportunities may include inmate meal preparation and delivery, commissary administration, food supply logistics, nutritional compliance, kitchen operations support, and correctional food service management depending on final contract structure.",
+    sourceId: "2026-08-18-agenda-pdf-63c310",
+    postedDaysAgo: 29,
+    expectedInDays: 63,
+    agencyName: "Nye County",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "NV",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://www.nyecountynv.gov/AgendaCenter",
+      opens: "meetings"
+    },
+    docKey: "3b3f09c3039056b8bf32bba3e345286b",
+    files: [
+      {
+        fileName: "2026.08.18.Agenda..pdf",
+        sizeBytes: 313880
+      }
+    ],
+    plainTitle: "Jail meals for Nye County, Nevada",
+    semanticFit: 0.8
+  },
+  {
+    key: "sled-concord-culinary-incubator",
+    lane: "sled",
+    oppKey: "2e18445189955aad911a8f38361f91db",
+    hgTitle: "Culinary Incubator and Food Hub Development",
+    hgText: "During the public hearing for rezoning case Z(CD)-01-25, City staff presented a City-submitted conditional rezoning for approximately 0.820 acres at 228 McGill Ave., 234 McGill Ave., 438 Allison St., and 445 Allison St. for development of a culinary incubator and food hub with associated parking. Staff stated that the structures on the properties have already been demolished and the land cleared for the project. The proposed facility would be 8,624 square feet and include space for a culinary incubator, retail section, and container village.\n\nThe project was described as a public-nonprofit partnership intended to create an educational facility for prospective entrepreneurs to gain skills and knowledge for successful culinary businesses. The City Manager stated that the City is still working with various funding agencies to procure funds from nonprofits and federal sources, with some remaining funding gap that may require eventual City contribution, and that staff are not yet ready to present the full financial picture.\n\nAlthough final funding is not complete, this is a strong early-stage pipeline opportunity for architecture, engineering, construction, site development, parking, utilities, fit-out, food-service related infrastructure, modular/container improvements, and possibly owner’s rep or grant-related consulting support.",
+    sourceId: "4-7-2026-external-agency-hearing-work-session-budget-presentation-pdf-6537f5",
+    postedDaysAgo: 23,
+    expectedInDays: 69,
+    agencyName: "City of Concord",
+    agencyAbbr: null,
+    naicsCode: "236220",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "NC",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://concordnc.gov/Government/Documents-Resources/Council-Agenda",
+      opens: "meetings"
+    },
+    docKey: "2e18445189955aad911a8f38361f91db",
+    files: [
+      {
+        fileName: "4-7-2026- External Agency Hearing- Work Session- Budget Presentation.pdf",
+        sizeBytes: 215984
+      }
+    ],
+    plainTitle: "Build a shared kitchen for new food businesses, Concord",
+    semanticFit: 0.1
+  },
+  {
+    key: "sled-mecklenburg-jail-north",
+    lane: "sled",
+    oppKey: "89b9ad0436305883a18c253925ad1667",
+    hgTitle: "Jail North Reopening Could Drive Facility and Operational Procurements",
+    hgText: "Under the Manager's Report, the agenda lists \"Reopening of Jail North to House Growing Inmate Population,\" with an attached presentation titled \"SHF-BOCC Presentation North Activation 8.26.2026.\" This indicates the county is planning or discussing the activation of Jail North in response to rising inmate population needs.\n\nReopening a detention facility commonly creates service and product purchasing needs beyond direct county staffing, including detention facility activation support, equipment, furnishings, security-related systems, medical and operational supplies, food service support, janitorial or sanitation services, maintenance, repairs, inspections, and other startup or operational contracting needs. The agenda wording makes clear this is a forward-looking operational initiative rather than a purely historical report.\n\nWhile the agenda does not itself identify a specific solicitation, budget amount, or vendor, the reopening of a jail to increase housing capacity is a substantial government action that could reasonably lead to one or more future procurements tied to facility readiness and ongoing contracted services.",
+    sourceId: "agenda-2026-09-01-pdf-7ecfab",
+    postedDaysAgo: 15,
+    expectedInDays: 76,
+    agencyName: "County of Mecklenburg",
+    agencyAbbr: null,
+    naicsCode: "561210",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "NC",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://mecklenburg.legistar.com/Calendar.aspx",
+      opens: "meetings"
+    },
+    docKey: "89b9ad0436305883a18c253925ad1667",
+    files: [
+      {
+        fileName: "agenda_2026-09-01.pdf",
+        sizeBytes: 144373
+      }
+    ],
+    plainTitle: "A county jail reopens, Charlotte",
+    semanticFit: 0.35
+  },
+  {
+    key: "sled-barnstable-school-food",
+    lane: "sled",
+    oppKey: "fb0964eaa80e5506affcbbfe1d066840",
+    hgTitle: "School Food Services Management Rebid",
+    hgText: "The Barnstable Food Services Department through the School Committee is seeking authorization from the Town Council to permit the school department to seek a 5-year contract term for a food services management company when the district goes out to bid this Fall for a successor contract. The order specifically authorizes the School Committee to solicit, award and execute a contract with a term of up to five years for a food services management company, commencing in the summer of 2027.\n\nThe summary explains that the district is currently in its last year of a 5-year term for a food services management company that manages the district’s food services. The requested contract structure would be an initial 1-year term with the ability to renew for an additional period of up to 4 years at the discretion of the School Committee. The materials note that federal regulations limit contracts between a school food authority and food service management company to 5 years.\n\nThe document explicitly states that the district expects to go out to bid this Fall for a successor contract. It also notes that the longer contract term has historically been advantageous because it has allowed the district to lock in favorable pricing and has helped the district enter into agreements that are sometimes difficult to find vendors for. This appears to be a direct future procurement opportunity for firms providing school food management, meal program administration, staffing, procurement support, nutrition compliance, and cafeteria operations services.",
+    sourceId: "agenda-08-20-20263-pdf-6e2f84",
+    postedDaysAgo: 27,
+    expectedInDays: 349,
+    agencyName: "Town of Barnstable",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "MA",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://town.barnstable.ma.us/boardscommittees/TownCouncil/",
+      opens: "meetings"
+    },
+    docKey: "fb0964eaa80e5506affcbbfe1d066840",
+    files: [
+      {
+        fileName: "Agenda_08-20-20263.pdf",
+        sizeBytes: 4029628
+      }
+    ],
+    plainTitle: "School meals company for Barnstable schools",
+    semanticFit: 0.8
+  },
+  {
+    key: "sled-petersburg-nutrition-plan",
+    lane: "sled",
+    oppKey: "64d871fb40bb59d1849f08049de7ea6a",
+    hgTitle: "Future Nutrition Program Capital Improvement Plan",
+    hgText: "During the FY27 State Budget Update discussion, Petersburg City Public Schools stated that they were developing a capital improvement plan specifically for their nutrition program. Dr. Greywoode said the school division had a significant fund balance in its nutrition budget and that they were developing a capital improvement plan specifically for the nutrition program.\n\nEarlier in the same discussion, Superintendent Brown and Dr. Martinez described active efforts to improve school nutrition offerings, including pilot programs, menu redesign, and longer-term plans to diversify what is offered so students would eat lunch and make use of the Community Eligibility Provision free lunch program. While they said they were presently repurposing existing dollars, they also indicated that a future budget may include a request for additional nutrition initiatives if those needs do not fit within USDA and state funding guidelines.\n\nThis combination of statements suggests likely future contracting opportunities around cafeteria modernization, food service equipment, kitchen upgrades, serving line equipment, consulting on school nutrition operations, menu and program design support, or related facilities improvements funded through a nutrition capital plan. The exact scope is not yet defined, but the discussion goes beyond routine staffing and points toward outside purchases and capital work.",
+    sourceId: "09012026-work-session-agenda-packet-pdf-6619fb",
+    postedDaysAgo: 10,
+    expectedInDays: 81,
+    agencyName: "City of Petersburg",
+    agencyAbbr: null,
+    naicsCode: "236220",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: null,
+    valHigh: null,
+    popState: "VA",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://petersburgva.portal.civicclerk.com/search?q=&filters=AgendaFiles,Agendas,Minutes",
+      opens: "meetings"
+    },
+    docKey: "64d871fb40bb59d1849f08049de7ea6a",
+    files: [
+      {
+        fileName: "09012026 Work Session Agenda Packet.pdf",
+        sizeBytes: 21209228
+      }
+    ],
+    plainTitle: "A plan to improve school kitchens, Petersburg, Virginia",
+    semanticFit: 0.3
+  },
+  {
+    key: "sled-detroit-teen-events",
+    lane: "sled",
+    oppKey: "925e067eeca552f797e1a6a3e74b51a1",
+    hgTitle: "Teen Kickback Grant Points to Event Vendors and Paid Youth Support",
+    hgText: "The Skillman Foundation awarded the Detroit Public Safety Foundation the FY 2026 Teen Kickbacks Grant for a total of $80,000.00 to support the Mayor’s Office Division of Youth and Education’s Summer Teen Kickback Program. City materials state that the funding will be utilized to provide youth with safe, fun, and engaging events that promote prosocial behavior with their peers, with events slated to take place before the launch of Occupy the Summer and Grow Detroit’s Young Talent, as a bridge between in-school and summer programming.\n\nThe supporting grant documents provide more explicit implementation detail. The Foundation anticipates the grant will support compensation of eight youth leaders as paid interns in City Hall to plan three Teen Takeover activations, and partnership with youth interns to execute up to three Teen Kickback/Takeover events in downtown Detroit and neighborhoods this spring, including booking event space, confirming safety procedures such as fencing and police, and booking vendors including food trucks, DJ, emcee, dance instructors, and related supports.\n\nThis is not a formal City RFP, but it is a clear indication of near-term outside purchasing for event-related services. Plausible opportunities include event production, venue support, food service, entertainment, temporary staffing, youth engagement facilitation, security coordination, fencing, and other activation logistics tied to City-supported youth programming.",
+    sourceId: "agenda-package-phssc-jul06-2026-pdf-1b555e",
+    postedDaysAgo: 18,
+    expectedInDays: 288,
+    agencyName: "City of Detroit",
+    agencyAbbr: null,
+    naicsCode: "561920",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 80000,
+    valHigh: 80000,
+    popState: "MI",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://detroitmi.gov/government/city-clerk/city-council-agendas-documents",
+      opens: "meetings"
+    },
+    docKey: "925e067eeca552f797e1a6a3e74b51a1",
+    files: [
+      {
+        fileName: "Agenda Package - PHSSC_Jul06_2026.pdf",
+        sizeBytes: 23823457
+      }
+    ],
+    plainTitle: "Food trucks for teen events, Detroit",
+    semanticFit: 0.35
+  },
+  {
+    key: "sled-washtenaw-senior-nutrition",
+    lane: "sled",
+    oppKey: "c0eb7bef79aa5b119af88eb3783a41b4",
+    hgTitle: "Senior Nutrition Provider Contracts for FY 2026-2027",
+    hgText: "The Board agenda includes a resolution allocating additional Older Persons Millage funds to the Senior Nutrition Program from the Office of Aging Services. The item explicitly states that it authorizes contracts with senior nutrition providers for the period of October 1, 2026 through September 30, 2027.\n\nThe resolution allocates up to $2,409,132 from the Older Persons Millage. This indicates a likely upcoming or renewed procurement/contracting opportunity for outside service providers that deliver senior nutrition services. Depending on program structure, this could involve meal preparation, congregate meal services, home-delivered meals, food logistics, nutrition program administration, or related support services under county-funded agreements.\n\nBecause the agenda specifically references authorization of contracts with providers and gives a defined service period and funding amount, this appears to be a concrete future-facing service contracting opportunity rather than a general budget line item.",
+    sourceId: "september-16-2026-board-of-commissioners-meeting-agenda-final-pdf-93081d",
+    postedDaysAgo: 1,
+    expectedInDays: 379,
+    agencyName: "Washtenaw County",
+    agencyAbbr: null,
+    naicsCode: "624210",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 2409132,
+    valHigh: 2409132,
+    popState: "MI",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://washtenawcomi.portal.civicclerk.com/search?q=&filters=AgendaFiles,Agendas,Minutes",
+      opens: "meetings"
+    },
+    docKey: "c0eb7bef79aa5b119af88eb3783a41b4",
+    files: [
+      {
+        fileName: "September 16, 2026 Board of Commissioners Meeting Agenda Final.pdf",
+        sizeBytes: 270015
+      }
+    ],
+    plainTitle: "Meals for older adults, Washtenaw County, Michigan",
+    semanticFit: 0.7
+  },
+  {
+    key: "sled-durham-garden-coordinator",
+    lane: "sled",
+    oppKey: "a34c8bee7f6f52f89935db7bf3de6e70",
+    hgTitle: "Community Garden Coordinator Contract Opportunity",
+    hgText: "The Board is requested to approve Budget Amendment Ordinance No. 27BCC025 recognizing $35,000 from the City of Durham to increase access to food and nutritional support and to approve an interlocal cooperation agreement between Durham County and the City of Durham. The funding comes from the City’s grant project, “The Together Table,” and is provided through September 2027.\n\nThe agenda text specifically states that Durham County Cooperative Extension will use the funding to expand and strengthen Durham’s community garden network and to provide community-centered cooking and nutrition education. It further states that funding will support a part-time contractor for a Community Garden Coordinator role. The Coordinator will lead technical assistance, resource planning, and training to help community gardens become more productive, resilient, and accessible, particularly in neighborhoods with limited access to food and garden resources.\n\nAlthough the dollar amount is modest, this is an explicit outside-contractor opportunity rather than a county employee position. It may be relevant to consultants, nonprofits, or small service providers specializing in urban agriculture, community food systems, training, and garden program coordination.",
+    sourceId: "agenda-2026-09-03-pdf-b02b15",
+    postedDaysAgo: 13,
+    expectedInDays: 379,
+    agencyName: "Durham County",
+    agencyAbbr: null,
+    naicsCode: "541611",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 35000,
+    valHigh: 35000,
+    popState: "NC",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://durhamcounty.legistar.com/Calendar.aspx",
+      opens: "meetings"
+    },
+    docKey: "a34c8bee7f6f52f89935db7bf3de6e70",
+    files: [
+      {
+        fileName: "agenda_2026-09-03.pdf",
+        sizeBytes: 280055
+      }
+    ],
+    plainTitle: "Community garden and cooking classes, Durham",
+    semanticFit: 0.35
+  },
+  {
+    key: "sled-uw-green-bay-dining",
+    lane: "sled",
+    oppKey: "29a0026a06db59399c4bd54f6aee5545",
+    hgTitle: "UW-Green Bay Union Dining and Kitchen Overhaul",
+    hgText: "The University of Wisconsin System Administration requests that the Board of Regents recommend this project of $16,305,000 Program Revenue Supported Borrowing to selectively reconfigure and renovate the University Union dining, kitchen, and serving areas at UW-Green Bay.\n\nThis project reconfigures the dining, kitchen, and serving areas to improve operational efficiencies, functionality, and accessibility. Cross traffic will be eliminated from the entry and dish return areas. The serving counter, casework, flooring surfaces, and bulkhead will be removed. All building infrastructure systems, food service equipment, and furnishings will be replaced and renovated to serve the resulting operational layout. Air supply and exhaust, electrical, lighting, telecommunication, domestic water, and natural gas utility distribution and connection points will be reconfigured to accommodate the new equipment positions and operational layout.\n\nThe undersized walk-in coolers and freezers will be replaced with appropriately sized and energy-efficient units. The dry storage area will be expanded and the food preparation and cook's line will be reconfigured to meet current and future dining program needs. New serving concepts, a beverage counter, and a salad bar will be introduced and incorporated into the final design solution. All architectural finishes will be replaced, and seating capacity will be increased to approximately 650 users.\n\nThe background notes that UW-Green Bay's dining program expanded from 750 meal plans in 2004 to almost 2,000 in 2026, and that this success has outpaced the capacity and efficiency of the current Catering and Bakery kitchen, last updated in 1997. The current facility is described as undersized and outdated, with no food preparation area, operational bottlenecks, inadequate storage, and frequent maintenance issues caused by failing infrastructure. The Marketplace serving and dining areas also require comprehensive renovation to align with the current meal service model, improve sightlines and traffic flow, and support faster student processing through new self-check-in gates.\n\nThe project also notes pending approval for a segregated fee rate increase estimated to occur in Fall 2030. Fee impacts are explicitly tied to this project, with proposed incremental increases of $50 in 2030-31, 2031-32, and 2032-33, for a total increase of $150.\n\nThe schedule shows A/E selection in July 2027, Design Report (75%) in August 2028, approval in December 2028, bid opening in February 2029, start in May 2029, substantial completion in August 2030, and close out in February 2031. This is a strong future procurement for food service design, kitchen equipment, MEP reconfiguration, refrigeration, interiors, furnishings, and construction services.",
+    sourceId: "meeting-book-capital-planning-budget-committee-august-20-2026-pdf-e60b5e",
+    postedDaysAgo: 27,
+    expectedInDays: 958,
+    agencyName: "University of Wisconsin System",
+    agencyAbbr: null,
+    naicsCode: "236220",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 16305000,
+    valHigh: 16305000,
+    popState: "WI",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://www.wisconsin.edu/regents/meetingmaterials/#2025",
+      opens: "meetings"
+    },
+    docKey: "29a0026a06db59399c4bd54f6aee5545",
+    files: [
+      {
+        fileName: "Meeting-Book---Capital-Planning-&-Budget-Committee-(August-20,-2026).pdf",
+        sizeBytes: 3910296
+      }
+    ],
+    plainTitle: "Rebuild the student union dining hall, UW-Green Bay",
+    semanticFit: 0.1
+  },
+  {
+    key: "sled-peekskill-kitchen-incubator",
+    lane: "sled",
+    oppKey: "61058f3e48995fcd9db45566c5f43220",
+    hgTitle: "Firehouse Kitchen Incubator Construction Rebid and Equipment Procurement",
+    hgText: "The Peekskill Facilities Development Corporation discussed the Peekskill Firehouse Kitchen Incubator project and reported that, after USEDA did not agree to the awarding of only the General Construction Contract No. 1, revised scoping and bids were being sought for all 3 contracts. The Board was told that the NYS Bid list was also being researched as an alternative for equipment procurement. Mr. Rudikoff stated that a revised project budget would determine the new local share requirement, that the City’s and Agency’s concurrence to proceed would be sought, and that a resubmission to EDA for permission to award bids would be made.\n\nThis is a strong indicator of future contracting activity because the project is not complete, prior award efforts were not accepted in their current form, and the agency is actively preparing revised scopes and bids. The materials show a total project cost of $6,442,284, with total funding on hand of $4,015,011.13 and a current project shortfall of $2,427,272.87. The financial materials identify the project as involving significant future expenditures under the Peekskill Firehouse Kitchen Incubator expense line, and the expenditure report shows substantial pre-construction activity already completed, including architectural, civil and structural engineering, MEP engineering, environmental services, specification writing support, legal services, utility work, asbestos services, and related preparatory tasks.\n\nPotential vendor opportunities may include general construction, specialized construction trades, kitchen and food-service equipment supply, installation services, project support services, and other infrastructure or fit-out procurements associated with bringing the incubator facility to construction commencement. Mr. Rudikoff further noted that the agency has until March 2028 to commence construction under the applicable EDA funding timeline, and state funding also expires in 2028, giving a clear future planning horizon for procurement-related actions.",
+    sourceId: "08-25-26-pfdc-agenda-package-pdf-99768e",
+    postedDaysAgo: 22,
+    expectedInDays: 562,
+    agencyName: "City of Peekskill",
+    agencyAbbr: null,
+    naicsCode: "236220",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 6442284,
+    valHigh: 6442284,
+    popState: "NY",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://www.cityofpeekskillny.gov/AgendaCenter",
+      opens: "meetings"
+    },
+    docKey: "61058f3e48995fcd9db45566c5f43220",
+    files: [
+      {
+        fileName: "08.25.26 PFDC Agenda Package.pdf",
+        sizeBytes: 992671
+      }
+    ],
+    plainTitle: "Build a shared kitchen in an old firehouse, Peekskill, New York",
+    semanticFit: 0.1
+  },
+  {
+    key: "sled-cumberland-school-meals",
+    lane: "sled",
+    oppKey: "6ac22d561c6b5797b94f2a84db0b9d17",
+    hgTitle: "Child Nutrition and After School Operating Purchases",
+    hgText: "The Enterprise Expense Fund in the 2026-2027 Budget Resolution totals $35,572,251 and is allocated primarily to Child Nutrition Services ($32,301,740) and Prime Time After School Care ($3,270,511). Expenditures by object include $2,200,107 in Contracted spending, $14,365,480 in Supplies, and $791,000 in Equipment.\n\nThis indicates substantial future purchasing activity tied to enterprise operations, especially child nutrition and after-school care. The magnitude of supplies spending strongly suggests recurring procurements for food service supplies, consumables, materials, and program support items, while the contracted amount may support outsourced operational services, food service support, maintenance, logistics, or other service-based requirements. The equipment allocation further suggests potential purchases of kitchen, cafeteria, storage, transportation, or program equipment, though the source does not specify exact items.\n\nGiven the scale and operational nature of these enterprise functions, vendors in food service, program operations, equipment supply, maintenance, and ancillary support services may find future bid opportunities associated with this budget.",
+    sourceId: "2026-2027-budget-resolution-summary-all-funds-presented-06-23-2026-1-pdf-f470da",
+    postedDaysAgo: 85,
+    expectedInDays: 287,
+    agencyName: "Cumberland County Board of Education",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Agendas / Minutes",
+    setAsideCode: null,
+    valLow: 17356587,
+    valHigh: 17356587,
+    popState: "NC",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://go.boarddocs.com/nc/ccsd/Board.nsf/Public",
+      opens: "meetings"
+    },
+    docKey: "6ac22d561c6b5797b94f2a84db0b9d17",
+    files: [
+      {
+        fileName: "2026-2027 Budget Resolution Summary All Funds Presented 06-23-2026 (1).pdf",
+        sizeBytes: 161679
+      }
+    ],
+    plainTitle: "School meal spending plan, Cumberland County Schools",
+    semanticFit: 0.6
+  },
+  {
+    key: "sled-vsu-campus-dining",
+    lane: "sled",
+    oppKey: "3f95972fa7a051b296e0e902f0a2ccc0",
+    hgTitle: "Annual Food Services Board Plans",
+    hgText: "Provision of board plans for food services covering the fall 2026 and spring 2027 sessions, delivering meals and related food services as specified for the period from August 3, 2026 to June 30, 2027.",
+    sourceId: "va-annual-food-services-board-plans-fy27-9dfb6f2",
+    postedDaysAgo: 68,
+    expectedInDays: 287,
+    agencyName: "Virginia State University",
+    agencyAbbr: null,
+    naicsCode: "722310",
+    pscCode: null,
+    oppType: "Expiring Contract",
+    setAsideCode: null,
+    valLow: 14600000,
+    valHigh: 14600000,
+    popState: "VA",
+    popCity: null,
+    contactName: null,
+    contactRole: null,
+    sourceName: null,
+    sourceLink: {
+      url: "https://logi.cgieva.com/External/rdPage.aspx?rdReport=Public.Reports.Report9021_Data&txtNumber=PO05403024",
+      opens: "purchase"
+    },
+    docKey: "3f95972fa7a051b296e0e902f0a2ccc0",
+    files: null,
+    plainTitle: "Campus dining at Virginia State University",
+    semanticFit: 0.7
+  }
+];

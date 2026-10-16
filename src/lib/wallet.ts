@@ -49,7 +49,7 @@ function seed(): Wallet {
     paymentMethod: { brand: "Visa", last4: "4242" },
     transactions: [
       { id: "tx_006", date: daysAgo(22), description: "Added funds", type: "credit", amountUSD: 100 },
-      { id: "tx_005", date: daysAgo(18), description: "Mentor review — VA roof maintenance", type: "debit", amountUSD: 97, relatedTo: { label: "View thread", href: "/mentors/rev_va_salisbury" } },
+      { id: "tx_005", date: daysAgo(18), description: "Mentor review — VA patient meal service", type: "debit", amountUSD: 97, relatedTo: { label: "View thread", href: "/mentors/rev_va_salisbury" } },
       { id: "tx_004", date: daysAgo(14), description: "Added funds", type: "credit", amountUSD: 100 },
       { id: "tx_003", date: daysAgo(10), description: "Capability Statement (DFY)", type: "debit", amountUSD: 2000, relatedTo: { label: "View in My Business", href: "/business-profile" } },
       { id: "tx_002", date: daysAgo(5), description: "Added funds", type: "credit", amountUSD: 50 },

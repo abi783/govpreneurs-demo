@@ -107,17 +107,17 @@ export function SourcingPanel({
 
   return (
     <section className="mp-source">
-      <h2 className="mp-h2">Can you get this part?</h2>
+      <h2 className="mp-h2">Can you get this item?</h2>
 
       {supplied ? (
         <p className="mp-source__known">
           <Check size={16} aria-hidden className="mp-ic-ok" />
-          You have supplied this exact part before.
+          You have supplied this exact item before.
         </p>
       ) : isCommercial(o) ? (
         <p className="mp-source__known">
           <Package size={16} aria-hidden />
-          This one is sold openly. It is a commercial part, so you do not have to be the maker.
+          This one is sold openly. It is a commercial item, so you do not have to be the maker.
         </p>
       ) : (
         <p className="mp-source__known">
@@ -275,7 +275,7 @@ export function SourcingPanel({
       <p className="mp-source__surplus">
         <AlertTriangle size={15} aria-hidden />
         <span>
-          <b>Buy new parts for this one.</b>
+          <b>Buy new items for this one.</b>
           <em>
             {o.repeats === true
               ? "This job lasts a year. Used, repaired or government surplus stock is not allowed."
@@ -319,7 +319,7 @@ export function SourcingPanel({
               thing she is most afraid of.
               The heading's own words, verbatim: one question, asked twice in
               one place, is cheaper than three unlabelled buttons. */}
-        <span className="mp-source__q">Can you get this part?</span>
+        <span className="mp-source__q">Can you get this item?</span>
         <div className="mp-source__btns">
           <button
             type="button"

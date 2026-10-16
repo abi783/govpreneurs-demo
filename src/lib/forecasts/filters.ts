@@ -159,8 +159,8 @@ function inCities(f: ScoredForecast, filters: ForecastFilters): boolean {
 /** The industry code the record carries, or null. */
 const naicsOf = (f: ScoredForecast): string | null => f.record.naicsCode?.trim() || null;
 
-/** True when the record carries one of the chosen codes, exactly: `238160` never
- *  matches `2381`. While a code is chosen, a forecast with no code is not shown. */
+/** True when the record carries one of the chosen codes, exactly: `722310` never
+ *  matches `7223`. While a code is chosen, a forecast with no code is not shown. */
 function inNaics(f: ScoredForecast, codes: string[]): boolean {
   if (codes.length === 0) return true;
   const code = naicsOf(f);

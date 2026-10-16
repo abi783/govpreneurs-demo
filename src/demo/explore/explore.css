@@ -1,0 +1,40 @@
+/* DEMO: styles for the Explore pages that production does not have. */
+
+/* The "Ava is building" tag on a Pipeline card. */
+.bid-card__ava {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid color-mix(in oklab, var(--blue-7) 28%, var(--surface));
+  background: color-mix(in oklab, var(--blue-7) 8%, var(--surface));
+  color: var(--blue-9);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.bid-card__ava:hover {
+  background: color-mix(in oklab, var(--blue-7) 16%, var(--surface));
+}
+
+/* A card title that opens a dialog. */
+button.bid-card__title {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Lists inside a mentor's message show their numbers and bullets. */
+.mentors-msg__bubble ol {
+  list-style: decimal outside;
+  margin: 6px 0;
+  padding-left: 22px;
+}
+.mentors-msg__bubble ul {
+  list-style: disc outside;
+}

@@ -4,12 +4,17 @@
 // opportunity page (where Send-to-Mentor, proposals, and stage moves live);
 // value/scope render only when the opportunity carries them.
 
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { contextLineFor, type Bid } from "../../lib/mock/bids";
 import { isInsideClosingWindow } from "../../lib/closingWindow";
 import { relayWhenEmbedded } from "../../lib/ghlNav";
 import { WatchMarker } from "../Forecast/WatchMarker";
+// DEMO: the Pipeline shows the story's pursuits, their next moves and Ava's work.
+import type { DemoBid } from "../../demo/explore/pipelineBoard";
+import { PursuitDetailDialog } from "../../demo/explore/PursuitDialog";
+import "../../demo/explore/explore.css";
 
 function DeadlinePill({ bid }: { bid: Bid }) {
   if (bid.expired)
@@ -87,6 +92,7 @@ function TrackedLink({
 }
 
 export function BidCard({ bid }: { bid: Bid }) {
+  const [detailOpen, setDetailOpen] = useState(false);
   const ctx = contextLineFor(bid);
   const oppRoute = `/opportunities/${bid.opportunityId}`;
   // Opportunity detail lives on the Opportunities custom page, a different GHL
@@ -139,6 +145,12 @@ export function BidCard({ bid }: { bid: Bid }) {
           ctx && <div className="bid-card__ctx">{ctx}</div>
         )}
 
+        {(bid as DemoBid).demo?.ava && (
+          <Link to={(bid as DemoBid).demo!.ava!.to as never} className="bid-card__ava">
+            <Sparkles size={11} aria-hidden /> Ava is building
+          </Link>
+        )}
+
         <div className="bid-card__actions">
           <Link
             to="/mentors/$reviewId"
@@ -153,16 +165,30 @@ export function BidCard({ bid }: { bid: Bid }) {
     );
   }
 
+  // DEMO: what the demo adds to a card (the story's next move, Ava's tag, a closed pursuit).
+  const demo = (bid as DemoBid).demo;
+  const closedId = demo?.closedId;
+  const next = demo?.next;
+  // A closed pursuit has no opportunity page. Its card opens a dialog; a link to this
+  // same page ("/pipeline") also opens the dialog.
+  const nextOpensDialog = Boolean(closedId) && (!next || next.to === "/pipeline");
+
   return (
     <article className={`bid-card${bid.expired ? " is-expired" : ""}`} data-stage={bid.stage}>
       <div className="bid-card__top">
-        <TrackedLink
-          bid={bid}
-          className="bid-card__title"
-          onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
-        >
-          {bid.title}
-        </TrackedLink>
+        {closedId ? (
+          <button type="button" className="bid-card__title" onClick={() => setDetailOpen(true)}>
+            {bid.title}
+          </button>
+        ) : (
+          <TrackedLink
+            bid={bid}
+            className="bid-card__title"
+            onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
+          >
+            {bid.title}
+          </TrackedLink>
+        )}
         {bid.forecast && <WatchMarker oppKey={bid.opportunityId} />}
         <DeadlinePill bid={bid} />
       </div>
@@ -191,22 +217,47 @@ export function BidCard({ bid }: { bid: Bid }) {
         ctx && <div className="bid-card__ctx">{ctx}</div>
       )}
 
+      {demo?.ava && (
+        <Link to={demo.ava.to as never} className="bid-card__ava">
+          <Sparkles size={11} aria-hidden /> Ava is building
+        </Link>
+      )}
+
       <div className="bid-card__actions">
-        <TrackedLink
-          bid={bid}
-          className="btn btn-primary btn-sm"
-          onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
-        >
-          {primaryLabel(bid)} <ArrowRight size={12} />
-        </TrackedLink>
-        <TrackedLink
-          bid={bid}
-          className="bid-card__view"
-          onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
-        >
-          View →
-        </TrackedLink>
+        {nextOpensDialog ? (
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setDetailOpen(true)}>
+            {next?.label ?? "See details"} <ArrowRight size={12} />
+          </button>
+        ) : next ? (
+          <Link to={next.to as never} className="btn btn-primary btn-sm">
+            {next.label} <ArrowRight size={12} />
+          </Link>
+        ) : (
+          <TrackedLink
+            bid={bid}
+            className="btn btn-primary btn-sm"
+            onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
+          >
+            {primaryLabel(bid)} <ArrowRight size={12} />
+          </TrackedLink>
+        )}
+        {closedId ? (
+          <button type="button" className="bid-card__view" onClick={() => setDetailOpen(true)}>
+            View →
+          </button>
+        ) : (
+          <TrackedLink
+            bid={bid}
+            className="bid-card__view"
+            onOpportunityClick={openOnOpportunitiesPage(oppRoute)}
+          >
+            View →
+          </TrackedLink>
+        )}
       </div>
+      {closedId && (
+        <PursuitDetailDialog closedId={closedId} open={detailOpen} onOpenChange={setDetailOpen} />
+      )}
     </article>
   );
 }
