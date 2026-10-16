@@ -70,6 +70,20 @@ describe("invented people", () => {
     expect(retitled).toEqual([]);
   });
 
+  it("a contact on an opportunity page has the same title as on the Government Buyers page", () => {
+    const roleOf = new Map<string, string>();
+    for (const b of BUYER_SEED) for (const o of b.officers) roleOf.set(o.name.replace(/^(?:[A-Z][A-Za-z]*\.? )+(?=[A-Z][a-z]+ [A-Z])/, ""), o.role);
+    const wrong: string[] = [];
+    for (const opp of OPPORTUNITIES) {
+      for (const secondary of [false, true]) {
+        const c = contactFor(opp, secondary);
+        const role = roleOf.get(c.name);
+        if (role && role !== c.title) wrong.push(`${c.name}: ${c.title} here, ${role} on the Government Buyers page`);
+      }
+    }
+    expect([...new Set(wrong)]).toEqual([]);
+  });
+
   it("each person on the Government Buyers page has one name at one buyer", () => {
     const seen = new Map<string, string>();
     const dup: string[] = [];

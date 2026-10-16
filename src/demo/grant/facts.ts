@@ -190,28 +190,28 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
 /** State and local buyers that the Government Buyers page already names. */
 const LOCAL_TEAMS: Record<string, Person[]> = {
   "City of Fayetteville, NC": [
-    { name: "Dominic Reyes", title: "Procurement Officer" },
-    { name: "Ayesha Khan", title: "Purchasing Agent" },
+    { name: "Dominic Reyes", title: "Contracting Officer" },
+    { name: "Ayesha Khan", title: "Contract Specialist" },
   ],
   "Cumberland County, NC": [
-    { name: "Calvin Moore", title: "Purchasing Manager" },
-    { name: "Joy Mathis", title: "Purchasing Agent" },
+    { name: "Calvin Moore", title: "Contracting Officer" },
+    { name: "Joy Mathis", title: "Contract Specialist" },
   ],
   "Cumberland County Schools, NC": [
-    { name: "Gordon Yates", title: "Purchasing Director" },
-    { name: "Tamika Bell", title: "Purchasing Agent" },
+    { name: "Gordon Yates", title: "Contracting Officer" },
+    { name: "Tamika Bell", title: "Small-Business Liaison" },
   ],
   "North Carolina National Guard": [
-    { name: "Beth Anne Parrish", title: "Procurement Officer" },
-    { name: "Curtis Lowe", title: "Purchasing Agent" },
+    { name: "Beth Anne Parrish", title: "Contracting Officer" },
+    { name: "Curtis Lowe", title: "Small-Business Liaison" },
   ],
   "Public Schools of Robeson County, NC": [
-    { name: "Terrence Bullard", title: "Purchasing Manager" },
-    { name: "Patricia Lowry", title: "Purchasing Agent" },
+    { name: "Terrence Bullard", title: "Contracting Officer" },
+    { name: "Patricia Lowry", title: "Small-Business Liaison" },
   ],
   "Durham County, NC": [
-    { name: "Edward Kincaid", title: "Procurement Officer" },
-    { name: "Monica Alvarez", title: "Purchasing Agent" },
+    { name: "Edward Kincaid", title: "Contracting Officer" },
+    { name: "Monica Alvarez", title: "Small-Business Liaison" },
   ],
 };
 
