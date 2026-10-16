@@ -21,7 +21,7 @@ export const COPY_RULES: { rule: string; pattern: RegExp }[] = [
   },
   {
     rule: "wrong plural (1 months, 1 days, 1 awards)",
-    pattern: /(?<![\d.,$])1 (?:months|days|weeks|hours|awards|firms|jobs|orders|forecasts|matches)\b/i,
+    pattern: /(?<![\d.,$])1 (?:months|days|weeks|hours|awards|firms|jobs|orders|forecasts|opportunities)\b/i,
   },
   {
     rule: "odd place name (Stem, NC)",

@@ -14,6 +14,7 @@ describe("copy rules", () => {
       ["County and ZIP-radius live in Advanced below until the gazetteer tree is ported.", "reads as unfinished"],
       ["This job comes up for bid again in about 1 months.", "wrong plural"],
       ["Tight — 1 days", "wrong plural"],
+      ["1 opportunities · showing 1", "wrong plural"],
       ["1 awards · $11.9M", "wrong plural"],
       ["Almost all their work is in Stem and nearby, in North Carolina.", "odd place name"],
       ["Hunter will prioritise their solicitations.", "not US English"],
@@ -26,6 +27,7 @@ describe("copy rules", () => {
     const good = [
       "This job comes up for bid again in about 1 month.",
       "Tight — 1 day",
+      "1 opportunity · showing 1. 1 matches you. 11 opportunities.",
       "11 days left. 21 days. 1.1 days. $1 days",
       "A reply does not guarantee a place in the next one.",
       "Senior meals at two Durham County centers, 12 firms, 1 award.",

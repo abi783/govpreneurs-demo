@@ -1892,7 +1892,10 @@ export function OpportunitiesFeed() {
             )}
             {!previewFeed && !loading && visibleCards.length > 0 && (
               <div className="load-more-count">
-                {totalOpps} {savedNoun ?? (allTab ? "opportunities" : "match you")} · showing{" "}
+                {/* DEMO: singular for one result ("1 opportunity", "1 matches you"). */}
+                {totalOpps}{" "}
+                {savedNoun ?? (allTab ? (totalOpps === 1 ? "opportunity" : "opportunities") : totalOpps === 1 ? "matches you" : "match you")}{" "}
+                · showing{" "}
                 {visibleCards.length}
               </div>
             )}
