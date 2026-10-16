@@ -458,7 +458,10 @@
   gap: var(--s-4);
   padding: var(--s-4);
   border-top: 1px solid var(--blue-2);
-  animation: rm2-reveal var(--d-base) var(--ease) both;
+  /* DEMO: `backwards`, not `both`. A forwards fill keeps a transform animation "in effect" for good.
+     That makes this box the containing block of a `position: fixed` child, and the booking sheet
+     inside it was cut off at the top and covered only this box. */
+  animation: rm2-reveal var(--d-base) var(--ease) backwards;
 }
 
 .gpds-rm3 .rm2-detailwrap .rm2-detail {

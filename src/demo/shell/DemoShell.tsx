@@ -4,7 +4,7 @@
 // The menu is fixed. Only `#demo-main` scrolls. Page code that needs the scroll
 // container can read `document.getElementById("demo-main")`.
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { RotateCcw, Search } from "lucide-react";
 import { PERSONA } from "../story/persona";
@@ -16,12 +16,44 @@ import { ScChatHost } from "../sc/ScChatHost";
 import "./shell.css";
 import "../nav/storySearch";
 
+/**
+ * DEMO: Escape closes a dialog that production built by hand. Radix dialogs already close on
+ * Escape and mark the key as handled, so this does nothing for them. A hand-built one (the booking
+ * sheet, a drawer) has a close button, and Escape presses it. The top-most dialog goes first.
+ */
+function useEscapeForHandBuiltDialogs() {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      const visible = (el: HTMLElement) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden";
+      };
+      const open = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]'))
+        .filter((el) => !el.hasAttribute("data-state") && visible(el));
+      const top = open[open.length - 1];
+      if (!top) return;
+      const buttons = Array.from(top.querySelectorAll<HTMLElement>("button, [role='button']")).filter(visible);
+      const close =
+        buttons.find((b) => /^close\b/i.test(b.getAttribute("aria-label") ?? "")) ??
+        buttons.find((b) => b.classList.contains("ui-modal-close")) ??
+        buttons.find((b) => /^(close|cancel|not now|done|back)$/i.test((b.textContent ?? "").trim()));
+      if (!close) return;
+      e.preventDefault();
+      close.click();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+}
+
 const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 
 export function DemoShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
+  useEscapeForHandBuiltDialogs();
 
   return (
     <div className="demo-shell">
