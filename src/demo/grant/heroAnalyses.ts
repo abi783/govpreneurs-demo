@@ -90,7 +90,7 @@ const fieldMeals: Maker = (f, sol) => {
     gistBold: "only woman-owned firms can bid",
     thesisBold: ["the right first federal prime for you"],
     limitKinds: ["responsibility", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: "the **other woman-owned caterers** near you. Six list your code within 100 miles",
+    competitiveRisk: "the **other woman-owned caterers** near you, six of whom list your code within 100 miles",
     readBold: {
       "Is it your kind of work?": "you delivered 1,100 meals a day for the county schools",
       "Does the size fit?": "about a third of your revenue",
@@ -434,7 +434,7 @@ const fortBraggDining: Maker = (f, sol) => {
     gistBold: "as Carolina Dining Group's subcontractor",
     thesisBold: ["the bond is not", "Bid as a subcontractor under the firm that holds the contract"],
     limitKinds: ["responsibility", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: `**${PARTNER.name}**, which has held this work since 2019. The Army exercised all four options, so it may not want to switch`,
+    competitiveRisk: `**${PARTNER.name}**, which has held this work since 2019 and had all four options exercised, so the Army may not want to switch`,
     readBold: {
       "Is it your kind of work?": `as ${PARTNER.name}'s subcontractor`,
       "Does the size fit?": "more than three times",
