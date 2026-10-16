@@ -61,3 +61,19 @@ export async function fetchWalletLedger(): Promise<LedgerTx[]> {
 export const GHL_WALLET_BILLING_URL =
   (import.meta.env.VITE_GHL_WALLET_BILLING_URL as string | undefined) ||
   "https://app.govpreneurs.com/v2/location/{locationId}/settings/company-billing/billing?tab=wallet_transactions";
+
+/**
+ * DEMO: a top-up that always succeeds. The live product sends the member to the GHL billing
+ * page. The demo adds the funds to the sample wallet and records a "Wallet top-up" entry.
+ */
+export async function topUpWallet(amount: number): Promise<WalletBalance> {
+  const response = await apiFetch(`${API_BASE_URL}/wallet/top-up`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount }),
+  });
+  if (!response.ok) {
+    return await buildApiError(response, "Could not add funds");
+  }
+  return response.json() as Promise<WalletBalance>;
+}
