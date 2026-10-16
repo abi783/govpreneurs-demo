@@ -56,7 +56,17 @@ export function SendToMentorModal({
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm" className="ava-modal" aria-describedby={undefined}>
+      <Modal.Content
+        size="sm"
+        className="ava-modal"
+        aria-describedby={undefined}
+        // The receipt is shorter than the form, so the dialog shrinks under a
+        // double press and the second press lands on the page behind it. That
+        // press must not close the dialog before she reads the receipt.
+        onInteractOutside={(e) => {
+          if (sentAt.current && Date.now() - sentAt.current < SETTLE_MS) e.preventDefault();
+        }}
+      >
         <Modal.Header title={`Send to ${MENTOR.name}`} />
         <Modal.Body>
           {sent ? (

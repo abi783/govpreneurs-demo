@@ -194,6 +194,17 @@ function heldParts(parts: Part[], holds: Hold[]): Set<string> {
 
 /** What Ava says to words she cannot act on yet in her read of the bid. The
  *  demo has no model, so the answers are scripted for what a person asks. */
+/** Words typed after she taps a sentence: a question about it, an order about
+ *  it, or the new words themselves. */
+export function aboutSentence(text: string): "why" | "order" | "words" {
+  const t = text.trim().toLowerCase();
+  if (/\?\s*$/.test(t) || /^(why|what|how|who|when|where|which|is|are|does|do|did)\b/.test(t))
+    return "why";
+  if (/^(please\b|can you\b|could you\b|would you\b|make\b|change\b|shorten\b|rewrite\b|reword\b|remove\b|delete\b|fix\b|improve\b|edit\b)/.test(t))
+    return "order";
+  return "words";
+}
+
 function readerReply(text: string, bid: AvaBid): string {
   const t = text.toLowerCase();
   if (/download|pdf|word|excel|file/.test(t))
@@ -602,6 +613,7 @@ function ReadChat({
   useEffect(() => {
     setProposal(null);
     setWhyOpen(false);
+    setSaid(null);
     if (nav.sel) setNote(null);
   }, [nav.sel]);
   useEffect(() => {
@@ -658,6 +670,21 @@ function ReadChat({
 
   const onSend = (text: string, how: { voice: boolean }) => {
     if (sentence) {
+      // Words typed after she taps a sentence are the new sentence, unless they
+      // ask a question or give an order. Those are never put into her bid.
+      const kind = aboutSentence(text);
+      if (kind === "why") {
+        setWhyOpen(true);
+        setSaid({ you: text, ava: "Here is why I put this sentence in your bid." });
+        return;
+      }
+      if (kind === "order") {
+        setSaid({
+          you: text,
+          ava: "I cannot rewrite a sentence from an order in this sample. Type the words you want in its place, and I show you the new sentence before anything changes.",
+        });
+        return;
+      }
       setProposal({ key: sentence.key, now: text, voice: how.voice });
       return;
     }
@@ -905,7 +932,7 @@ function ReadChat({
             </AgentTurn>
           ) : null}
 
-          {said ? (
+          {said && !(sentence && sec) ? (
             <>
               <YouMsg>{said.you}</YouMsg>
               <AgentTurn avatar={avaFace}>
@@ -956,6 +983,14 @@ function ReadChat({
                 {secPart ? pieceWords(flow.parts, secPart).replace(/^part/, "Part") : sec.title}: “
                 {sentence.text}”
               </YouMsg>
+              {said ? (
+                <>
+                  <YouMsg>{said.you}</YouMsg>
+                  <AgentTurn avatar={avaFace}>
+                    <AgentMsg>{said.ava}</AgentMsg>
+                  </AgentTurn>
+                </>
+              ) : null}
               {s.edits[sentence.key] && !proposal ? (
                 <AgentTurn avatar={avaFace}>
                   <ChatCard>

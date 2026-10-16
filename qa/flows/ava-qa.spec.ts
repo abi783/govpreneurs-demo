@@ -305,3 +305,183 @@ test.describe("reload keeps the state", () => {
     expect(w.problems).toEqual([]);
   });
 });
+
+
+// ─── Every way into Ava lands on the right bid ───
+
+const TITLES: Record<string, RegExp> = {
+  "SP4701-26-Q-0021": /Camp Mackall/,
+  "FAYNC-2026-R-08": /Employee Cafe and Event Catering/,
+  "CUMCO-2026-014": /Inmate Meal Services/,
+  "W912EE-27-S-0004": /Sources Sought/,
+  "W912PM-26-Q-0017": /Ceremony and Official Function Catering/,
+  "RCSC-2026-09": /Cafeteria Food Service/,
+};
+
+async function landedOn(page: Page, id: string): Promise<void> {
+  await expect(page, `landed on ${id}`).toHaveURL(new RegExp(`/ava/${id}`));
+  await expect(page.locator(".ava2-top h1")).toHaveText(TITLES[id]);
+}
+
+test.describe("ways into Ava", () => {
+  test("the opportunity page button opens each bid", async ({ page }) => {
+    const w = watch(page);
+    for (const id of Object.keys(TITLES)) {
+      await page.goto(`/opportunities/${id}?fast=1`);
+      await page.waitForLoadState("networkidle");
+      const intro = page.getByRole("button", { name: /Show me the analysis/ });
+      if (await intro.isVisible().catch(() => false)) await intro.click();
+      const way = /Build (this bid|the bid|the quote) with Ava|Open (your|the) reply with Ava/i;
+      const go = page.getByRole("button", { name: way }).or(page.getByRole("link", { name: way }));
+      await expect(go.first(), `a way into Ava on ${id}`).toBeVisible();
+      await go.first().click();
+      await landedOn(page, id);
+    }
+    expect(w.problems).toEqual([]);
+  });
+
+  test("Grant's next move opens the bid", async ({ page }) => {
+    const w = watch(page);
+    for (const [id, label] of [
+      ["SP4701-26-Q-0021", /Build the quote with Ava/],
+      ["CUMCO-2026-014", /with Ava|Ava/],
+    ] as const) {
+      await page.goto(`/opportunities/${id}?fast=1`);
+      await page.waitForLoadState("networkidle");
+      const intro = page.getByRole("button", { name: /Show me the analysis/ });
+      if (await intro.isVisible().catch(() => false)) await intro.click();
+      const next = page.getByRole("button", { name: label }).or(page.getByRole("link", { name: label }));
+      await next.last().scrollIntoViewIfNeeded();
+      await next.last().click();
+      await landedOn(page, id);
+    }
+    expect(w.problems).toEqual([]);
+  });
+
+  test("the Pipeline tags and next moves open the bid, with the same days left", async ({ page }) => {
+    const w = watch(page);
+    const ids = ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"];
+    for (const id of ids) {
+      await page.goto("/pipeline?fast=1");
+      await page.waitForLoadState("networkidle");
+      const tag = page.locator(`a[href="/ava/${id}"]`).first();
+      const card = tag.locator("xpath=ancestor::*[contains(., 'days left')][1]");
+      const days = (await card.innerText()).match(/(\d+) days? left/)?.[1];
+      await tag.click();
+      await landedOn(page, id);
+      expect(await page.locator(".ava2-top__days").innerText(), `days left on ${id}`).toContain(days!);
+    }
+    expect(w.problems).toEqual([]);
+  });
+
+  test("Tasks and Success Center open the bid", async ({ page }) => {
+    const w = watch(page);
+    for (const route of ["/tasks", "/"]) {
+      await page.goto(`${route}?fast=1`);
+      await page.waitForLoadState("networkidle");
+      const hrefs = await page
+        .locator('#demo-main a[href^="/ava/"]')
+        .evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("href")!))]);
+      expect(hrefs.length, `Ava links on ${route}`).toBeGreaterThan(0);
+      for (const href of hrefs) {
+        await page.goto(`${route}?fast=1`);
+        await page.waitForLoadState("networkidle");
+        await page.locator(`#demo-main a[href="${href}"]`).first().click();
+        await landedOn(page, href.replace("/ava/", ""));
+      }
+    }
+    expect(w.problems).toEqual([]);
+  });
+
+  test("the list card opens the bid, and the menu opens the list", async ({ page }) => {
+    const w = watch(page);
+    await page.goto("/?fast=1");
+    await page.getByRole("link", { name: "Ava", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Bids Ava is building" })).toBeVisible();
+    const cards = page.locator(".ava-idx__card");
+    await expect(cards).toHaveCount(4);
+    for (const id of ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"]) {
+      await page.goto("/ava?fast=1");
+      await page.locator(".ava-idx__card", { hasText: id }).click();
+      await landedOn(page, id);
+    }
+    expect(w.problems).toEqual([]);
+  });
+});
+
+
+// ─── The mentor button ───
+
+async function walletBalance(page: Page): Promise<string> {
+  await page.goto("/wallet?fast=1");
+  await page.waitForLoadState("networkidle");
+  const text = await page.locator("#demo-main").innerText();
+  return text.match(/\$[0-9,]+\.\d\d/)![0];
+}
+
+test.describe("the mentor button", () => {
+  test.setTimeout(60_000);
+  test("a double press sends one $97 review; the review shows in Mentors; the button reads that Sarah is reviewing", async ({
+    page,
+  }) => {
+    const w = watch(page);
+    expect(await walletBalance(page)).toBe("$306.00");
+    await open(page, BIDS.mackall);
+    await page.getByRole("button", { name: "Build with a mentor" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByText("Send to Sarah Mitchell")).toBeVisible();
+    await expect(dialog).toContainText("$97.00");
+    await expect(dialog).toContainText("Your wallet has $306.00");
+    await dialog.getByRole("button", { name: "Send for $97.00" }).dblclick();
+    // The receipt stays on screen: the second press must not close it.
+    await page.waitForTimeout(300);
+    await expect(dialog).toContainText("Sent to Sarah Mitchell.");
+    await expect(dialog).toContainText("$97.00 was charged to your wallet.");
+    await page.waitForTimeout(600);
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(dialog).toHaveCount(0);
+    const sarah = page.getByRole("link", { name: "Sarah is reviewing" });
+    await expect(sarah).toBeVisible();
+    await expect(page.getByRole("button", { name: /Build with a mentor/ })).toHaveCount(0);
+    await page.reload();
+    await expect(page.getByRole("link", { name: "Sarah is reviewing" })).toBeVisible();
+    expect(await walletBalance(page)).toBe("$209.00");
+    await page.goto("/mentors?fast=1");
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByText("Review my bid: Field Feeding Support").first()).toBeVisible();
+    expect(
+      await page.getByText("Review my bid: Field Feeding Support").count(),
+      "one review, once in the list and once in the thread",
+    ).toBeLessThanOrEqual(2);
+    // The link on the Ava page opens that review.
+    await open(page, BIDS.mackall);
+    await page.getByRole("link", { name: "Sarah is reviewing" }).click();
+    await expect(page).toHaveURL(/\/mentors\/rev-/);
+    expect(w.problems).toEqual([]);
+  });
+
+  test("phase 2 and the paused bid send the same way, once each", async ({ page }) => {
+    const w = watch(page);
+    // Phase 2: the card in the chat.
+    await open(page, BIDS.reply);
+    await page.getByRole("button", { name: "Read my bid" }).click();
+    await page.getByRole("button", { name: /Send to (a mentor|Sarah)/ }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByRole("button", { name: "Send for $97.00" }).dblclick();
+    await page.waitForTimeout(900);
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(page.getByRole("link", { name: "Sarah is reviewing" })).toBeVisible();
+    // The paused bid.
+    await open(page, BIDS.cumberland);
+    await page.getByRole("button", { name: /Ask a mentor/ }).click();
+    const d2 = page.getByRole("dialog");
+    await expect(d2).toContainText("The rule you cannot meet");
+    await d2.getByRole("button", { name: "Send for $97.00" }).dblclick();
+    await page.waitForTimeout(900);
+    await d2.getByRole("button", { name: "Done" }).click();
+    await expect(page.getByText(/With Sarah since/)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Ask a mentor/ })).toHaveCount(0);
+    expect(await walletBalance(page)).toBe("$112.00");
+    expect(w.problems).toEqual([]);
+  });
+});
