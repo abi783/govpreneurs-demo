@@ -65,6 +65,11 @@ export interface AwardRecency {
   justAwarded: boolean | null;
   comingUpAgain: boolean;
   recompeteAt: string | null;
+  /**
+   * DEMO: the buyer already takes bids for the next contract. The page says so
+   * instead of "comes up for bid again in N months".
+   */
+  openNowNote?: string;
   /** Defense-aware: the 30–90d window sits inside the ~90d defense reporting lag. */
   reportingLagNote: string;
 }
@@ -277,6 +282,7 @@ export function atLeastSubs(bench: AwardBench): string {
  * badge follows.
  */
 export function whatHappensNext(a: AwardRecord): string | null {
+  if (a.recency.openNowNote) return a.recency.openNowNote;
   const months = a.recency.recompeteAt
     ? (new Date(a.recency.recompeteAt).getTime() - Date.now()) / (30 * 86_400_000)
     : null;
@@ -352,6 +358,7 @@ export function whyThisAward(a: AwardRecord): string {
   if (a.recency.justAwarded && ago) {
     return `Won ${ago}. Worth asking who is already on the team.`;
   }
+  if (a.recency.openNowNote) return a.recency.openNowNote;
   if (a.recency.comingUpAgain && a.recency.recompeteAt) {
     const months = Math.max(
       1,

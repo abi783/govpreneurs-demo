@@ -39,7 +39,7 @@ export function cardTakeLine(oppKey: string): string | null {
   const when_ = expectedDays(r) == null ? "" : ` Expected ${weeksOrMonths(Math.max(expectedDays(r) as number, 0))}.`;
   switch (oppKey) {
     case FORT_BRAGG_FORECAST_KEY:
-      return `The follow-on to the Fort Bragg dining contract that ${KEY_PARTNER.name} has held since 2019. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
+      return `The Army's larger dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
     case POPE_FORECAST_KEY:
       return `Event catering at Pope and Fort Bragg, planned for women-owned firms. You hold that certificate, and it fits your event work and your size.${when_}`;
     case SEYMOUR_FORECAST_KEY:
@@ -157,7 +157,7 @@ export function forecastGrantReply(oppKey: string, message: string): string {
     return `${firstStep(r)} ${when(r)}.`;
   }
   if (has(/\b(mentor|sarah|review)\b/)) {
-    return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She read the Camp Mackall and Fayetteville proposals, so she knows your work.`;
+    return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
     const best = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub") ?? PAST_PERFORMANCE[0];
