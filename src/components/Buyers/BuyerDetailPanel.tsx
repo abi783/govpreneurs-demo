@@ -23,6 +23,22 @@ import {
 import { JargonGloss } from "@/components/Layout/JargonGloss";
 import { awardedAgo, usd } from "@/lib/awardsApi";
 import { DraftIntroModal } from "./DraftIntroModal";
+import { showDemoNotice } from "@/demo/ui/notice";
+
+// DEMO: a mail or phone link would open a program on the visitor's computer. These contacts
+// are sample data, so a click copies the address and says so.
+function copyContact(e: { preventDefault: () => void }, value: string) {
+  e.preventDefault();
+  try {
+    void navigator.clipboard?.writeText(value).catch(() => undefined);
+  } catch {
+    // The notice below still tells the visitor what happened.
+  }
+  showDemoNotice({
+    title: "Copied",
+    message: `${value} is copied. This contact is sample data, so nothing is sent.`,
+  });
+}
 import { BuyerPursueAnalysis } from "./BuyerPursueAnalysis";
 
 const ROLE_GLOSS: Record<OfficerRole, string> = {
@@ -171,10 +187,14 @@ export function BuyerDetailPanel({
                   </div>
                 </div>
                 <div className="officer-row-contact">
-                  <a className="officer-contact" href={`mailto:${o.email}`}>
+                  <a className="officer-contact" href={`mailto:${o.email}`} onClick={(e) => copyContact(e, o.email)}>
                     <Mail size={11} /> <span className="fr-mono">{o.email}</span>
                   </a>
-                  <a className="officer-contact" href={`tel:${o.phone.replace(/\s+/g, "")}`}>
+                  <a
+                    className="officer-contact"
+                    href={`tel:${o.phone.replace(/\s+/g, "")}`}
+                    onClick={(e) => copyContact(e, o.phone)}
+                  >
                     <Phone size={11} /> <span className="fr-mono">{o.phone}</span>
                   </a>
                 </div>
