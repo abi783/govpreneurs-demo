@@ -21,6 +21,9 @@ interface StoredReview {
 
 const KEY = "mentorReviews";
 
+/** Makes ids unique even for two sends in the same millisecond. */
+let seq = 0;
+
 const STATUS: Record<MentorReviewStory["status"], MentorReviewSummary["status"]> = {
   awaiting_mentor: "pending",
   mentor_replied: "responded",
@@ -135,7 +138,7 @@ export function addMemberReply(id: string, bodyHtml: string, attachmentNames: st
     prev.map((r) => {
       if (r.summary.id !== id) return r;
       created = {
-        id: `m-${Date.now()}`,
+        id: `m-${Date.now()}-${++seq}`,
         author: "member",
         authorName: PERSONA.ownerName,
         bodyHtml: bodyHtml || "<p>(attachment)</p>",
@@ -163,7 +166,7 @@ export function createReview(input: { oppKey: string; title: string; message: st
   if (existing) return existing;
   const now = new Date().toISOString();
   const first: MentorThreadMessage = {
-    id: `m-${Date.now()}`,
+    id: `m-${Date.now()}-${++seq}`,
     author: "member",
     authorName: PERSONA.ownerName,
     bodyHtml: input.message ? `<p>${escapeHtml(input.message)}</p>` : "<p>Could you review this one for me?</p>",
@@ -171,7 +174,7 @@ export function createReview(input: { oppKey: string; title: string; message: st
     attachments: [],
   };
   const summary: MentorReviewSummary = {
-    id: `rev-${Date.now()}`,
+    id: `rev-${Date.now()}-${++seq}`,
     oppKey: input.oppKey,
     // DEMO: forecasts and small orders are records too, so their reviews link back.
     oppResolved: Boolean(getOpportunity(input.oppKey)) || describeSaved(input.oppKey) !== null,

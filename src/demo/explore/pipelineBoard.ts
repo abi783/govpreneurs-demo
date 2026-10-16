@@ -7,6 +7,7 @@
 // a record appears once. If a mentor review is open for it, the review card
 // stands for it.
 
+import { avaSentAt, cumberlandCertificatesIn } from "@/demo/ava/progress";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { calendarIso } from "./dates";
 import { OPPORTUNITIES, getOpportunity, type StoryOpportunity } from "@/demo/story/opportunities";
@@ -58,9 +59,25 @@ function withoutVerdictWords(line: string): string {
 
 const VERDICT_WORD = { bid: "Bid", review: "Look closer", no_bid: "Don't bid" } as const;
 
-function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean): DemoBid {
+function storyBid(o: StoryOpportunity, storyStage: Bid["stage"], withPursuit: boolean): DemoBid {
   const value = valueRange(o);
-  const pursuit = withPursuit ? o.pursuit : undefined;
+  let pursuit = withPursuit ? o.pursuit : undefined;
+  let stage = storyStage;
+  let avaLabel = o.ava ? avaTagLabel(o.ava) : null;
+  // What Tim did in Ava during the call wins over the story's starting point.
+  const sentAt = o.ava ? avaSentAt(o.id) : null;
+  if (o.ava && sentAt && pursuit) {
+    stage = "submitted";
+    avaLabel = "Sent";
+    pursuit = {
+      ...pursuit,
+      note: `You sent it on ${new Date(sentAt).toLocaleDateString("en-US", { month: "long", day: "numeric" })}. The buyer decides after the due date.`,
+      next: { label: "See what you sent", to: `/ava/${o.id}` },
+    };
+  } else if (o.ava?.paused && pursuit && cumberlandCertificatesIn()) {
+    avaLabel = "Ava is building";
+    pursuit = { ...pursuit, note: "Certificates in. Ava is building the bid again.", next: { label: "Open the bid", to: `/ava/${o.id}` } };
+  }
   // An outcome card (submitted, won, not awarded, declined) shows no countdown.
   const outcome = ["submitted", "won", "not_awarded", "declined"].includes(stage);
   const deadline = outcome ? null : calendarIso(o.closesInDays);
@@ -84,7 +101,7 @@ function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean
     scope: o.scope,
     demo: {
       ...(pursuit ? { next: pursuit.next } : {}),
-      ...(o.ava ? { ava: { to: `/ava/${o.id}`, label: avaTagLabel(o.ava) } } : {}),
+      ...(o.ava && avaLabel ? { ava: { to: `/ava/${o.id}`, label: avaLabel } } : {}),
     },
   };
 }

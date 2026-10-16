@@ -6,6 +6,7 @@
 // the visitor does (tick, dismiss, snooze, restore) is kept in the demo store.
 // Booking the quarterly targeting call on the Roadmap, or from here, ticks its task.
 
+import { avaSentAt, cumberlandCertificatesIn } from "@/demo/ava/progress";
 import type {
   BookingStepView,
   MemberTaskSection,
@@ -186,8 +187,12 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
 function viewFor(t: StoryTask, now: Date): TaskView {
   const change = getChanges()[t.id] ?? {};
   const booked = t.id === "task-targeting-call" && !!bookingForCall(CALL_STEP_IDS.targeting);
+  // DEMO: tasks that Ava finishes when Tim does the step in Ava during a call.
+  const doneInAva =
+    (t.id === "task-send-reply" && !!avaSentAt("W912EE-27-S-0004")) ||
+    (t.id === "task-certificates" && cumberlandCertificatesIn());
 
-  const status: TaskView["status"] = change.status ?? (t.done || booked ? "done" : "open");
+  const status: TaskView["status"] = change.status ?? (t.done || booked || doneInAva ? "done" : "open");
   const auto = t.source === "roadmap";
   const open = status === "open";
 
@@ -197,6 +202,9 @@ function viewFor(t: StoryTask, now: Date): TaskView {
     if (change.status === "done") {
       doneAt = change.doneAt ?? now.toISOString();
       doneBy = change.doneBy ?? "member";
+    } else if (doneInAva) {
+      doneAt = now.toISOString();
+      doneBy = "auto:ava";
     } else if (booked) {
       doneAt = bookingForCall(CALL_STEP_IDS.targeting)!.createdAt;
       doneBy = "auto:booking";

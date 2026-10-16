@@ -96,3 +96,8 @@ name its number.
 - D72. **The Virginia catering forecast is at Defense Supply Center Richmond** (about 170 miles), not Naval Station Norfolk (220 miles). Its "Good fit" label is then true for a 200-mile service area.
 - D73. **Hunter's "Which am I ready for?" answer says "a stretch on your own"** for jobs above her size, such as Fort Bragg dining. Readiness is about bidding alone. The card's priority rating is about fit. Grant's prime no-go agrees.
 - D74. **Copy review:** no text promises a win, US spelling throughout, one timeline for her history (onboarding 218 days ago, positioning call 150, SAM 183), each invented person has one role, and "Blackwater Dining Group" is renamed (it echoed a real contractor). A rule set in `qa/copyRules.ts` checks every page on every crawl.
+- D75. **No link leaves the demo.** "Go to DIBBS", "Open sam.gov", "Watch the video" and the like show an in-app notice instead of opening an outside site.
+- D76. **What Tim does in Ava shows everywhere.** A bid he marks as sent moves to "Submitted" on the Pipeline. Uploading the Cumberland certificates un-pauses that card, and the matching tasks check themselves off.
+- D77. **Due dates can fall on a weekend on some days.** Dates count from the day the demo opens; rolling them to weekdays would make "N days left" differ between pages. Accepted as a small realism gap.
+- D78. **Small Orders never lists a set-aside she can't bid on as "for you"** (for example a service-disabled-veteran set-aside).
+- D79. **A double-click sends once.** Mentor reviews, bookings and purchases charge the wallet once, even on a fast double-click.
