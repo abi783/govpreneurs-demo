@@ -1746,8 +1746,14 @@ test.describe("Buy a done-for-you service", () => {
     await code.fill("DEMO10");
     await dialog.getByRole("button", { name: "Apply" }).click();
     await expect(dialog).toContainText("$177.30");
-    const buy = dialog.getByRole("button", { name: "Purchase" });
-    await buy.dblclick({ noWaitAfter: true });
+    // A quick double-click on Purchase moves to the check step. It must not also press "Confirm and pay".
+    await humanDoubleClick(page, dialog.getByRole("button", { name: "Purchase" }));
+    await expect(dialog).toContainText("Check this before you pay");
+    await page.waitForTimeout(600);
+    await expect(dialog).toContainText("Check this before you pay");
+    // Confirm with a double-click: one charge.
+    const pay = dialog.getByRole("button", { name: /^Confirm and pay/ });
+    await humanDoubleClick(page, pay);
     await settle(page);
     await page.waitForTimeout(1000);
     await settle(page);
@@ -1759,7 +1765,7 @@ test.describe("Buy a done-for-you service", () => {
 test.describe("Drawers on the Success Center home", () => {
   for (const [button, heading] of [
     ["Booking History", "Booking History"],
-    [/Usage History/, "Usage History"],
+    [/Usage History/, "Wallet Usage"],
   ] as [string | RegExp, string][]) {
     test(`${heading} closes on Escape, on the close button and on a click outside`, async ({ page, context }) => {
       const w = await watch(page, context);
@@ -2022,4 +2028,72 @@ test.describe("Every dialog on every page closes", () => {
       await healthy(page, w, route);
     });
   }
+});
+
+// ── Downloads are real files ───────────────────────────────────────────────
+
+test.describe("Downloads", () => {
+  test("every document link gives a real PDF or file, never a 404", async ({ page, context }) => {
+    test.setTimeout(600_000);
+    const w = await watch(page, context);
+    const seen = new Set<string>();
+    const bad: string[] = [];
+    for (const route of SWEEP_SET) {
+      await open(page, route + (route.includes("?") ? "&" : "?") + "fast=1");
+      const hrefs = await page.evaluate(() =>
+        Array.from(document.querySelectorAll<HTMLAnchorElement>("a[href]"))
+          .map((a) => a.getAttribute("href") ?? "")
+          .filter((h) => /\/documents\?|\/demo-files\/|\.pdf($|\?)|\.docx?($|\?)|\.xlsx?($|\?)|\.csv($|\?)|\/download/i.test(h)),
+      );
+      for (const href of hrefs) {
+        if (seen.has(href)) continue;
+        seen.add(href);
+        const res = await page.evaluate(async (h) => {
+          const r = await fetch(h);
+          const buf = new Uint8Array(await r.arrayBuffer());
+          return { ok: r.ok, status: r.status, type: r.headers.get("content-type") ?? "", size: buf.length, head: String.fromCharCode(...buf.slice(0, 5)) };
+        }, href);
+        if (!res.ok) bad.push(`${href}: status ${res.status}`);
+        else if (res.size < 100) bad.push(`${href}: only ${res.size} bytes`);
+        else if (/pdf/i.test(res.type) && !res.head.startsWith("%PDF")) bad.push(`${href}: says PDF but starts with "${res.head}"`);
+        else if (/html/i.test(res.type)) bad.push(`${href}: gave an HTML page, not a file`);
+      }
+    }
+    expect(seen.size, "the pages offer documents").toBeGreaterThan(10);
+    expect(bad).toEqual([]);
+    await healthy(page, w, "downloads");
+  });
+
+  test("a Download button gives a file with a name", async ({ page, context }) => {
+    const w = await watch(page, context);
+    await open(page, "/small-orders/mp-101");
+    const link = main(page).getByRole("link", { name: /Read the order paper/ });
+    const [download] = await Promise.all([page.waitForEvent("download", { timeout: 8000 }), link.click()]);
+    expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
+    await healthy(page, w, "order paper download");
+  });
+});
+
+test.describe("One message per send", () => {
+  test("a double-click on Send reply and on a chat send posts once", async ({ page, context }) => {
+    const w = await watch(page, context);
+    await open(page, "/mentors/rev-fayetteville-proposal");
+    const mine = () => main(page).locator(".mentors-msg--member");
+    const before = await mine().count();
+    await page.locator(".reply-composer__editor").click();
+    await page.keyboard.insertText("Thank you, Sarah. I will move my event work to the top.");
+    await humanDoubleClick(page, page.getByRole("button", { name: "Send reply" }));
+    await settle(page);
+    await page.waitForTimeout(800);
+    await expect(mine()).toHaveCount(before + 1);
+    // Hunter's chat: Enter twice, quickly.
+    await open(page, "/opportunities");
+    const box = page.getByPlaceholder(/Ask Hunter/);
+    await box.fill("What is closing soonest?");
+    await box.press("Enter");
+    await box.press("Enter");
+    await page.waitForTimeout(800);
+    await expect(page.locator(".hunter-bubble.from-user", { hasText: "What is closing soonest?" })).toHaveCount(1);
+    await healthy(page, w, "one message per send");
+  });
 });
