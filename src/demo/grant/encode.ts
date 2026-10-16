@@ -6,7 +6,8 @@
 // trail of checks. A test (grant.test.ts) checks that every sentence of a brief
 // shows up in the analysis, so nothing a brief says is lost on the way.
 
-import { isoDaysFromNow, dateDaysFromNow } from "@/demo/story/clock";
+import { DEMO_TODAY, dateDaysFromNow } from "@/demo/story/clock";
+import { calendarDay } from "./calendar";
 import type { GrantBrief, ReadName } from "@/demo/story/grantBriefs";
 import { PERSONA } from "@/demo/story/persona";
 import type {
@@ -251,7 +252,7 @@ export function encodeBrief(
   }));
 
   const keyDateTrail = brief.keyDates
-    .map((k) => `${k.label} ${new Date(isoDaysFromNow(k.inDays)).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`)
+    .map((k) => `${k.label} ${calendarDay(DEMO_TODAY, k.inDays).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`)
     .join(" · ");
   const questionsRef = clauseOf(sol, "questions")?.clause.ref;
   const trail: TrailGroup[] = ex.trail.map((g, gi) =>

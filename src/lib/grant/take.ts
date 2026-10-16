@@ -237,11 +237,14 @@ export function buildTake(
           : blockerUnrecoverable
             ? "Locked at no-go for this solicitation"
             : "Currently no-go",
-      reason: blockerUnrecoverable
-        ? lockedReason
-        : subState === "go"
+      // DEMO: a bond that blocks the prime path does not block a subcontract, so a path
+      // that is still "go" never shows the reason that locks the other.
+      reason:
+        subState === "go"
           ? [t("No unresolved issue currently prevents pursuing this as a sub.")]
-          : verdict.confidence.remedy,
+          : blockerUnrecoverable
+            ? lockedReason
+            : verdict.confidence.remedy,
     },
   ];
 

@@ -8,7 +8,9 @@
 import { getGrantBrief } from "@/demo/story/grantBriefs";
 import { offerWord } from "./domains";
 import { longDate, type OppFacts } from "./facts";
+import { calendarDay } from "./calendar";
 import { AUTHORED_BRIEFS } from "./heroBriefs";
+import { DEMO_TODAY } from "@/demo/story/clock";
 
 export interface KeyDate {
   label: string;
@@ -51,7 +53,8 @@ export function keyDatesFor(f: OppFacts): KeyDate[] {
 
 /** The calendar day of a key date. */
 export function dateOfKey(f: OppFacts, k: KeyDate): Date {
-  return new Date(f.closes.getTime() + (k.inDays - f.opp.closesInDays) * 86_400_000);
+  void f;
+  return calendarDay(DEMO_TODAY, k.inDays);
 }
 
 /** The date written out, for example "Questions due: October 28, 2026, 5:00 PM Eastern". */
@@ -65,7 +68,7 @@ export function keyDateBullets(f: OppFacts, dates: KeyDate[] = keyDatesFor(f)): 
 /** When written questions are due. */
 export function questionsDate(f: OppFacts): Date {
   const q = keyDatesFor(f).find((k) => /question/i.test(k.label));
-  return q ? dateOfKey(f, q) : new Date(f.closes.getTime() - 10 * 86_400_000);
+  return q ? dateOfKey(f, q) : calendarDay(f.closes, -10);
 }
 
 /** When the buyer expects to award, or null. */

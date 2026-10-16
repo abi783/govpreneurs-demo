@@ -157,9 +157,12 @@ describe("dates are relative to now", () => {
   for (const o of OPPORTUNITIES) {
     it(`${o.id} closes ${o.closesInDays} days from now`, () => {
       const d = buildDetail(o.id)!;
-      const days = (new Date(d.responseDeadline).getTime() - Date.now()) / 86_400_000;
-      expect(days).toBeGreaterThan(o.closesInDays - 1);
-      expect(days).toBeLessThan(o.closesInDays + 1);
+      // The deadline is midnight at the start of day N, so the page reads N all day.
+      const due = new Date(d.responseDeadline);
+      expect([due.getHours(), due.getMinutes(), due.getSeconds()]).toEqual([0, 0, 0]);
+      expect(Math.ceil((due.getTime() - Date.now()) / 86_400_000)).toBe(o.closesInDays);
+      const a0 = buildAnalysis(o.id)!;
+      expect(a0.realDeadlineInputs.responseDue).toBe(d.responseDeadline);
       const a = buildAnalysis(o.id)!;
       const analyzed = new Date(a.meta.analyzedAt!).getTime();
       expect(Date.now() - analyzed).toBeGreaterThan(0);

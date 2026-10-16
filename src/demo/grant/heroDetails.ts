@@ -6,14 +6,16 @@
 // Every number comes from the story (the opportunity record, the persona or the
 // clock), so a change in the story reaches the page, the sample PDFs and Grant.
 
+import { DEMO_TODAY } from "@/demo/story/clock";
 import { HERO_IDS } from "@/demo/story/opportunities";
+import { calendarDay } from "./calendar";
 import type { HeroDetail } from "./detail";
 import { longDate, type OppFacts, termText, usd } from "./facts";
 
 type Builder = (f: OppFacts) => HeroDetail;
 
 const dateIn = (f: OppFacts, days: number): string =>
-  longDate(new Date(f.closes.getTime() + (days - f.opp.closesInDays) * 86_400_000));
+  longDate(calendarDay(DEMO_TODAY, days));
 
 /** Number the summary states, such as "about 18 rotations a year". */
 const fromSummary = (f: OppFacts, re: RegExp, fallback: string): string => re.exec(f.opp.summary)?.[1] ?? fallback;

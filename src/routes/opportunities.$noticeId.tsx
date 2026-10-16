@@ -642,6 +642,14 @@ function OpportunityDetailContent() {
           <p className="t-body-sm">
             No opportunity with ID <code>{noticeId}</code>.
           </p>
+          {/* DEMO: say what to do next, so the card is never a dead end. */}
+          <p className="t-body-sm" style={{ marginTop: "var(--s-2)" }}>
+            It may have closed, or the link may be old. Go back to your opportunities to pick another one, or ask Hunter
+            for a new match.
+          </p>
+          <Link to="/opportunities" className="btn btn-primary btn-sm" style={{ marginTop: "var(--s-3)" }}>
+            See your opportunities
+          </Link>
         </div>
       </div>
     );
@@ -682,6 +690,10 @@ function OpportunityDetailContent() {
           }
         }
         setMentorModalOpen(false);
+        // DEMO: read the page data again, so the status pill opens this review's thread.
+        fetchOpportunityV2(noticeId, session.locationId)
+          .then(setOpp)
+          .catch((err) => console.error("Failed to refresh the opportunity after send", err));
         // New thread now exists on the backend — refresh the shared store so
         // /mentors and the unread badges (Sidebar/home) pick it up.
         refreshMentorReviews().catch((err) =>
@@ -737,7 +749,7 @@ function OpportunityDetailContent() {
 
   return (
     <div style={{ display: "flex", flex: 1, minWidth: 0 }}>
-      <section className="opp-detail-main">
+      <section className="opp-detail-main opp-detail-main--opp">
         {/* Grant introduces himself before anything else on the page renders —
             not just the take card — so the whole latency of his analysis
             fetch is covered by one clear "the work hasn't started yet"

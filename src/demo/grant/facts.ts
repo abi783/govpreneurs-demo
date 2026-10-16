@@ -4,7 +4,7 @@
 // opportunities, clock). Nothing is typed twice: if the story changes, the page,
 // the documents and Grant's analysis change with it.
 
-import { daysFromNow, isoDaysFromNow } from "@/demo/story/clock";
+import { deadlineDate, deadlineIso, postedDate, postedIso } from "./calendar";
 import {
   getOpportunity,
   type SetAside,
@@ -234,17 +234,14 @@ export interface OppFacts {
   isSealedBid: boolean;
 }
 
-/** All opportunity deadlines fall at 5 PM Eastern on the day. The workspace uses the same hour. */
-export const DEADLINE_HOUR = 17;
-
 export function factsFor(opp: StoryOpportunity): OppFacts {
   const place = PLACES[opp.place];
   const years = parseTermYears(opp);
   const mid = opp.valueLow !== null && opp.valueHigh !== null ? Math.round((opp.valueLow + opp.valueHigh) / 2) : null;
   const annual =
     mid === null ? null : opp.valueBasis === "per_year" ? mid : Math.round(mid / Math.max(years, 1));
-  const closesAtISO = isoDaysFromNow(opp.closesInDays, DEADLINE_HOUR);
-  const postedAtISO = isoDaysFromNow(-opp.postedDaysAgo, 9);
+  const closesAtISO = deadlineIso(opp.closesInDays);
+  const postedAtISO = postedIso(opp.postedDaysAgo);
   const valueText =
     opp.valueLow === null || opp.valueHigh === null
       ? "No value stated"
@@ -266,8 +263,8 @@ export function factsFor(opp: StoryOpportunity): OppFacts {
     daysLeft: liveDaysTo(closesAtISO),
     closesAtISO,
     postedAtISO,
-    closes: daysFromNow(opp.closesInDays, DEADLINE_HOUR),
-    posted: daysFromNow(-opp.postedDaysAgo, 9),
+    closes: deadlineDate(opp.closesInDays),
+    posted: postedDate(opp.postedDaysAgo),
     contact: contactFor(opp),
     secondContact: contactFor(opp, true),
     isFederal: opp.scope === "fed",

@@ -11,13 +11,13 @@
 
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { getGrantBrief } from "@/demo/story/grantBriefs";
-import { HERO_IDS } from "@/demo/story/opportunities";
+import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
 import { PERSONA } from "@/demo/story/persona";
 import type { OpenQuestion, Pin, RoadmapItem, TrailGroup } from "@/lib/grant/types";
 import { encodeBrief, type Extras, type RowSpec } from "./encode";
 import { AUTHORED_BRIEFS } from "./heroBriefs";
 import { coverageFor } from "./coverage";
-import { CERTIFIED, COOKS, PARTNER, PP, shareWords, UNCERTIFIED, usd, type OppFacts } from "./facts";
+import { CERTIFIED, COOKS, factsFor, PARTNER, PP, shareWords, UNCERTIFIED, usd, type OppFacts } from "./facts";
 import { rt, pinComputed, pinPublic } from "./rich";
 import { clausePin, naicsLabel, type Solicitation } from "./solicitation";
 import { solicitationFor } from "./detail";
@@ -533,7 +533,8 @@ const fortBraggDining: Maker = (f, sol) => {
 const restrictedSite: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
   const annual = f.annual ?? 0;
-  const days = f.daysLeft;
+  // The days left on Camp Mackall field meals: the quote the first roadmap step points at.
+  const days = factsFor(getOpportunity(HERO_IDS.fieldMeals)!).daysLeft;
   const roadmap: RoadmapItem[] = [
     {
       item: rt("**Win Camp Mackall field meals** first"),
@@ -601,7 +602,7 @@ const restrictedSite: Maker = (f, sol) => {
     blocking: ["Can you do the work?"],
     rows: [
       ...COMMON_ROWS,
-      { match: /Secret clearance/, kind: "clearance", category: "clearance", required: "Secret clearance for every on-site worker", closable: false, firmValue: "none on file" },
+      { match: /Secret clearance/, kind: "clearance", category: "clearance", required: "Secret clearance", closable: false, firmValue: "none on file" },
       { match: /Food-handler/, kind: "certs", category: "submission", required: "a certificate for every cook" },
     ],
     nextBold: "Spend this month on that quote",
