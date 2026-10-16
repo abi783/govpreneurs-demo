@@ -17,6 +17,7 @@ import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
 import { MENTOR, PERSONA } from "@/demo/story/persona";
 import { CLOSED_PURSUITS, MENTOR_REVIEWS } from "@/demo/story/workspace";
 import { BENCH, getBenchMentor, toPortalMentor } from "@/demo/sc/mentors/bench";
+import { readBusiness } from "@/demo/sc/business/state";
 import { getActionPlans } from "./actionPlan";
 import { PROGRAM_SPECIALIST } from "./people";
 import { getHomeProgress } from "./progress";
@@ -182,6 +183,21 @@ function activityFeed(): ActivityItem[] {
   return items.sort((x, y) => y.at.localeCompare(x.at)).slice(0, 6);
 }
 
+/**
+ * DEMO: the contact card reads what the visitor typed in My Business, so a phone number edited
+ * there shows here too. A missing or odd value falls back to the story.
+ */
+function typedContact(fieldKey: string): string | null {
+  try {
+    const v = readBusiness().rows.find((r) => r.fieldKey === fieldKey)?.value;
+    if (typeof v === "string" && v.trim()) return v.trim();
+    if (v && typeof v === "object" && typeof (v as { url?: unknown }).url === "string") return (v as { url: string }).url.trim() || null;
+  } catch {
+    /* the My Business record is not readable: use the story */
+  }
+  return null;
+}
+
 export function buildHomeData(): HomeData {
   const progress = getHomeProgress();
   const walletBalance = getWalletBalance();
@@ -196,16 +212,16 @@ export function buildHomeData(): HomeData {
     planName: PERSONA.plan,
     ownerFirstName: PERSONA.ownerFirstName,
     contact: {
-      firstName: PERSONA.ownerFirstName,
-      lastName: PERSONA.ownerName.replace(`${PERSONA.ownerFirstName} `, ""),
-      email: PERSONA.email,
-      phone: PERSONA.phone,
+      firstName: (typedContact("primary_contact_name") ?? PERSONA.ownerName).split(" ")[0] || PERSONA.ownerFirstName,
+      lastName: (typedContact("primary_contact_name") ?? PERSONA.ownerName).split(" ").slice(1).join(" "),
+      email: typedContact("email") ?? PERSONA.email,
+      phone: typedContact("phone") ?? PERSONA.phone,
       photoUrl: images.contactPhoto,
     },
     company: {
       accountName: PERSONA.businessName,
       address: PERSONA.physicalAddress,
-      website: PERSONA.website,
+      website: typedContact("website") ?? PERSONA.website,
       logoUrl: images.companyLogo,
     },
     meta: {
