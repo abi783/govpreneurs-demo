@@ -47,25 +47,40 @@ function useEscapeForHandBuiltDialogs() {
   }, []);
 }
 
+/** What a click is about: the control, its label and state, and the list row around it. */
+function clickSignature(node: Node | null): string {
+  const el = node instanceof Element ? node : (node?.parentElement ?? null);
+  const control = el?.closest("button, a, [role=button], [role=tab], [role=checkbox], [role=switch], summary, label") ?? el;
+  const row = control?.closest("li, article, tr, [role=listitem]");
+  const text = (n: Element | null | undefined, max: number) => (n?.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+  return [text(control, 60), text(row, 80), control?.getAttribute("aria-label") ?? "", control?.getAttribute("aria-pressed") ?? ""].join("|");
+}
+
 /**
- * DEMO: a quick double-click on a dialog button closes the dialog with the first click. The second
- * click then lands on whatever sits under the dialog (a card, a link) and opens it by surprise. This
- * drops that second click. It only applies when the first click was inside a dialog and the second
- * is outside every dialog, within a short time.
+ * DEMO: the second click of a quick double-click often lands on something else. The first click can
+ * close a dialog, tick a task so the list moves up, save a card, or open a page. The second click then
+ * presses whatever sits under the pointer: a card under the dialog, the next task, a button on the
+ * new page (even "Show me the analysis"). This drops a second click when the thing under the pointer
+ * is no longer what the first click pressed. A double-click on one steady control still counts twice.
  */
-function useNoClickThroughAfterDialog() {
+function useNoClickThroughOnDoubleClick() {
   useEffect(() => {
-    let last = { at: 0, inDialog: false };
+    let last: { at: number; target: Node | null; signature: string } = { at: 0, target: null, signature: "" };
     const onClick = (e: MouseEvent) => {
-      const inDialog = Boolean((e.target as Element | null)?.closest?.('[role="dialog"], [role="alertdialog"]'));
       const now = performance.now();
-      if (e.detail >= 2 && last.inDialog && !inDialog && now - last.at < 900) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return;
+      const target = e.target as Node | null;
+      const signature = clickSignature(target); // read before the app reacts to this click
+      if (e.detail >= 2 && last.target && target && now - last.at < 900) {
+        const before = last.target;
+        const same = before.isConnected && (before === target || before.contains(target) || target.contains(before)) && signature === last.signature;
+        if (!same) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return;
+        }
       }
-      last = { at: now, inDialog };
+      last = { at: now, target, signature };
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
@@ -79,7 +94,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   useEscapeForHandBuiltDialogs();
-  useNoClickThroughAfterDialog();
+  useNoClickThroughOnDoubleClick();
 
   return (
     <div className="demo-shell">
