@@ -23,7 +23,7 @@ This file lists every backend call that the frontend code under `src/` makes. A 
 3. If no handler matches, the router answers 501 with `{ message: "Demo has no handler for METHOD /path" }`. It logs `[demo] unhandled API call` and records the call in `window.__DEMO_UNHANDLED__`. If a handler throws, the router answers 500 with `{ message: "Demo handler failed", error }` and records it in `window.__DEMO_ERRORS__`. The UI treats both as an ordinary failed request. The "Errors" line of each block says what the page shows.
 4. The router picks the pattern with the most literal segments. So `GET /awards/saved` wins over `GET /awards/:awardId`, and `GET /opportunities/discover/v2/scores` wins over `GET /opportunities/discover/v2/:oppKey`.
 5. `apiFetch` adds the `X-GHL-Token` header only if `sessionStorage` holds `ghl_token`. No code sets that key, so the demo never sends it. `POST /opportunities/send-for-review` always sends `X-GHL-User-Token: demo-token` (`src/lib/mentorApi.ts:36`). A handler must not require either header.
-6. If `sessionStorage` holds `mock_location_id`, `apiFetch` sets a `locationId` query key on every URL (`src/lib/api.ts:44`). The key is set only after a session reload on a page whose URL has `?locationId=` (`src/lib/ghlUser.tsx:62`). A handler ignores this key.
+6. If `sessionStorage` holds `mock_location_id`, `apiFetch` sets a `locationId` query key on every URL (`withMockLocationId`, `src/lib/api.ts:42`). The key is set only after a session reload on a page whose URL has `?locationId=` (`src/lib/ghlUser.tsx:62`). A handler ignores this key.
 7. The demo has one member. A handler ignores `userId` and `locationId` in a request. The production backend does the same: it reads identity from the session.
 8. The router waits 150 to 400 ms before it calls a handler (zero when the page URL has `?fast=1`). If the page aborts the request, the router throws `AbortError`. A handler needs no abort code.
 9. Dates in sample data must be relative to today. The feed cards and the opportunity page measure time left with `new Date()` (`src/lib/discoverMapper.ts:70`).
@@ -286,7 +286,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
 - Area file: hunter
 - Called from: `answerProfileAsk` `src/lib/hunterChat.ts:442` (apiFetch at :448).
   - `src/lib/enrichment.ts:324` `answerProfileAsk`, from `confirmOrganicOffer` (`src/components/Hunter/EnrichmentJourney.tsx:185`): the member confirms an organic offer chip. This is the call that runs today.
-  - `src/components/Hunter/ProfileAskBlock.tsx:328` `answerProfileAsk`: this branch runs only when the component has no `handlers` prop. Both current uses (`EnrichmentJourney.tsx:409`, `:425`) pass `handlers`, so the branch does not run today.
+  - `src/components/Hunter/ProfileAskBlock.tsx:328` `answerProfileAsk`: this branch runs only when the component has no `handlers` prop. Both current uses (`src/components/Hunter/EnrichmentJourney.tsx:409` and `:425`) pass `handlers`, so the branch does not run today.
 - Query: none
 - Request body: `{ askId: string; field: string; value: string; documentUrl?: string }`
 - Response: ignored. Return `{ ok: true }`.
@@ -385,7 +385,7 @@ Area file: `src/demo/api/hunter.ts`. This area owns the feed, the filter helpers
   - `src/components/Hunter/EnrichmentJourney.tsx:191` `getNextEnrichment`: `loadNext`, after the member enters, answers without an inline `next`, skips, or continues past a checkpoint.
 - Query: none
 - Request body: none
-- Response: `NextPayload`. A `question` payload (`NextQuestionPayload`, `:75`) has `kind: "question"`, `milestone`, `ask` (`ProfileAsk`), `elicitShape`, `rail`, and optional `canGoBack`, `followUp`, `draft`. A `checkpoint` payload (`CheckpointPayload`, `:97`) has `options: ["continue", "stop"]`. A `complete` payload (`CompletePayload`, `:155`) has `kind: "complete"`.
+- Response: `NextPayload`. A `question` payload (`NextQuestionPayload`, `src/lib/enrichment.ts:75`) has `kind: "question"`, `milestone`, `ask` (`ProfileAsk`), `elicitShape`, `rail`, and optional `canGoBack`, `followUp`, `draft`. A `checkpoint` payload (`CheckpointPayload`, `src/lib/enrichment.ts:97`) has `options: ["continue", "stop"]`. A `complete` payload (`CompletePayload`, `src/lib/enrichment.ts:155`) has `kind: "complete"`.
 - Errors the UI handles: an error in `loadNext` is not caught at the call. The click handler gets a rejected promise and the card does not change. A 501 or 500 shows no message.
 - Notes: none.
 
@@ -504,14 +504,14 @@ Area file: `src/demo/api/grant.ts`. This area owns `/grants-take/*`. The demo se
 - Query: none
 - Request body: `{ oppKey: string }`
 - Response: `{ analysis: GrantAnalysis | null }` (`GrantAnalysis`, `src/lib/grant/types.ts:593`). The wrapper returns `analysis ?? null`.
-- Errors the UI handles: a null analysis or any failure makes the page use `unanalyzed(opp)` (`src/lib/grant/index.ts:83`). The canvas then says "Not analyzed yet" and the rail still opens. The canvas shows a skeleton until the call ends (`:854`).
-- Notes: `complianceMatrix` must be an array, because `resolveComplianceAgainstFirm(live.complianceMatrix)` runs on the result (`src/lib/grant/index.ts:59`). `getGrantAnalysis(opp)` (`src/lib/grant/index.ts:26`) already builds a full analysis from a fixture or from the opportunity's own facts. A handler can reuse it with an `Opportunity` (`src/lib/mock/opportunities.ts:21`). Production answers 403 for a location outside the grant_v2 cohort. The demo must always answer with an analysis. The rail mounts only after an analysis exists (`:928`).
+- Errors the UI handles: a null analysis or any failure makes the page use `unanalyzed(opp)` (`src/lib/grant/index.ts:83`). The canvas then says "Not analyzed yet" and the rail still opens. The canvas shows a skeleton until the call ends (`src/routes/opportunities.$noticeId.tsx:854`).
+- Notes: `complianceMatrix` must be an array, because `resolveComplianceAgainstFirm(live.complianceMatrix)` runs on the result (`src/lib/grant/index.ts:59`). `getGrantAnalysis(opp)` (`src/lib/grant/index.ts:26`) already builds a full analysis from a fixture or from the opportunity's own facts. A handler can reuse it with an `Opportunity` (`src/lib/mock/opportunities.ts:21`). Production answers 403 for a location outside the grant_v2 cohort. The demo must always answer with an analysis. The rail mounts only after an analysis exists (`src/routes/opportunities.$noticeId.tsx:928`).
 
 ### POST /grants-take/rail
 - Area file: grant
-- Called from: `fetchRailReply` `src/lib/grant/rail.ts:135` (apiFetch at :147). Call site `src/components/Grant/GrantRail.tsx:363` `fetchRailReply`, in `send`. It runs when the member sends a chat message, clicks an "ask" chip, or answers an open-question card (then `openQuestion` is set). The wrapper gives up after 60000 ms (`RAIL_TIMEOUT_MS`, `:28`).
+- Called from: `fetchRailReply` `src/lib/grant/rail.ts:135` (apiFetch at :147). Call site `src/components/Grant/GrantRail.tsx:363` `fetchRailReply`, in `send`. It runs when the member sends a chat message, clicks an "ask" chip, or answers an open-question card (then `openQuestion` is set). The wrapper gives up after 60000 ms (`RAIL_TIMEOUT_MS`, `src/lib/grant/rail.ts:28`).
 - Query: none
-- Request body: `{ oppKey: string; message: string; openQuestion?: string }`. The message is at most 2000 characters (`MAX_RAIL_MESSAGE`, `:31`); the rail refuses to send a longer one.
+- Request body: `{ oppKey: string; message: string; openQuestion?: string }`. The message is at most 2000 characters (`MAX_RAIL_MESSAGE`, `src/lib/grant/rail.ts:31`); the rail refuses to send a longer one.
 - Response: `RailReply` (`src/lib/grant/rail.ts:5`): `{ kind, reply, fact?, sources?, cta? }`. `kind` is `interrogate`, `supply`, `draft_request`, `offscope`, `unavailable` or `pending`. The wrapper turns a body without a string `reply` or a known `kind` into the "unavailable" reply. `cta: "mentor"` shows a mentor button. `sources` is `Pin[]` (`src/lib/grant/types.ts:293`).
 - Errors the UI handles: any non-2xx or timeout becomes the reply "Grant is unavailable right now — try again in a moment." The thread keeps working.
 - Notes: only the kinds `interrogate` and `supply` count as accepted (`GrantRail.tsx:38`). With `openQuestion` set, an accepted reply makes the page call `POST /grants-take/analysis` again. Any other kind restores the question card.
@@ -650,11 +650,11 @@ Area file: `src/demo/api/mentorReviews.ts`. This area owns `/mentor-reviews/*` a
 - Area file: mentorReviews
 - Called from: `replyToMentorReview` `src/lib/mentorReviewsApi.ts:173` (through `apiFetchForm`, `:124`, which calls `apiFetch` at :125).
   - `src/components/Mentors/ConversationView.tsx:70` `replyToMentorReview`: the member sends a reply.
-  - `src/lib/mentorReviewsApi.ts:211` `replyToMentorReview`: `attachFileToSentReview`, after a send with a file. Callers: `src/routes/opportunities.$noticeId.tsx:671`, `src/lib/mentorSend.ts:110`, `src/components/MicroPurchases/OrderMentor.tsx:150`. The body text is the fixed sentence "Here is a supporting file for my question." (`MENTOR_ATTACHMENT_NOTE`, `:215`).
+  - `src/lib/mentorReviewsApi.ts:211` `replyToMentorReview`: `attachFileToSentReview`, after a send with a file. Callers: `src/routes/opportunities.$noticeId.tsx:671`, `src/lib/mentorSend.ts:110`, `src/components/MicroPurchases/OrderMentor.tsx:150`. The body text is the fixed sentence "Here is a supporting file for my question." (`MENTOR_ATTACHMENT_NOTE`, `src/lib/mentorReviewsApi.ts:215`).
 - Query: none
 - Request body: multipart `FormData` (no `Content-Type` header). Field `body` holds a string (editor HTML, or an empty string). Field `attachments` repeats once for each `File`. The router passes a `FormData` object in `ctx.body`.
 - Response: `{ message: MentorThreadMessage }`. The wrapper returns `message`.
-- Errors the UI handles: the composer shows the error text and keeps the draft. For the file attach step, a failure shows "Sent to a mentor, but the file didn't attach. Add it to the conversation in Mentors." (`MENTOR_ATTACH_FAILED`, `:218`).
+- Errors the UI handles: the composer shows the error text and keeps the draft. For the file attach step, a failure shows "Sent to a mentor, but the file didn't attach. Add it to the conversation in Mentors." (`MENTOR_ATTACH_FAILED`, `src/lib/mentorReviewsApi.ts:218`).
 - Notes: store the message in the thread. The attach step finds the review in a fresh `GET /mentor-reviews` by `oppKey`, so the review must exist already.
 
 ### POST /mentor-reviews/:id/viewed
@@ -685,7 +685,7 @@ Area file: `src/demo/api/wallet.ts`. This area owns `/wallet/*`, `GET /opportuni
 ### GET /wallet/balance
 - Area file: wallet
 - Called from: `fetchWalletBalance` `src/lib/walletApi.ts:22` (apiFetch at :25).
-  - `src/routes/wallet.tsx:40` `fetchWalletBalance`: `/wallet` page load.
+  - `src/routes/wallet.tsx:41` `fetchWalletBalance`: `/wallet` page load.
   - `src/routes/opportunities.$noticeId.tsx:527` `fetchWalletBalance`: detail page load, only for a plan that can send to a mentor.
   - `src/lib/mentorSend.ts:75` `fetchWalletBalance`: forecast page load, same condition.
   - `src/components/MicroPurchases/OrderMentor.tsx:113` `fetchWalletBalance`: small order page load, same condition.
@@ -926,7 +926,7 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 - Area file: forecasts
 - Called from: `sendForecastGrantMessage` `src/lib/forecasts/grantChatApi.ts:77` (apiFetch at :84; URL from `grantUrl`, `:62`). Call site `src/components/Forecast/ForecastGrantRail.tsx:298` `sendForecastGrantMessage`, in `sendChat`. It runs when the member sends a chat message in the forecast rail.
 - Query: none
-- Request body: `{ message: string; read: ForecastGrantReadSummary }`. The message is at most 2000 characters (`MESSAGE_MAX`). `read` is `{ call, summary, unknowns }` (`:20`): the summary is at most 600 characters, with at most 12 unknowns of at most 160 characters each.
+- Request body: `{ message: string; read: ForecastGrantReadSummary }`. The message is at most 2000 characters (`MESSAGE_MAX`). `read` is `{ call, summary, unknowns }` (`src/lib/forecasts/grantChatApi.ts:20`): the summary is at most 600 characters, with at most 12 unknowns of at most 160 characters each.
 - Response: `{ reply: string }`. The reply must be a non-empty string.
 - Errors the UI handles: status 502 gives `unavailable`. Another failure gives `failed`. For both, the rail removes the member's bubble, keeps the text in the box and shows its failure line.
 - Notes: store the pair of messages so that the session call returns them.
@@ -936,7 +936,7 @@ Area file: `src/demo/api/forecasts.ts`. This area owns `/forecasts*` and the for
 - Called from: `fetchForecastGrantSession` `src/lib/forecasts/grantChatApi.ts:111` (apiFetch at :116). Call site `src/components/Forecast/ForecastGrantRail.tsx:285` `fetchForecastGrantSession`. It runs the first time the member opens the rail on a forecast.
 - Query: none
 - Request body: none
-- Response: `{ messages: ForecastGrantMessage[] }` (`:27`): `{ role: "user" | "grant", text, at }`, oldest first. The wrapper drops a message that is not valid.
+- Response: `{ messages: ForecastGrantMessage[] }` (`src/lib/forecasts/grantChatApi.ts:27`): `{ role: "user" | "grant", text, at }`, oldest first. The wrapper drops a message that is not valid.
 - Errors the UI handles: a failure gives an empty thread.
 - Notes: return `{ messages: [] }` for a new forecast.
 

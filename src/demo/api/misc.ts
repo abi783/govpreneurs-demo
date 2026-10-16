@@ -8,4 +8,11 @@
 
 import type { DemoRouteDef } from "../runtime/router";
 
-export const routes: DemoRouteDef[] = [];
+export const routes: DemoRouteDef[] = [
+  // Success Center page-view tracking (src/lib/portalTrack.ts). Nothing is stored in the demo.
+  {
+    method: "POST",
+    path: "/api/portal/:locationId/track",
+    handler: () => ({ ok: true }),
+  },
+];
