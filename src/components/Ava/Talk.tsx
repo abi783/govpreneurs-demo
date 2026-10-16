@@ -20,6 +20,7 @@ import {
 } from "../ds/AgentChat";
 import { findOpportunity } from "../../demo/ava/opportunity";
 import { getGrantSummary } from "../../demo/ava/grantSummary";
+import { untellGrant } from "../../demo/ava/grantFacts";
 import { createReview } from "../../demo/ava/mentorReviews";
 import { ava } from "../../lib/ava/store";
 import { bidDecision, DEMO } from "../../lib/ava/derive";
@@ -255,6 +256,17 @@ export function Talk({
     return () => window.removeEventListener("focus", done);
   }, [choosing]);
   const pausedRule = paused?.reason.replace(/^You cannot meet this rule: /, "").replace(/\.$/, "");
+  // "Take my answer back": the answer that paused the bid goes away, and Ava
+  // asks the question again. (A bid that starts paused has no saved decision,
+  // so the answer itself is what must go.)
+  const takeBack = () => {
+    ava.keepGoing(id);
+    if (bid.failedAtStart) ava.fix(id, "failed-at-start");
+    const from = paused?.fromAskId ? bid.asks.find((a) => a.id === paused.fromAskId) : undefined;
+    if (!from) return;
+    ava.reopenAsk(id, from.id);
+    if (from.grantQuestion) untellGrant(id, from.grantQuestion);
+  };
   const pick = useRef(null as HTMLInputElement | null);
   const repliesRef = useRef<Reply[]>([]);
   if (flow.stage === "stopped") {
@@ -342,7 +354,7 @@ export function Talk({
               onClick: () => setAskMentor("paused"),
             },
           ]),
-      { label: "Take my answer back", onClick: () => ava.keepGoing(id) },
+      { label: "Take my answer back", onClick: takeBack },
       { label: "Stop working on this bid", kind: "ghost", onClick: () => ava.walkAway(id) },
     );
   } else if (flow.stage === "ready") {
