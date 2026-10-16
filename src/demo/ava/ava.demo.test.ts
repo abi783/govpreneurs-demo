@@ -68,7 +68,7 @@ describe("the story, as Ava reads it", () => {
 
   test("the list shows a value for a bid, and none for a reply with no price", () => {
     expect(getAvaStory(MACKALL)?.value).toBe("$540K–$780K");
-    expect(getAvaStory(FAYETTEVILLE)?.value).toBe("$185K–$235K");
+    expect(getAvaStory(FAYETTEVILLE)?.value).toBe("$185K–$235K a year");
     expect(getAvaStory(REPLY)?.value).toBeNull();
   });
 });
