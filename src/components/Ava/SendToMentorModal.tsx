@@ -8,7 +8,7 @@
 // the shared mentor state, so the $97 charge and the Mentor Reviews page agree
 // (src/demo/ava/mentorReviews.ts).
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Send } from "lucide-react";
 import { Modal } from "../ui/Modal";
@@ -16,6 +16,9 @@ import { formatUSD } from "../../lib/wallet";
 import type { AvaOpportunity } from "../../demo/ava/opportunity";
 import type { GrantSummary } from "../../demo/ava/grantSummary";
 import { MENTOR, MENTOR_REPLY, sendCheck } from "../../demo/ava/mentorReviews";
+
+/** How long "Done" ignores a press after Send, in milliseconds. */
+const SETTLE_MS = 700;
 
 export function SendToMentorModal({
   opp,
@@ -38,10 +41,14 @@ export function SendToMentorModal({
 }) {
   const [note, setNote] = useState("");
   const [sent, setSent] = useState(false);
+  // When she pressed Send. "Done" takes the place of "Send" under her finger, so a
+  // double press must not close the dialog before she reads that it was sent.
+  const sentAt = useRef(0);
   useEffect(() => {
     if (!open) {
       setNote("");
       setSent(false);
+      sentAt.current = 0;
     }
   }, [open]);
   const money = sendCheck();
@@ -49,7 +56,17 @@ export function SendToMentorModal({
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm" className="ava-modal" aria-describedby={undefined}>
+      <Modal.Content
+        size="sm"
+        className="ava-modal"
+        aria-describedby={undefined}
+        // The receipt is shorter than the form, so the dialog shrinks under a
+        // double press and the second press lands on the page behind it. That
+        // press must not close the dialog before she reads the receipt.
+        onInteractOutside={(e) => {
+          if (sentAt.current && Date.now() - sentAt.current < SETTLE_MS) e.preventDefault();
+        }}
+      >
         <Modal.Header title={`Send to ${MENTOR.name}`} />
         <Modal.Body>
           {sent ? (
@@ -105,11 +122,15 @@ export function SendToMentorModal({
         </Modal.Body>
         <Modal.Footer>
           {sent ? (
-            <Modal.Close asChild>
-              <button type="button" className="btn btn-primary">
-                Done
-              </button>
-            </Modal.Close>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                if (Date.now() - sentAt.current > SETTLE_MS) onOpenChange(false);
+              }}
+            >
+              Done
+            </button>
           ) : (
             <>
               <Modal.Close asChild>
@@ -122,6 +143,9 @@ export function SendToMentorModal({
                 className="btn btn-primary"
                 disabled={!money.enough}
                 onClick={() => {
+                  // One press sends one review, even if the press repeats.
+                  if (sentAt.current) return;
+                  sentAt.current = Date.now();
                   onConfirm(note.trim());
                   setSent(true);
                 }}

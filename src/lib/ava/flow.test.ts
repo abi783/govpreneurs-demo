@@ -20,6 +20,8 @@ import {
   leadLine,
   mentorTooLate,
   mustQueue,
+  mustRows,
+  addByDay,
   needsWords,
   leftList,
   readyWords,
@@ -38,6 +40,7 @@ import { withGrantFor } from "./grant";
 import { approvalTotal, isRateList, rates, ratesApproved } from "./price";
 import { nowIso } from "./dates";
 import { emptyState, type BidState } from "./store";
+import { cumberlandStart } from "./starts/cumberland";
 import { checkSig } from "./flow";
 import { createReview, getReviewByOpportunity, demoMentor } from "../../demo/ava/mentorReviews";
 
@@ -779,6 +782,11 @@ describe("the mentor", () => {
       rationale: "",
       note: "Opp",
     });
+    // The shared list names a review by the millisecond it was sent. A person
+    // cannot send two in one millisecond; this test can.
+    for (const t = Date.now(); Date.now() === t; ) {
+      /* wait for the next millisecond */
+    }
     createReview({
       opportunityId: id,
       opportunityTitle: "T",
@@ -870,5 +878,33 @@ describe("every screen of the design can be reached", () => {
     const s = play(FAY, started(), stage("answer"));
     const { bid, flow } = look(FAY, s);
     expect(mustQueue(bid, s, flow.parts)).toHaveLength(0);
+  });
+});
+
+describe("a rule row names the day the paper must be in the bid, not a lead time of Ava's own (OD2)", () => {
+  test("the Cumberland bonds say the day the bid needs them, and so does her email", () => {
+    // Where the demo starts Cumberland: she said she can get both bonds in time.
+    const { bid, s } = look(CUM, { ...emptyState(), ...cumberlandStart() });
+    const rows = mustRows(bid, s).filter((r) => r.state === "getting");
+    expect(rows.length).toBeGreaterThan(0);
+    const day = addByDay(bid);
+    const words = `${day.getUTCDate()} ${day.toLocaleString("en-US", { month: "long", timeZone: "UTC" })}`;
+    for (const r of rows) {
+      expect(r.line).toMatch(/^Needed in your bid by /);
+      expect(r.line).toContain(words);
+    }
+  });
+
+  test("a day to ask for a paper is never a weekend", () => {
+    const { bid } = look(CUM, started());
+    const ask = bid.asks.find((a) => a.id === "ask-bid-bond")!;
+    for (const said of ["days", "week", "weeks"] as const) {
+      const s = { ...started(), lead: { [ask.id]: said } };
+      const text = leadLine(bid, s, ask).text;
+      const m = /Ask for it by (\w+ )?(\d+) (\w+) (\d{4})/.exec(text);
+      if (!m) continue;
+      const d = new Date(`${m[2]} ${m[3]} ${m[4]} 12:00 UTC`);
+      expect([0, 6]).not.toContain(d.getUTCDay());
+    }
   });
 });

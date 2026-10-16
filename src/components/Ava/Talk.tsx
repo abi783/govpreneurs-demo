@@ -20,6 +20,7 @@ import {
 } from "../ds/AgentChat";
 import { findOpportunity } from "../../demo/ava/opportunity";
 import { getGrantSummary } from "../../demo/ava/grantSummary";
+import { untellGrant } from "../../demo/ava/grantFacts";
 import { createReview } from "../../demo/ava/mentorReviews";
 import { ava } from "../../lib/ava/store";
 import { bidDecision, DEMO } from "../../lib/ava/derive";
@@ -30,8 +31,16 @@ import { currentMember } from "../../demo/ava/member";
 import { openOutside } from "./outside";
 import { keepPaper } from "./paperFiles";
 import { SendToMentorModal } from "./SendToMentorModal";
-import { answerByWords, avaFace, matchReply, QuestionCard, TALK_LINE } from "./Asking";
+import {
+  answerByWords,
+  avaFace,
+  matchReply,
+  notUnderstood,
+  QuestionCard,
+  TALK_LINE,
+} from "./Asking";
 import { initials, Showing } from "./Showing";
+import { buildReply } from "./chatReplies";
 import { FoldedSide, SideFold } from "../ds/AgentWorkspace";
 import type { Side } from "./Frame2";
 
@@ -48,6 +57,16 @@ function askForCopy(bid: AvaContext["bid"]): Extra {
     voice: false,
     ava: `Here is the question, ready to copy: “The words in ${main?.name ?? "the main file"} come out jumbled. Could you send a copy we can read, so we can see every requirement? ${bid.bidNumber}.” Send it the way the ${buyerWord(bid)} takes questions.`,
   };
+}
+
+/** A line Ava wrote to the member ("You have 3 of 5."), as the member would say
+ *  it to her mentor ("I have 3 of 5."). */
+export function inMyVoice(line: string): string {
+  return line
+    .replace(/\bYou (have|are|cannot|can't|do not|don't|need|must|lose|did|had)\b/g, "I $1")
+    .replace(/\byou (have|are|cannot|can't|do not|don't|need|must|lose|did|had)\b/g, "I $1")
+    .replace(/\bYour\b/g, "My")
+    .replace(/\byour\b/g, "my");
 }
 
 /** How many turns show before "Show earlier messages". */
@@ -255,6 +274,17 @@ export function Talk({
     return () => window.removeEventListener("focus", done);
   }, [choosing]);
   const pausedRule = paused?.reason.replace(/^You cannot meet this rule: /, "").replace(/\.$/, "");
+  // "Take my answer back": the answer that paused the bid goes away, and Ava
+  // asks the question again. (A bid that starts paused has no saved decision,
+  // so the answer itself is what must go.)
+  const takeBack = () => {
+    ava.keepGoing(id);
+    if (bid.failedAtStart) ava.fix(id, "failed-at-start");
+    const from = paused?.fromAskId ? bid.asks.find((a) => a.id === paused.fromAskId) : undefined;
+    if (!from) return;
+    ava.reopenAsk(id, from.id);
+    if (from.grantQuestion) untellGrant(id, from.grantQuestion);
+  };
   const pick = useRef(null as HTMLInputElement | null);
   const repliesRef = useRef<Reply[]>([]);
   if (flow.stage === "stopped") {
@@ -342,7 +372,7 @@ export function Talk({
               onClick: () => setAskMentor("paused"),
             },
           ]),
-      { label: "Take my answer back", onClick: () => ava.keepGoing(id) },
+      { label: "Take my answer back", onClick: takeBack },
       { label: "Stop working on this bid", kind: "ghost", onClick: () => ava.walkAway(id) },
     );
   } else if (flow.stage === "ready") {
@@ -401,9 +431,7 @@ export function Talk({
       {
         you: text,
         voice: how.voice,
-        ava: flow.current
-          ? "I cannot use words for this question yet. Tap one of the answers above, or say “Why?”."
-          : "Thank you. I keep working. I will ask you when I need something.",
+        ava: buildReply(text, bid, view.bidReview ?? view.oppReview) ?? notUnderstood(flow.current),
       },
     ]);
   };
@@ -417,6 +445,8 @@ export function Talk({
     if (ask?.answer.type === "enter" && ask.answer.fields.length === 1) {
       const f = ask.answer.fields[0];
       if (f.unit === "text") return "We cook every meal fresh in our own kitchen.";
+      if (f.unit === "phone") return "(910) 555-0100";
+      if (f.unit === "email") return "name@example.com";
       return String(f.floor ? Math.ceil(f.floor.value) : 12);
     }
     if (q.kind === "decision") return "Use your words, Ava.";
@@ -591,7 +621,7 @@ export function Talk({
               note:
                 note ||
                 (pausedRule
-                  ? `I cannot meet this rule: ${pausedRule}. Ava paused the bid. Should I still bid?`
+                  ? `I cannot meet this rule: ${inMyVoice(pausedRule)}. Ava paused the bid. Should I still bid?`
                   : "I cannot meet one rule on this bid, so Ava paused it. Should I still bid?"),
               subject: "paused",
             });

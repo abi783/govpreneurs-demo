@@ -67,6 +67,16 @@ async function confirmDialog(page: Page): Promise<boolean> {
   return true;
 }
 
+/** Words a person could type in the box that asks for `asks`. */
+function fillFor(asks: string): string {
+  if (/meals/.test(asks)) return "400";
+  if (/percent|%|contingency|profit/.test(asks)) return "5";
+  if (/email/.test(asks)) return "reference@example.com";
+  if (/phone/.test(asks)) return "(910) 555-0100";
+  if (/name|title/.test(asks)) return "Dana Reyes";
+  return "12";
+}
+
 /** Answer questions until Ava says the bid is ready (the "Read my bid" button).
  *  Once, the answer is typed in the talk box instead of tapped. */
 async function answerAll(page: Page, typeOnce = false): Promise<number> {
@@ -92,9 +102,7 @@ async function answerAll(page: Page, typeOnce = false): Promise<number> {
             .innerText()
             .catch(() => "")
         ).toLowerCase();
-        await input.fill(
-          /meals/.test(asks) ? "400" : /percent|%|contingency|profit/.test(asks) ? "5" : "12",
-        );
+        await input.fill(fillFor(asks));
       }
       const go = page.locator(".ava2-fields button.btn-primary:not([disabled])");
       if ((await go.count()) > 0) {
@@ -309,9 +317,9 @@ test.describe("Ava, one full flow per bid", () => {
   }) => {
     const w = watch(page);
     await open(page, "RCSC-2026-09");
-    await expect(page.getByText(/I need the county's files first. Public Schools/)).toBeVisible();
+    await expect(page.getByText(/I need the district's files first. Public Schools/)).toBeVisible();
     const chooser = page.waitForEvent("filechooser");
-    await page.getByText(/Add the county's files/).click();
+    await page.getByText(/Add the district's files/).click();
     await (
       await chooser
     ).setFiles({

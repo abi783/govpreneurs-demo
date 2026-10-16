@@ -14,6 +14,7 @@
 // This file does not import play.ts or testLab.ts. Both import the fixtures
 // index, and the index imports this file, so the import would be a cycle.
 
+import { MEMBER_EIN, REFERENCE_CONTACTS } from "../../../demo/ava/contacts";
 import { cumberlandBid } from "../fixtures/cumberland";
 import { ISO } from "../fixtures/when";
 import type { AskAnswer, BidState } from "../store";
@@ -82,15 +83,15 @@ export function cumberlandStart(): Partial<BidState> {
     "ask-ref-2": done(),
     "ask-ref-contacts": done({
       values: {
-        "janet-phone": "(910) 555-0161",
-        "janet-email": "janet.reyes@cumberlandschools.example",
-        "mike-phone": "(910) 555-0174",
-        "mike-email": "mike.sutton@carolinadining.example",
+        "janet-phone": REFERENCE_CONTACTS.janetReyes.phone,
+        "janet-email": REFERENCE_CONTACTS.janetReyes.email,
+        "mike-phone": REFERENCE_CONTACTS.mikeSutton.phone,
+        "mike-email": REFERENCE_CONTACTS.mikeSutton.email,
       },
     }),
     "ask-permit": done({ fileName: "Food establishment permit.pdf" }),
     "ask-cfpm": done({ fileName: "Food protection manager certificate.pdf" }),
-    "ask-ein": done({ values: { ein: "12-3456789" } }),
+    "ask-ein": done({ values: { ein: MEMBER_EIN } }),
     "ask-background": done({ choiceId: "bg-drivers" }),
     "ask-pay": done({ values: PAY }),
     "ask-food": done({ values: FOOD }),

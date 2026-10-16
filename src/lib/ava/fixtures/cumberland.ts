@@ -18,6 +18,7 @@
 // The first start (src/lib/ava/starts/cumberland.ts) pauses this bid at the
 // rule "Food-handler certificate for every cook": 3 of the 5 cooks hold one.
 
+import { buyerPeople } from "../../../demo/ava/contacts";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import { getGrantBrief } from "../../../demo/story/grantBriefs";
 import { PAST_PERFORMANCE, PERSONA } from "../../../demo/story/persona";
@@ -30,6 +31,8 @@ import { D, DM, ET_OFFSET, SAM_ACTIVE_UNTIL, USWD, WD, WDM } from "./when";
 
 const NOTICE = "CUMCO-2026-014";
 const STORY = getOpportunity(NOTICE)!;
+/** The county's buyer: the person the opportunity page names. */
+const BUYER = buyerPeople(NOTICE).primary;
 const GRANT_DATES = getGrantBrief(NOTICE)!.keyDates;
 const inDays = (label: string) => GRANT_DATES.find((k) => k.label === label)!.inDays;
 
@@ -112,7 +115,7 @@ const S_QUESTIONS = doc(
   IFB,
   "Section 2.3, page 3",
   "§2.3",
-  `Questions shall be submitted in writing by email only to Angela Pruitt, Procurement Officer, angela.pruitt@cumberlandcountync.gov, no later than 5:00 PM Eastern Time on ${USWD(QUESTIONS)}. Answers will be issued by addendum.`,
+  `Questions shall be submitted in writing by email only to ${BUYER.name}, ${BUYER.title}, ${BUYER.email}, no later than 5:00 PM Eastern Time on ${USWD(QUESTIONS)}. Answers will be issued by addendum.`,
 );
 const S_DEPOSIT = doc(
   IFB,
@@ -1601,7 +1604,7 @@ export const cumberlandBid: AvaBid = {
       checked: "No addendum or county answer settles it yet.",
       passages: [S_TRAYS_IFB, S_TRAYS_ATT],
       question: `Section 5.4 of IFB ${NOTICE} says the contractor supplies disposable trays. Attachment A, Section 5.1 says meals go on county trays that the contractor washes. Which one applies to this contract?`,
-      to: "Angela Pruitt, Procurement Officer, Cumberland County",
+      to: `${BUYER.name}, ${BUYER.title}, Cumberland County`,
       channel: "by email only, per Section 2.3",
       kind: "decision",
       meanwhile: "Ava prices disposable trays for now. Your food cost per meal includes them.",
@@ -2291,13 +2294,13 @@ export const cumberlandBid: AvaBid = {
     estimatedValue: null,
     penalties: null,
     contact: {
-      name: "Angela Pruitt",
-      role: "Procurement Officer, Cumberland County",
-      email: "angela.pruitt@cumberlandcountync.gov",
+      name: BUYER.name,
+      role: `${BUYER.title}, Cumberland County`,
+      email: BUYER.email,
       source: S_QUESTIONS,
     },
     questionsChannel: {
-      text: "In writing, by email only, to Angela Pruitt. The county answers by addendum.",
+      text: `In writing, by email only, to ${BUYER.name}. The county answers by addendum.`,
       source: S_QUESTIONS,
     },
     noContact: null,

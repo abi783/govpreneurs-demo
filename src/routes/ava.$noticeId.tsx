@@ -28,6 +28,7 @@ import { passToGrant } from "../lib/ava/grant";
 import { ava } from "../lib/ava/store";
 import { getGrantSummary } from "../demo/ava/grantSummary";
 import { applyCase } from "../lib/ava/cases";
+import { wait } from "../demo/ava/pace";
 import { useAva, useAvaState } from "../components/Ava/useAva";
 import { DemoBar } from "../components/Ava/AvaChrome";
 import { useAvaControls } from "../components/Ava/AvaControls";
@@ -139,6 +140,27 @@ function AvaWorkspace() {
   useEffect(() => {
     if (ctx) void ensureSamplePapers(ctx.id, ctx.bid, ctx.s);
   }, [ctx]);
+
+  // DEMO: Ava cannot read a file in the sample. In the prototype a hidden control
+  // finished the comparing of an addendum the member added. On a call there is no
+  // such control, so Ava finishes it herself after a short pause, and goes on to
+  // what the addendum asks (its acknowledgment).
+  const notCompared = ctx
+    ? ctx.s.addendumUploads
+        .map((_, i) => (ctx.s.fixes[`upload-compared:${i}`] ? null : i))
+        .filter((i): i is number => i !== null)
+        .join(",")
+    : "";
+  useEffect(() => {
+    if (!ctx || !notCompared) return;
+    const id = ctx.id;
+    const timers = notCompared
+      .split(",")
+      .map((i) => window.setTimeout(() => ava.fix(id, `upload-compared:${i}`), wait(3500)));
+    return () => timers.forEach((t) => window.clearTimeout(t));
+    // `ctx` changes with every answer; only the list of files not yet compared matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ctx?.id, notCompared]);
 
   // Proof, answers and a rule she cannot meet go on to Grant, so his read
   // stays current. Grant weighs them; Ava decides nothing.

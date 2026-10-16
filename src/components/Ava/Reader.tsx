@@ -65,13 +65,19 @@ import { fullDate } from "../../lib/ava/dates";
 import { daysLeft } from "../../lib/ava/derive";
 import { findOpportunity } from "../../demo/ava/opportunity";
 import { getGrantSummary } from "../../demo/ava/grantSummary";
-import { createReview, MENTOR_REPLY, MENTOR_REPLY_DAYS } from "../../demo/ava/mentorReviews";
+import {
+  createReview,
+  MENTOR_REPLY,
+  MENTOR_REPLY_DAYS,
+  type MentorReview,
+} from "../../demo/ava/mentorReviews";
 import { ava } from "../../lib/ava/store";
 import type { Part } from "../../lib/ava/package";
 import { sentencesOf } from "../../lib/ava/thread";
 import { openOutside } from "./outside";
 import { SendToMentorModal } from "./SendToMentorModal";
 import { answerByWords, avaFace, QuestionCard, TALK_LINE } from "./Asking";
+import { readerReply } from "./chatReplies";
 import { BidText } from "./BidText";
 import { downloadBid } from "./download";
 import { modeFor, planDownload, type PlannedPaper } from "./downloads";
@@ -192,21 +198,19 @@ function heldParts(parts: Part[], holds: Hold[]): Set<string> {
   return out;
 }
 
-/** What Ava says to words she cannot act on yet in her read of the bid. The
- *  demo has no model, so the answers are scripted for what a person asks. */
-function readerReply(text: string, bid: AvaBid): string {
-  const t = text.toLowerCase();
-  if (/download|pdf|word|excel|file/.test(t))
-    return "Press Download in the bar over your bid. I build every file on your device, so nothing leaves it.";
-  if (/send|email|submit|deliver|portal/.test(t))
-    return "After you download your bid, How to send it shows your steps, in order. I never send anything for you.";
-  if (/due|deadline|when|date|late/.test(t))
-    return `Your ${bid.kind === "reply" ? "reply" : "bid"} is due ${dueWords(bid)}. Send it a day early.`;
-  if (/mentor|sarah|review|second opinion/.test(t))
-    return "Press the mentor button at the top. A review costs $97 from your wallet, and the mentor usually replies within 1 business day.";
-  if (/price|cost|total|how much/.test(t))
-    return "Open the price part of your bid to see every line. If you change a cost, I ask you to approve the price again.";
-  return "Tap the sentence you want to change first. Then tell me the new words.";
+/** Words typed after she taps a sentence: a question about it, an order about
+ *  it, or the new words themselves. */
+export function aboutSentence(text: string): "why" | "order" | "words" {
+  const t = text.trim().toLowerCase();
+  if (/\?\s*$/.test(t) || /^(why|what|how|who|when|where|which|is|are|does|do|did)\b/.test(t))
+    return "why";
+  if (
+    /^(please\b|can you\b|could you\b|would you\b|make\b|change\b|shorten\b|rewrite\b|reword\b|remove\b|delete\b|fix\b|improve\b|edit\b)/.test(
+      t,
+    )
+  )
+    return "order";
+  return "words";
 }
 
 export function Reader({
@@ -228,6 +232,8 @@ export function Reader({
   mentorAsk?: number;
 }) {
   const { id, s, bid } = ctx;
+  // A reply to a notice is a reply, not a bid.
+  const noun = bid.kind === "reply" ? "reply" : "bid";
   const { flow } = view;
   const parts = flow.parts;
   const part = parts.find((p) => p.id === nav.tab) ?? parts[0];
@@ -366,12 +372,12 @@ export function Reader({
                   <Download size={16} aria-hidden />
                   {holes.length > 0 ? (
                     <Words
-                      long="Download your bid to finish (Word)"
+                      long={`Download your ${noun} to finish (Word)`}
                       short="Download to finish (Word)"
                       tiny="Download (Word)"
                     />
                   ) : (
-                    "Download your bid"
+                    `Download your ${noun}`
                   )}
                 </button>
               ) : null}
@@ -536,6 +542,7 @@ function ReadChat({
   mentorAsk: number;
 }) {
   const { bid, s, id } = ctx;
+  const noun = bid.kind === "reply" ? "reply" : "bid";
   const { flow } = view;
   const w = buyerWord(bid);
   const passed = daysLeft(bid) < 0;
@@ -602,6 +609,7 @@ function ReadChat({
   useEffect(() => {
     setProposal(null);
     setWhyOpen(false);
+    setSaid(null);
     if (nav.sel) setNote(null);
   }, [nav.sel]);
   useEffect(() => {
@@ -658,11 +666,26 @@ function ReadChat({
 
   const onSend = (text: string, how: { voice: boolean }) => {
     if (sentence) {
+      // Words typed after she taps a sentence are the new sentence, unless they
+      // ask a question or give an order. Those are never put into her bid.
+      const kind = aboutSentence(text);
+      if (kind === "why") {
+        setWhyOpen(true);
+        setSaid({ you: text, ava: "Here is why I put this sentence in your bid." });
+        return;
+      }
+      if (kind === "order") {
+        setSaid({
+          you: text,
+          ava: "I cannot rewrite a sentence from an order in this sample. Type the words you want in its place, and I show you the new sentence before anything changes.",
+        });
+        return;
+      }
       setProposal({ key: sentence.key, now: text, voice: how.voice });
       return;
     }
     if (focusQ && answerByWords(ctx, focusQ, text, how.voice)) return;
-    setSaid({ you: text, ava: readerReply(text, bid) });
+    setSaid({ you: text, ava: readerReply(text, bid, view.bidReview) });
   };
 
   /** The question a hold opens: its own, or the check's question about it. */
@@ -865,8 +888,8 @@ function ReadChat({
                 <h4>The files you have are older than your bid</h4>
                 <p>
                   {flow.holds.length > 0 || missing.length > 0
-                    ? "Do not send them. Answer what is above, then download your bid again. Then I show you how to send it."
-                    : "Download your bid again before you send. Then I show you how to send it."}
+                    ? `Do not send them. Answer what is above, then download your ${noun} again. Then I show you how to send it.`
+                    : `Download your ${noun} again before you send. Then I show you how to send it.`}
                 </p>
               </ChatCard>
               {flow.holds.length === 0 && missing.length === 0 ? (
@@ -894,7 +917,9 @@ function ReadChat({
                 <QuickReplies
                   replies={[
                     {
-                      label: holesOpen ? "Download your bid to finish (Word)" : "Download your bid",
+                      label: holesOpen
+                        ? `Download your ${noun} to finish (Word)`
+                        : `Download your ${noun}`,
                       kind: "primary",
                       icon: <Download size={16} aria-hidden />,
                       onClick: onDownload,
@@ -905,7 +930,7 @@ function ReadChat({
             </AgentTurn>
           ) : null}
 
-          {said ? (
+          {said && !(sentence && sec) ? (
             <>
               <YouMsg>{said.you}</YouMsg>
               <AgentTurn avatar={avaFace}>
@@ -956,6 +981,14 @@ function ReadChat({
                 {secPart ? pieceWords(flow.parts, secPart).replace(/^part/, "Part") : sec.title}: “
                 {sentence.text}”
               </YouMsg>
+              {said ? (
+                <>
+                  <YouMsg>{said.you}</YouMsg>
+                  <AgentTurn avatar={avaFace}>
+                    <AgentMsg>{said.ava}</AgentMsg>
+                  </AgentTurn>
+                </>
+              ) : null}
               {s.edits[sentence.key] && !proposal ? (
                 <AgentTurn avatar={avaFace}>
                   <ChatCard>
@@ -1385,8 +1418,8 @@ function ReadChat({
                 <h4>The files you have are older than your bid</h4>
                 <p>
                   {flow.holds.length > 0 || missing.length > 0
-                    ? "Do not send them. Answer what is above, then download your bid again. Then I show you how to send it."
-                    : "Download your bid again before you send. Then I show you how to send it."}
+                    ? `Do not send them. Answer what is above, then download your ${noun} again. Then I show you how to send it.`
+                    : `Download your ${noun} again before you send. Then I show you how to send it.`}
                 </p>
               </ChatCard>
               {flow.holds.length === 0 && missing.length === 0 ? (
@@ -1414,7 +1447,9 @@ function ReadChat({
                 <QuickReplies
                   replies={[
                     {
-                      label: holesOpen ? "Download your bid to finish (Word)" : "Download your bid",
+                      label: holesOpen
+                        ? `Download your ${noun} to finish (Word)`
+                        : `Download your ${noun}`,
                       kind: "primary",
                       icon: <Download size={16} aria-hidden />,
                       onClick: onDownload,

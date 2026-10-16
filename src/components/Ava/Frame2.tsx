@@ -202,12 +202,20 @@ function rowMark(group: string, act?: string): MarkKind {
   return act && open.includes(act) ? "need" : "done";
 }
 
+/** On a laptop screen the opened checklist floats over the work, as a drawer
+ *  (ava.css). It is never open when a page loads: it would cover the first
+ *  thing she needs. */
+export const DRAWER_WIDTHS = "(min-width: 1101px) and (max-width: 1599px)";
+export function checklistIsDrawer(): boolean {
+  return typeof window !== "undefined" && window.matchMedia(DRAWER_WIDTHS).matches;
+}
+
 /** Open or folded, remembered on this device only. */
 export function useRailOpen(): [boolean, () => void] {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     try {
-      setOpen(window.localStorage.getItem(RAIL_KEY) === "1");
+      setOpen(window.localStorage.getItem(RAIL_KEY) === "1" && !checklistIsDrawer());
     } catch {
       /* private window: the rail starts folded */
     }
@@ -215,7 +223,8 @@ export function useRailOpen(): [boolean, () => void] {
   const toggle = () =>
     setOpen((v) => {
       try {
-        window.localStorage.setItem(RAIL_KEY, v ? "0" : "1");
+        // A drawer is not remembered: the next page starts with it folded.
+        if (!checklistIsDrawer()) window.localStorage.setItem(RAIL_KEY, v ? "0" : "1");
       } catch {
         /* nothing to remember */
       }

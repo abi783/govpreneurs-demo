@@ -25,7 +25,7 @@ const PURPOSE: Array<[RegExp, string]> = [
     /acknowledg|sf 30|amendment of solicitation/i,
     "Says you received this change to the buyer's files",
   ],
-  [/sf 1449/i, "Your signed offer. If the buyer accepts it, it becomes the contract."],
+  [/sf 1449/i, "Your signed offer. If the buyer accepts it, it becomes the contract"],
   [
     /representations and certifications/i,
     "Your standard statements to the government about your company",

@@ -17,6 +17,7 @@
 // ("Cannot access AVA_BIDS before initialization") when the page loads the
 // fixtures first. The loop below keeps this file free of that cycle.
 
+import { MEMBER_EIN, REFERENCE_CONTACTS } from "../../../demo/ava/contacts";
 import { PAST_PERFORMANCE } from "../../../demo/story/persona";
 import { effectiveBid } from "../derive";
 import { fayettevilleBid } from "../fixtures/fayetteville";
@@ -59,14 +60,14 @@ const PAPERS: Record<string, string> = {
 /** The words and numbers she typed for each enter ask. */
 const TYPED: Record<string, Record<string, number | string>> = {
   "ask-ref-contacts": {
-    "ref1-phone": "(910) 555-0161",
-    "ref1-email": "janet.reyes@ccs.example",
-    "ref2-phone": "(910) 555-0172",
-    "ref2-email": "mike.sutton@carolinadining.example",
-    "ref3-phone": "(910) 555-0183",
-    "ref3-email": "pastor.hall@riversidefellowship.example",
+    "ref1-phone": REFERENCE_CONTACTS.janetReyes.phone,
+    "ref1-email": REFERENCE_CONTACTS.janetReyes.email,
+    "ref2-phone": REFERENCE_CONTACTS.mikeSutton.phone,
+    "ref2-email": REFERENCE_CONTACTS.mikeSutton.email,
+    "ref3-phone": REFERENCE_CONTACTS.pastorHall.phone,
+    "ref3-email": REFERENCE_CONTACTS.pastorHall.email,
   },
-  "ask-city-vendor": { "vendor-number": "CV-48215", "tax-id": "84-2619047" },
+  "ask-city-vendor": { "vendor-number": "CV-48215", "tax-id": MEMBER_EIN },
   "ask-pay-rates": { "pay-manager": 23.5, "pay-cook": 17.5, "pay-server": 14.5 },
   "ask-food-cost": { "food-lunch": 3.5, "food-guest": 7.5 },
   "ask-other-costs": { "cost-vehicle": 170, "cost-permit": 350, "cost-renewal": 180 },

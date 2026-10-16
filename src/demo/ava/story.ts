@@ -1,7 +1,12 @@
 // DEMO: what the story says about each bid Ava builds (src/demo/story
 // `ava` field), in one place for the list and the starting states.
 
-import { AVA_BIDS, getOpportunity, type AvaState } from "../story/opportunities";
+import {
+  AVA_BIDS,
+  getOpportunity,
+  type AvaState,
+  type StoryOpportunity,
+} from "../story/opportunities";
 
 export interface AvaStoryBid {
   id: string;
@@ -17,14 +22,17 @@ function money(n: number): string {
   return `$${Math.round(n / 1_000)}K`;
 }
 
+/** "$540K–$780K", "$185K–$235K a year", or null when the buyer states no value. */
+export function valueLine(o: StoryOpportunity): string | null {
+  return o.valueLow !== null && o.valueHigh !== null
+    ? `${money(o.valueLow)}–${money(o.valueHigh)}${o.valueBasis === "per_year" ? " a year" : ""}`
+    : null;
+}
+
 export function getAvaStory(id: string): AvaStoryBid | null {
   const o = getOpportunity(id);
   if (!o?.ava) return null;
-  const value =
-    o.valueLow !== null && o.valueHigh !== null
-      ? `${money(o.valueLow)}–${money(o.valueHigh)}${o.valueBasis === "per_year" ? " a year" : ""}`
-      : null;
-  return { id, state: o.ava, statusLine: o.ava.statusLine, value };
+  return { id, state: o.ava, statusLine: o.ava.statusLine, value: valueLine(o) };
 }
 
 export const STORY_BIDS: AvaStoryBid[] = AVA_BIDS.map((o) => getAvaStory(o.id)!);

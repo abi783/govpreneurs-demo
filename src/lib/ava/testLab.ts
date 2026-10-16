@@ -51,6 +51,24 @@ export function roleFloors(bid: AvaBid): Map<string, number> {
   return out;
 }
 
+/** Words a caterer could type in a box that gives no example, by the box's id.
+ *  Each answer is one phrase with no final full stop: the draft adds it. They
+ *  match the answers the bids start with (lib/ava/starts), so a screen made by
+ *  a prototype control reads like the bid she is building. */
+const TEXT_ANSWERS: Record<string, string> = {
+  "fb-hire":
+    "we ask people we trust for the names of good cooks, and every new cook works one paid trial shift",
+  "fb-keep":
+    "we give every cook a steady weekly schedule and pay on time, and each cook learns a second station",
+  "fb-sites-lead":
+    "a lead cook runs the kitchen at each dining facility, and our owner manages both leads",
+  "fb-sites-supply":
+    "local farms and produce suppliers near Fayetteville, and one restaurant food wholesaler",
+  "temp-check": "Every hour during service, and at each handoff",
+  "temp-record": "On a signed log sheet at the hot line. The manager reviews it each day",
+  "missed-fix": "The cook replaces or reheats the item at once. The manager logs it",
+};
+
 /** A plausible value for an entered field. Never under a floor. */
 function sampleValue(askId: string, f: EnterField, floors: Map<string, number>): number | string {
   const floor = f.floor?.value;
@@ -69,7 +87,7 @@ function sampleValue(askId: string, f: EnterField, floors: Map<string, number>):
       // The field's own example reads like a real answer ("For example: Sam
       // Ortiz, our head cook…"); a bare placeholder would show in the draft.
       const ex = f.hint?.match(/^For example[:,]\s*(.+?)\.?$/i)?.[1];
-      return ex ?? "Sample answer";
+      return ex ?? TEXT_ANSWERS[f.id] ?? "Sample answer";
     }
     case "phone":
       return "(910) 555-0100";
