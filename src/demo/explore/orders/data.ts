@@ -497,7 +497,9 @@ const SPECS: Spec[] = [
     amsc: "G",
     standardPrice: 61.5,
     deliveryDays: 50,
-    setAside: "SDVOSBC",
+    // DEMO: this was a service-disabled veteran-owned set-aside. Amira is not a veteran-owned firm,
+    // so it sat in "Orders for you" as a match she cannot bid. A small-business set-aside she can.
+    setAside: "SBA",
     postedDaysAgo: 6,
     closesInDays: 6,
     contact: CONTACTS.whitfield,
