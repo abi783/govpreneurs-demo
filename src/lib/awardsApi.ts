@@ -283,7 +283,9 @@ export function whatHappensNext(a: AwardRecord): string | null {
   // A known rebid date beats age: it is a real date to prepare for, which is
   // different advice from "go court them now".
   if (months !== null && months > 0 && months <= 18) {
-    return `This job comes up for bid again in about ${Math.round(months)} months. Getting on their radar now is what puts you on the team next time.`;
+    // DEMO: "1 month", not "1 months".
+    const whole = Math.round(months);
+    return `This job comes up for bid again in about ${whole} ${whole === 1 ? "month" : "months"}. Getting on their radar now is what puts you on the team next time.`;
   }
   const days = a.recency.daysSinceAward;
   if (days === null) return null;
@@ -355,7 +357,8 @@ export function whyThisAward(a: AwardRecord): string {
       1,
       Math.round((new Date(a.recency.recompeteAt).getTime() - Date.now()) / (30 * 86_400_000)),
     );
-    return `This job comes up for bid again in about ${months} months. Start getting ready and you could bid it.`;
+    // DEMO: "1 month", not "1 months".
+    return `This job comes up for bid again in about ${months} ${months === 1 ? "month" : "months"}. Start getting ready and you could bid it.`;
   }
   if (a.location.state) {
     return `This is your kind of work, in your area. It shows you who pays for it.`;
