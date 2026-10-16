@@ -50,6 +50,12 @@ function avaTagLabel(ava: NonNullable<StoryOpportunity["ava"]>): string {
   return "Ava is building";
 }
 
+/** The card prints "Grant: Bid — ", so Grant's own opening words ("Bid it.", "Look closer.", "Skip it.") would say the verdict twice. */
+function withoutVerdictWords(line: string): string {
+  const rest = line.replace(/^(Bid it|Look closer|Skip it|Reply)\.\s+/, "");
+  return rest.charAt(0).toUpperCase() + rest.slice(1);
+}
+
 const VERDICT_WORD = { bid: "Bid", review: "Look closer", no_bid: "Don't bid" } as const;
 
 function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean): DemoBid {
@@ -68,7 +74,7 @@ function storyBid(o: StoryOpportunity, stage: Bid["stage"], withPursuit: boolean
     stage,
     ...(pursuit
       ? { contextOverride: pursuit.note }
-      : { grantVerdict: { verdict: VERDICT_WORD[o.grant.verdict], oneLine: o.grant.oneLine } }),
+      : { grantVerdict: { verdict: VERDICT_WORD[o.grant.verdict], oneLine: withoutVerdictWords(o.grant.oneLine) } }),
     nextAction: { label: pursuit?.next.label ?? "Review with Grant", href: pursuit?.next.to ?? `/opportunities/${o.id}` },
     lastActivityAt: isoDaysFromNow(-(pursuit?.lastActivityDaysAgo ?? 3)),
     daysLeft: outcome ? null : o.closesInDays,
