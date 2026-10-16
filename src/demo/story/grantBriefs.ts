@@ -82,7 +82,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       },
       "Does this move you forward?": {
         rating: "strong",
-        text: "A first federal prime at Fort Bragg is the record you need for the dining-hall recompete in two years.",
+        text: "A first federal prime at Fort Bragg is the record you need for the larger dining-hall bids that follow.",
       },
     },
     limits: [
@@ -204,9 +204,9 @@ export const GRANT_BRIEFS: GrantBrief[] = [
   {
     oppId: "CUMCO-2026-014",
     confidence: 3,
-    gist: "A price-only sealed bid from a county that knows you.",
+    gist: "A price-only sealed bid, in a county where you have fed 1,100 children a day.",
     thesis:
-      "The county already trusts your food, and a sealed bid is decided on price. Bid it, once every cook has a food-handler certificate.",
+      "You have already fed this county at volume, and a sealed bid is decided on price. Bid it, once every cook has a food-handler certificate.",
     reads: {
       "Is it your kind of work?": { rating: "strong", text: "Hot meals cooked off-site and delivered, three times a day." },
       "Does the size fit?": { rating: "good", text: "About $350K a year, more than half your revenue." },

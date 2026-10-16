@@ -395,7 +395,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       prime: "go",
       sub: null,
       oneLine:
-        "Bid it. The county knows your work, and a sealed bid is decided on price, so this is about your numbers, not your writing.",
+        "Bid it. You have fed this county's children before, and a sealed bid is decided on price, so this is about your numbers, not your writing.",
       authored: true,
     },
     saved: true,
@@ -436,11 +436,11 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       score: 92,
       forYouRank: 4,
       line:
-        "Ceremony catering at Pope Army Airfield: a woman-owned set-aside, about $390K, 15 minutes away, and event menus like your church catering work.",
+        "Ceremony catering at Pope Army Airfield: a woman-owned set-aside, about $390K, 15 miles away, and event menus like your church catering work.",
       fit: [
         { kind: "setAside", code: "WOSB", says: "a woman-owned set-aside" },
         { kind: "valueInRange", says: "about $390K" },
-        { kind: "distance", says: "15 minutes away" },
+        { kind: "distance", says: "15 miles away" },
         { kind: "pastPerformance", id: "pp-church", says: "your church catering work" },
       ],
     },
@@ -481,10 +481,10 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       score: 84,
       forYouRank: 6,
       line:
-        "Drill-weekend meals for the NC National Guard: about $215K, 10 minutes from your kitchen, and the same batch-cooking as your county summer meals.",
+        "Drill-weekend meals for the NC National Guard: about $215K, 10 miles from your kitchen, and the same batch-cooking as your county summer meals.",
       fit: [
         { kind: "valueInRange", says: "about $215K" },
-        { kind: "distance", says: "10 minutes from your kitchen" },
+        { kind: "distance", says: "10 miles from your kitchen" },
         { kind: "pastPerformance", id: "pp-county-schools", says: "your county summer meals" },
       ],
     },
@@ -492,7 +492,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       verdict: "bid",
       prime: "go",
       sub: null,
-      oneLine: "Bid it. Weekend work fits around your weekday jobs, and the armory is ten minutes away.",
+      oneLine: "Bid it. Weekend work fits around your weekday jobs, and the armory is 10 miles away.",
     },
   },
   {

@@ -5,6 +5,7 @@
 
 import { AGENCIES, allAwardRecords } from "./awardsData";
 import { anyFirmByKey } from "./firms";
+import { PLACES } from "@/demo/story/places";
 import type {
   BuyerAnalysis,
   BuyerOfficer,
@@ -91,7 +92,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "MICC Fort Bragg",
     type: "federal",
     location: "Fort Bragg, NC",
-    distanceMiles: 12,
+    distanceMiles: PLACES.fortBragg.milesFromKitchen,
     whatTheyBuy:
       "Dining facility operations, field feeding, event catering and mess attendant services for soldiers at Fort Bragg, Pope Army Airfield and Camp Mackall. Many of its awards are set aside for small and woman-owned businesses.",
     buysFood: true,
@@ -126,7 +127,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "Womack AMC",
     type: "federal",
     location: "Fort Bragg, NC",
-    distanceMiles: 11,
+    distanceMiles: PLACES.fortBragg.milesFromKitchen,
     whatTheyBuy:
       "Patient meals, therapeutic diets and kitchen support for the hospital on Fort Bragg.",
     buysFood: true,
@@ -159,7 +160,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "Pope AAF",
     type: "federal",
     location: "Pope Army Airfield, NC",
-    distanceMiles: 14,
+    distanceMiles: PLACES.popeAaf.milesFromKitchen,
     whatTheyBuy:
       "Ceremonies, official functions and unit events with catering for 50 to 600 guests. Often set aside for woman-owned firms.",
     buysFood: true,
@@ -190,7 +191,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "VA NCO 6",
     type: "federal",
     location: "Durham, NC (serves the Fayetteville VA Medical Center)",
-    distanceMiles: 65,
+    distanceMiles: PLACES.durham.milesFromKitchen,
     whatTheyBuy:
       "Patient meals, hospital kitchen support and retail dining at VA medical centers in North Carolina and Virginia.",
     buysFood: true,
@@ -238,7 +239,7 @@ export const BUYER_SEED: GovBuyer[] = [
     ],
     analysis: analysis(
       "worth-it",
-      "The county knows your work from the schools program, and a sealed bid is decided on price, not on writing. Get every cook food-handler certified before you bid.",
+      "You fed this county's children in the schools program, and a sealed bid is decided on price, not on writing. Get every cook food-handler certified before you bid.",
       spend([1_700_000, 1_900_000, 2_100_000], [
         ["Detention center meals", 0.6],
         ["Senior nutrition", 0.25],
@@ -571,7 +572,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "NS Norfolk",
     type: "federal",
     location: "Norfolk, VA",
-    distanceMiles: 220,
+    distanceMiles: PLACES.norfolk.milesFromKitchen,
     whatTheyBuy: "Galley services and mess attendants for the Navy's largest base.",
     buysFood: true,
     agencyMatchers: ["Naval Station Norfolk"],
