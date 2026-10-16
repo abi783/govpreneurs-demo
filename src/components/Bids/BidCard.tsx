@@ -147,7 +147,7 @@ export function BidCard({ bid }: { bid: Bid }) {
 
         {(bid as DemoBid).demo?.ava && (
           <Link to={(bid as DemoBid).demo!.ava!.to as never} className="bid-card__ava">
-            <Sparkles size={11} aria-hidden /> Ava is building
+            <Sparkles size={11} aria-hidden /> {(bid as DemoBid).demo!.ava!.label}
           </Link>
         )}
 
@@ -219,7 +219,7 @@ export function BidCard({ bid }: { bid: Bid }) {
 
       {demo?.ava && (
         <Link to={demo.ava.to as never} className="bid-card__ava">
-          <Sparkles size={11} aria-hidden /> Ava is building
+          <Sparkles size={11} aria-hidden /> {demo.ava.label}
         </Link>
       )}
 
