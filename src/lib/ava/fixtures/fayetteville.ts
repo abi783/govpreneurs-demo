@@ -1969,7 +1969,7 @@ export const fayettevilleBid: AvaBid = {
               id: "clm-cov-staff",
               tag: "unsupported",
               askId: "ask-employees",
-              gap: `[CONFIRM: do you still have ${PERSONA.employeesW2} employees?]`,
+              gap: `[CONFIRM: how many employees you have today]`,
               resolvedText: `We have ${PERSONA.employeesW2} employees`,
             },
           },
