@@ -2,8 +2,26 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { hasMetGrant, markMetGrant } from "./metGrant";
 
+/** A small in-memory Storage, for runtimes whose own `localStorage` global hides jsdom's. */
+function memoryStorage(): Storage {
+  const data = new Map<string, string>();
+  return {
+    get length() {
+      return data.size;
+    },
+    clear: () => data.clear(),
+    getItem: (k: string) => data.get(k) ?? null,
+    key: (i: number) => Array.from(data.keys())[i] ?? null,
+    removeItem: (k: string) => void data.delete(k),
+    setItem: (k: string, v: string) => void data.set(k, String(v)),
+  };
+}
+
 describe("metGrant — per (member, opportunity) persistence", () => {
   beforeEach(() => {
+    if (!window.localStorage) {
+      Object.defineProperty(window, "localStorage", { value: memoryStorage(), configurable: true });
+    }
     window.localStorage.clear();
   });
 

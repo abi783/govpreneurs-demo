@@ -10,12 +10,15 @@ export function DFYServiceModal({
   prereqs,
   total,
   onConfirmed,
+  onSubmitted,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   prereqs: UnmetPrereq[];
   total: number;
   onConfirmed: () => void;
+  /** DEMO: runs when the visitor confirms, so the request is kept even if the dialog is closed with the X. */
+  onSubmitted?: () => void;
 }) {
   const [submitted, setSubmitted] = useState(false);
 
@@ -67,7 +70,13 @@ export function DFYServiceModal({
                 <Button variant="secondary" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>
-                <Button variant="primary" onClick={() => setSubmitted(true)}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setSubmitted(true);
+                    onSubmitted?.();
+                  }}
+                >
                   Confirm — ${total.toLocaleString()}
                 </Button>
               </div>

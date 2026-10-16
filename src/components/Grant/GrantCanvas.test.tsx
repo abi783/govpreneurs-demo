@@ -13,7 +13,7 @@ describe("GrantCanvas — mentor CTA deadline gate", () => {
   it("dispatches onReviewWithMentor when not disabled", () => {
     const onMentor = vi.fn();
     render(<GrantCanvas analysis={analysis} onReviewWithMentor={onMentor} />);
-    fireEvent.click(screen.getByRole("button", { name: /review with mentor/i }));
+    fireEvent.click(screen.getByRole("button", { name: /second opinion|review with mentor/i }));
     expect(onMentor).toHaveBeenCalledTimes(1);
   });
 
@@ -26,7 +26,7 @@ describe("GrantCanvas — mentor CTA deadline gate", () => {
         mentorDisabledReason={MENTOR_DEADLINE_TOO_CLOSE_MESSAGE}
       />,
     );
-    const btn = screen.getByRole("button", { name: /review with mentor/i });
+    const btn = screen.getByRole("button", { name: /second opinion|review with mentor/i });
     expect(btn).toHaveProperty("disabled", true);
     expect(btn.closest("span")?.getAttribute("title")).toBe(MENTOR_DEADLINE_TOO_CLOSE_MESSAGE);
     fireEvent.click(btn);
@@ -45,6 +45,11 @@ describe("GrantCanvas — next-move link", () => {
     const sub = withPrimary("review", "Find a prime to team with", "/pipeline?opp=X&as=sub");
     render(<GrantCanvas analysis={sub} onReviewWithMentor={vi.fn()} />);
     expect(screen.queryByRole("link", { name: /find a prime/i })).toBeNull();
+  });
+
+  it("keeps the Partners link on a sub path, because Partners is a live page in the demo", () => {
+    render(<GrantCanvas analysis={analysis} onReviewWithMentor={vi.fn()} />);
+    expect(screen.getByRole("link", { name: /on partners/i }).getAttribute("href")).toBe("/partners");
   });
 
   it("keeps the 'Back to your matches' link on a sub-path no-bid", () => {

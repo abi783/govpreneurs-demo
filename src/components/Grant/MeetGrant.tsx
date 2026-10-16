@@ -40,7 +40,7 @@ export function MeetGrant({
       </div>
 
       <p className="meet__say">
-        Hunter put {opportunityTitle} in front of you. I have read the whole solicitation against
+        Hunter put “{opportunityTitle}” in front of you. I have read the whole solicitation against
         your profile — the requirements, the deadlines, what the agency has bought before — and
         everything below carries a source you can open. If I cannot show you where something came
         from, I do not say it.
