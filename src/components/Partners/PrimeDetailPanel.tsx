@@ -138,12 +138,17 @@ export function PrimeDetailPanel({
 
             <section className="prime-detail__block">
               <h3 className="prime-detail__h">Do they hire small firms?</h3>
-              <p className="t-body-sm">
-                They have brought in {atLeastSubs(partner.bench)} on work like this
-                {partner.bench.repeatSubs > 0
-                  ? `, and went back to ${partner.bench.repeatSubs} of them more than once.`
-                  : "."}
-              </p>
+              {/* DEMO: a company with no subcontracts on record says so, not "at least 0 firms". */}
+              {partner.bench.distinctSubs === 0 ? (
+                <p className="t-body-sm">We have no record of them hiring outside firms.</p>
+              ) : (
+                <p className="t-body-sm">
+                  They have brought in {atLeastSubs(partner.bench)} on work like this
+                  {partner.bench.repeatSubs > 0
+                    ? `, and went back to ${partner.bench.repeatSubs} of them more than once.`
+                    : "."}
+                </p>
+              )}
               <p className="award-note">
                 Counts come from public filings that only cover the largest subcontracts, so treat
                 them as &ldquo;at least this many&rdquo;.
