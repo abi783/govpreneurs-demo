@@ -9,7 +9,7 @@ import { BuyerDetailPanel } from "../components/Buyers/BuyerDetailPanel";
 interface BuyerSearch {
   q: string;
   near: "nc" | "all";
-  buys: "roofing" | "all";
+  buys: "food" | "all";
   buyer?: string;
   focus?: "people" | "approach";
 }
@@ -17,7 +17,7 @@ interface BuyerSearch {
 function validateBuyerSearch(input: Record<string, unknown>): BuyerSearch {
   const q = typeof input.q === "string" ? input.q : "";
   const near = input.near === "all" ? "all" : "nc";
-  const buys = input.buys === "all" ? "all" : "roofing";
+  const buys = input.buys === "all" ? "all" : "food";
   const buyer = typeof input.buyer === "string" && input.buyer ? input.buyer : undefined;
   const focus =
     input.focus === "people" || input.focus === "approach" ? input.focus : undefined;

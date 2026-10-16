@@ -1,4 +1,4 @@
-import { Search, MapPin, Hammer } from "lucide-react";
+import { Search, MapPin, UtensilsCrossed } from "lucide-react";
 
 export function BuyerSearchBar({
   q,
@@ -12,8 +12,8 @@ export function BuyerSearchBar({
   onQChange: (v: string) => void;
   near: "nc" | "all";
   onNearChange: (v: "nc" | "all") => void;
-  buys: "roofing" | "all";
-  onBuysChange: (v: "roofing" | "all") => void;
+  buys: "food" | "all";
+  onBuysChange: (v: "food" | "all") => void;
 }) {
   return (
     <div className="buyer-toolbar">
@@ -38,11 +38,11 @@ export function BuyerSearchBar({
         </button>
         <button
           type="button"
-          className={`buyer-pill${buys === "roofing" ? " is-active" : ""}`}
-          onClick={() => onBuysChange(buys === "roofing" ? "all" : "roofing")}
-          aria-pressed={buys === "roofing"}
+          className={`buyer-pill${buys === "food" ? " is-active" : ""}`}
+          onClick={() => onBuysChange(buys === "food" ? "all" : "food")}
+          aria-pressed={buys === "food"}
         >
-          <Hammer size={11} /> Buys · Roofing &amp; building repair
+          <UtensilsCrossed size={11} /> Buys · Food service
         </button>
       </div>
     </div>

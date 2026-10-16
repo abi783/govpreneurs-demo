@@ -51,7 +51,7 @@ export function BuyerPursueAnalysis({
           <h3 className="cs-pursue-title">Not enough signal yet.</h3>
         </header>
         <p className="t-body-sm" style={{ color: "var(--text-2)" }}>
-          We don't have a roofing-spend baseline for {buyer.name} in our current dataset. Use "Your
+          We don't have a food service spend baseline for {buyer.name} in our current dataset. Use "Your
           move" below to make a low-cost intro and watch the Opportunities feed for their next post.
         </p>
       </section>
@@ -73,7 +73,7 @@ export function BuyerPursueAnalysis({
       <ul className="cs-pursue-facts">
         <li>
           <BarChart3 size={12} />
-          <span className="cs-fact-label">Annual roofing/construction spend</span>
+          <span className="cs-fact-label">Annual food service spend</span>
           <span className="cs-fact-value fr-mono">
             {a.annualSpendByYear.map((r) => formatDollars(r.trade)).join(" · ")}
           </span>
@@ -91,10 +91,10 @@ export function BuyerPursueAnalysis({
         </li>
         <li>
           <TrendingUp size={12} />
-          <span className="cs-fact-label">Goes to SDVOSB (your edge)</span>
-          <span className="cs-fact-value fr-mono">{a.sdvosbPct}%</span>
-          <span className={`cs-fact-read cs-fact-read--${pctReadLabel(a.sdvosbPct, 20)}`}>
-            {pctReadLabel(a.sdvosbPct, 20)}
+          <span className="cs-fact-label">Goes to woman-owned firms (your edge)</span>
+          <span className="cs-fact-value fr-mono">{a.wosbPct}%</span>
+          <span className={`cs-fact-read cs-fact-read--${pctReadLabel(a.wosbPct, 10)}`}>
+            {pctReadLabel(a.wosbPct, 10)}
           </span>
         </li>
         <li>

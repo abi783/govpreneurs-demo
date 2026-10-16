@@ -1,6 +1,9 @@
-// Labor pricing seed data — Davis-Bacon construction prevailing wages
-// (default view for a roofer) plus service-contract LCAT benchmarks
-// (operator depth, scoped correctly).
+// Labor pricing seed data for a food service business in Fayetteville, NC.
+// DEMO: the wage data was replaced with food service rates. The rates below are sample figures
+// in the shape of a Service Contract Act wage determination (the legal minimum pay on
+// federal service contracts), plus sample hourly benchmarks for professional services.
+
+import { dateDaysFromNow } from "@/demo/story/clock";
 
 export interface PrevailingWage {
   trade: string;
@@ -10,94 +13,104 @@ export interface PrevailingWage {
   notes?: string;
 }
 
-// Cumberland County, NC — illustrative Davis-Bacon roofing/construction rates.
-// Mock numbers, realistic ranges.
+// Cumberland County, NC. Sample figures in the shape of a wage determination.
+// Health and welfare is the same for every title, as on a real determination.
+const HEALTH_AND_WELFARE = 5.36;
+
 export const PREVAILING_WAGES_CUMBERLAND_NC: PrevailingWage[] = [
-  { trade: "Roofer", baseHourly: 24.86, fringeHourly: 8.42, notes: "Built-up, single-ply, metal" },
-  { trade: "Laborer (Group 1, General)", baseHourly: 18.12, fringeHourly: 7.05 },
-  { trade: "Sheet Metal Worker", baseHourly: 27.40, fringeHourly: 11.85, notes: "Flashing, gutters, metal panels" },
-  { trade: "Carpenter", baseHourly: 25.95, fringeHourly: 9.20, notes: "Deck repair, framing" },
-  { trade: "Equipment Operator (Group 2)", baseHourly: 26.50, fringeHourly: 9.40, notes: "Lifts, telehandler" },
-  { trade: "Truck Driver (Heavy)", baseHourly: 22.15, fringeHourly: 7.90 },
+  { trade: "Cook I", baseHourly: 15.12, fringeHourly: HEALTH_AND_WELFARE, notes: "Line cook, prep cook, short-order" },
+  { trade: "Cook II", baseHourly: 17.4, fringeHourly: HEALTH_AND_WELFARE, notes: "Lead cook, diet kitchen, therapeutic menus" },
+  { trade: "Food Service Worker", baseHourly: 12.8, fringeHourly: HEALTH_AND_WELFARE, notes: "Serving line, salad bar, tray assembly" },
+  { trade: "Dishwasher / Kitchen Helper", baseHourly: 12.8, fringeHourly: HEALTH_AND_WELFARE, notes: "Paid at the food service worker rate" },
+  { trade: "Dining Facility Attendant", baseHourly: 13.25, fringeHourly: HEALTH_AND_WELFARE, notes: "Dining room setup, cleaning, sanitizing" },
+  { trade: "Food Service Supervisor", baseHourly: 21.6, fringeHourly: HEALTH_AND_WELFARE },
+  { trade: "Delivery Driver (Light Truck)", baseHourly: 14.95, fringeHourly: HEALTH_AND_WELFARE, notes: "Refrigerated van, same-day delivery" },
 ];
 
 export const PREVAILING_WAGE_META = {
   county: "Cumberland County, NC",
-  determination: "NC20240013, Mod 14",
-  effectiveDate: "2026-01-15",
-  source: "U.S. Dept. of Labor — Wage Determinations (mock)",
+  determination: "2015-5213, Rev. 31 (sample)",
+  effectiveDate: dateDaysFromNow(-200),
+  source: "U.S. Dept. of Labor — Service Contract Act wage determinations (sample)",
 };
 
-// Comparable awarded roofing jobs in the region — links into Awarded tab.
+// Comparable awarded food service jobs in the region. Each links to an award on the Awards page.
 export interface ComparableAward {
-  contractId: string; // matches AwardedContract.id in awardedContracts.ts
+  awardId: string; // matches an award id in src/demo/explore/awardsData.ts
   title: string;
   agency: string;
   awardValue: number;
-  squareFootage?: string;
-  pricePerSqFt?: number; // approximated
+  /** How the job is priced, in plain words. */
+  unitNote: string;
   location: string;
 }
 
-export const COMPARABLE_ROOFING_AWARDS: ComparableAward[] = [
+export const COMPARABLE_FOOD_AWARDS: ComparableAward[] = [
   {
-    contractId: "AWD-sterling-lejeune",
-    title: "Camp Lejeune barracks envelope renovation",
+    awardId: "FA4800-26-P-0007",
+    title: "Lodging breakfast service, Seymour Johnson AFB",
+    agency: "Air Force / 4th Contracting Squadron",
+    awardValue: 180_700,
+    unitNote: "About 60 guests a day, about $8.25 per breakfast",
+    location: "Goldsboro, NC",
+  },
+  {
+    awardId: "W81K04-24-P-0187",
+    title: "Patient meal support: Womack Army Medical Center",
+    agency: "Army / Womack Army Medical Center",
+    awardValue: 126_000,
+    unitNote: "About 75 therapeutic trays a day, about $8.50 per tray",
+    location: "Fort Bragg, NC",
+  },
+  {
+    awardId: "W9124M-25-P-0074",
+    title: "Ceremony and official function catering, Pope Army Airfield",
+    agency: "Air Force / 43rd Air Mobility Operations Group",
+    awardValue: 295_000,
+    unitNote: "Orders as needed, about $38 per guest at 600-guest dinners",
+    location: "Pope Army Airfield, NC",
+  },
+  {
+    awardId: "N40085-24-C-0112",
+    title: "Mess attendant services, MCB Camp Lejeune",
     agency: "Navy / NAVFAC Mid-Atlantic",
-    awardValue: 3_200_000,
-    squareFootage: "~95K sq ft",
-    pricePerSqFt: 33.7,
+    awardValue: 1_200_000,
+    unitNote: "Priced by labor hour, about $24.50 an hour billed",
     location: "Jacksonville, NC",
-  },
-  {
-    contractId: "AWD-ccs-fayetteville",
-    title: "Cumberland County Schools — 4 elementary roof replacements",
-    agency: "Cumberland County Schools",
-    awardValue: 1_180_000,
-    squareFootage: "~38K sq ft",
-    pricePerSqFt: 31.1,
-    location: "Fayetteville, NC",
-  },
-  {
-    contractId: "AWD-archer-greensboro",
-    title: "VA Greensboro CBOC roof replacement",
-    agency: "VA",
-    awardValue: 845_000,
-    squareFootage: "~22K sq ft",
-    pricePerSqFt: 38.4,
-    location: "Greensboro, NC",
   },
 ];
 
-// ── Service-contract LCAT rates (CALC-style) ──────────────────────────
+// ── Professional service labor rates (sample benchmarks) ───────────────
 export type ExperienceTier = "0–3 yrs" | "3–7 yrs" | "7–15 yrs" | "15+ yrs";
 export type EducationLevel = "HS" | "Associate" | "Bachelor" | "Master" | "PhD";
+
+export type LcatLocation = "Nationwide" | "Fayetteville" | "Raleigh-Durham" | "Charlotte" | "Norfolk";
 
 export interface LcatRate {
   id: string;
   category: string;
   experience: ExperienceTier;
   education: EducationLevel;
-  location: "Nationwide" | "DC Metro" | "Raleigh-Durham" | "Charlotte";
+  location: LcatLocation;
   low: number; // fully-burdened hourly $
   median: number;
   high: number;
 }
 
-// Mock CALC-style benchmark rates. Service contracts only — not construction.
+// Sample benchmark rates for the roles a food service contractor bills by the hour.
 export const LCAT_RATES: LcatRate[] = [
-  { id: "lcat-pm-sr", category: "Program Manager (Sr)", experience: "15+ yrs", education: "Bachelor", location: "Nationwide", low: 142, median: 168, high: 215 },
-  { id: "lcat-pm-mid", category: "Program Manager (Mid)", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 108, median: 132, high: 162 },
-  { id: "lcat-se-sr", category: "Software Engineer (Sr)", experience: "7–15 yrs", education: "Bachelor", location: "DC Metro", low: 138, median: 165, high: 198 },
-  { id: "lcat-se-mid", category: "Software Engineer (Mid)", experience: "3–7 yrs", education: "Bachelor", location: "DC Metro", low: 95, median: 118, high: 145 },
-  { id: "lcat-cyber-sr", category: "Cybersecurity Analyst (Sr)", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 132, median: 158, high: 195 },
-  { id: "lcat-helpdesk-2", category: "Help Desk Specialist (Tier 2)", experience: "3–7 yrs", education: "Associate", location: "Nationwide", low: 58, median: 72, high: 88 },
-  { id: "lcat-data-sci", category: "Data Scientist", experience: "3–7 yrs", education: "Master", location: "DC Metro", low: 142, median: 175, high: 220 },
+  { id: "lcat-site-mgr-sr", category: "Food Service Site Manager (Sr)", experience: "7–15 yrs", education: "Bachelor", location: "Fayetteville", low: 68, median: 82, high: 104 },
+  { id: "lcat-site-mgr", category: "Food Service Site Manager", experience: "3–7 yrs", education: "Associate", location: "Fayetteville", low: 52, median: 64, high: 79 },
+  { id: "lcat-exec-chef", category: "Executive Chef", experience: "7–15 yrs", education: "Associate", location: "Raleigh-Durham", low: 58, median: 71, high: 90 },
+  { id: "lcat-dietitian", category: "Registered Dietitian", experience: "3–7 yrs", education: "Bachelor", location: "Fayetteville", low: 62, median: 76, high: 95 },
+  { id: "lcat-qa-haccp", category: "Quality Assurance Manager (HACCP)", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 66, median: 81, high: 102 },
+  { id: "lcat-cook-lead", category: "Lead Cook", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 31, median: 38, high: 47 },
+  { id: "lcat-cook", category: "Cook", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 26, median: 31, high: 38 },
+  { id: "lcat-fsw", category: "Food Service Worker", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 22, median: 26, high: 32 },
+  { id: "lcat-catering-coord", category: "Catering Coordinator", experience: "3–7 yrs", education: "Associate", location: "Charlotte", low: 42, median: 52, high: 66 },
+  { id: "lcat-driver", category: "Delivery Driver", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 25, median: 30, high: 37 },
   { id: "lcat-admin", category: "Administrative Assistant", experience: "3–7 yrs", education: "HS", location: "Nationwide", low: 38, median: 52, high: 68 },
-  { id: "lcat-tech-writer", category: "Technical Writer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 62, median: 82, high: 105 },
-  { id: "lcat-sys-arch", category: "Systems Architect (Sr)", experience: "15+ yrs", education: "Master", location: "DC Metro", low: 165, median: 195, high: 248 },
-  { id: "lcat-ba-sr", category: "Business Analyst (Sr)", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 102, median: 128, high: 158 },
-  { id: "lcat-trainer", category: "Training Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 65, median: 85, high: 108 },
+  { id: "lcat-galley-mgr", category: "Galley / Dining Hall Manager", experience: "7–15 yrs", education: "Associate", location: "Norfolk", low: 60, median: 74, high: 93 },
 ];
 
 export function fmtRate(n: number): string {

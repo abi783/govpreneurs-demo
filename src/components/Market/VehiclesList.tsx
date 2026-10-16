@@ -5,6 +5,15 @@ import { type Vehicle, formatCeiling } from "../../lib/mock/vehicles";
 import { VehicleTypeChip } from "./VehicleTypeChip";
 import { crossPageClick } from "../../lib/ghlNav";
 
+// DEMO: a pursue link may carry a query string. Split it so the router gets a path and a search object.
+function pursuePath(href: string): string {
+  return href.split("?")[0];
+}
+function pursueSearch(href: string): Record<string, string> | undefined {
+  const query = href.split("?")[1];
+  return query ? Object.fromEntries(new URLSearchParams(query)) : undefined;
+}
+
 export function VehiclesList({ vehicles }: { vehicles: Vehicle[] }) {
   return (
     <div className="veh-list" role="list">
@@ -24,7 +33,7 @@ function VehicleRow({ v }: { v: Vehicle }) {
   const [open, setOpen] = useState(false);
   return (
     <article
-      className={`veh-row${open ? " is-open" : ""}${v.fitsRoofing ? "" : " is-not-fit"}`}
+      className={`veh-row${open ? " is-open" : ""}${v.fitsFood ? "" : " is-not-fit"}`}
       role="listitem"
     >
       <button
@@ -54,9 +63,9 @@ function VehicleRow({ v }: { v: Vehicle }) {
           </div>
         </div>
         <div className="veh-row-fit">
-          {v.fitsRoofing ? (
+          {v.fitsFood ? (
             <span className="veh-fit-badge veh-fit-badge--yes">
-              <Check size={11} aria-hidden /> Fits roofing
+              <Check size={11} aria-hidden /> Fits food service
             </span>
           ) : (
             <span className="veh-fit-badge veh-fit-badge--no">
@@ -97,10 +106,11 @@ function VehicleRow({ v }: { v: Vehicle }) {
             ) : null}
           </dl>
 
-          {v.fitsRoofing && v.pursueLink ? (
+          {v.fitsFood && v.pursueLink ? (
             <div className="veh-actions">
               <Link
-                to={v.pursueLink.href}
+                to={pursuePath(v.pursueLink.href)}
+                search={pursueSearch(v.pursueLink.href) as never}
                 className="btn btn-sm btn-secondary"
                 onClick={crossPageClick(v.pursueLink.href)}
               >

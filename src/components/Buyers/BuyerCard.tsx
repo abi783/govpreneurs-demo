@@ -32,7 +32,7 @@ export function BuyerCard({
         <MapPin size={11} /> {buyer.location} · {distanceLabel}
       </div>
       <p className="gov-buyer-card-line">
-        Buys: <strong>roofing &amp; building repair.</strong> {buyer.whatTheyBuy}
+        Buys: <strong>food service.</strong> {buyer.whatTheyBuy}
       </p>
       <div className="gov-buyer-card-stats">
         <span>

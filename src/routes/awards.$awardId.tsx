@@ -3,6 +3,7 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { Bookmark, BookmarkCheck, Clock3, RotateCcw } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { isEmbeddedInGhl, requestCrossPageNav } from "../lib/ghlNav";
+import { AMIRA_FIRM } from "../demo/explore/firms";
 import { useSavedAwards } from "../lib/useSavedAwards";
 import {
   atLeastSubs,
@@ -98,6 +99,8 @@ function AwardDetailPage() {
   const collapsedMoney = collapseAwardMoney(award);
   const justAwarded = award.recency.justAwarded === true;
   const where = [award.location.city, award.location.state].filter(Boolean).join(", ");
+  // DEMO: Amira won one of these awards herself. Her own company has no partner file to open.
+  const isMine = award.winner.awardeeKey === AMIRA_FIRM.key;
 
   // Two ways back, because a member arrives with two different intents: they either
   // want the rest of the awards, or to carry on with what they were doing. Offering
@@ -238,7 +241,7 @@ function AwardDetailPage() {
                   values, so a string serialised as company=%2210113502%22 and the
                   Partners side parsed Number('"10113502"') → NaN, which silently
                   never opened the panel. A number serialises unquoted. */}
-              {award.winner.awardeeKey !== null ? (
+              {award.winner.awardeeKey !== null && !isMine ? (
                 <Link
                   to="/partners"
                   search={
@@ -254,6 +257,8 @@ function AwardDetailPage() {
                 >
                   {award.winner.name}
                 </Link>
+              ) : isMine ? (
+                `${award.winner.name} (you)`
               ) : (
                 award.winner.name
               )}
@@ -357,10 +362,18 @@ function AwardDetailPage() {
           Award records are published by the government after the contract is signed.{" "}
           {award.recency.reportingLagNote}
         </p>
-        <p className="award-note">
-          We cannot tell you who to call at {award.winner.name} — the government publishes company
-          records, not people. Start at their website and ask for whoever handles subcontracting.
-        </p>
+        {isMine ? (
+          <p className="award-note">
+            This is your own job. Ask the contracting officer for a performance rating (CPARS) so
+            the next buyer can read it.
+          </p>
+        ) : (
+          <p className="award-note">
+            We cannot tell you who to call at {award.winner.name} — the government publishes
+            company records, not people. Start at their website and ask for whoever handles
+            subcontracting.
+          </p>
+        )}
         {award.sourceUrl && (
           <p className="award-note">
             <a href={award.sourceUrl} target="_blank" rel="noreferrer">
