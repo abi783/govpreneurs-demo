@@ -8,6 +8,8 @@
 import type { ComparePayload } from "../../../lib/hunterChat";
 import { CAPTURE_STATUS } from "../../../lib/forecasts/copy";
 import { PERSONA } from "../../story/persona";
+import { daysToDay } from "../../explore/dates";
+import { forecastRecord } from "../../explore/forecastData";
 import { setSaved } from "../../state/workspace";
 import { joinList } from "../facts";
 import { chip } from "./answers";
@@ -27,6 +29,29 @@ import { normalize } from "./resolve";
 import type { ChatCtx, Rule, Turn } from "./types";
 
 const has = (ctx: ChatCtx, rx: RegExp) => rx.test(ctx.norm);
+
+function money(n: number): string {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  return `$${Math.round(n / 1_000)}K`;
+}
+
+/** The buyer's estimate for a forecast, as a range, or "Not shared". */
+function estimateOf(oppKey: string): string {
+  const r = forecastRecord(oppKey);
+  if (!r || (r.valLow == null && r.valHigh == null)) return "Not shared";
+  if (r.valLow != null && r.valHigh != null && r.valLow !== r.valHigh) return `${money(r.valLow)} to ${money(r.valHigh)}`;
+  return money((r.valHigh ?? r.valLow) as number);
+}
+
+/** When the buyer expects to ask for bids, in words, or "No date given". */
+function expectedOf(oppKey: string): string {
+  const r = forecastRecord(oppKey);
+  if (!r?.dueOn) return "No date given";
+  const days = daysToDay(r.dueOn);
+  if (days < 14) return "In the next two weeks";
+  if (days < 60) return `In about ${Math.round(days / 7)} weeks`;
+  return `In about ${Math.round(days / 30.44)} months`;
+}
 
 const FORECAST_CHIPS = {
   what: "What is a forecast?",
@@ -131,14 +156,16 @@ const compareForecasts: Rule = {
       })),
       rows: [
         { field: "Place", values: picked.map((v) => v.location ?? "Not stated"), winner: null },
+        { field: "Buyer's estimate", values: picked.map((v) => estimateOf(v.oppKey)), winner: null },
+        { field: "Buyer expects bids", values: picked.map((v) => expectedOf(v.oppKey)), winner: null },
         { field: "Status", values: picked.map(() => "Forecast: not posted yet"), winner: null },
       ],
       verdict: undefined as unknown as ComparePayload["verdict"],
       tradeoff:
-        "A forecast states no deadline and no value yet, so I can compare only the place. Compare again when the notices post. Grant makes the go or no-go call.",
+        "A forecast has no bid deadline yet, and its value is the buyer's estimate. Compare again when the notices post. Grant makes the go or no-go call.",
     };
     return {
-      reply: `I compared ${joinList(picked.map((v) => v.title))} by place. A forecast states no deadline or value yet, so that is all I can compare today.`,
+      reply: `I compared ${joinList(picked.map((v) => v.title))} by place, the buyer's estimate and the date the buyer expects to ask for bids. A forecast has no bid deadline yet, so Grant makes no call until the notice posts.`,
       kind: "compare",
       data,
       chips: [FORECAST_CHIPS.what, FORECAST_CHIPS.best, chip.how],
