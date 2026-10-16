@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- @dsCard group="Colors" name="Brand red vs urgency red" subtitle="Two reds, two roles — never confused" viewport="700x260" -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../type-and-components.css">
+<style>body{padding:24px;background:var(--surface);display:flex;flex-direction:column;gap:18px;}
+.row{display:flex;gap:14px;align-items:center;}
+.swatch{width:80px;height:80px;border-radius:8px;display:flex;align-items:flex-end;padding:8px;font-family:var(--font-mono);font-size:10px;color:white;letter-spacing:-0.02em;flex-shrink:0;}
+.meta .name{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-0.005em;}
+.meta .role{font-size:11.5px;color:var(--text-3);margin-top:2px;line-height:1.45;}
+.meta .hex{font-family:var(--font-mono);font-size:11px;color:var(--text-2);margin-top:4px;}
+</style>
+</head><body>
+<div class="row">
+  <div class="swatch" style="background:var(--brand-7)">brand</div>
+  <div class="meta">
+    <div class="name">GovPreneurs Brand Red</div>
+    <div class="role">Brand moments only — logo, Pro upsells, premium CTAs, brand stripe. Never list data, AI surfaces, or destructive actions.</div>
+    <div class="hex">#D82221 · --brand-7</div>
+  </div>
+</div>
+<div class="row">
+  <div class="swatch" style="background:var(--urg-7)">urg</div>
+  <div class="meta">
+    <div class="name">Urgency Red</div>
+    <div class="role">Same hue family but distinct semantic role. Reserved for &lt;7-day deadlines and destructive confirmations.</div>
+    <div class="hex">#C11F1E · --urg-7 (alias --red-7)</div>
+  </div>
+</div>
+</body></html>

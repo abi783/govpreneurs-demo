@@ -1,0 +1,314 @@
+/* =================================================================
+   GovPreneurs DS v4 — Token layer
+   Federal-meets-terminal. Warm neutrals, desaturated blue,
+   reserved AI warmth, real elevation.
+
+   RESERVED FAMILIES — do not cross-use:
+     --brand-*   GovPreneurs red. Logo, Pro/upsell, brand CTAs ONLY.
+     --ai-*      AI-AUTHORED output. Hunter chat, Ava drafting,
+                 Grant analysis bubbles, AgentAvatar chrome.
+     --ava-*     Ava agent surfaces ONLY.
+     --urg-*     Errors and destructive confirmations.
+     --insight-* Read-only data analysis chrome (timing, teaming,
+                 sub-chain, awarded-card metadata, forecast pills).
+     --pos-*     Positive / awarded / verified.
+     --warn-*    Pending / medium-confidence cautionary.
+     --hl-*      Source-reference highlight ONLY. The span of a document
+                 or the field of a record that backs an AI claim. Never
+                 interactive, never a brand moment, never AI-authored —
+                 which is exactly why it cannot borrow blue, red or amber.
+                 Used only by .src-* (see components.css).
+   ================================================================= */
+
+:root {
+  /* ─── Neutrals: warm-gray, 12 steps (Radix-style role map) ─── */
+  /* Designed on a warm-neutral axis (~30° hue) for humanity in a federal product */
+  --n-0: #ffffff; /* pure white — reserved, rarely used */
+  --n-1: #fbfaf9; /* app bg                              */
+  --n-2: #f5f4f2; /* subtle bg                           */
+  --n-3: #eeebe7; /* ui element bg                       */
+  --n-4: #e6e2dd; /* ui hovered                          */
+  --n-5: #dbd6cf; /* ui active                           */
+  --n-6: #c3bdb3; /* subtle border                       */
+  --n-7: #a39d93; /* ui border                           */
+  --n-8: #6f6860; /* muted text, disabled — 5.27:1 on --n-1, 4.62:1 on
+                     --n-3. Was #80796f, which measured 4.13:1 on the app
+                     background and 3.62:1 on an element background: every
+                     provenance line and every `term` footnote in the product
+                     failed WCAG 1.4.3. Darkened, not replaced — the hue is
+                     unchanged so nothing else shifts.        */
+  --n-9: #5a544b; /* secondary text                      */
+  --n-10: #3d3934; /* strong text                         */
+  --n-11: #201d1a; /* primary text                        */
+  --n-12: #0c0a08; /* hi-contrast text                    */
+
+  /* ─── Federal Blue: desaturated, considered ─── */
+  /* Old: #0039FF (pure primary, fatiguing). New: pulled toward navy. */
+  --blue-1: #f5f7fe;
+  --blue-2: #e8edfc;
+  --blue-3: #d4ddf9;
+  --blue-4: #b4c2f2;
+  --blue-5: #8ba0e7;
+  --blue-6: #5772d6;
+  --blue-7: #3154c1; /* primary interactive — considered blue  */
+  --blue-8: #203e9e; /* pressed                                */
+  --blue-9: #162e7a; /* dense / nav                            */
+  --blue-10: #0d1f56; /* authoritative — federal authority      */
+  --blue-11: #091641; /* header ink                             */
+  --blue-12: #050e2b; /* deepest ink                            */
+
+  /* ─── AI Surface: warm amber/apricot — human warmth vs federal cold ─── */
+  /* Used exclusively for AI-authored surfaces, streaming output, agent chrome */
+  --ai-1: #fefaf4;
+  --ai-2: #fdf2e3;
+  --ai-3: #fae2c3;
+  --ai-4: #f6cd96;
+  --ai-5: #efb268;
+  --ai-6: #e19345;
+  --ai-7: #c37728; /* ai accent — strokes, text              */
+  --ai-8: #9b5d1c;
+  --ai-9: #764616;
+  --ai-10: #55320f;
+  --ai-grad: linear-gradient(135deg, #fde9cc 0%, #fef6e8 35%, #fdf2e3 65%, #fce4c6 100%);
+  --ai-border-grad: linear-gradient(135deg, #e19345 0%, #c37728 50%, #e19345 100%);
+
+  /* ─── GovPreneurs Brand Red: #D82221 — promoted in v4.1 ─── */
+  /* Brand moments ONLY: logo, Pro/upsell, brand CTAs, premium chrome.
+     NEVER list data, never AI surfaces, never decorative. */
+  --brand-1: #fef4f3;
+  --brand-2: #fbd9d7;
+  --brand-3: #f6b3af;
+  --brand-5: #e64a48;
+  --brand-7: #d82221; /* THE GovPreneurs red                    */
+  --brand-8: #b91d1c; /* pressed                                */
+  --brand-9: #a01817;
+  --brand-10: #7a1615;
+  --brand-12: #4a0d0c;
+
+  /* ─── Urgency Red: same hue family, semantic role only ─── */
+  /* For <7-day deadlines, destructive confirmations. Muted + contextual. */
+  --urg-1: #fef6f5;
+  --urg-2: #fce9e7;
+  --urg-3: #f8ccc8;
+  --urg-6: #d0463c;
+  --urg-7: #c11f1e;
+  --urg-8: #8f2219;
+  --urg-9: #6b1711;
+  --urg-11: #3a0d0a;
+
+  /* Back-compat aliases — old `--red-*` refs still resolve to urgency */
+  --red-1: var(--urg-1);
+  --red-2: var(--urg-2);
+  --red-3: var(--urg-3);
+  --red-6: var(--urg-6);
+  --red-7: var(--urg-7);
+  --red-8: var(--urg-8);
+  --red-9: var(--urg-9);
+
+  /* ─── Brand stripe — THE bridge to GHL shell ─── */
+  /* 3-4px height, top of every embedded page. Navy→red gradient. */
+  --brand-stripe: linear-gradient(
+    90deg,
+    var(--blue-12) 0%,
+    var(--blue-10) 30%,
+    var(--brand-8) 75%,
+    var(--brand-7) 100%
+  );
+  /* Brand glyph uses pure brand red, NOT the stripe gradient. The stripe
+     bridges to the GHL host shell at the very top of the page; the glyph is
+     the standalone identity mark and must match the red shield used in
+     production (favicon, GHL nav, marketing emails, govpreneurs.com). */
+  --brand-glyph-bg: linear-gradient(135deg, var(--brand-5) 0%, var(--brand-7) 100%);
+
+  /* ─── Positive (awarded / verified) — muted sage, not loud green ─── */
+  --pos-2: #e6f0e9;
+  --pos-3: #c9dfd0;
+  --pos-7: #3a7049;
+  --pos-9: #1f4227;
+
+  /* ─── Warn (pending, medium-confidence) — subdued ochre, not neon ─── */
+  /* ─── Warn — muted mauve (hue 326), ported from the tasks prototype ───
+     WAS A SUBDUED OCHRE, AND THAT WAS THE BUG. `--warn-2: #faefd7` measured
+     oklch(0.954 0.034 86) against `--ai-2: #fdf2e3` oklch(0.966 0.023 76):
+     10 degrees of hue at a chroma of 0.03, an OKLab distance of 0.0162. On a
+     phone at arm's length they are one pale cream, so a page carrying a
+     caution (warn) beside a Hunter block (AI) showed two blocks of the same
+     colour carrying two meanings — and amber stopped meaning "a model wrote
+     this". Three-colour discipline was honoured in the token names and
+     defeated in the pixels.
+
+     Warn is a status family; nothing requires it to be warm, and amber is
+     spoken for. Hue 326 is the measured optimum: the midpoint of the only wide
+     gap left on the wheel, 55 degrees from the blue family (interactive) and 58
+     from brand and urgent, which are the two confusions that would cost more
+     than the one being fixed. Distance to --ai-2 becomes 0.0515, 3.2x the
+     collision it replaces.
+
+     CONTRAST WAS RE-MEASURED, NOT ASSUMED — every ink step improved:
+       --warn-7   5.43 on --n-1 / 4.77 on --n-3 / 4.78 on --warn-2
+       --warn-9  10.04 / 8.81 / 8.83
+       --warn-11 13.53 / 11.87 / 11.91
+     Lowest ratio anywhere in the family is 4.75; AA holds on every pair.
+
+     DO NOT MOVE THIS FAMILY BACK TOWARD AMBER, OCHRE OR YELLOW: --ai-* owns
+     62-82 and --hl-* owns 85, and there is no room between them. */
+  --warn-2: oklch(0.945 0.034 326);
+  --warn-3: oklch(0.885 0.055 326);
+  --warn-7: oklch(0.525 0.1 326);
+  --warn-9: oklch(0.378 0.075 326);
+  --warn-11: oklch(0.298 0.058 326);
+
+  /* ─── Insight: data-analysis chrome — cool slate-cyan ─── */
+  /* Reserved for read-only inferences/analytics (timing pills, teaming
+     advisories, sub-chain trends, awarded-card metadata, forecast pills).
+     Distinct from --ai-* (AI-authored output) and --pos/--warn (status). */
+  --insight-2: oklch(0.96 0.018 230);
+  --insight-3: oklch(0.92 0.035 230);
+  --insight-6: oklch(0.62 0.085 230);
+  --insight-7: oklch(0.54 0.09 230);
+  --insight-9: oklch(0.38 0.07 230);
+  --insight-11: oklch(0.26 0.055 230);
+
+  /* ─── Ava agent — sage/teal axis (hue 162) ─── */
+  /* Reserved for the Ava agent surfaces only (agent card, agent avatar). */
+  --ava-1: oklch(0.98 0.01 162);
+  --ava-2: oklch(0.95 0.025 162);
+  --ava-3: oklch(0.9 0.05 162);
+  --ava-4: oklch(0.83 0.09 162);
+  --ava-5: oklch(0.76 0.12 162);
+  --ava-6: oklch(0.71 0.14 162);
+  --ava-7: oklch(0.66 0.16 162);
+  --ava-8: oklch(0.55 0.14 162);
+  --ava-9: oklch(0.44 0.11 162);
+  --ava-10: oklch(0.32 0.08 162);
+
+  /* ─── Source highlight — warm ochre (hue 85) ─── */
+  /* The one job: mark the span of a document, or the field of a record,
+     that backs an AI claim. A highlight is not interactive (so not blue),
+     not a brand moment (so not red), and not AI-authored (so not amber) —
+     it is the physical act of underlining a page. Hue 85 sits clear of
+     --ai-* (hue ~70) at low chroma so the two never read as the same
+     family when a claim and its source are on screen together.
+     Consumed only by .src-* in components.css. */
+  --hl-2: oklch(0.94 0.055 85); /* the highlight fill */
+  --hl-4: oklch(0.85 0.09 85); /* its edge / underline */
+  --hl-9: oklch(0.42 0.07 85); /* text on the fill, when contrast needs help */
+
+  /* ─── Semantic aliases ─── */
+  --bg: var(--n-1);
+  --bg-subtle: var(--n-2);
+  --bg-element: var(--n-3);
+  --bg-hover: var(--n-4);
+  --bg-active: var(--n-5);
+  --surface: var(--n-0);
+  --border: rgba(32, 29, 26, 0.08); /* 1px carefully-tuned hairline */
+  --border-soft: rgba(32, 29, 26, 0.05);
+  --border-strong: rgba(32, 29, 26, 0.14);
+  --border-focus: var(--blue-7);
+
+  --text: var(--n-11);
+  --text-2: var(--n-9);
+  --text-3: var(--n-8);
+  --text-ink: var(--blue-11); /* headers, moments           */
+  --text-inverse: var(--n-1);
+
+  --accent: var(--blue-7);
+  --accent-hover: var(--blue-8);
+  --accent-muted: var(--blue-2);
+  --accent-ink: var(--blue-11);
+
+  --ai: var(--ai-7);
+  --ai-surface: var(--ai-2);
+  --ai-surface-subtle: var(--ai-1);
+
+  --ava: var(--ava-7);
+  --insight: var(--insight-7);
+
+  /* ─── Radii — collapsed to 4 tokens ─── */
+  --r-sm: 6px; /* atoms: inputs, buttons, kbd, checkbox     */
+  --r-md: 10px; /* cards, containers                          */
+  --r-lg: 16px; /* sheets, modals, hero surfaces              */
+  --r-pill: 999px;
+
+  /* ─── Shadows — layered, directional, with contact + ambient + rim ─── */
+  /* rest: barely there; hover: lifts; press: compresses */
+  --sh-rest:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.035),
+    0 2px 6px -2px rgba(15, 23, 42, 0.05);
+
+  --sh-hover:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 1px 1px rgba(15, 23, 42, 0.04), 0 6px 16px -4px rgba(15, 23, 42, 0.08),
+    0 12px 36px -12px rgba(15, 23, 42, 0.12);
+
+  --sh-press: inset 0 1px 2px rgba(15, 23, 42, 0.08), inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+
+  --sh-sheet:
+    0 1px 1px rgba(15, 23, 42, 0.04), 0 12px 40px -12px rgba(15, 23, 42, 0.14),
+    0 32px 80px -24px rgba(15, 23, 42, 0.22);
+
+  --sh-overlay-inner:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+
+  /* ─── Focus ring — restrained, refined, high-contrast, ring-offset ─── */
+  --ring-focus: 0 0 0 2px var(--n-1), 0 0 0 4px var(--blue-7);
+  --ring-focus-ai: 0 0 0 2px var(--n-1), 0 0 0 4px var(--ai-7);
+
+  /* ─── Button CTA — inner gradient, not outer halo ─── */
+  --sh-cta-rest:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(13, 31, 86, 0.18);
+  --sh-cta-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.14),
+    0 1px 2px rgba(13, 31, 86, 0.18), 0 6px 18px -4px rgba(22, 46, 122, 0.35);
+
+  /* ─── Motion ─── */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+  --d-fast: 120ms;
+  --d-base: 200ms;
+  --d-slow: 360ms;
+
+  /* ─── Space — 4px base ─── */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+
+  /* ─── Layout constants ─── */
+  --container-max: 1200px;
+  --sidebar-w: 250px;
+}
+
+/* ─── Noise utility — 1.5% monochrome grain, premium tactility ─── */
+.noise,
+[data-noise] {
+  position: relative;
+}
+.noise::before,
+[data-noise]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  border-radius: inherit;
+}
+
+/* Hide scrollbars but keep scroll */
+.no-scroll::-webkit-scrollbar {
+  display: none;
+}
+.no-scroll {
+  scrollbar-width: none;
+}

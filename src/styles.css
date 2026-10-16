@@ -1,6 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
+/* DEMO: the design-system folder holds docs and preview pages, not components. */
+@source not "../src/sc/design-system";
+
+/* DEMO: the Success Center legacy colour names, as Tailwind colours (bg-bg-1, text-gold, ...).
+   Each one reads a variable that exists only under `.sc-legacy` (src/sc/legacy-tokens.css). */
+@theme inline {
+  --font-sans: var(--font-inter, "Inter DS", system-ui, sans-serif);
+  --color-bg-base:      var(--bg-base);
+  --color-bg-1:         var(--bg-1);
+  --color-bg-2:         var(--bg-2);
+  --color-bg-3:         var(--bg-3);
+  --color-green:        var(--green);
+  --color-green-mid:    var(--green-mid);
+  --color-green-bright: var(--green-bright);
+  --color-green-text:   var(--green-text);
+  --color-gold:         var(--gold);
+  --color-gold-light:   var(--gold-light);
+  --color-gold-bright:  var(--gold-bright);
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted:     var(--text-muted);
+}
 @import "./styles/tokens.css";
 @import "./styles/components.css";
 @import "./styles/small-orders.css";

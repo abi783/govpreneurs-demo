@@ -1,0 +1,91 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   GovPreneurs Design System v4.1 — production entry point
+   ───────────────────────────────────────────────────────────────────────
+   This is the ONE file production imports. It is imported from
+   src/app/globals.css, so every page in the app can reach the DS.
+
+   Canonical source lives beside this file:
+     tokens.css               primitives + semantic aliases  (147 tokens)
+     type-and-components.css  type ramp + .btn/.card/.badge/.ai-surface/…
+     colors_and_type.css      aggregator; also maps bare h1–h5/p/a
+     README.md · SKILL.md     what the system is, and how an agent loads it
+     preview/                 24 preview cards, one per token cluster
+     ui_kits/govpreneurs-app/ hi-fi React recreation of the Hunter app
+
+   ───────────────────────────────────────────────────────────────────────
+   WHY ONLY TOKENS ARE GLOBAL HERE
+
+   tokens.css is pure custom properties and collides with NOTHING in
+   globals.css — verified: 111 DS vars vs 51 globals vars, zero shared
+   names. Loading it globally changes no pixel until something opts in.
+
+   The component + type layers CANNOT be global. They would break the app
+   on import:
+     .mono   collides with 40 production classNames
+     .btn    39      .card  38      .input 23
+     .badge   7      .scrim  5      .field  4     .hint 3     .label 1
+     type-and-components.css also sets html,body { font-size:14px;
+       background; color } — restyling every screen.
+     colors_and_type.css restyles bare h1–h5, p, small, a.
+
+   So components are OPT-IN and must be scoped. The proven pattern already
+   shipping on the Business Profile + Getting-Started pages is
+   src/components/business/ds.css — everything nested under `.gpds`.
+   Follow that: wrap your subtree in a scope class, then use DS classes.
+
+   ───────────────────────────────────────────────────────────────────────
+   HOW TO USE IT
+
+   Tokens — available anywhere, no import, no wrapper:
+     background: var(--blue-7);  border-radius: var(--r-md);
+     padding: var(--s-4);        box-shadow: var(--sh-rest);
+
+   Components — scope first (see src/components/business/ds.css):
+     <div className="gpds"> … <button className="gpds-btn"> … </div>
+
+   Fonts are self-hosted from /ds-fonts (GHL iframe: no external CDN).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: "Inter DS";
+  src: url("/ds-fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono DS";
+  src: url("/ds-fonts/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif DS";
+  src: url("/ds-fonts/InstrumentSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif DS";
+  src: url("/ds-fonts/InstrumentSerif-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Primitives + semantic aliases. Safe globally — zero name collisions. */
+@import "./tokens.css";
+
+/* The DS font stacks, as tokens. tokens.css defines colour/space/shadow;
+   these three name the self-hosted families above so a component can say
+   font-family: var(--font-ui) without knowing the @font-face names. */
+:root {
+  --font-ui: "Inter DS", ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono DS", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-editorial: "Instrument Serif DS", ui-serif, Georgia, serif;
+}
+
+/* NOT imported here, deliberately — see the header. Import them yourself,
+   scoped, when you want the component layer:
+     @import "@/design-system/type-and-components.css";
+     @import "@/design-system/colors_and_type.css";
+*/

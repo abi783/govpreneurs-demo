@@ -6,6 +6,8 @@ import { RouterProvider } from "@tanstack/react-router";
 import { PostHogProvider } from "posthog-js/react";
 import { router } from "./router";
 import "./styles.css";
+// DEMO: the lifted Success Center styles. Layered or scoped, so frontend-v2 pages do not change.
+import "./sc/sc.css";
 // After styles.css, not @imported from it: an @import lands before every rule in
 // the file, and the forecast rules must win over base rules of equal weight.
 import "./styles/forecasts.css";

@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Research pipeline stepper" subtitle="done · active · pending stepper" viewport="700x140" -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../type-and-components.css">
+<style>
+  body { padding: 24px; background: var(--surface); display: flex; gap: 14px; }
+  .dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center; flex-shrink: 0;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  }
+  .done { background: var(--pos-2); color: var(--pos-9); }
+  .done svg { width: 20px; height: 20px; stroke-width: 2.5; stroke: var(--pos-9); }
+  .active { background: var(--ai-3); color: var(--ai-9); position: relative; }
+  .active::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    border: 2px solid var(--ai-5); border-top-color: transparent;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pending { background: var(--n-3); color: var(--text-3); }
+  .cell { display: flex; align-items: center; gap: 10px; }
+  .col { display: flex; flex-direction: column; }
+  .t { font-weight: 600; font-size: 13px; color: var(--text); }
+  .d { font-size: 11.5px; color: var(--text-3); font-family: var(--font-mono); }
+</style>
+</head><body>
+  <div class="cell">
+    <div class="dot done" aria-label="Done">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"/></svg>
+    </div>
+    <div class="col"><div class="t">Ingestion</div><div class="d">Done · 42s</div></div>
+  </div>
+  <div class="cell">
+    <div class="dot active"></div>
+    <div class="col"><div class="t">Competitive landscape</div><div class="d">Running · 1m 22s</div></div>
+  </div>
+  <div class="cell">
+    <div class="dot pending">3</div>
+    <div class="col"><div class="t">Strategy brief</div><div class="d">Queued</div></div>
+  </div>
+</body></html>

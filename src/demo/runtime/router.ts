@@ -130,6 +130,8 @@ declare global {
     __DEMO_UNHANDLED__?: { method: string; path: string }[];
     __DEMO_ERRORS__?: { method: string; path: string; message: string }[];
     __DEMO_BLOCKED__?: { url: string; method?: string }[];
+    /** Number of demo API calls now in flight. The QA harness waits for 0. */
+    __DEMO_INFLIGHT__?: number;
   }
 }
 
@@ -197,6 +199,20 @@ async function readBody(init: RequestInit | undefined, request: Request | null):
  * header comment (no prefix for `/__demo_api`, the full path for `/api`).
  */
 export async function handleDemoRequest(
+  routePath: string,
+  url: URL,
+  init: RequestInit | undefined,
+  request: Request | null,
+): Promise<Response> {
+  window.__DEMO_INFLIGHT__ = (window.__DEMO_INFLIGHT__ ?? 0) + 1;
+  try {
+    return await dispatch(routePath, url, init, request);
+  } finally {
+    window.__DEMO_INFLIGHT__ = Math.max(0, (window.__DEMO_INFLIGHT__ ?? 1) - 1);
+  }
+}
+
+async function dispatch(
   routePath: string,
   url: URL,
   init: RequestInit | undefined,

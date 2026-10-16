@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- @dsCard group="Spacing" name="Radii tokens" subtitle="4 tokens · atom · container · sheet · pill" viewport="700x180" -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../type-and-components.css">
+<style>body{padding:24px;background:var(--surface);display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.box{aspect-ratio:1.6/1;background:var(--n-3);border:1px solid var(--border);display:flex;flex-direction:column;justify-content:flex-end;padding:10px;}
+.l{font-size:10.5px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-2);}
+.v{font-family:var(--font-mono);font-size:10px;color:var(--text-3);}
+</style>
+</head><body>
+<div class="box" style="border-radius:var(--r-sm)"><div class="l">Atom · 6px</div><div class="v">--r-sm</div></div>
+<div class="box" style="border-radius:var(--r-md)"><div class="l">Container · 10</div><div class="v">--r-md</div></div>
+<div class="box" style="border-radius:var(--r-lg)"><div class="l">Sheet · 16</div><div class="v">--r-lg</div></div>
+<div class="box" style="border-radius:var(--r-pill)"><div class="l">Pill · 999</div><div class="v">--r-pill</div></div>
+</body></html>

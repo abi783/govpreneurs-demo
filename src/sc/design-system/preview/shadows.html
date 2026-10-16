@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- @dsCard group="Spacing" name="Shadow ladder" subtitle="rest · hover · press · sheet" viewport="700x230" -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../type-and-components.css">
+<style>body{padding:20px;background:var(--bg-subtle);display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.box{aspect-ratio:1.5/1;border-radius:var(--r-md);padding:12px;display:flex;flex-direction:column;justify-content:flex-end;background:var(--surface);}
+.l{font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);}
+.v{font-family:var(--font-mono);font-size:10.5px;color:var(--text-2);}
+</style>
+</head><body>
+<div class="box" style="box-shadow:var(--sh-rest)"><div class="l">Rest</div><div class="v">--sh-rest</div></div>
+<div class="box" style="box-shadow:var(--sh-hover)"><div class="l">Hover</div><div class="v">--sh-hover</div></div>
+<div class="box" style="box-shadow:var(--sh-press);background:var(--bg-subtle)"><div class="l">Press</div><div class="v">--sh-press</div></div>
+<div class="box" style="box-shadow:var(--sh-sheet)"><div class="l">Sheet</div><div class="v">--sh-sheet</div></div>
+</body></html>

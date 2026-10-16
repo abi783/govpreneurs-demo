@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo } from "react";
 import { Command } from "cmdk";
+import * as Dialog from "@radix-ui/react-dialog";
 import { CornerDownLeft } from "lucide-react";
 import { ALL_MENU_ITEMS } from "../nav/menu";
 import { useSearchEntries } from "../nav/searchIndex";
@@ -54,6 +55,10 @@ export function CommandPalette({
       overlayClassName="demo-palette-overlay"
       contentClassName="demo-palette"
     >
+      <Dialog.Title className="demo-sr-only">Search the demo</Dialog.Title>
+      <Dialog.Description className="demo-sr-only">
+        Type to find a page or an item, then press Enter to open it.
+      </Dialog.Description>
       <Command.Input placeholder="Search pages, opportunities, and more" autoFocus />
       <Command.List>
         <Command.Empty>Nothing matches that search.</Command.Empty>

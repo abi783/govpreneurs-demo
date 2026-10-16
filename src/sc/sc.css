@@ -1,0 +1,55 @@
+/* DEMO: global entry for the lifted Success Center styles. Imported once in main.tsx.
+
+   What it does, and why it cannot change a frontend-v2 page:
+
+   1. The design-system tokens load in a CSS cascade layer. Layered rules lose to
+      unlayered rules, and frontend-v2 already defines the same 147 tokens, so its
+      own values always win. (The two files differ only in white space and in
+      `--sidebar-w`, which no demo page uses.)
+   2. The @font-face rules add four font family names. A family that nothing names
+      changes nothing.
+   3. The font tokens are set only under the scope classes `.gpds`, `.gpds-rm3` and
+      `.sc-legacy`. The Success Center sets them on :root, which would replace the
+      frontend-v2 font stack, so they are scoped here instead.
+
+   The component rules (.gpds .gpds-btn and so on) ship with the lifted components
+   in their own ds.css files, already scoped by `.gpds`. */
+
+@import "./design-system/tokens.css" layer(sc-ds-tokens);
+@import "./legacy-tokens.css";
+
+@font-face {
+  font-family: "Inter DS";
+  src: url("/ds-fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono DS";
+  src: url("/ds-fonts/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif DS";
+  src: url("/ds-fonts/InstrumentSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif DS";
+  src: url("/ds-fonts/InstrumentSerif-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.gpds,
+.gpds-rm3,
+.sc-legacy {
+  --font-ui: "Inter DS", ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono DS", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-editorial: "Instrument Serif DS", ui-serif, Georgia, serif;
+  /* Next.js set this variable with next/font. Tailwind's `font-sans` reads it. */
+  --font-inter: "Inter DS", Inter, system-ui, sans-serif;
+}
