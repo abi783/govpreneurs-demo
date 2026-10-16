@@ -2097,3 +2097,33 @@ test.describe("One message per send", () => {
     await healthy(page, w, "one message per send");
   });
 });
+
+test.describe("The Back button with a dialog open", () => {
+  for (const d of DIALOGS) {
+    test(d.name, async ({ page, context }) => {
+      const w = await watch(page, context);
+      // A page to go back to, then the page that holds the dialog.
+      await open(page, "/tasks");
+      await menu(page, d.route === "/" ? "Success Center" : "Roadmap").click().catch(() => undefined);
+      await page.goto(d.route, { waitUntil: "domcontentloaded" });
+      await settle(page);
+      await d.open(page);
+      await expect(openDialogs(page).first()).toBeVisible();
+      await page.goBack();
+      await settle(page);
+      await page.waitForTimeout(500);
+      // A dialog of the shell (the search box, Reset demo) may stay open over the new page. Escape closes it.
+      // Whatever the dialog did, the page takes clicks and shows no cover after that.
+      if (await openDialogs(page).count()) {
+        await page.keyboard.press("Escape");
+        await expect(openDialogs(page)).toHaveCount(0);
+      }
+      expect(await page.evaluate(() => getComputedStyle(document.body).pointerEvents), "the page must take clicks").not.toBe("none");
+      await menu(page, "Tasks").click();
+      await expect(page).toHaveURL(/\/tasks/);
+      await menu(page, "Roadmap").click();
+      await expect(page).toHaveURL(/\/roadmap/);
+      await healthy(page, w, `Back with ${d.name} open`);
+    });
+  }
+});
