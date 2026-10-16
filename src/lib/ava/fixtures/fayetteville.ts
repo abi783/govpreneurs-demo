@@ -17,6 +17,7 @@
 // Values inside upload `extracts` and claim `resolvedText` are what the
 // prototype shows AFTER the member supplies the document or answer.
 
+import { buyerPeople } from "../../../demo/ava/contacts";
 import { getGrantBrief } from "../../../demo/story/grantBriefs";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import {
@@ -64,6 +65,8 @@ const FILE_NAME = PERSONA.businessShortName.replace(/\s+/g, "");
 
 const STORY_ID = "FAYNC-2026-R-08";
 const STORY = getOpportunity(STORY_ID)!;
+/** The city's buyer: the person the opportunity page names. */
+const BUYER = buyerPeople(STORY_ID).primary;
 const QUESTIONS_DUE = getGrantBrief(STORY_ID)?.keyDates.find((k) => /^questions/i.test(k.label));
 if (!QUESTIONS_DUE) throw new Error(`${STORY_ID}: Grant's brief lists no day for the questions.`);
 
@@ -138,7 +141,7 @@ const S = {
     "f-rfp",
     "Section 1.5, page 2",
     "§1.5",
-    `Questions shall be submitted by email only to Patricia Boyd, Procurement Officer, at patricia.boyd@fayettevillenc.gov, no later than 5:00 PM Eastern Time on ${USWD(DAYS.questionsDue)}.`,
+    `Questions shall be submitted by email only to ${BUYER.name}, ${BUYER.title}, at ${BUYER.email}, no later than 5:00 PM Eastern Time on ${USWD(DAYS.questionsDue)}.`,
   ),
   addenda: doc(
     "f-rfp",
@@ -1662,7 +1665,7 @@ export const fayettevilleBid: AvaBid = {
       passages: [S.pageLimit, S.formatTab3],
       question:
         "FAYNC-2026-R-08, Section 5.2 limits Tab 3 to ten (10) pages. Exhibit C allows Tab 3 up to twelve (12) pages. Could you confirm which limit applies?",
-      to: "Patricia Boyd, Procurement Officer, City of Fayetteville (patricia.boyd@fayettevillenc.gov)",
+      to: `${BUYER.name}, ${BUYER.title}, City of Fayetteville (${BUYER.email})`,
       channel: "By email only, per Section 1.5",
       kind: "simple-limit",
       meanwhile: "Ava builds Tab 3 to 10 pages, so it is safe under either limit.",
@@ -3045,12 +3048,12 @@ export const fayettevilleBid: AvaBid = {
     estimatedValue: null,
     penalties: null,
     contact: {
-      name: "Patricia Boyd",
-      role: "Procurement Officer, City of Fayetteville",
-      email: "patricia.boyd@fayettevillenc.gov",
+      name: BUYER.name,
+      role: `${BUYER.title}, City of Fayetteville`,
+      email: BUYER.email,
       source: S.questions,
     },
-    questionsChannel: { text: "By email only, to Patricia Boyd.", source: S.questions },
+    questionsChannel: { text: `By email only, to ${BUYER.name}.`, source: S.questions },
     noContact: null,
     buyerPortal: {
       text: "The city's vendor portal. A free account opens Exhibit D and the upload.",

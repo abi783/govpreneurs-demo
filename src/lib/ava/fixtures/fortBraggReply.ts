@@ -34,9 +34,9 @@
 //     English-proficient attendants" became "Lead Cooks with ServSafe or
 //     equivalent food safety certification, dining facility attendants able to
 //     obtain installation access".
-//   · Contacts: two invented people, Angela.M.Brooks.civ@army.mil
-//     (contracting officer) and Kevin.T.Lowe.civ@army.mil (contract
-//     specialist), in the shape of the real ones.
+//   · Contacts: the two invented people the opportunity page names for this
+//     notice (src/demo/ava/contacts.ts): the contracting officer and the
+//     contract specialist.
 //   · Due time: 1500 Eastern Time (ET). The notice sets no deadline for
 //     questions and no meeting.
 //   · Part B: twelve questions became nine that make sense at one US base.
@@ -67,6 +67,7 @@
 // date; no calendar date is typed in this file.
 
 import { doc, profile, sam, yourDoc } from "../build";
+import { buyerPeople } from "../../../demo/ava/contacts";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import {
   KEY_PARTNER,
@@ -83,6 +84,8 @@ import { D, ET_OFFSET, FORMED_ON, SAM_ACTIVE_UNTIL, US } from "./when";
 const NOTICE_ID = "W912EE-27-S-0004";
 const STORY = getOpportunity(NOTICE_ID);
 if (!STORY) throw new Error(`The story has no opportunity ${NOTICE_ID}`);
+/** The Army's two contacts: the people the opportunity page names. */
+const { primary: CO, second: CS } = buyerPeople(NOTICE_ID);
 
 /** How many days ago the notice posted, and how many days the reply stays open. */
 const POSTED_DAYS_AGO = STORY.postedDaysAgo;
@@ -254,7 +257,7 @@ const S_SEND = doc(
   NOTICE,
   "Section 4.0, Submission Instructions",
   "§4.0",
-  `all interested parties must submit their responses no later than 1500 Eastern Time (ET) on ${US(CLOSES_IN_DAYS)} via email to: Contracting Officer Angela.M.Brooks.civ@army.mil, and Contract Specialist Kevin.T.Lowe.civ@army.mil`,
+  `all interested parties must submit their responses no later than 1500 Eastern Time (ET) on ${US(CLOSES_IN_DAYS)} via email to: Contracting Officer ${CO.email}, and Contract Specialist ${CS.email}`,
 );
 const S_SUBJECT = doc(
   NOTICE,
@@ -1161,9 +1164,8 @@ export const fortBraggReplyBid: AvaBid = {
 
   submission: {
     method: "email",
-    where:
-      "By email to Angela Brooks, the contracting officer, and Kevin Lowe, the contract specialist",
-    account: "Angela.M.Brooks.civ@army.mil and Kevin.T.Lowe.civ@army.mil",
+    where: `By email to ${CO.name}, the contracting officer, and ${CS.name}, the contract specialist`,
+    account: `${CO.email} and ${CS.email}`,
     source: S_SEND,
     limits: "Part A is 3 pages at most. Part B is the Army's own form. Both go in one email.",
     files: [
@@ -1194,7 +1196,7 @@ export const fortBraggReplyBid: AvaBid = {
       { id: "fb-ck-subject", label: "Copy the Army's subject line word for word" },
       {
         id: "fb-ck-email",
-        label: "Send one email to Angela Brooks and Kevin Lowe before 3:00 PM Eastern Time",
+        label: `Send one email to ${CO.name} and ${CS.name} before 3:00 PM Eastern Time`,
       },
       { id: "fb-ck-receipt", label: "Save the sent email as your receipt and upload it here" },
     ],
@@ -1251,9 +1253,9 @@ export const fortBraggReplyBid: AvaBid = {
     estimatedValue: null,
     penalties: null,
     contact: {
-      name: "Angela M. Brooks",
+      name: CO.name,
       role: `Contracting officer, ${STORY.office}`,
-      email: "Angela.M.Brooks.civ@army.mil",
+      email: CO.email,
       source: S_SEND,
     },
     questionsChannel: null,
