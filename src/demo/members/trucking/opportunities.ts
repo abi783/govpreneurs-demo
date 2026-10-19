@@ -237,7 +237,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
 
   // ── The rest of "Opportunities for you" ──────────────────────────────
   {
-    id: "W91247-27-Q-0131",
+    id: "W91247-27-Q-0183",
     title: "Barracks Furniture Removal and Delivery, Fort Bragg, NC",
     plainTitle: "Barracks furniture moves at Fort Bragg",
     agency: ARMY,
