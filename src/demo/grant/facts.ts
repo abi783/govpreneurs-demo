@@ -201,6 +201,20 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
     ],
   },
   {
+    match: /Defense Health/i,
+    team: [
+      { name: "Marisol Pennington", title: "Contracting Officer" },
+      { name: "Everett Kuykendall", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Health and Human Services/i,
+    team: [
+      { name: "Noreen Bassett", title: "Contracting Officer" },
+      { name: "Cedric Oyelaran", title: "Contract Specialist" },
+    ],
+  },
+  {
     match: /General Services/i,
     team: [
       { name: "Dale Harmon", title: "Contracting Officer" },
