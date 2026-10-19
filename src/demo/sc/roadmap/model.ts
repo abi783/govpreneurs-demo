@@ -1,8 +1,11 @@
-// DEMO: where Amira stands on the Roadmap, as plain data.
+// DEMO: where the member stands on the Roadmap, as plain data.
 //
 // This file is light on purpose: the Success Center Home page imports
 // `summary.ts`, which imports this file. The heavy parts (the Digital Compliance
 // form, the verification results) live in payload.ts.
+//
+// Both members stand on the same steps; only the dates differ (DONE_DATES). Dana
+// (the agency) joined about ten months ago, Amira (the caterer) about seven.
 //
 // The story: Amira joined the program about six months ago. She finished the
 // Foundation (LLC, Digital Compliance, SAM.gov, SLED), Visibility & Credibility
@@ -32,6 +35,7 @@ import { nextActionFor } from "@sc/lib/roadmapV3/nextAction";
 import { CALL_STEP_IDS } from "@sc/lib/callStepIds";
 import { SUB_STEP_DETAIL } from "@sc/components/portal/roadmap-v3/detailContent";
 import { isoDaysFromNow } from "@/demo/story/clock";
+import { byMember, own } from "@/demo/member";
 import { PERSONA } from "@/demo/story/persona";
 import {
   COMPLIANCE_CALL_DAYS_AGO,
@@ -49,6 +53,10 @@ import {
   bookingForCall,
   type DemoEnrollment,
 } from "./state";
+
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // ── The shape: the production programme plus Amira's quarterly call ─────────
 
@@ -264,19 +272,25 @@ const ago = (days: number) => isoDaysFromNow(-days, 10);
  * SAM.gov finished 183 days ago, which is a year before PERSONA.samActiveUntil
  * (a SAM registration lasts one year).
  */
-export const DONE_DATES: Record<string, { started?: number; done: number }> = {
-  "p1-business-setup": { started: 218, done: 210 },
-  "p1-digital-compliance": { started: 212, done: 196 },
-  "p1-federal-registration": { started: 205, done: SAM_CHECKED_DAYS_AGO },
-  "p1-sled-registration": { started: 183, done: 170 },
-  "p2-capability-statement": { started: 168, done: 160 },
-  "p2-sbs-registration": { started: 160, done: 158 },
-  "p2-cmmc-level-1": { started: 158, done: 154 },
-  "p3-positioning-call": { done: POSITIONING_CALL_DAYS_AGO },
-  "p3-planned-pursuit": { done: 148 },
-  "p3-prime-registration": { done: 144 },
-  "p3-send-to-mentor": { done: FIRST_MENTOR_QUESTION_DAYS_AGO },
-};
+export const DONE_DATES: Record<string, { started?: number; done: number }> = byMember({
+  caterer: {
+    "p1-business-setup": { started: 218, done: 210 },
+    "p1-digital-compliance": { started: 212, done: 196 },
+    "p1-federal-registration": { started: 205, done: SAM_CHECKED_DAYS_AGO },
+    "p1-sled-registration": { started: 183, done: 170 },
+    "p2-capability-statement": { started: 168, done: 160 },
+    "p2-sbs-registration": { started: 160, done: 158 },
+    "p2-cmmc-level-1": { started: 158, done: 154 },
+    "p3-positioning-call": { done: POSITIONING_CALL_DAYS_AGO },
+    "p3-planned-pursuit": { done: 148 },
+    "p3-prime-registration": { done: 144 },
+    "p3-send-to-mentor": { done: FIRST_MENTOR_QUESTION_DAYS_AGO },
+  },
+  // DEMO: Dana joined while the NC Guard campaign ran, already registered in SAM.gov
+  // (she renewed it later, SAM_CHECKED_DAYS_AGO). Her capability statement was
+  // finished two days before the positioning call, as My Business shows.
+  pack: copy.ROADMAP_DONE_DATES,
+});
 
 // The dates of the calls and of the SAM check live in ../timeline.ts, so every page tells the same history.
 export { COMPLIANCE_CALL_DAYS_AGO, MEMBER_SINCE_DAYS, POSITIONING_CALL_DAYS_AGO };

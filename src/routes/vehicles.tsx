@@ -1,4 +1,5 @@
 // DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
+// DEMO: two members. The copy below is picked per member (COPY); the data is in lib/mock/vehicles.ts.
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { usePageMeta } from "../components/Layout/page-meta";
@@ -6,6 +7,31 @@ import { VEHICLES, vehiclesByFit } from "../lib/mock/vehicles";
 import { WhatThisMeansCard } from "../components/Market/WhatThisMeansCard";
 import { VehiclesList } from "../components/Market/VehiclesList";
 import { JargonGloss } from "../components/Layout/JargonGloss";
+import { byMember, own } from "../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
+// DEMO: each member's words for the page.
+const COPY = byMember({
+  pack: copy.VEHICLES_PAGE,
+  caterer: {
+    meta: "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for a food service business.",
+    lead: "a food service business like yours.",
+    fitsLabel: "Fits my work (food service)",
+    famous: "For a caterer: the most famous vehicles (",
+    path: (
+      <>
+        The ones that fit food service: <strong>base and agency food service IDIQs</strong>{" "}
+        (Fort Bragg events, VA nutrition), <strong>state term contracts</strong>, and{" "}
+        <strong>teaming with the prime</strong> that holds a big dining contract. We&apos;ve defaulted
+        you to those.
+      </>
+    ),
+  },
+});
+const NOT_FOR = byMember({ pack: copy.VEHICLES_NOT_FOR, caterer: "not for food service" });
 
 export const Route = createFileRoute("/vehicles")({
   head: () => ({
@@ -13,8 +39,7 @@ export const Route = createFileRoute("/vehicles")({
       { title: "Contract Vehicles — Know your market · GovPreneurs" },
       {
         name: "description",
-        content:
-          "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for a food service business.",
+        content: COPY.meta,
       },
     ],
   }),
@@ -40,8 +65,8 @@ function VehiclesPage() {
         <div className="t-label" style={{ marginBottom: "var(--s-3)" }}>Know your market</div>
         <h1 className="t-display-lg">Contract Vehicles</h1>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 700 }}>
-          Pre-approved contracts that let agencies buy from you faster — and what they mean for a
-          food service business like yours.
+          Pre-approved contracts that let agencies buy from you faster — and what they mean for{" "}
+          {COPY.lead}
         </p>
       </header>
 
@@ -60,20 +85,15 @@ function VehiclesPage() {
             it, you compete only against the few others on it — not thousands.
           </li>
           <li>
-            For a caterer: the most famous vehicles (
-            <JargonGloss term="SEWP">NASA's IT-hardware GWAC — not for food service.</JargonGloss>,{" "}
-            <JargonGloss term="Alliant">GSA's IT-services GWAC — not for food service.</JargonGloss>,{" "}
-            <JargonGloss term="CIO-SP">NIH's IT/health-IT GWAC — not for food service.</JargonGloss>,{" "}
+            {COPY.famous}
+            <JargonGloss term="SEWP">{`NASA's IT-hardware GWAC — ${NOT_FOR}.`}</JargonGloss>,{" "}
+            <JargonGloss term="Alliant">{`GSA's IT-services GWAC — ${NOT_FOR}.`}</JargonGloss>,{" "}
+            <JargonGloss term="CIO-SP">{`NIH's IT/health-IT GWAC — ${NOT_FOR}.`}</JargonGloss>,{" "}
             <JargonGloss term="VETS 2">Service-disabled veteran-only — and IT services only.</JargonGloss>,{" "}
             <JargonGloss term="Polaris">Small-business IT services GWAC.</JargonGloss>) are
             IT-focused — <strong>not your path</strong>.
           </li>
-          <li>
-            The ones that fit food service: <strong>base and agency food service IDIQs</strong>{" "}
-            (Fort Bragg events, VA nutrition), <strong>state term contracts</strong>, and{" "}
-            <strong>teaming with the prime</strong> that holds a big dining contract. We've defaulted
-            you to those.
-          </li>
+          <li>{COPY.path}</li>
         </ul>
       </WhatThisMeansCard>
 
@@ -85,7 +105,7 @@ function VehiclesPage() {
           className={`forecast-view-btn${filter === "fits" ? " is-active" : ""}`}
           onClick={() => setFilter("fits")}
         >
-          Fits my work (food service)
+          {COPY.fitsLabel}
           <span className="forecast-view-count">{fitsCount}</span>
         </button>
         <button

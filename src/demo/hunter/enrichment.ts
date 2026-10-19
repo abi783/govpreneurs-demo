@@ -1,6 +1,6 @@
 // DEMO (Hunter): the profile-setup journey, and the small profile helpers of the chat.
 //
-// In the demo, Amira's profile is complete. So the rail says every step is done,
+// In the demo, the member's profile is complete. So the rail says every step is done,
 // the ranking is `hybrid` (the full ranking), and no question waits. The calls
 // still answer, so nothing in the rail can fail:
 //   - `enter` and `next` say that there is nothing left to ask.

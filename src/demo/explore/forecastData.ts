@@ -5,8 +5,10 @@
 // words on each card are NOT written here: the page works them out from the
 // record and from the member's facts below, exactly as it does in production.
 // So a line like "the right size for you" is true because the numbers say so.
+// DEMO: for the agency, the 14 forecasts of src/demo/members/agency/market/forecasts.ts.
 
 import { calendarDay } from "./dates";
+import { byMember, MEMBER, own } from "@/demo/member";
 import { PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
 import type {
   ForecastListRowDto,
@@ -19,11 +21,19 @@ import { firmFromMember, scoreLive } from "@/lib/forecasts/live";
 import { FORT_BRAGG_FORECAST_KEY, LOCAL_SEEDS } from "./forecastLocalSeeds";
 import { RECORDED_SEEDS, type ForecastSeed } from "./forecastSeeds";
 
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
+
+/** A set-aside code a member holds, as the forecast engine's certificate name. */
+const CERT_OF: Partial<Record<string, string>> = { WOSB: "wosb", HZC: "hubzone", SDVOSBC: "sdvosb", "8A": "8a" };
+
 /** Amira's facts, as the forecast rules read them. */
 export const FORECAST_MEMBER: ForecastMemberDto = {
   naics: [PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)],
   states: [...PERSONA.serviceStates],
-  certs: ["wosb"],
+  // DEMO: the member's own program certificates, in the engine's names (WOSB → "wosb").
+  certs: PERSONA.setAsideEligibility.flatMap((c) => (CERT_OF[c] ? [CERT_OF[c]] : [])),
   certsKnown: true,
   isSmall: true,
   registration: { status: "active", endsOn: PERSONA.samActiveUntil },
@@ -43,8 +53,9 @@ function plainDate(days: number): string {
   return calendarDay(d);
 }
 
-/** How close the industry code is to Amira's own, 0 to 1. Null: no code. */
+/** How close the industry code is to the member's own, 0 to 1. Null: no code. */
 function categoryFitOf(code: string | null): number | null {
+  if (MEMBER !== "caterer") return pack.categoryFit(code, FORECAST_MEMBER.naics);
   if (!code) return null;
   if (FORECAST_MEMBER.naics.includes(code)) return 1;
   if (/^(7223|7225|311)/.test(code)) return 0.8;
@@ -88,7 +99,12 @@ function toRecord(seed: ForecastSeed): ForecastRecordDto {
   };
 }
 
-const ALL_SEEDS: ForecastSeed[] = [...LOCAL_SEEDS, ...RECORDED_SEEDS];
+// DEMO: two members. The caterer has 48 forecasts; the agency's 14 are in
+// src/demo/members/agency/market/forecasts.ts.
+const ALL_SEEDS: ForecastSeed[] = byMember({
+  pack: pack.FORECAST_SEEDS,
+  caterer: [...LOCAL_SEEDS, ...RECORDED_SEEDS],
+});
 
 /** Every forecast, in the order of the seeds. */
 export const FORECAST_RECORDS: ForecastRecordDto[] = ALL_SEEDS.map(toRecord);

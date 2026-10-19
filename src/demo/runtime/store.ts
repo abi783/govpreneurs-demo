@@ -17,6 +17,7 @@
 //   - `resetDemo()` wipes everything and returns to the Success Center.
 
 import { useCallback, useSyncExternalStore } from "react";
+import { MEMBER_KEY } from "../member";
 
 export const DEMO_STATE_PREFIX = "gp-demo:v1:";
 
@@ -126,6 +127,28 @@ export function clearDemoState(name: string): void {
 }
 
 /**
+ * Empty every store without reloading: the starting story comes back on the next
+ * read. The presenter's "jump to segment" wipes, writes that segment's state,
+ * then loads its page.
+ */
+export function wipeDemoStorage(): void {
+  cache.clear();
+  try {
+    // The member (agency or caterer) is the presenter's choice, not demo state: keep it.
+    const member = window.sessionStorage.getItem(MEMBER_KEY);
+    window.sessionStorage.clear();
+    if (member) window.sessionStorage.setItem(MEMBER_KEY, member);
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.localStorage.clear();
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
  * Wipe the demo and start again.
  *
  * It clears all of `sessionStorage` and `localStorage`. The demo owns this
@@ -135,17 +158,7 @@ export function clearDemoState(name: string): void {
  */
 export function resetDemo(): void {
   resetting = true;
-  cache.clear();
-  try {
-    window.sessionStorage.clear();
-  } catch {
-    /* ignore */
-  }
-  try {
-    window.localStorage.clear();
-  } catch {
-    /* ignore */
-  }
+  wipeDemoStorage();
   const keepFast = new URLSearchParams(window.location.search).get("fast") === "1";
   const target = keepFast ? "/?fast=1" : "/";
   const already =

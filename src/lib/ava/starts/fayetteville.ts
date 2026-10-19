@@ -18,7 +18,7 @@
 // fixtures first. The loop below keeps this file free of that cycle.
 
 import { MEMBER_EIN, REFERENCE_CONTACTS } from "../../../demo/ava/contacts";
-import { PAST_PERFORMANCE } from "../../../demo/story/persona";
+import { PAST_PERFORMANCE, findPastPerformance } from "../../../demo/story/persona";
 import { effectiveBid } from "../derive";
 import { fayettevilleBid } from "../fixtures/fayetteville";
 import { ISO } from "../fixtures/when";
@@ -31,7 +31,7 @@ import type { Ask, AvaBid } from "../types";
 
 const ID = "FAYNC-2026-R-08";
 
-const job = (id: string) => PAST_PERFORMANCE.find((p) => p.id === id)!;
+const job = (id: string) => findPastPerformance(id)!;
 const COUNTY = job("pp-county-schools");
 const BRAGG = job("pp-cdg-sub");
 const CHURCH = job("pp-church");

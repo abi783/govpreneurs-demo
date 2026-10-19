@@ -4,6 +4,13 @@
 // codes that matter for a food-service business and its neighbors (food, kitchen
 // equipment, housekeeping and support services), so the tree, the search and the
 // "code you already have" box all work. Titles follow the published PSC manual.
+// The agency also gets the advertising, public relations and video groups.
+
+import { byMember, own } from "../../../member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type PscSegment = "product" | "service" | "randd";
 
@@ -23,7 +30,7 @@ export interface PscGroupRow {
   count: number;
 }
 
-interface GroupDef {
+export interface GroupDef {
   groupCode: string;
   groupTitle: string;
   segment: PscSegment;
@@ -31,7 +38,7 @@ interface GroupDef {
   codes: [string, string][];
 }
 
-const GROUPS: GroupDef[] = [
+const FOOD_GROUPS: GroupDef[] = [
   {
     groupCode: "S2",
     groupTitle: "Housekeeping Services",
@@ -120,6 +127,8 @@ const GROUPS: GroupDef[] = [
     ],
   },
 ];
+
+const GROUPS: GroupDef[] = byMember({ caterer: FOOD_GROUPS, pack: [...copy.PSC_GROUPS, ...FOOD_GROUPS] });
 
 export const PSC_CODES: PscCode[] = GROUPS.flatMap((g) =>
   g.codes.map(([code, description]) => ({

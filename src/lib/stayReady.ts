@@ -4,10 +4,15 @@
 // survives a reload and "Reset demo" restores the start. Dates come from the demo
 // clock, so nothing in the list falls into the past between sales calls.
 
+import { byMember, own } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { daysFromNow as clockDaysFromNow, daysUntil as clockDaysUntil, isoDaysFromNow } from "../demo/story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "../demo/runtime/store";
 import { saveRenewalConfirmation } from "./knowledgeBase";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type ItemKind = "sam" | "permit" | "wosb-cert" | "insurance";
 export type ItemStatus =
@@ -53,21 +58,29 @@ export const STAY_READY_CHANGED_EVENT = "stay-ready-changed";
 const KEY = "profile.stayReady";
 
 function seed(): TrackedItem[] {
+  return byMember({ caterer: catererItems, pack: () => copy.stayReadyItems(samItem) })();
+}
+
+function samItem(): TrackedItem {
+  return {
+    id: "sam",
+    kind: "sam",
+    name: "SAM.gov registration",
+    shortName: "SAM.gov",
+    // The story says SAM is active until this date (PERSONA.samActiveUntil).
+    dueDate: new Date(`${PERSONA.samActiveUntil}T00:00:00`).toISOString(),
+    dfyAvailable: true,
+    dfyPriceUSD: 290,
+    smsOptIn: true,
+    stakes:
+      "SAM must stay active to be awarded contracts. If it lapses, you can't win work until it's renewed.",
+    govLink: "https://sam.gov",
+  };
+}
+
+function catererItems(): TrackedItem[] {
   return [
-    {
-      id: "sam",
-      kind: "sam",
-      name: "SAM.gov registration",
-      shortName: "SAM.gov",
-      // The story says SAM is active until this date (PERSONA.samActiveUntil).
-      dueDate: new Date(`${PERSONA.samActiveUntil}T00:00:00`).toISOString(),
-      dfyAvailable: true,
-      dfyPriceUSD: 290,
-      smsOptIn: true,
-      stakes:
-        "SAM must stay active to be awarded contracts. If it lapses, you can't win work until it's renewed.",
-      govLink: "https://sam.gov",
-    },
+    samItem(),
     {
       id: "health-permit",
       kind: "permit",

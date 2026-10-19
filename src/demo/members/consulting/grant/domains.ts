@@ -1,0 +1,411 @@
+// THE CONSULTANT's kinds of work (read through src/demo/grant/domains.ts).
+//
+// What a real notice for each kind of consulting and training work asks for: the
+// buyer's needs, what the firm hands over, the rules and what goes wrong. The
+// detail page, the sample documents and Grant's generated reviews read it. Every
+// claim about Coppervale Advisory Group must be true of persona.ts: 11 staff and 7
+// contract facilitators, a 30-seat training room, one ICF PCC and two ACC coaches,
+// and Simone's PMP, Lean Six Sigma and SHRM credentials.
+
+import type { Domain } from "../../../grant/domains";
+
+/** Named as the agency's type is, so the shared code can read either member's keys. */
+export type AgencyDomainKey = "leadership" | "training" | "lean" | "strategy" | "hr" | "analyst" | "specialty";
+
+/** The kind of work a story opportunity is when DOMAIN_OF does not name it. */
+export const DEFAULT_DOMAIN: AgencyDomainKey = "lean";
+
+/** Which kind of work each of the firm's opportunities is. A new story entry needs a line here. */
+export const DOMAIN_OF: Record<string, AgencyDomainKey> = {
+  "36C24627Q0094": "leadership",
+  "W91247-27-Q-0171": "analyst",
+  "W15QKN-27-R-0014": "training",
+  "W91247-27-Q-0146": "lean",
+  "W91247-27-Q-0139": "lean",
+  "W91242-27-Q-0037": "strategy",
+  "36C24627Q0106": "training",
+  "W91247-27-R-0034": "analyst",
+  "CUMCO-DSS-2027-02": "lean",
+  "FAY-HR-2027-03": "leadership",
+  PWC2627018: "hr",
+  "DMVA-SP-2027-01": "strategy",
+  "W91247-27-Q-0158": "specialty",
+  "36C24627Q0118": "training",
+  "36C24627Q0127": "leadership",
+  "36C24627Q0133": "analyst",
+  "36C24627Q0141": "analyst",
+  "M67001-27-Q-0047": "training",
+  "FA4809-27-Q-0023": "strategy",
+  "FSU-OD-2027-04": "lean",
+  "OSHR-TD-2027-02": "leadership",
+  "NCDHHS-OD-2027-06": "lean",
+  "DURPS-SP-2027-03": "strategy",
+  "SPRL-HR-2027-01": "specialty",
+  "LUMB-TR-2027-01": "training",
+};
+
+const TRAINING_PSC = "U008 (Education and training: training and curriculum development)";
+const PROGRAM_PSC = "R408 (Support: program management and support)";
+
+export const DOMAINS: Record<AgencyDomainKey, Domain> = {
+  leadership: {
+    key: "leadership",
+    service: "leadership development",
+    scopeLine: "The contractor runs a leadership program for the buyer's supervisors: classroom days, a 360 assessment and coaching for each person, and a report on results.",
+    intent: "The buyer wants supervisors who lead better, and proof that they do. Results tied to the buyer's own survey or measures count more than a polished course.",
+    needs: [
+      "Run cohorts of supervisors through classroom days on the buyer's schedule.",
+      "Give each person a 360 assessment and coaching sessions on the results.",
+      "Name a program manager and a lead facilitator the buyer can reach.",
+      "Report each cohort's attendance and results against the buyer's measures.",
+    ],
+    deliverables: [
+      "A program plan and a cohort calendar for the year",
+      "Course materials, approved before the first class",
+      "A 360 report and a coaching record for each person",
+      "A quarterly report on attendance and results",
+    ],
+    technical: [
+      "Course content the buyer approves before it is taught.",
+      "A 360 tool that keeps each person's answers private.",
+      "Coaches with the credential the work statement names, or an equal.",
+      "Classes held at the buyer's sites, in rooms the buyer provides.",
+    ],
+    personnel: [
+      "A named program manager and a lead facilitator for the length of the contract.",
+      "Facilitators with experience teaching supervisors.",
+      "Credentialed coaches, and a background check for anyone who works on the buyer's site.",
+    ],
+    risks: [
+      "A coach credential can be written narrowly. Ask in Q&A what counts as equal.",
+      "On a set-aside, contract facilitators may count against the limit on subcontracting. Count paid hours by person.",
+      "Cohorts slip when the buyer can't free supervisors. Agree the calendar in writing.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "Cohort leadership programs with 360s and coaching are what your firm sells, and your nurse-manager academy ran the same way.",
+      short: "Leadership programs are your core work.",
+    },
+    fitBold: "what your firm sells",
+    scoring: [
+      { factor: "Technical approach and program plan", weight: 40 },
+      { factor: "Past performance on similar programs", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Program management, price per month", "Cohort delivery, price per cohort", "360 assessments, price per person", "Coaching sessions, price per session"],
+    competition: "Leadership programs of this size draw small consulting and training firms from across the state, and a few national ones.",
+    reference: "pp-tidewell-academy",
+    leadWith: "your nurse-manager academy and a results report the buyer can read in one page",
+    psc: TRAINING_PSC,
+    plan: "Write a cohort calendar with who teaches each day and who coaches whom.",
+  },
+  training: {
+    key: "training",
+    service: "staff training",
+    scopeLine: "The contractor designs and teaches classes for the buyer's staff, in person or online, and reports who attended and what they learned.",
+    intent: "The buyer wants its staff to learn a skill and use it on the job. Plain, practical classes that fit around the work count most.",
+    needs: [
+      "Plan the classes with the buyer and fit them to its staff and schedule.",
+      "Teach the classes at the buyer's sites or online.",
+      "Give each student materials they can use on the job.",
+      "Report attendance and a short check of what each class learned.",
+    ],
+    deliverables: [
+      "A course outline and materials, approved before the first class",
+      "Attendance rosters for each class",
+      "A short end-of-class check and its results",
+      "A final report with what to teach next",
+    ],
+    technical: [
+      "Course content the buyer approves before it is taught.",
+      "Materials in plain language, accessible to every student.",
+      "Online classes on a platform the buyer allows.",
+      "Records that keep student scores private.",
+    ],
+    personnel: [
+      "A named lead trainer.",
+      "Trainers with experience in the subject and with adult learners.",
+      "A background check for anyone who teaches on the buyer's site.",
+    ],
+    risks: [
+      "Licensed or brand-name courses can only be taught by the publisher's partners. Read who may teach.",
+      "Travel to far sites adds cost to each class day.",
+      "Classes get canceled when staff are pulled away. Agree on what a canceled class costs.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "Staff classes are your training code, and you taught the Army's family readiness staff for two years.",
+      short: "Staff training is your work.",
+    },
+    fitBold: "you taught the Army's family readiness staff for two years",
+    scoring: [
+      { factor: "Technical approach and course plan", weight: 40 },
+      { factor: "Past performance on similar training", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "price"],
+    priceLines: ["Course design, lump sum", "Class delivery, price per class day", "Materials, price per student", "Final report, lump sum"],
+    competition: "Staff training of this size draws local trainers, consulting firms and a few national training companies.",
+    reference: "pp-halyard-family-readiness",
+    leadWith: "your Army family readiness classes and a sample lesson",
+    psc: TRAINING_PSC,
+    plan: "Write a course outline and a class calendar.",
+  },
+  lean: {
+    key: "lean",
+    service: "process review",
+    scopeLine: "The contractor maps how the buyer's office does a piece of work, finds the waste and the waits, and gives a plan to fix them, with training for the staff.",
+    intent: "The buyer wants shorter waits and fewer steps, measured. A plan the staff can run after the contractor leaves counts more than a thick report.",
+    needs: [
+      "Map the current process with the staff who run it.",
+      "Measure the waits and the steps, and find what causes them.",
+      "Write a plan to cut them, with measures the buyer can track.",
+      "Train the staff on the new steps and check the results.",
+    ],
+    deliverables: [
+      "A current-state map with measured times",
+      "A future-state plan with the changes and their measures",
+      "Training for the staff on the new steps",
+      "A results report after the changes are in place",
+    ],
+    technical: [
+      "Lean or Lean Six Sigma methods, run by a certified practitioner.",
+      "Data handled under the buyer's privacy rules.",
+      "A plan written in plain language for the staff who run it.",
+      "Measures the buyer can keep tracking after the contract ends.",
+    ],
+    personnel: [
+      "A named project lead with Lean Six Sigma certification.",
+      "An analyst to collect and measure the data.",
+      "A background check for anyone who works on the buyer's site.",
+    ],
+    risks: [
+      "Data on waits can be thin. Agree early on what you will measure and how.",
+      "Staff time is scarce. Book the mapping sessions in the first two weeks.",
+      "Fixes that need new systems or hiring sit outside your control. Say so in the plan.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "Lean reviews are your consulting code, and your Fort Bragg ACS review cut walk-in waits from 38 to 14 minutes.",
+      short: "Lean reviews are your work.",
+    },
+    fitBold: "cut walk-in waits from 38 to 14 minutes",
+    scoring: [
+      { factor: "Technical approach and work plan", weight: 40 },
+      { factor: "Past performance on similar reviews", weight: 35 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws", "price"],
+    priceLines: ["Current-state review, lump sum", "Future-state plan, lump sum", "Staff training, price per session", "Results report, lump sum"],
+    competition: "Process reviews of this size draw small consulting firms and a few regional ones.",
+    reference: "pp-acs-lean-review",
+    leadWith: "your Fort Bragg ACS review and its 38-to-14-minute result",
+    psc: PROGRAM_PSC,
+    plan: "Write a work plan with the mapping sessions, the measures and the dates.",
+  },
+  strategy: {
+    key: "strategy",
+    service: "strategic planning",
+    scopeLine: "The contractor runs planning sessions with the buyer's leaders, staff and public, and writes a strategic plan with goals and measures.",
+    intent: "The buyer wants a plan its board or leaders adopt and use. Listening to the right people and plain, measurable goals count most.",
+    needs: [
+      "Run planning sessions with the buyer's leaders and staff.",
+      "Hold listening sessions or surveys with the people the plan serves.",
+      "Write the plan: mission, goals, actions and measures.",
+      "Present the draft and revise it until it is adopted.",
+    ],
+    deliverables: [
+      "A project plan and a session calendar",
+      "Notes and a summary from each session",
+      "A draft plan and a final plan",
+      "A one-page summary and a set of measures",
+    ],
+    technical: [
+      "Sessions run by a trained facilitator.",
+      "A plan written in plain language.",
+      "Measures the buyer can track each year.",
+      "Public sessions held where the buyer asks, with notice.",
+    ],
+    personnel: [
+      "A named lead facilitator.",
+      "A writer or analyst for the plan.",
+      "A background check for anyone who works on a federal site.",
+    ],
+    risks: [
+      "Leaders' calendars slip. Book the sessions before you sign.",
+      "A plan written for the wrong audience gets shelved. Agree who adopts it.",
+      "Extra rounds of revision can eat the margin. Cap them in the price.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "Strategic plans are your consulting code, and the Town of Hope Mills adopted yours unchanged.",
+      short: "Strategic plans are your work.",
+    },
+    fitBold: "adopted yours unchanged",
+    scoring: [
+      { factor: "Technical approach and session plan", weight: 40 },
+      { factor: "Past performance on similar plans", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "price"],
+    priceLines: ["Planning sessions, lump sum", "Listening sessions, price per session", "Draft and final plan, lump sum"],
+    competition: "Strategic plans of this size draw local consultants and a few regional planning firms.",
+    reference: "pp-hope-mills-plan",
+    leadWith: "your Hope Mills plan, which the board adopted unchanged",
+    psc: PROGRAM_PSC,
+    plan: "Write a session calendar and an outline of the plan.",
+  },
+  hr: {
+    key: "hr",
+    service: "HR consulting",
+    scopeLine: "The contractor helps the buyer with a people question: a pay or classification plan, a policy, or training for managers on how to apply it.",
+    intent: "The buyer wants managers who understand the plan and use it fairly. Clear explanations and plain materials count most.",
+    needs: [
+      "Learn the buyer's plan or policy with its HR staff.",
+      "Teach managers how it works and how to explain it to their staff.",
+      "Give managers short guides they can use afterward.",
+      "Report who was trained and the questions they raised.",
+    ],
+    deliverables: [
+      "A work plan and a session calendar",
+      "Manager guides and session materials",
+      "Attendance rosters",
+      "A final report with the open questions",
+    ],
+    technical: [
+      "Materials the buyer's HR office approves before use.",
+      "Employee data handled under the buyer's privacy rules.",
+      "Plain language for every guide.",
+      "Sessions held at the buyer's site or online.",
+    ],
+    personnel: [
+      "A named lead with HR credentials, such as SHRM certification.",
+      "A trainer for the manager sessions.",
+      "A background check where the buyer asks for one.",
+    ],
+    risks: [
+      "Pay questions get personal. Keep the sessions on how the plan works.",
+      "A plan that changes mid-contract changes the materials. Agree who pays for rework.",
+      "Pay and classification studies want a record of similar studies. Check what the buyer asks for.",
+    ],
+    fit: {
+      rating: "good",
+      text: "HR consulting is one of your codes. You ran HR for an Army corps and hold SHRM certification.",
+      short: "HR work is one of your codes.",
+    },
+    fitBold: "You ran HR for an Army corps",
+    scoring: [
+      { factor: "Technical approach", weight: 40 },
+      { factor: "Past performance on similar HR work", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "price"],
+    priceLines: ["Planning, lump sum", "Manager sessions, price per session", "Guides and materials, lump sum"],
+    competition: "HR work of this size draws local HR consultants and a few regional pay-study firms.",
+    reference: "pp-halyard-family-readiness",
+    leadWith: "your years running HR for an Army corps",
+    psc: PROGRAM_PSC,
+    plan: "Write a session calendar and an outline of the manager guide.",
+  },
+  analyst: {
+    key: "analyst",
+    service: "analyst support",
+    scopeLine: "The contractor places full-time analysts in the buyer's office to run studies, write requirements and brief leaders, for the length of the contract.",
+    intent: "The buyer wants experienced people in seats, on time, who stay. Résumés that match the labor categories and a plan to fill vacancies count most.",
+    needs: [
+      "Fill each position with an analyst who meets its labor category.",
+      "Run the studies, reviews and briefings the buyer assigns.",
+      "Keep every seat filled, and replace anyone who leaves within the buyer's deadline.",
+      "Report hours and work done each month.",
+    ],
+    deliverables: [
+      "Résumés for each key position before award",
+      "A staffing plan and a vacancy plan",
+      "Monthly status reports and hours",
+      "The studies and briefings the buyer assigns",
+    ],
+    technical: [
+      "Analysts who meet each labor category's education and years of experience.",
+      "Work under the buyer's direction, at its site.",
+      "Data handled under the buyer's rules.",
+      "Base access for every analyst before the first day.",
+    ],
+    personnel: [
+      "A named program manager.",
+      "Full-time analysts for each position, with résumés approved by the buyer.",
+      "A background check and base access for each analyst.",
+    ],
+    risks: [
+      "Full-time seats mean hiring before award. Know who you would hire.",
+      "A vacancy that runs long costs money and the buyer's trust.",
+      "Staffing work runs on thin margins. Price from real salaries and your wrap rate.",
+    ],
+    fit: {
+      rating: "watch",
+      text: "Analyst work is your consulting code, but full-time seats are staffing, not the projects your firm runs.",
+      short: "Full-time analyst seats are staffing work.",
+    },
+    fitBold: "full-time seats are staffing",
+    scoring: [
+      { factor: "Staffing plan and key personnel", weight: 45 },
+      { factor: "Past performance on similar support", weight: 30 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Program manager, price per hour", "Senior analyst, price per hour", "Analyst, price per hour"],
+    competition: "Analyst support draws federal staffing firms with deep benches, most of them on GSA schedules.",
+    reference: "pp-acs-lean-review",
+    leadWith: "your Fort Bragg ACS job and a named program manager",
+    psc: PROGRAM_PSC,
+    plan: "Write a staffing plan with who fills each seat and how fast you replace one.",
+  },
+  specialty: {
+    key: "specialty",
+    service: "specialist services",
+    scopeLine: "The contractor provides a service that needs a license or a specialty your firm does not hold, such as clinical assessment or executive search.",
+    intent: "The buyer wants a firm that does this one service every day, with the license or record it requires.",
+    needs: [
+      "Provide the specialist service the notice names.",
+      "Staff it with licensed or credentialed people.",
+      "Keep records the license or the buyer requires.",
+      "Report results to the buyer.",
+    ],
+    deliverables: [
+      "A work plan and a schedule",
+      "The licensed staff's credentials",
+      "The service's reports",
+      "A closeout report",
+    ],
+    technical: [
+      "The license or credential the notice names.",
+      "Records kept under the profession's rules.",
+      "Work to the buyer's standards.",
+    ],
+    personnel: [
+      "Licensed or credentialed staff for every task the notice names.",
+      "A named lead.",
+    ],
+    risks: [
+      "The license takes years to earn. Hiring it in means subcontracting most of the work.",
+      "A firm outside the specialty has no record to show.",
+    ],
+    fit: {
+      rating: "weak",
+      text: "This needs a license or specialty your firm doesn't hold. Your work is leadership, Lean, planning and HR.",
+      short: "This is a service you don't offer.",
+    },
+    fitBold: "a license or specialty your firm doesn't hold",
+    scoring: [
+      { factor: "Technical approach and credentials", weight: 45 },
+      { factor: "Past performance in the specialty", weight: 30 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws"],
+    priceLines: ["Specialist services, lump sum"],
+    competition: "Specialist work draws the firms that hold the license and do it every day.",
+    leadWith: "a partner who holds the license",
+    psc: PROGRAM_PSC,
+    plan: "Skip it, or ask a licensed firm whether it needs a facilitator.",
+  },
+};

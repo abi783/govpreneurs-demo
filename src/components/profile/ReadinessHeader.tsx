@@ -5,12 +5,17 @@ import { HelpPopover } from "./HelpPopover";
 import { AggregatedDfyModal, useDfyCandidates } from "./AggregatedDfyModal";
 import { Card } from "../ui/Card";
 import { FOR_YOU } from "../../demo/story/opportunities";
+import { MEMBER, byMember, own } from "../../demo/member";
 import { PERSONA } from "../../demo/story/persona";
 import { FIELD_DEFS, effectiveField } from "../../demo/profile/fields";
 import { useFieldOverrides } from "../../demo/profile/store";
 import { useSledRegistrations } from "../../demo/profile/sled";
 import { usePastPerformance } from "../../demo/profile/pastPerformance";
 import type { TabSlug } from "./TabNavigation";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 interface Gap {
   key: string;
@@ -49,6 +54,11 @@ export function ReadinessHeader() {
   if (state("ein") === "missing") {
     notReady.push({ key: "ein", label: "Federal payments and invoices (your EIN is not on file)", tab: "identity" });
   }
+  // DEMO: the agency's gaps from the story pack: no GSA schedule, no named PM and
+  // alternate. The lists show three lines, so these come before the general ones.
+  if (MEMBER !== "caterer" && copy.READINESS_GAPS.gsa && state("vehicles") === "missing") {
+    notReady.push({ key: "gsa", label: "Buys open only to GSA schedule holders (no GSA schedule yet)", tab: "capabilities" });
+  }
   if (PERSONA.clearances.length === 0) {
     notReady.push({
       key: "clearance",
@@ -62,7 +72,11 @@ export function ReadinessHeader() {
     couldHelp.push({ key: "dsbs", label: "a DSBS profile (so federal buyers can find you)", tab: "certifications" });
   }
   if (pp.some((e) => e.cpars === "Awaiting rating")) {
-    couldHelp.push({ key: "cpars", label: "a performance rating (CPARS) for your Womack job", tab: "past-performance" });
+    const job = byMember({ caterer: "your Womack job", pack: copy.RATING_JOB });
+    couldHelp.push({ key: "cpars", label: `a performance rating (CPARS) for ${job}`, tab: "past-performance" });
+  }
+  if (MEMBER !== "caterer" && copy.READINESS_GAPS.keyPersonnel && state("key-personnel") === "missing") {
+    couldHelp.push({ key: "key-personnel", label: "your project manager and alternate (most service buys name both)", tab: "positioning" });
   }
   if (state("win-themes") === "missing") {
     couldHelp.push({ key: "win", label: "your win themes (so Ava drafts in your voice)", tab: "positioning" });

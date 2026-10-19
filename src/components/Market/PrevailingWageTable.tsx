@@ -9,6 +9,20 @@ import {
   fmtMoney,
 } from "../../lib/mock/laborRates";
 import { JargonGloss } from "../Layout/JargonGloss";
+import { byMember, own } from "../../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
+// DEMO: each member's words. The agency's determination is real; the caterer's is sample.
+const COPY = byMember({
+  pack: copy.WAGE_TABLE,
+  caterer: {
+    floor: "you can pay on a federal food service contract here. You can pay more — you can't pay less. These are sample figures.",
+    compare: "Wage floors are the bottom; here's where comparable NC food service jobs landed on total price.",
+  },
+});
 
 export function PrevailingWageTable() {
   return (
@@ -21,8 +35,7 @@ export function PrevailingWageTable() {
             By law, federal service contracts over $2,500 must pay at least the local wage set by the
             U.S. Department of Labor for each job title.
           </JargonGloss>{" "}
-          rates below are the <em>minimum</em> you can pay on a federal food service contract here.
-          You can pay more — you can't pay less. These are sample figures.
+          rates below are the <em>minimum</em> {COPY.floor}
         </p>
         <div className="wage-meta">
           <span><MapPin size={11} aria-hidden /> {PREVAILING_WAGE_META.county}</span>
@@ -68,7 +81,7 @@ export function PrevailingWageTable() {
       <div className="wage-compare">
         <h3 className="t-body-md" style={{ fontWeight: 600 }}>What similar jobs actually awarded for</h3>
         <p className="t-body-sm" style={{ color: "var(--text-2)", marginTop: "var(--s-1)" }}>
-          Wage floors are the bottom; here's where comparable NC food service jobs landed on total price.
+          {COPY.compare}
         </p>
         <ul className="wage-compare-list">
           {COMPARABLE_FOOD_AWARDS.map((c) => (

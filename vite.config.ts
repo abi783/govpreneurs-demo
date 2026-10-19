@@ -1,9 +1,29 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+
+// DEMO: the start screen collects leads (src/demo/visitor.ts, D98). A production
+// build with the start screen on must say where they go, so a live site never
+// drops them. Set VITE_LEAD_WEBHOOK_URL, or VITE_LEAD_WEBHOOK_URL=none on purpose,
+// or VITE_START_SCREEN=off.
+function leadDestinationCheck(): Plugin {
+  return {
+    name: "demo-lead-destination",
+    apply: "build",
+    configResolved(config) {
+      const env = loadEnv(config.mode, process.cwd(), "VITE_");
+      if (env.VITE_START_SCREEN !== "off" && !env.VITE_LEAD_WEBHOOK_URL) {
+        throw new Error(
+          "The start screen is on but VITE_LEAD_WEBHOOK_URL is not set, so leads would go nowhere. " +
+            "Set it to the HighLevel webhook, or to 'none', or set VITE_START_SCREEN=off.",
+        );
+      }
+    },
+  };
+}
 
 export default defineConfig({
   // DEMO: static site served from the root.
@@ -19,6 +39,7 @@ export default defineConfig({
     strictPort: true,
   },
   plugins: [
+    leadDestinationCheck(),
     TanStackRouterVite(),
     react(),
     tailwindcss(),

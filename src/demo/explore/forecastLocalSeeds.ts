@@ -7,25 +7,43 @@
 // 200-mile area) so a search in Virginia, one of her three states, finds something.
 
 import type { ForecastSeed } from "./forecastSeeds";
-import { HERO_IDS, OPPORTUNITIES } from "@/demo/story/opportunities";
+import { OPPORTUNITIES } from "@/demo/story/opportunities";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { byMember, own } from "@/demo/member";
+
+const { FORECAST_KEYS: PACK_KEYS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
 
 /** The sources sought notice for the next Fort Bragg dining program, from the story. */
 const SOURCES_SOUGHT_ID = OPPORTUNITIES.find((o) => o.noticeType === "Sources Sought")!.id;
 
-/** Forecast key of the Fort Bragg dining program, the one the story points at. */
-export const FORT_BRAGG_FORECAST_KEY = "80e9e92fd343cd7549f92d15374c2885";
-export const POPE_FORECAST_KEY = "56bab3ae5e621d59e2833dc342c88ace";
-export const SEYMOUR_FORECAST_KEY = "b8df4a0e3186f2939a144fd849a2ff9c";
-export const CUMBERLAND_SUMMER_KEY = "c4bc5f58071250bae50daa744a3df632";
+const CATERER_KEYS = {
+  fortBragg: "80e9e92fd343cd7549f92d15374c2885",
+  pope: "56bab3ae5e621d59e2833dc342c88ace",
+  seymour: "b8df4a0e3186f2939a144fd849a2ff9c",
+  cumberlandSummer: "c4bc5f58071250bae50daa744a3df632",
+};
+
+// DEMO: two members. The names are the caterer's; each key is the active member's
+// forecast in that story role (the agency's are in src/demo/members/agency/market/forecasts.ts).
+/** The forecast the story points at: Fort Bragg dining, or the VA hiring campaign. Hunter says team up. */
+export const FORT_BRAGG_FORECAST_KEY = byMember({ pack: PACK_KEYS.teamUp, caterer: CATERER_KEYS.fortBragg });
+/** Set aside for woman-owned firms: Pope ceremony catering, or Fort Bragg's family-program videos. */
+export const POPE_FORECAST_KEY = byMember({ pack: PACK_KEYS.wosb, caterer: CATERER_KEYS.pope });
+/** The next round of a job she lost on price: Seymour Johnson breakfast, or the county hurricane campaign. */
+export const SEYMOUR_FORECAST_KEY = byMember({ pack: PACK_KEYS.lost, caterer: CATERER_KEYS.seymour });
+/** The next round of her own local job: summer meals, or the city's stormwater campaign. */
+export const CUMBERLAND_SUMMER_KEY = byMember({ pack: PACK_KEYS.pastJob, caterer: CATERER_KEYS.cumberlandSummer });
 
 export const LOCAL_SEEDS: ForecastSeed[] = [
   {
     key: "fort-bragg-dining-fy27",
     lane: "federal",
-    oppKey: FORT_BRAGG_FORECAST_KEY,
+    oppKey: CATERER_KEYS.fortBragg,
     hgTitle: "Installation Dining Services, Fort Bragg: FY2027 Program",
     hgText:
-      `The Army's next dining program for Fort Bragg, planned after the two-facility contract that it is bidding now (notice ${HERO_IDS.fortBraggDining}). Full food service at the on-post dining facilities: three meals a day, seven days a week, with a base year and four option years. The Army is running a market study (sources sought notice ${SOURCES_SOUGHT_ID}) to decide how much of the work to set aside for small business.`,
+      `The Army's next dining program for Fort Bragg, planned after the two-facility contract that it is bidding now (notice ${CATERER_HERO.teamUp}). Full food service at the on-post dining facilities: three meals a day, seven days a week, with a base year and four option years. The Army is running a market study (sources sought notice ${SOURCES_SOUGHT_ID}) to decide how much of the work to set aside for small business.`,
     sourceId: "MICC-FB-FY27-0412",
     postedDaysAgo: 21,
     expectedInDays: 165,
@@ -51,7 +69,7 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
   {
     key: "pope-aaf-ceremony-bpa",
     lane: "federal",
-    oppKey: POPE_FORECAST_KEY,
+    oppKey: CATERER_KEYS.pope,
     hgTitle: "Ceremony and Official Function Catering BPA, Pope Army Airfield and Fort Bragg",
     hgText:
       "Blanket purchase agreement for ceremony, retirement and official-function catering at Pope Army Airfield and Fort Bragg. Buffet and plated service for 50 to 600 guests, with staff, setup and clean-up. The Army plans to set the agreement aside for women-owned small businesses.",

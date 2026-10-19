@@ -1,4 +1,5 @@
 import { OPPORTUNITIES, type Opportunity } from "./mock/opportunities";
+import { VOCAB } from "../demo/hunter/vocab";
 
 // ───── Types ─────
 
@@ -95,7 +96,11 @@ const LOCATION_OPTIONS = [
   "Outside NC",
 ];
 
-const WORK_TYPE_OPTIONS = [
+// DEMO: the sample member's own work types and pre-saved list, where the member has them
+// (src/demo/members/<member>/hunter/vocab.ts). Otherwise production's examples.
+const MEMBER_LIST = VOCAB.ui.smartList;
+
+const WORK_TYPE_OPTIONS = MEMBER_LIST?.workTypes ?? [
   "Modified bitumen re-roofing",
   "TPO single-ply roofing",
   "Standing-seam metal roofing",
@@ -284,7 +289,7 @@ export function nextId(prefix: string): string {
 }
 
 export function makeEmptyCondition(): Condition {
-  return { id: nextId("c"), field: "workType", operator: "is", value: "Modified bitumen re-roofing" };
+  return { id: nextId("c"), field: "workType", operator: "is", value: WORK_TYPE_OPTIONS[0] };
 }
 
 export function makeEmptyGroup(): ConditionGroup {
@@ -313,7 +318,7 @@ export function defaultValueForField(field: ConditionField, operator: ConditionO
 export const INITIAL_SAVED_LISTS: SavedSmartList[] = [
   {
     id: "seed-sdvosb-nc",
-    name: "SDVOSB roofing $250K–$1M, NC",
+    name: MEMBER_LIST?.seedName ?? "SDVOSB roofing $250K–$1M, NC",
     tree: {
       groupJoin: "AND",
       groups: [
@@ -321,8 +326,8 @@ export const INITIAL_SAVED_LISTS: SavedSmartList[] = [
           id: "seed-g1",
           join: "AND",
           conditions: [
-            { id: "seed-c1", field: "setAside", operator: "is_any_of", value: ["SDVOSB", "Total Small Business"] },
-            { id: "seed-c2", field: "contractValue", operator: "between", value: [250_000, 1_000_000] },
+            { id: "seed-c1", field: "setAside", operator: "is_any_of", value: MEMBER_LIST?.seedSetAsides ?? ["SDVOSB", "Total Small Business"] },
+            { id: "seed-c2", field: "contractValue", operator: "between", value: MEMBER_LIST?.seedValue ?? [250_000, 1_000_000] },
           ],
         },
         {

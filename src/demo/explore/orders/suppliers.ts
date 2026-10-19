@@ -24,6 +24,16 @@ export const SUPPLIERS = {
   lanternfish: { cage: "4LP91", name: "Lanternfish Packaging Group" },
   orchard: { cage: "8OL25", name: "Orchard Lane Sauces" },
   fairhaven: { cage: "1FF73", name: "Fairhaven Food Equipment" },
+  // DEMO: the parts and supplies sellers on the agency's board (members/agency/orders).
+  ironbridge: { cage: "2IB57", name: "Ironbridge Industrial Supply" },
+  cardinal: { cage: "6CF20", name: "Cardinal Fastener Co." },
+  piedmont: { cage: "3PF84", name: "Piedmont Filtration Products" },
+  greystone: { cage: "5GJ09", name: "Greystone Janitorial Supply" },
+  tarRiver: { cage: "8TR46", name: "Tar River Tool Works" },
+  sandhill: { cage: "1SO62", name: "Sandhill Office Products" },
+  northgate: { cage: "4NH75", name: "Northgate Hydraulics" },
+  bellwether: { cage: "9BB13", name: "Bellwether Bearing Corp." },
+  quarry: { cage: "0QE88", name: "Quarry Point Electric" },
 } as const satisfies Record<string, Supplier>;
 
 export type SupplierKey = keyof typeof SUPPLIERS;

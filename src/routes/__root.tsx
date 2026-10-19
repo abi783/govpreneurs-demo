@@ -5,7 +5,9 @@ import {
   HeadContent,
   createRootRouteWithContext,
   useRouter,
+  Navigate,
 } from "@tanstack/react-router";
+import { needsStart } from "../demo/visitor";
 import { useEffect } from "react";
 import { usePostHog } from "posthog-js/react";
 
@@ -187,6 +189,11 @@ function AuthGate() {
       </div>
     );
   }
+
+  // DEMO: the start screen and the presenter's sign-in stand alone, without the menu.
+  if (location.pathname === "/start" || location.pathname === "/admin") return <Outlet />;
+  // DEMO: a first-time visitor tells us who they are before the demo opens (visitor.ts).
+  if (needsStart()) return <Navigate to="/start" search={{ next: location.href }} replace />;
 
   return (
     <CommandBarProvider>

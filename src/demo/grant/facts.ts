@@ -4,6 +4,7 @@
 // opportunities, clock). Nothing is typed twice: if the story changes, the page,
 // the documents and Grant's analysis change with it.
 
+import { byMember } from "@/demo/member";
 import { deadlineDate, deadlineIso, postedDate, postedIso } from "./calendar";
 import {
   getOpportunity,
@@ -11,27 +12,38 @@ import {
   type SetAside,
   type StoryOpportunity,
 } from "@/demo/story/opportunities";
-import { KEY_PARTNER, MENTOR, PAST_PERFORMANCE, PERSONA, type PastPerformance } from "@/demo/story/persona";
+import { SET_ASIDES } from "@/demo/story/setAsides";
+import {
+  KEY_PARTNER,
+  MENTOR,
+  PAST_PERFORMANCE, findPastPerformance,
+  PAST_PERFORMANCE_ROLES,
+  PERSONA,
+  type PastPerformance,
+} from "@/demo/story/persona";
 import { PLACES, type Place } from "@/demo/story/places";
 
 // ── The member's own record, read from the story ─────────────────────────
 
 const pp = (id: PastPerformance["id"]): PastPerformance => {
-  const found = PAST_PERFORMANCE.find((p) => p.id === id);
+  const found = findPastPerformance(id);
   if (!found) throw new Error(`No past performance ${id} in the story`);
   return found;
 };
 
 /** The four past jobs, by name. */
 export const PP = {
-  county: pp("pp-county-schools"),
-  cdg: pp("pp-cdg-sub"),
-  church: pp("pp-church"),
-  womack: pp("pp-womack"),
+  county: pp(PAST_PERFORMANCE_ROLES.county),
+  cdg: pp(PAST_PERFORMANCE_ROLES.cdg),
+  church: pp(PAST_PERFORMANCE_ROLES.church),
+  womack: pp(PAST_PERFORMANCE_ROLES.womack),
 };
 
 /** The customer's name without the agency tail: "Womack Army Medical Center". */
 export const customerShort = (p: PastPerformance): string => p.customerName.split(",")[0].replace(/ \(prime\)$/, "");
+
+// The caterer's trade facts below (meals, guests, cooks, certificates) are read only
+// by caterer content. Words the generator shares between members are in vocab.ts.
 
 /** Meals a day the kitchen has cooked, from the persona: 1100. */
 export const MEALS_PER_DAY = Number(
@@ -47,10 +59,12 @@ export const MENTOR_FIRST = MENTOR.firstName;
 export const MENTOR_NAME = MENTOR.name;
 export const PARTNER = KEY_PARTNER;
 
-/** Holders of a food-handler certificate, and how many cooks she has. */
-export const COOKS = PERSONA.employeesW2;
-export const CERTIFIED = PERSONA.foodHandlerCertified;
-export const UNCERTIFIED = COOKS - CERTIFIED;
+/** Staff on the payroll. */
+export const STAFF = PERSONA.employeesW2;
+/** Holders of a food-handler certificate, and how many cooks she has. A trade with no such certificate has no gap. */
+export const COOKS = STAFF;
+export const CERTIFIED = PERSONA.foodHandlerCertified ?? 0;
+export const UNCERTIFIED = PERSONA.foodHandlerCertified === undefined ? 0 : COOKS - CERTIFIED;
 
 // ── Money, dates and words ───────────────────────────────────────────────
 
@@ -99,28 +113,28 @@ export function liveDaysTo(iso: string): number {
 
 // ── Set-asides ───────────────────────────────────────────────────────────
 
-export const SET_ASIDE_LABEL: Record<NonNullable<SetAside>, string> = {
-  WOSB: "Women-Owned Small Business (WOSB) set-aside",
-  SBA: "Total Small Business set-aside",
-};
+export const SET_ASIDE_LABEL: Record<NonNullable<SetAside>, string> = Object.fromEntries(
+  Object.entries(SET_ASIDES).map(([c, s]) => [c, s.label]),
+) as Record<NonNullable<SetAside>, string>;
 
-export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = {
-  WOSB: "woman-owned",
-  SBA: "small-business",
-};
+export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = Object.fromEntries(
+  Object.entries(SET_ASIDES).map(([c, s]) => [c, s.short]),
+) as Record<NonNullable<SetAside>, string>;
 
 // ── Term of the contract ─────────────────────────────────────────────────
 
-const WORD_TO_N: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+const WORD_TO_N: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5 };
 
 /** Years in the contract, base plus options, read from the buyer's own summary. */
 export function parseTermYears(opp: StoryOpportunity): number {
   if (opp.noticeType === "Sources Sought") return 0;
   const m =
-    /(?:base year|one(?:-| )(?:school )?year(?: contract)?)[^.]*?\b(one|two|three|four|five)\b (?:option|renewal)/i.exec(
+    /(?:base year|one(?:-| )(?:school )?year(?: contract)?)[^.]*?\b(one|two|three|four|five|[1-5])\b (?:option|renewal)/i.exec(
       opp.summary,
     );
   if (m) return 1 + WORD_TO_N[m[1].toLowerCase()];
+  if (/\b(?:12|twelve) months\b|\bnext school year\b/i.test(opp.summary)) return 1;
+  if (/\btwo years\b/i.test(opp.summary)) return 2;
   return 3;
 }
 
@@ -148,7 +162,8 @@ const ARMY_TEAM: Person[] = [
   { name: "Martin Whitfield", title: "Contract Specialist" },
   { name: "Beatrice Calhoun", title: "Contracting Officer" },
   { name: "Terrence Boyle", title: "Contract Specialist" },
-  { name: "Janelle Okafor", title: "Contracting Officer" },
+  // The agency's owner is Dana Okafor, so its Army buyer must not share her name.
+  { name: byMember({ pack: "Janelle Ostrander", caterer: "Janelle Okafor" }), title: "Contracting Officer" },
   { name: "Gregory Lindqvist", title: "Contract Specialist" },
 ];
 
@@ -179,10 +194,80 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
     ],
   },
   {
+    match: /Defense Logistics/i,
+    team: [
+      { name: "Marisa Okonjo", title: "Contracting Officer" },
+      { name: "Russell Tierney", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Department of Defense/i,
+    team: [
+      { name: "Annika Severson", title: "Contracting Officer" },
+      { name: "Darnell Prewitt", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Postal/i,
+    team: [
+      { name: "Annette Castile", title: "Contracting Officer" },
+      { name: "Byron Medlock", title: "Purchasing Specialist" },
+    ],
+  },
+  {
+    match: /Interior/i,
+    team: [
+      { name: "Lydia Achterberg", title: "Contracting Officer" },
+      { name: "Simon Hartsell", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Transportation|Aviation/i,
+    team: [
+      { name: "Rosalind Mercer", title: "Contracting Officer" },
+      { name: "Grady Whitlock", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Defense Health/i,
+    team: [
+      { name: "Marisol Pennington", title: "Contracting Officer" },
+      { name: "Everett Kuykendall", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Health and Human Services/i,
+    team: [
+      { name: "Noreen Bassett", title: "Contracting Officer" },
+      { name: "Cedric Oyelaran", title: "Contract Specialist" },
+    ],
+  },
+  {
     match: /General Services/i,
     team: [
       { name: "Dale Harmon", title: "Contracting Officer" },
       { name: "Jun Tanaka", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Department of Defense/i,
+    team: [
+      { name: "Noreen Castellano", title: "Contracting Officer" },
+      { name: "Elliott Fairbanks", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Agriculture/i,
+    team: [
+      { name: "Hollis Brandt", title: "Contracting Officer" },
+      { name: "Marisol Quintero", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Environmental Protection/i,
+    team: [
+      { name: "Vernon Ashby", title: "Contracting Officer" },
+      { name: "Celeste Rowan", title: "Contract Specialist" },
     ],
   },
 ];
@@ -346,7 +431,7 @@ export function factsFor(opp: StoryOpportunity): OppFacts {
     opp,
     id: opp.id,
     place,
-    miles: place.milesFromKitchen,
+    miles: place.milesFromBase,
     placeText: `${place.city}, ${place.state}`,
     years,
     mid,

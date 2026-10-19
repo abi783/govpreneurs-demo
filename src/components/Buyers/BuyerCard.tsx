@@ -1,7 +1,7 @@
 // DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Building2, MapPin, Users, Target, ArrowRight, HelpCircle } from "lucide-react";
 import type { GovBuyer } from "@/lib/mock/governmentBuyers";
-import { getOpenOppsForBuyer } from "@/lib/mock/governmentBuyers";
+import { getOpenOppsForBuyer, TRADE } from "@/lib/mock/governmentBuyers";
 
 export function BuyerCard({
   buyer,
@@ -33,7 +33,8 @@ export function BuyerCard({
         <MapPin size={11} /> {buyer.location} · {distanceLabel}
       </div>
       <p className="gov-buyer-card-line">
-        Buys: <strong>food service.</strong> {buyer.whatTheyBuy}
+        {/* DEMO: the member's trade. */}
+        Buys: <strong>{TRADE.phrase}.</strong> {buyer.whatTheyBuy}
       </p>
       <div className="gov-buyer-card-stats">
         <span>

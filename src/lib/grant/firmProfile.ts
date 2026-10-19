@@ -1,11 +1,17 @@
-// Structured insurance and bonding for the demo firm (Haddad Catering & Food
-// Services LLC), so Grant's gate strip can compare what a notice requires with what
-// the firm holds (PRD 96 §12 build note, PRD 97 §S1 silent-disqualifier, §4 firm-profile tool).
+// Structured insurance and bonding for the demo firm, so Grant's gate strip can
+// compare what a notice requires with what the firm holds (PRD 96 §12 build note,
+// PRD 97 §S1 silent-disqualifier, §4 firm-profile tool).
 //
-// DEMO: production's copy described a different sample firm. Every figure here is
-// read from the story persona or is a plain fact about a five-person caterer.
+// DEMO: production's copy described a different sample firm. There is one profile
+// per sample member (src/demo/member.ts): Haddad Catering or Lantern Row Creative.
+// Every figure is read from the story persona or is a plain fact about that firm.
 
+import { MEMBER, own } from "@/demo/member";
 import { PERSONA } from "@/demo/story/persona";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type InsuranceCoverageType =
   | "gl" // Commercial General Liability
@@ -33,9 +39,14 @@ export interface InsuranceBonding {
   bonding: { single: number; aggregate: number } | null;
 }
 
+/** The member's insurance and bonding. */
+export function firmInsurance(): InsuranceBonding {
+  return MEMBER === "caterer" ? catererInsurance() : copy.insurance();
+}
+
 /** The caterer carries general liability, workers' compensation and vehicle cover for
  *  both vans. Her largest bond is the county summer meals job: the persona's `largestBond`. */
-export function firmInsurance(): InsuranceBonding {
+function catererInsurance(): InsuranceBonding {
   return {
     coverages: [
       {

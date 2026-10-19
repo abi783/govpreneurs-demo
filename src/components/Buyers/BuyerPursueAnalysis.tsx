@@ -12,7 +12,8 @@ import {
   BarChart3,
   Trophy,
 } from "lucide-react";
-import { VERDICT_LABEL, type GovBuyer, type PursueVerdict } from "@/lib/mock/governmentBuyers";
+import { TRADE, VERDICT_LABEL, type GovBuyer, type PursueVerdict } from "@/lib/mock/governmentBuyers";
+import { byMember } from "@/demo/member";
 
 function formatDollars(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -52,7 +53,8 @@ export function BuyerPursueAnalysis({
           <h3 className="cs-pursue-title">Not enough signal yet.</h3>
         </header>
         <p className="t-body-sm" style={{ color: "var(--text-2)" }}>
-          We don't have a food service spend baseline for {buyer.name} in our current dataset. Use "Your
+          {/* DEMO: the member's trade. */}
+          We don't have a {TRADE.phrase} spend baseline for {buyer.name} in our current dataset. Use "Your
           move" below to make a low-cost intro and watch the Opportunities feed for their next post.
         </p>
       </section>
@@ -74,7 +76,7 @@ export function BuyerPursueAnalysis({
       <ul className="cs-pursue-facts">
         <li>
           <BarChart3 size={12} />
-          <span className="cs-fact-label">Annual food service spend</span>
+          <span className="cs-fact-label">Annual {TRADE.phrase} spend</span>
           <span className="cs-fact-value fr-mono">
             {a.annualSpendByYear.map((r) => formatDollars(r.trade)).join(" · ")}
           </span>
@@ -148,7 +150,13 @@ export function BuyerPursueAnalysis({
               })}
             </tbody>
           </table>
-          <p className="cs-pursue-foot">Same buyer, last 3 fiscal years. Sample analysis.</p>
+          {/* DEMO: the agency's spend is real (USAspending); the caterer's is sample. */}
+          <p className="cs-pursue-foot">
+            {byMember({
+              pack: "Same buyer, last 3 fiscal years. From public federal award records.",
+              caterer: "Same buyer, last 3 fiscal years. Sample analysis.",
+            })}
+          </p>
         </div>
       </details>
 

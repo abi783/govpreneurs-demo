@@ -61,7 +61,8 @@ function pickFacts(m: CapFacts, knowledge: KnowledgeSource[]): SourceFact[] {
     {
       key: "bonding",
       label: "Bonding",
-      value: `Largest bond carried: ${fmtUsd(m.largestBond)}`,
+      // DEMO: a member who has never needed a bond (the ad agency) says so, not "$0".
+      value: m.largestBond > 0 ? `Largest bond carried: ${fmtUsd(m.largestBond)}` : "No bond carried yet",
       source: "Profile · Bidder Profile",
       editable: true,
     },
@@ -69,7 +70,8 @@ function pickFacts(m: CapFacts, knowledge: KnowledgeSource[]): SourceFact[] {
       key: "certifications",
       label: "Certifications",
       value:
-        [...m.certifications, `${m.foodHandlers} of ${m.employees} staff food-handler certified`].join(" · ") || null,
+        // DEMO: only a member whose staff need food-handler cards (the caterer) gets that line.
+        [...m.certifications, ...(m.foodHandlers > 0 ? [`${m.foodHandlers} of ${m.employees} staff food-handler certified`] : [])].join(" · ") || null,
       source: "Profile · Certifications",
       editable: true,
     },

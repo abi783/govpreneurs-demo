@@ -21,7 +21,15 @@ import {
   effectiveBid,
   visibleAsks,
 } from "./derive";
-import { AVA_BIDS } from "./fixtures";
+import { ALL_AVA_BIDS, AVA_BIDS } from "./fixtures";
+import { FAMILY_ADVOCACY_ID } from "./fixtures/familyAdvocacy";
+import { HERO_IDS as CONSTRUCTION_IDS } from "../../demo/members/construction/opportunities";
+import { HERO_IDS as STORY_HERO_IDS } from "../../demo/story/opportunities";
+
+const PACK_HEROES = Object.values(
+  import.meta.glob<typeof import("../../demo/members/agency/ava")>("/src/demo/members/*/ava/index.ts", { eager: true }),
+).map((p) => p.HERO_BID.noticeId);
+import { MEMBER } from "../../demo/member";
 import { STAFFING_KEY } from "./flow";
 import { cumberlandBid } from "./fixtures/cumberland";
 import { fayettevilleBid } from "./fixtures/fayetteville";
@@ -43,6 +51,11 @@ import type { Addendum, AvaBid, Span } from "./types";
 
 const DAY = 86_400_000;
 const BIDS = Object.values(AVA_BIDS);
+const PACK_AVA = import.meta.glob<typeof import("../../demo/members/agency/ava")>(
+  "/src/demo/members/*/ava/index.ts",
+  { eager: true },
+);
+const CATERER_IDS = ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"];
 /** Where each bid starts in the demo (src/lib/ava/start.ts). */
 const SEEDS: Record<string, Partial<BidState>> = Object.fromEntries(
   Object.keys(AVA_BIDS).map((id) => [id, startingState(id)]),
@@ -189,10 +202,20 @@ function closesOffset(noticeId: string): number | null {
 
 describe("fixtures", () => {
   test("there are four sample bids, one of each kind we promised", () => {
-    // Four kinds, a reply to a sources sought among them: the story's four bids.
-    expect(BIDS.length).toBe(4);
-    for (const [id, bid] of Object.entries(AVA_BIDS)) expect(bid.noticeId).toBe(id);
-    expect(new Set(BIDS.map((b) => b.kind)).size).toBe(4);
+    // Four kinds, a reply to a sources sought among them: the caterer's four
+    // bids. DEMO: the agency's story has one, its hero (src/demo/member.ts).
+    const caterer = CATERER_IDS.map((id) => ALL_AVA_BIDS[id]);
+    expect(caterer.every(Boolean)).toBe(true);
+    expect(new Set(caterer.map((b) => b.kind)).size).toBe(4);
+    // Every pack member that has built its own hero bid adds one (a pack still
+    // holding the agency's copy adds none).
+    const packHeroes = [...new Set(Object.values(PACK_AVA).map((p) => p.HERO_BID.noticeId))];
+    expect(packHeroes).toContain(FAMILY_ADVOCACY_ID);
+    expect(packHeroes).toContain(CONSTRUCTION_IDS.hero);
+    expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual([...CATERER_IDS, ...packHeroes].sort());
+    for (const [id, bid] of Object.entries(ALL_AVA_BIDS)) expect(bid.noticeId).toBe(id);
+    if (MEMBER === "caterer") expect(BIDS.map((b) => b.noticeId)).toEqual(CATERER_IDS);
+    else expect(BIDS).toHaveLength(1);
   });
 
   for (const bid of BIDS) {
@@ -784,8 +807,10 @@ describe("flags", () => {
   });
 
   test("the list page sees every started bid", () => {
-    for (const bid of BIDS) ava.start(bid.noticeId);
-    expect(startedIds().sort()).toEqual(BIDS.map((b) => b.noticeId).sort());
+    // DEMO: every member's bid has a seed, so all of them count.
+    const all = Object.keys(ALL_AVA_BIDS);
+    for (const id of all) ava.start(id);
+    expect(startedIds().sort()).toEqual(all.sort());
   });
 });
 

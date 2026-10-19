@@ -3,11 +3,16 @@
 // The board saves this document with PUT /small-orders/state and reads it back
 // with GET /small-orders/state, so it is still there after a reload.
 
+import { MEMBER, own } from "@/demo/member";
 import { readDemoState, writeDemoState } from "@/demo/runtime/store";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { PERSONA } from "@/demo/story/persona";
 import type { MicroState } from "@/lib/state/microPurchases";
 import { findOrder } from "./data";
+
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 const KEY = "explore.smallOrders.state";
 
@@ -15,8 +20,13 @@ function nsnOf(id: string): string {
   return findOrder(id)?.nsn ?? "";
 }
 
-/** Amira's starting answers. */
+/** The member's starting answers. */
 export function initialMemberState(): MicroState {
+  return MEMBER === "caterer" ? catererState() : copy.smallOrdersStart();
+}
+
+/** Amira's starting answers. */
+function catererState(): MicroState {
   const pasta = findOrder("mp-109");
   return {
     categories: ["food-beverage", "food-service-supplies", "kitchen-equipment", "safety-gear"],

@@ -46,6 +46,16 @@ import {
   type PscGroup,
   type PscSearchResult,
 } from "@sc/lib/businessProfile/pscDescriptions";
+// DEMO: the search hint names the member's own kind of work (D85).
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+const PSC_SEARCH_HINT = byMember({
+  caterer: "Search a group or a code — housekeeping, catering, guard…",
+  pack: copy.PSC_SEARCH_HINT,
+});
 
 /** Long enough that typing a word does not fire a request per keystroke. */
 const SEARCH_DEBOUNCE_MS = 200;
@@ -311,7 +321,7 @@ export function PscPicker({ initial, onSave, saving }: MbControlProps): ReactEle
         loadChildren={loadChildren}
         initialLoadedChildren={seededChildren}
         onQueryChange={onQueryChange}
-        searchPlaceholder="Search a group or a code — housekeeping, catering, guard…"
+        searchPlaceholder={PSC_SEARCH_HINT}
         emptyLabel={NOTHING_FOUND}
         childNoun={{ one: "code", many: "codes" }}
       />

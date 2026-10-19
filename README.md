@@ -12,8 +12,15 @@ commit `fddbf283`, 16 Oct 2026), plus:
 - a left menu that copies the GoHighLevel member menu.
 
 There is **no backend, no login and no network call**. Every API call is answered
-in the browser from sample data about one fictional member, Amira Haddad of
-Haddad Catering & Food Services LLC.
+in the browser from sample data about one fictional member. There are seven
+(`src/demo/member.ts`, D85, D93): **Lantern Row Creative** (ad agency, the Level
+Up story and the default), **Haddad Catering**, **Ninebark Builders**
+(construction), **Rockfish Run Freight** (trucking), **Gallberry Technology
+Group** (IT services), **Coppervale Advisory Group** (consulting) and **Gray Owl
+Facility Services** (janitorial). Add `?member=<id>` to any URL (`agency`,
+`caterer`, `construction`, `trucking`, `it`, `consulting`, `janitorial`), or use
+the presenter panel (Shift+Alt+P), to switch. A new member is one folder:
+`src/demo/members/README.md`.
 
 ## For Abhi: build and host
 
@@ -38,8 +45,19 @@ return `dist/index.html` (an "SPA fallback"). Examples:
 The app is built for the root path (`/`). The domain is `demo.govpreneurs.com`,
 which today points at an older Lovable project.
 
-No environment variables are needed. Do not set `VITE_POSTHOG_KEY`: the demo
+**One environment variable is required: `VITE_LEAD_WEBHOOK_URL`.** The start
+screen (`/start`) asks each visitor for a name, an email and a phone (optional),
+and posts them to this URL as a form post (for example a HighLevel inbound
+webhook). The build stops if it is not set, so the live site can't drop leads.
+Use `VITE_LEAD_WEBHOOK_URL=none` to build without sending leads, or
+`VITE_START_SCREEN=off` to build without the start screen. This post is the only
+call the demo makes outside the browser. Do not set `VITE_POSTHOG_KEY`: the demo
 should not send analytics.
+
+**Presenters:** open `/admin` and type the presenter password once per browser.
+That shows the presenter panel (Shift + Option/Alt + P) and skips the start
+screen. The password is checked in the browser, so it hides demo controls; it
+does not protect anything. For real protection, put HTTP basic auth on the host.
 
 ## Check it before you deploy
 
@@ -58,11 +76,13 @@ bun run qa:crawl       # opens every page in a headless browser and clicks every
 
 | Folder | What is in it |
 |---|---|
-| `src/demo/story/` | **The story.** Every fact about Amira, every opportunity, Grant's calls, the pipeline, tasks, mentor reviews and the wallet. Every page reads from here. `check.ts` proves each Hunter reason is true. |
+| `src/demo/members/<member>/` | Each member's own story data: persona, opportunities, workspace, Grant briefs, Sarah's replies, and per-area content. |
+| `src/demo/story/` | **The story.** The shapes and rules, and the active member's facts: every opportunity, Grant's calls, the pipeline, tasks, mentor reviews and the wallet. Every page reads from here. `check.ts` proves each Hunter reason is true. |
 | `src/demo/runtime/` | The fetch interceptor and router that answer every API call in the browser, and the store that keeps the visitor's changes in `sessionStorage`. |
 | `src/demo/api/` | One file per area with the API handlers. `ENDPOINTS.md` lists every call the app makes. |
 | `src/demo/state/` | Shared state: saved list, wallet, mentor reviews. |
 | `src/demo/shell/` | The left menu, search palette, sample-data strip and "Reset demo". |
+| `src/demo/presenter/` | The presenter panel (Shift+Alt+P): Sarah answers, award, jump to a story segment, booth mode. Decisions D80–D84. |
 | `src/demo/<area>/` | Sample data and helpers for one area (hunter, grant, ava, explore, sc/…). |
 | `src/sc/` | Code lifted from the Success Center app, with `next/*` replaced by shims in `src/demo/shims/`. |
 | `src/routes/`, `src/components/`, `src/lib/` | Production frontend code. Demo changes are marked `// DEMO:`. |

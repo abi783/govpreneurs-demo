@@ -2,7 +2,7 @@
 // browser (PDF, Word or text) or gives back a file that ships with the demo.
 // Nothing here calls a server.
 
-import { PERSONA } from "../story/persona";
+import { PAST_PERFORMANCE, PERSONA } from "../story/persona";
 import { fmtLong } from "./dates";
 import type { CapStatementDraft } from "../../lib/capStatementBuilder";
 import { CAP_STATEMENT_FILE_NAME, getCapStatement } from "../../lib/capStatementState";
@@ -183,7 +183,7 @@ function knowledgeBody(file: KnowledgeSource): PdfSection[] {
         heading: "Food-handler certificates",
         lines: [
           `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} staff hold a current food-handler certificate.`,
-          `${PERSONA.employeesW2 - PERSONA.foodHandlerCertified} staff still need one.`,
+          `${PERSONA.employeesW2 - (PERSONA.foodHandlerCertified ?? 0)} staff still need one.`,
         ],
       },
     ];
@@ -209,7 +209,25 @@ function knowledgeBody(file: KnowledgeSource): PdfSection[] {
     ];
   }
   if (name.includes("kitchen")) {
-    return [{ heading: "Kitchen and vehicles", lines: [PERSONA.kitchen] }];
+    return [{ heading: "Kitchen and vehicles", lines: [(PERSONA.kitchen ?? "")] }];
+  }
+  // DEMO: the agency's files (lib/knowledgeBase.ts).
+  if (name.includes("wosb certification letter")) {
+    return [{ heading: "Certifications", lines: PERSONA.certifications.map((c) => `• ${c}`) }];
+  }
+  if (name.includes("rate card")) {
+    return [{ heading: "What we sell", lines: PERSONA.differentiators.map((d) => `• ${d}`) }];
+  }
+  if (name.includes("campaign results")) {
+    return [
+      {
+        heading: "Campaigns",
+        lines: PAST_PERFORMANCE.filter((p) => p.customerType !== "commercial").map((p) => `• ${p.projectTitle}: ${p.scopeDescription}`),
+      },
+    ];
+  }
+  if (name.includes("studio")) {
+    return [{ heading: "Studio and equipment", lines: [(PERSONA.kitchen ?? "")] }];
   }
   return [{ heading: "About this file", lines: [`${file.name} was added to your knowledge base.`] }];
 }

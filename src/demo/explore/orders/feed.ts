@@ -2,11 +2,16 @@
 // feed, the code census, the category counts and the fit scores. The same rules
 // as the production service, over 20 orders instead of 16,000.
 
+import { byMember, own } from "@/demo/member";
 import type { SmallOrdersFeed } from "@/lib/microPurchases/api";
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroOrder } from "@/lib/microPurchases/order";
 import { calendarDay } from "../dates";
 import { ORDERS, ORDER_META } from "./data";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/orders/data")>("/src/demo/members/*/orders/data.ts", { eager: true }),
+);
 
 /** Production serves 50 orders a page. */
 export const PAGE_SIZE = 50;
@@ -36,8 +41,23 @@ function writtenOut(day: string): string {
  * The industry codes the "For you" tab covers: food making, food service and the
  * kitchen and packaging goods around them. Production reads Amira's profile
  * codes and their allied codes; the sample has one fixed set.
+ * DEMO: the agency's set is her own five codes, and no DLA order carries one.
  */
-const FOR_YOU_NAICS_PREFIXES = ["311", "312", "322", "326", "332", "333", "424", "722"];
+const FOR_YOU_NAICS_PREFIXES: readonly string[] = byMember({
+  caterer: ["311", "312", "322", "326", "332", "333", "424", "722"],
+  pack: pack.FOR_YOU_NAICS,
+});
+
+/**
+ * DEMO: what an empty "Orders for you" says when the member's trade has no DLA
+ * orders at all: Hunter's sentence and one link on. Null keeps production's
+ * empty state. For the board route: Hunter's line on that tab, and the empty
+ * state's one button.
+ */
+export const FOR_YOU_NOTE: typeof pack.FOR_YOU_NOTE | null = byMember({
+  caterer: null,
+  pack: pack.FOR_YOU_NOTE,
+});
 
 function inForYouLane(o: MicroOrder): boolean {
   return o.naics != null && FOR_YOU_NAICS_PREFIXES.some((p) => o.naics!.startsWith(p));

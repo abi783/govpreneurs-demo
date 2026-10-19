@@ -8,6 +8,7 @@
 // a charge or a ticked step shows at once.
 
 import { walletAmountsFrom, type WalletAmounts } from "@sc/lib/billing/walletDisplay";
+import { byMember, own } from "@/demo/member";
 import type { EnrolledService } from "@sc/components/portal/RoadmapEnrollmentList";
 import type { ActivePlaybook } from "@sc/types/portal";
 import { getWalletBalance, getWalletEntries } from "@/demo/state/wallet";
@@ -30,6 +31,10 @@ import {
 } from "./store";
 import { CONTACT_TIMEZONE } from "./time";
 import type { GHLAppointment, MainStepProgress, WalletUsageItem } from "./types";
+
+const { homeActivity } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/sc/home")>("/src/demo/members/*/sc/home.ts", { eager: true }),
+);
 
 export interface ActivityItem {
   id: string;
@@ -120,15 +125,15 @@ function relativeAt(daysAgo: number, hour = 15): string {
 function activityFeed(): ActivityItem[] {
   const items: ActivityItem[] = [];
 
-  const fieldMeals = getOpportunity(HERO_IDS.fieldMeals);
-  if (fieldMeals?.ava) {
+  const hero = getOpportunity(HERO_IDS.hero);
+  if (hero?.ava) {
     items.push({
       id: "act-ava",
       kind: "ava",
-      title: `Ava is drafting your quote: ${fieldMeals.plainTitle}`,
-      detail: fieldMeals.ava.statusLine,
+      title: `Ava is drafting your quote: ${hero.plainTitle}`,
+      detail: hero.ava.statusLine,
       at: earlierToday(8),
-      to: `/ava/${fieldMeals.id}`,
+      to: `/ava/${hero.id}`,
     });
   }
 
@@ -145,15 +150,15 @@ function activityFeed(): ActivityItem[] {
     });
   }
 
-  const restricted = getOpportunity(HERO_IDS.classifiedSite);
-  if (restricted?.pursuit) {
+  const twin = getOpportunity(HERO_IDS.twin);
+  if (twin?.pursuit) {
     items.push({
       id: "act-grant",
       kind: "grant",
-      title: `Grant advised you to pass: ${restricted.plainTitle}`,
-      detail: restricted.pursuit.note,
-      at: relativeAt(restricted.pursuit.lastActivityDaysAgo),
-      to: `/opportunities/${restricted.id}`,
+      title: `Grant advised you to pass: ${twin.plainTitle}`,
+      detail: twin.pursuit.note,
+      at: relativeAt(twin.pursuit.lastActivityDaysAgo),
+      to: `/opportunities/${twin.id}`,
     });
   }
 
@@ -168,6 +173,10 @@ function activityFeed(): ActivityItem[] {
       to: submitted.next.to,
     });
   }
+
+  // DEMO: lines only one member's story has (the agency: Sarah's Pass on Visit NC
+  // and her answer on the NC Guard rating).
+  items.push(...byMember({ caterer: () => [], pack: homeActivity })());
 
   for (const a of getActivity()) {
     items.push({

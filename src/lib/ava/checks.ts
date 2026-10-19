@@ -12,6 +12,7 @@
 // label on the package and checklist, never in the files.
 
 import { findOpportunity } from "../../demo/ava/opportunity";
+import { byMember, own } from "../../demo/member";
 import type { BidState } from "./store";
 import {
   askResolved,
@@ -47,6 +48,10 @@ import {
   ratesApproved,
 } from "./price";
 import type { AvaBid, Severity } from "./types";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 /** Where a finding sends the member. Matches the workspace views. */
 export type FindingView = "brief" | "list" | "writing" | "price" | "forms" | "submit" | "addenda";
@@ -486,7 +491,13 @@ export function exactChecks(bid: AvaBid, s: BidState): CheckResult {
       });
     }
   } else if (delivery.covers) {
-    passed.push("The price pays for the crew, the food and every cost Ava knows about.");
+    // DEMO: in the member's own trade.
+    passed.push(
+      byMember({
+        caterer: "The price pays for the crew, the food and every cost Ava knows about.",
+        pack: copy.AVA_PRICE_COVERS,
+      }),
+    );
   }
 
   // 9 · Promises in the writing approved by you.

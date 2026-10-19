@@ -4,10 +4,15 @@
 // tab, Stay Ready (renewal confirmations) and the capability statement builder all
 // read and write this one list.
 
+import { byMember, own } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { isoDaysFromNow } from "../demo/story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "../demo/runtime/store";
 import { CAP_STATEMENT_FILE_NAME } from "./capStatementState";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type ConnectorId = "gdrive" | "gdocs" | "dropbox";
 export type SourceKind = ConnectorId | "upload" | "generated";
@@ -51,8 +56,10 @@ export const CONNECTOR_META: Record<ConnectorId, { label: string }> = {
   dropbox: { label: "Dropbox" },
 };
 
+export type ConnectorFiles = Record<ConnectorId, Omit<KnowledgeSource, "id" | "addedAt" | "status">[]>;
+
 /** The files each source brings in when it connects. Fictional files for a fictional business. */
-const CONNECTOR_FILES: Record<ConnectorId, Omit<KnowledgeSource, "id" | "addedAt" | "status">[]> = {
+const CATERER_FILES: ConnectorFiles = {
   gdrive: [
     {
       kind: "gdrive",
@@ -100,6 +107,8 @@ const CONNECTOR_FILES: Record<ConnectorId, Omit<KnowledgeSource, "id" | "addedAt
     },
   ],
 };
+
+const CONNECTOR_FILES: ConnectorFiles = byMember({ caterer: CATERER_FILES, pack: copy.CONNECTOR_FILES });
 
 function seed(): KnowledgeState {
   // Drive synced a couple of hours before the demo opened.

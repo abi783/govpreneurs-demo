@@ -3,8 +3,16 @@
 // The figures are sample data. They are internally consistent, they name only
 // the made-up companies of firms.ts, and a forecast that is not food service
 // gets no counted fact (the page then adds nothing to "How to win it").
+//
+// DEMO: for the agency, the facts are counted from the agency's award record
+// (src/demo/members/agency/market/awards.ts, each award modeled on a real one), so
+// Grant's take, the Awards page and Partners give the same numbers.
 
 import { isoDaysFromNow } from "@/demo/story/clock";
+import { MEMBER } from "@/demo/member";
+import { PERSONA } from "@/demo/story/persona";
+import { allAwardRecords } from "./awardsData";
+import type { AwardRecord } from "@/lib/awardsApi";
 import type { AwardTally, BuyerCitation, ForecastCitation } from "@/lib/grant/types";
 import type {
   ForecastTakeCountedFact,
@@ -13,7 +21,7 @@ import type {
   ForecastTakeResponse,
 } from "@/lib/forecasts/grantTakeApi";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
-import { CAROLINA_DINING, OTHER_FIRMS } from "./firms";
+import { AMIRA_FIRM, CAROLINA_DINING, OTHER_FIRMS } from "./firms";
 import { FORECAST_RECORDS } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY, POPE_FORECAST_KEY, SEYMOUR_FORECAST_KEY } from "./forecastLocalSeeds";
 
@@ -36,7 +44,14 @@ function sizeOf(valHigh: number | null): Size {
   return valHigh <= 3_000_000 ? "mid" : "large";
 }
 
+/** The member's codes, in the names NAICS gives them. */
+const MEMBER_NAICS_LABEL: Record<string, string> = Object.fromEntries([
+  [PERSONA.primaryNaics, PERSONA.primaryNaicsLabel],
+  ...PERSONA.secondaryNaics.map((n) => [n.code, n.label]),
+]);
+
 function naicsLabel(code: string): string {
+  if (MEMBER !== "caterer") return MEMBER_NAICS_LABEL[code] ?? PERSONA.primaryNaicsLabel;
   if (code === "722320") return "Caterers";
   if (code === "722330") return "Mobile Food Services";
   return "Food Service Contractors";
@@ -100,7 +115,10 @@ function buyerFact(record: ForecastRecordDto): ForecastTakeCountedFact {
 
 function upcomingFact(record: ForecastRecordDto): ForecastTakeFact {
   const other = otherForecastFor(record);
-  if (!other) return NOT_CHECKED;
+  return other ? upcomingFactFor(other) : NOT_CHECKED;
+}
+
+function upcomingFactFor(other: ForecastRecordDto): ForecastTakeCountedFact {
   const asOf = isoDaysFromNow(-2, 6);
   const citation: ForecastCitation = {
     oppKey: other.oppKey,
@@ -127,12 +145,135 @@ function upcomingFact(record: ForecastRecordDto): ForecastTakeFact {
   };
 }
 
+// ── The agency: facts counted from its own award record ─────────────────────
+
+const AGENCY_TRADE = new Set<string>([PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)]);
+const AGENCY_STATES = PERSONA.serviceStates as readonly string[];
+
+/** The award-record buyer that matches a forecast's office, by name. */
+const AGENCY_BUYER_OF: [RegExp, string][] = [
+  [/Mission and Installation Contracting Command/, "MICC Fort Bragg"],
+  [/USPFO for North Carolina/, "USPFO NC"],
+  [/Program Contracting Activity Central/, "VA PCAC"],
+  [/Network Contracting Office 6/, "VA NCO 6"],
+  [/MARSOC/, "MARSOC"],
+  [/Wilmington District/, "USACE Wilmington"],
+  [/Savannah District/, "USACE Savannah"],
+  [/763rd Enterprise Sourcing Squadron/, "763 ESS Pope"],
+  [/Federal Aviation Administration/, "FAA"],
+];
+
+function fiscalYear(day: string): number {
+  const [y, m] = day.split("-").map(Number);
+  return m >= 10 ? y + 1 : y;
+}
+
+function medianOf(values: number[]): number {
+  const s = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
+}
+
+/** The value at a share of the way up the sorted list (nearest rank): the page calls 25%–75% "the middle half". */
+function quantileOf(values: number[], p: number): number {
+  const s = [...values].sort((a, b) => a - b);
+  return s[Math.round(p * (s.length - 1))];
+}
+
+function agencyCounted(record: ForecastRecordDto, counted: Record<ForecastTakeCountedKey, ForecastTakeFact>): void {
+  const rows = allAwardRecords().filter(
+    (a) =>
+      a.naicsCode !== null &&
+      AGENCY_TRADE.has(a.naicsCode) &&
+      a.location.state !== null &&
+      AGENCY_STATES.includes(a.location.state),
+  );
+  if (rows.length === 0) return;
+  const fys = rows.map((a) => a.recency.awardedAt).filter((d): d is string => !!d).map(fiscalYear);
+  const years = `FY${Math.min(...fys)}–FY${Math.max(...fys)}`;
+  // DEMO: the agency's wording is kept; other pack members name their own codes and states.
+  const matchedOn =
+    MEMBER === "agency"
+      ? "Advertising, marketing, design and video awards (NAICS 541810, 541613, 541430, 512110, 541820), NC, VA and SC"
+      : `Awards in your codes (NAICS ${[...AGENCY_TRADE].join(", ")}), ${AGENCY_STATES.join(", ")}`;
+  const values = rows.map((a) => a.obligated ?? 0);
+  const t = (kind: AwardTally["kind"], over: Partial<AwardTally> & Pick<AwardTally, "figure" | "countedOver">) =>
+    tally(kind, matchedOn, { yearsCovered: years, ...over });
+
+  counted.comparableAwards = t("comparable-awards", {
+    figure: medianOf(values),
+    low: quantileOf(values, 0.25),
+    high: quantileOf(values, 0.75),
+    countedOver: rows.length,
+  });
+  const offers = rows.map((a) => a.offersReceived).filter((o): o is number => o !== null);
+  counted.fieldSize = t("field-size", { figure: medianOf(offers), countedOver: offers.length });
+
+  const by = new Map<string, { awards: number; total: number }>();
+  for (const a of rows) {
+    if (a.winner.awardeeKey === AMIRA_FIRM.key) continue; // the member herself
+    const w = by.get(a.winner.name) ?? { awards: 0, total: 0 };
+    w.awards += 1;
+    w.total += a.obligated ?? 0;
+    by.set(a.winner.name, w);
+  }
+  // "The firms with the most of these awards": most awards first, then the most money.
+  const ranked = [...by.entries()].sort((a, b) => b[1].awards - a[1].awards || b[1].total - a[1].total);
+  counted.marketWinners = t("market-winners", {
+    figure: by.size,
+    countedOver: by.size,
+    firms: ranked.slice(0, 3).map(([name, w]) => ({ name, awards: w.awards, totalValue: w.total })),
+  });
+
+  const benched = rows.filter((a) => a.bench && a.bench.distinctSubs > 0);
+  const subs = new Map<string, number>();
+  for (const a of benched) for (const s of a.bench!.sampleSubs) subs.set(s.name, (subs.get(s.name) ?? 0) + (s.awards ?? 0));
+  counted.subUse = t("sub-use", {
+    figure: benched.length,
+    countedOver: rows.length,
+    subs: [...subs.entries()].slice(0, 3).map(([name, awards]) => ({ name, awards, total: null })),
+  });
+
+  const abbrev = AGENCY_BUYER_OF.find(([re]) => re.test(record.agencyName))?.[1];
+  const office = abbrev ? allAwardRecords().filter((a) => a.agency.abbrev === abbrev) : [];
+  if (office.length > 0) counted.buyer = buyerFactFrom(record, office);
+
+  const other = FORECAST_RECORDS.find((r) => r.oppKey !== record.oppKey && r.agencyName === record.agencyName);
+  if (other) counted.upcoming = upcomingFactFor(other);
+}
+
+/** The buyer fact from the award record: how many of this office's awards were set aside. */
+function buyerFactFrom(record: ForecastRecordDto, office: AwardRecord[]): ForecastTakeCountedFact {
+  const asOf = isoDaysFromNow(-2, 6);
+  const setAside = office.filter((a) => a.setAside !== null).length;
+  const citation: BuyerCitation = {
+    agencyKey: 2000 + (record.agencyName.length % 90),
+    name: record.agencyName,
+    abbreviation: record.agencyAbbr,
+    agencyType: null,
+    isDefense: record.agencyAbbr !== "VA",
+    parents: [],
+    buys: [{ code: record.naicsCode ?? PERSONA.primaryNaics, description: naicsLabel(record.naicsCode ?? PERSONA.primaryNaics), awards: office.length }],
+    awardsExamined: office.length,
+    setAsideAwards: setAside,
+    officers: null,
+    asOf,
+  };
+  return {
+    state: "counted",
+    figure: setAside,
+    basis: { countedOver: office.length, matchedOn: "Awards by this contracting office", yearsCovered: null, atLeast: false },
+    source: { label: "This office's award record", provenance: { type: "public", ref: `buyer:${citation.agencyKey}#setAside`, buyer: citation } },
+    asOf,
+  };
+}
+
 /** The take for one forecast, or null when the key is not a forecast. */
 export function buildForecastTake(oppKey: string): ForecastTakeResponse | null {
   const record = FORECAST_RECORDS.find((r) => r.oppKey === oppKey);
   if (!record) return null;
 
-  const food = record.lane === "federal" && /^(722|311)/.test(record.naicsCode ?? "");
+  const food = MEMBER === "caterer" && record.lane === "federal" && /^(722|311)/.test(record.naicsCode ?? "");
   const counted: Record<ForecastTakeCountedKey, ForecastTakeFact> = {
     comparableAwards: NOT_CHECKED,
     fieldSize: NOT_CHECKED,
@@ -141,6 +282,11 @@ export function buildForecastTake(oppKey: string): ForecastTakeResponse | null {
     upcoming: NOT_CHECKED,
     subUse: NOT_CHECKED,
   };
+
+  // The team-up can sit outside her own codes (the trucker's is base logistics, 561210); it still gets the counted facts.
+  if (MEMBER !== "caterer" && record.lane === "federal" && (AGENCY_TRADE.has(record.naicsCode ?? "") || oppKey === FORT_BRAGG_FORECAST_KEY)) {
+    agencyCounted(record, counted);
+  }
 
   if (food) {
     const code = record.naicsCode ?? "722310";

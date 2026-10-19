@@ -91,6 +91,8 @@ import {
 // The member record this surface is rendered inside. Every other feature route
 // reads it; these four read nothing at all — see the seeding effect below.
 import { useCurrentMember } from "../lib/mock/currentMember";
+// DEMO: a member whose trade DLA does not buy (the ad agency) stays on For you, told why.
+import { FOR_YOU_NOTE } from "../demo/explore/orders/feed";
 
 /** Every tab ranks the same way: by her record and her profile fit. */
 const BOARD_SORT = "best" as const;
@@ -332,7 +334,7 @@ function MicroPurchasesIndex() {
   // For you before the switch. The switch replaces the address, so Back does
   // not return her to the empty tab. A failed walk keeps For you. The decision
   // is made once: a later walk with no matches does not move her.
-  const [landed, setLanded] = useState(s.view != null);
+  const [landed, setLanded] = useState(s.view != null || FOR_YOU_NOTE != null);
   const forYouAnswer = getWalkView() === "for-you" ? feed : undefined;
   const landing = landingView({ explicitView: s.view, forYou: forYouAnswer });
   const settling = !landed && s.view == null && (forYouAnswer === undefined || landing !== view);
@@ -540,7 +542,9 @@ function MicroPurchasesIndex() {
             {!folded && (
               <div className="mp-hunter__say">
                 <p className="mp-hunter__line">
-                  {view === "for-you" && feed && feed.boardTotal != null
+                  {view === "for-you" && FOR_YOU_NOTE && feed && feed.total === 0
+                    ? FOR_YOU_NOTE.hunter
+                    : view === "for-you" && feed && feed.boardTotal != null
                     ? forYouSummary(feed.boardTotal, feed.total)
                     : hunterSummary(result, member, undefined, feed?.total ?? null)}
                 </p>
@@ -677,7 +681,12 @@ function MicroPurchasesIndex() {
             onSeeAll={() => patch({ view: "all" })}
           />
         ) : view === "for-you" && !filtersActive(filters) ? (
-          <ForYouEmpty feedArrived={result.feedArrived} onSeeAll={() => patch({ view: "all" })} />
+          <ForYouEmpty
+            feedArrived={result.feedArrived}
+            onSeeAll={() => patch({ view: "all" })}
+            note={FOR_YOU_NOTE ?? undefined}
+            onNote={() => FOR_YOU_NOTE && void navigate({ to: FOR_YOU_NOTE.link.to as "/opportunities" })}
+          />
         ) : (
           <EmptyState
             feedArrived={result.feedArrived}
@@ -951,11 +960,26 @@ export function BoardTabs({
 export function ForYouEmpty({
   feedArrived,
   onSeeAll,
+  note,
+  onNote,
 }: {
   feedArrived: boolean;
   onSeeAll: () => void;
+  /** DEMO: the member's trade has no orders on this board (the ad agency). */
+  note?: { emptyHead: string; emptyBody: string; link: { label: string } };
+  onNote?: () => void;
 }) {
   if (!feedArrived) return null;
+  if (note)
+    return (
+      <div className="mp-empty">
+        <p className="mp-empty__head">{note.emptyHead}</p>
+        <p className="mp-empty__body">{note.emptyBody}</p>
+        <button type="button" className="btn btn-secondary" onClick={onNote}>
+          {note.link.label}
+        </button>
+      </div>
+    );
   return (
     <div className="mp-empty">
       <p className="mp-empty__head">Nothing today fits your business profile.</p>

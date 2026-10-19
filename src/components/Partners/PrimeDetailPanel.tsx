@@ -10,6 +10,13 @@ import {
   whereTheyWork,
   type PrimeCandidate,
 } from "../../lib/partnersApi";
+// DEMO: what the member already shares with the partner she knows (D85).
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+const KNOWN_CONTACT_HOOK = byMember({ caterer: "the work you did together in 2024", pack: copy.KNOWN_CONTACT_HOOK });
 
 /**
  * One company, in full — the detail behind a ranked card.
@@ -233,7 +240,7 @@ export function PrimeDetailPanel({
               {partner.flags.some((f) => f.id === "your_contact") ? (
                 <p className="t-body-sm">
                   You already know someone here. Start with the person named under &ldquo;Worth
-                  knowing&rdquo; and mention the work you did together in 2024.
+                  knowing&rdquo; and mention {KNOWN_CONTACT_HOOK}.
                 </p>
               ) : (
                 <p className="t-body-sm">

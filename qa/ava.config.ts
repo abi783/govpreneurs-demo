@@ -2,7 +2,7 @@
 // running (the production build, served by `vite preview`), so a run does not
 // build again and does not wipe qa/report.
 //
-//   bunx vite build --outDir .qa-dist/4371 --emptyOutDir
+//   VITE_START_SCREEN=off VITE_DEMO_MEMBER=caterer bunx vite build --outDir .qa-dist/4371 --emptyOutDir   (these specs follow the caterer's bids)
 //   bunx vite preview --outDir .qa-dist/4371 --port 4371 --strictPort &
 //   QA_PORT=4371 bunx playwright test -c qa/ava.config.ts
 import { defineConfig } from "@playwright/test";

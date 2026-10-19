@@ -1,0 +1,448 @@
+// THE TRUCKING COMPANY's kinds of work (read through src/demo/grant/domains.ts).
+//
+// What a real notice for each kind of freight work asks for: the buyer's needs,
+// what the carrier hands over, the rules and what goes wrong. The detail page,
+// the sample documents and Grant's generated reviews read it. Every claim about
+// Rockfish Run Freight must be true of persona.ts: 12 drivers, 7 tractors,
+// 9 trailers (6 dry vans, 1 reefer, 2 flatbeds), 4 box trucks with lift gates
+// and a cargo van; dispatch 5 AM to 9 PM and GPS on every truck. No hazmat
+// endorsements, no lowboys, no SDDC registration and no clearance.
+
+import type { Domain } from "../../../grant/domains";
+
+/** Named as the agency's type is, so the shared code can read either member's keys. */
+export type AgencyDomainKey = "routes" | "hauling" | "truckload" | "moving" | "courier" | "secure" | "logistics" | "offTrade";
+
+/** The kind of work a story opportunity is when DOMAIN_OF does not name it. */
+export const DEFAULT_DOMAIN: AgencyDomainKey = "hauling";
+
+/** Which kind of work each of the carrier's opportunities is. A new story entry needs a line here. */
+export const DOMAIN_OF: Record<string, AgencyDomainKey> = {
+  "36C24627Q0088": "routes",
+  "W91247-27-Q-0119": "hauling",
+  "SP3300-27-R-5007": "secure",
+  W519TC27R0011: "logistics",
+  "W91247-27-Q-0183": "moving",
+  M6700127Q0058: "hauling",
+  W81K0427QA014: "courier",
+  "36C24627Q0095": "moving",
+  "D6D2.POC.036": "hauling",
+  "RFP27-11-EM": "hauling",
+  "HCR-28370": "truckload",
+  "140FS327Q0021": "hauling",
+  "HTC711-27-R-R004": "secure",
+  "36C24627Q0102": "routes",
+  "36C24627Q0074": "offTrade",
+  "W91242-27-Q-0041": "hauling",
+  "W91242-27-Q-0047": "truckload",
+  COF2741182RFP: "offTrade",
+  "CCS-27-014": "moving",
+  "D08POCD1.PR31042": "hauling",
+  "36C24627Q0113": "courier",
+  W912PM27Q0014: "truckload",
+  "36C24627Q0121": "offTrade",
+  "HQC005-27-Q-E031": "truckload",
+  PANMCC27P0000011836: "offTrade",
+};
+
+/** Motor freight: the code most of her federal notices carry. */
+const FREIGHT_PSC = "V112 (Motor freight)";
+
+export const DOMAINS: Record<AgencyDomainKey, Domain> = {
+  routes: {
+    key: "routes",
+    service: "scheduled route trucking",
+    scopeLine: "The carrier runs the same routes on a set schedule, with its own trucks and drivers, and brings returns back.",
+    intent: "The buyer wants every stop made on time, every day, with no missed runs. A spare truck and a named backup driver count more than a low price.",
+    needs: [
+      "Run each route on the posted days and times, with the stops in order.",
+      "Supply the trucks, the drivers, the fuel and the dispatch.",
+      "Load and unload at each stop, and bring returns back to the start.",
+      "Cover a breakdown or a sick driver the same day.",
+    ],
+    deliverables: [
+      "A signed delivery ticket at each stop",
+      "A daily route log with GPS times",
+      "A monthly invoice that matches the signed tickets",
+      "A backup plan for trucks and drivers",
+    ],
+    technical: [
+      "Box trucks with lift gates, kept clean and closed.",
+      "GPS on every truck, with times the buyer can check.",
+      "Drivers who pass the buyer's background check.",
+      "USDOT and MC authority, and the vehicle insurance the notice names.",
+    ],
+    personnel: [
+      "A project manager and an alternate the buyer can reach during route hours.",
+      "Drivers with clean records, and a backup for each route.",
+      "A dispatcher on duty while the trucks run.",
+    ],
+    risks: [
+      "Fuel is the price you can't fix. Ask for a fuel adjustment, or price diesel at a stated base.",
+      "A missed stop is a failed day. Keep a spare truck ready.",
+      "Five fixed-price years: price the miles, the tires and the repairs for all five.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "Scheduled box-truck routes are your primary code, and you run daily clinic routes for Quarry Lane Medical Supply now.",
+      short: "Scheduled box-truck routes are your core work.",
+    },
+    fitBold: "you run daily clinic routes for Quarry Lane Medical Supply now",
+    scoring: [
+      { factor: "Route plan and backup trucks", weight: 40 },
+      { factor: "Past performance on similar routes", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price", "sites"],
+    priceLines: ["Route 1, price per day", "Route 2, price per day", "Added stop, price per stop", "Extra run on call, price per run"],
+    competition: "Route contracts like this draw a few local carriers and the courier firms that already run the buyer's other routes.",
+    reference: "pp-quarry-lane-routes",
+    leadWith: "your Quarry Lane clinic routes, the same daily box-truck work",
+    psc: FREIGHT_PSC,
+    plan: "Write a route plan: which trucks, which drivers, the spare and the backup.",
+  },
+  hauling: {
+    key: "hauling",
+    service: "on-call hauling",
+    scopeLine: "The carrier sends trucks and drivers when the buyer calls, and is paid for each move or by the hour.",
+    intent: "The buyer wants a truck there when it calls, and every load moved without damage. A carrier that answers the phone counts most.",
+    needs: [
+      "Answer each call inside the time the notice sets.",
+      "Supply the truck, the trailer and a driver for each move.",
+      "Load, tie down, haul and unload each load to the place the buyer names.",
+      "Keep a log of each call, with the times and the miles.",
+    ],
+    deliverables: [
+      "A signed ticket for each move",
+      "A call log with the times each truck arrived and finished",
+      "A monthly invoice that matches the tickets",
+    ],
+    technical: [
+      "Trucks and trailers rated for the loads the notice names.",
+      "Load securement to the federal cargo rules.",
+      "Permits for any load that is over legal size or weight.",
+      "USDOT and MC authority, and cargo and vehicle insurance.",
+    ],
+    personnel: [
+      "A dispatcher the buyer can reach during work hours.",
+      "Drivers with the license class each truck needs.",
+      "A background check and base pass for each driver on a federal site.",
+    ],
+    risks: [
+      "Calls come in bunches. Price for the busy weeks, not the average.",
+      "Empty miles to a far site are yours to price.",
+      "A load over legal size needs a permit and an escort. Check before you quote.",
+    ],
+    fit: {
+      rating: "strong",
+      text: "On-call hauling is one of your codes, and you made 46 trailer and container moves for the 18th Airborne Corps this year.",
+      short: "On-call hauling is your work.",
+    },
+    fitBold: "you made 46 trailer and container moves for the 18th Airborne Corps this year",
+    scoring: [
+      { factor: "Response plan and equipment", weight: 40 },
+      { factor: "Past performance on similar hauling", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Move within 25 miles, price per move", "Move over 25 miles, price per loaded mile", "Truck and driver on standby, price per hour"],
+    competition: "On-call hauling draws local carriers within an hour of the site. Some quote low and then can't answer the calls.",
+    reference: "pp-bragg-trailer-hauling",
+    leadWith: "your 46 moves for the 18th Airborne Corps",
+    psc: FREIGHT_PSC,
+    plan: "Write a response plan: which trucks answer, how fast, and who covers a second call.",
+  },
+  truckload: {
+    key: "truckload",
+    service: "truckload freight",
+    scopeLine: "The carrier hauls full trailer loads between the sites the notice names, with its own tractors, trailers and drivers.",
+    intent: "The buyer wants each load picked up and delivered on schedule, with no damage and no lost paperwork.",
+    needs: [
+      "Pick up and deliver each load on the schedule the buyer sets.",
+      "Supply the tractor, the trailer and the driver.",
+      "Keep the bill of lading and the seal numbers with each load.",
+      "Report any delay before the delivery time.",
+    ],
+    deliverables: [
+      "A signed bill of lading for each load",
+      "Delivery times from GPS",
+      "A monthly invoice by load",
+    ],
+    technical: [
+      "Dry vans or a reefer as the notice names, in good repair.",
+      "Drivers within the federal hours-of-service rules.",
+      "USDOT and MC authority, cargo insurance and vehicle insurance.",
+      "Seals and load records kept for each trip.",
+    ],
+    personnel: [
+      "A dispatcher who tracks every load.",
+      "Drivers with a Class A license and clean records.",
+    ],
+    risks: [
+      "A long run leaves a truck far from home. Price the trip back, loaded or empty.",
+      "Hours-of-service rules set how far one driver can go in a day.",
+      "Fuel moves the cost of every mile. Ask for a fuel adjustment.",
+    ],
+    fit: {
+      rating: "good",
+      text: "Truckload freight is one of your codes, and you run weekly refrigerated loads for Cypress Bend Foods across NC and SC.",
+      short: "Truckload freight is one of your codes.",
+    },
+    fitBold: "you run weekly refrigerated loads",
+    scoring: [
+      { factor: "Equipment and schedule plan", weight: 40 },
+      { factor: "Past performance on similar loads", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Load, price per trip", "Extra stop, price per stop", "Detention at a stop, price per hour"],
+    competition: "Truckload work draws carriers from across the region, and some from far away.",
+    reference: "pp-cypress-bend-reefer",
+    leadWith: "your weekly truckload runs for Cypress Bend Foods",
+    psc: FREIGHT_PSC,
+    plan: "Write a schedule: which tractors and trailers, and how each truck gets home.",
+  },
+  moving: {
+    key: "moving",
+    service: "furniture and equipment moving",
+    scopeLine: "The carrier moves furniture and equipment between rooms, floors and buildings, with a crew, box trucks and pads.",
+    intent: "The buyer wants things moved without damage and without holding up the people who work there. A crew that shows up on the day it was booked counts most.",
+    needs: [
+      "Move furniture and equipment on the days the buyer books.",
+      "Supply the box trucks, the crew, dollies, pads and wrap.",
+      "Protect floors, walls and doorways on the way.",
+      "Set each item where the buyer's plan shows it.",
+    ],
+    deliverables: [
+      "A move plan for each move, with dates",
+      "A signed ticket for each move",
+      "A damage report, if anything is damaged",
+    ],
+    technical: [
+      "Box trucks with lift gates, and moving pads and dollies.",
+      "A crew of the size the notice names on each move.",
+      "Cargo insurance for the items moved.",
+    ],
+    personnel: [
+      "A crew lead on every move.",
+      "Movers who pass the buyer's background check.",
+    ],
+    risks: [
+      "A move that runs long holds the crew another day. Price the hours, not just the trips.",
+      "Damage claims come out of your margin. Wrap every piece.",
+      "Out-of-state movers often win these on price. Price it tight.",
+    ],
+    fit: {
+      rating: "good",
+      text: "Moving is one of your codes, and your box trucks with lift gates fit the work. A four-person crew means pulling drivers off their routes.",
+      short: "Your box trucks fit. The crew is the question.",
+    },
+    fitBold: "your box trucks with lift gates fit the work",
+    scoring: [
+      { factor: "Move plan and crew", weight: 40 },
+      { factor: "Past performance", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Crew of four with a box truck, price per hour", "Box truck with driver, price per day", "Pads and wrap, lump sum"],
+    competition: "Furniture moves draw local movers and moving firms from out of state.",
+    reference: "pp-quarry-lane-routes",
+    leadWith: "your box trucks with lift gates and your daily routes",
+    psc: "V301 (Relocation services)",
+    plan: "Write a move plan: the crew, the trucks and the days.",
+  },
+  courier: {
+    key: "courier",
+    service: "courier work",
+    scopeLine: "The carrier picks up and delivers small loads on a schedule, and answers rush calls inside a set time.",
+    intent: "The buyer wants every pickup on time and every rush call answered fast. A missed run can hold up a patient's care.",
+    needs: [
+      "Run the scheduled pickups and deliveries each day.",
+      "Answer rush calls inside the time the notice sets, day or night.",
+      "Keep each item sealed, logged and handed over with a signature.",
+      "Keep a backup driver for sick days.",
+    ],
+    deliverables: [
+      "A chain-of-custody log for each item",
+      "Pickup and delivery times from GPS",
+      "A monthly invoice by run",
+    ],
+    technical: [
+      "Vans or small trucks kept clean, with GPS.",
+      "Handling to the buyer's rules for specimens or medicine.",
+      "Vehicle insurance the notice names.",
+    ],
+    personnel: [
+      "Drivers who pass the buyer's background check.",
+      "A dispatcher who can send a driver at any hour the notice names.",
+    ],
+    risks: [
+      "Rush calls around the clock need a driver on call every night.",
+      "Two calls at once need two drivers.",
+      "A driver based far from the site can't meet a short response time.",
+    ],
+    fit: {
+      rating: "good",
+      text: "Courier work is one of your codes, and you have a cargo van and dispatch from 5 AM to 9 PM. Calls outside those hours are new for you.",
+      short: "Courier runs fit. Night calls are new.",
+    },
+    fitBold: "Calls outside those hours are new for you",
+    scoring: [
+      { factor: "Response plan and drivers", weight: 40 },
+      { factor: "Past performance on similar runs", weight: 30 },
+      { factor: "Price", weight: 30 },
+    ],
+    documents: ["pws", "wage", "price"],
+    priceLines: ["Scheduled run, price per run", "Rush call, price per call", "Driver on call overnight, price per night"],
+    competition: "Courier work for medical sites draws courier firms that already run the buyer's other routes.",
+    reference: "pp-quarry-lane-routes",
+    leadWith: "your daily clinic routes and your dispatch hours",
+    psc: "R602 (Courier and messenger services)",
+    plan: "Write a response plan: who answers a rush call, and how fast.",
+  },
+  secure: {
+    key: "secure",
+    service: "secure freight",
+    scopeLine: "The carrier moves classified or sensitive cargo under guard, for carriers the Department of Defense has approved.",
+    intent: "The buyer wants the cargo watched every minute, by carriers it has already checked. Who may carry it is set before the notice posts.",
+    needs: [
+      "Move classified and sensitive cargo between the sites the buyer names.",
+      "Keep the cargo under watch at every stop.",
+      "Track each truck by satellite.",
+      "Report each pickup, stop and delivery.",
+    ],
+    deliverables: [
+      "A signed custody record for each load",
+      "Tracking records for each trip",
+      "A report of any delay or stop",
+    ],
+    technical: [
+      "Approval from the Surface Deployment and Distribution Command (SDDC) for protective service.",
+      "A security clearance for the company, and cleared drivers.",
+      "Hazmat endorsements where the cargo needs them.",
+      "Satellite tracking on every truck.",
+    ],
+    personnel: [
+      "Cleared drivers, often two to a truck.",
+      "A security officer for the company.",
+    ],
+    risks: [
+      "Only approved carriers can bid. Approval takes years, not weeks.",
+      "A company clearance needs a sponsor and a long review.",
+      "Two-driver teams and tracking cost more than plain truckload.",
+    ],
+    fit: {
+      rating: "weak",
+      text: "Secure freight is for carriers SDDC has approved for protective service. You have no approval, no clearance and no cleared drivers.",
+      short: "Secure freight needs an approval you don't have.",
+    },
+    fitBold: "You have no approval, no clearance and no cleared drivers",
+    scoring: [
+      { factor: "Security plan", weight: 40 },
+      { factor: "Past performance on secure freight", weight: 35 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws", "price"],
+    priceLines: ["Load, price per loaded mile", "Second driver, price per day", "Satellite tracking, price per trip"],
+    competition: "Only carriers SDDC already approved for protective service can offer.",
+    reference: "pp-cypress-bend-reefer",
+    leadWith: "your truckload record, once SDDC approves you",
+    psc: FREIGHT_PSC,
+    plan: "Skip it. Register in SDDC's carrier program and haul DoD freight first.",
+  },
+  logistics: {
+    key: "logistics",
+    service: "base logistics work",
+    scopeLine: "The contractor runs an installation's supply, maintenance and transportation work, with hundreds of staff.",
+    intent: "The Army wants one firm to run the whole operation without a gap when the old contract ends. A large team with a record on Army bases counts most.",
+    needs: [
+      "Run the installation's warehouses, supply and central receiving.",
+      "Maintain the motor pool and the unit equipment.",
+      "Run local freight, trailer moves and installation transportation.",
+      "Take over from the current contractor with no gap.",
+    ],
+    deliverables: [
+      "A transition plan",
+      "Monthly performance reports",
+      "Staffing and quality control plans",
+    ],
+    technical: [
+      "Holder of the Army's EAGLE ordering agreement.",
+      "Systems the Army uses for supply and maintenance.",
+      "A quality control plan for each function.",
+    ],
+    personnel: [
+      "A program manager and a manager for each function.",
+      "Hundreds of staff across supply, maintenance and transportation.",
+    ],
+    risks: [
+      "Only EAGLE agreement holders can bid.",
+      "A year of the work is many times a small carrier's revenue.",
+      "A subcontractor's share is set by the teaming agreement.",
+    ],
+    fit: {
+      rating: "weak",
+      text: "The whole contract is far beyond a 15-person carrier. The local freight and trailer moves inside it are your work.",
+      short: "The whole contract is too big. The freight part fits.",
+    },
+    fitBold: "The local freight and trailer moves inside it are your work",
+    scoring: [
+      { factor: "Technical and transition approach", weight: 40 },
+      { factor: "Past performance", weight: 35 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws"],
+    priceLines: ["Transportation division, price per year"],
+    competition: "EAGLE agreement holders with Army base records.",
+    reference: "pp-bragg-trailer-hauling",
+    leadWith: "your Fort Bragg trailer hauling, as a subcontractor",
+    psc: "R706 (Logistics support services)",
+    plan: "Find the EAGLE holders bidding, and offer them your local freight and trailer moves.",
+  },
+  offTrade: {
+    key: "offTrade",
+    service: "non-freight work",
+    scopeLine: "The contractor does work that a freight carrier doesn't run: it needs its own equipment, permits or trade.",
+    intent: "The buyer wants a firm that does this one kind of work every day, with the permits it needs.",
+    needs: [
+      "Do the work the notice names, with the equipment it names.",
+      "Hold the permits and licenses the work needs.",
+      "Keep the records the buyer asks for.",
+    ],
+    deliverables: [
+      "A work plan and a schedule",
+      "The records the notice names",
+      "A monthly invoice",
+    ],
+    technical: [
+      "The permits and licenses of that trade.",
+      "Equipment built for the work.",
+      "Insurance the notice names.",
+    ],
+    personnel: [
+      "Staff trained in the trade.",
+      "A background check for each worker on a federal site.",
+    ],
+    risks: [
+      "The permits and equipment take months to get.",
+      "A carrier would be learning a new trade on a live contract.",
+    ],
+    fit: {
+      rating: "weak",
+      text: "This isn't freight you haul.",
+      short: "This isn't freight you haul.",
+    },
+    fitBold: "This isn't freight you haul",
+    scoring: [
+      { factor: "Technical approach", weight: 40 },
+      { factor: "Past performance in the trade", weight: 35 },
+      { factor: "Price", weight: 25 },
+    ],
+    documents: ["pws"],
+    priceLines: ["Service, price per month", "Added work, price per hour"],
+    competition: "Firms that do this one kind of work every day.",
+    leadWith: "a partner who does the work every day",
+    psc: FREIGHT_PSC,
+    plan: "Skip it, or ask a firm in the trade whether it needs a truck.",
+  },
+};

@@ -1,6 +1,9 @@
 // THE SMALL ORDERS SAMPLE: 20 Defense Logistics Agency (DLA) product buys that a
 // caterer can read, price and quote. They replace the auto-parts sample.
 //
+// DEMO: that is the caterer's board. The ad agency's board holds 10 parts and
+// supplies orders instead, and none of them fit her (members/agency/orders/data.ts).
+//
 // - 14 orders are open to Haddad Catering ("Orders for you").
 // - 6 orders are not open to her: a source-approval order, a qualified-products
 //   order, a drawing-rights order and an approved-sellers order. They fill the
@@ -15,23 +18,36 @@
 // order record. So the title says it ("ships to Fort Bragg") and the sample
 // order paper (a PDF) lists the full address.
 
+import { byMember, own } from "@/demo/member";
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroAward, MicroOrder } from "@/lib/microPurchases/order";
 import { calendarDay } from "../dates";
 import { SUPPLIERS, type SupplierKey } from "./suppliers";
 
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/orders/data")>("/src/demo/members/*/orders/data.ts", { eager: true }),
+);
+
 export type ShipTo = "fortBragg" | "campLejeune" | "popeAaf";
 
-export const SHIP_TO: Record<ShipTo, { name: string; address: string }> = {
-  fortBragg: { name: "Fort Bragg", address: "Dining Facility Supply Point, Fort Bragg, NC 28310" },
-  campLejeune: { name: "Camp Lejeune", address: "Food Service Warehouse, Camp Lejeune, NC 28547" },
-  popeAaf: { name: "Pope Army Airfield", address: "Base Supply Receiving, Pope Army Airfield, NC 28308" },
-};
+// DEMO: per member, so the agency's order papers name no dining hall.
+export const SHIP_TO: Record<ShipTo, { name: string; address: string }> = byMember({
+  caterer: {
+    fortBragg: { name: "Fort Bragg", address: "Dining Facility Supply Point, Fort Bragg, NC 28310" },
+    campLejeune: { name: "Camp Lejeune", address: "Food Service Warehouse, Camp Lejeune, NC 28547" },
+    popeAaf: { name: "Pope Army Airfield", address: "Base Supply Receiving, Pope Army Airfield, NC 28308" },
+  },
+  pack: {
+    fortBragg: { name: "Fort Bragg", address: "Supply Support Activity, Fort Bragg, NC 28310" },
+    campLejeune: { name: "Camp Lejeune", address: "Base Supply Warehouse, Camp Lejeune, NC 28547" },
+    popeAaf: { name: "Pope Army Airfield", address: "Base Supply Receiving, Pope Army Airfield, NC 28308" },
+  },
+});
 
 /** What the demo knows about an order beyond the record DLA publishes. */
 export interface OrderMeta {
   shipTo: ShipTo;
-  /** The matching engine's fit score for Amira, 0 to 100. */
+  /** The matching engine's fit score for the member, 0 to 100. */
   fit: number;
 }
 
@@ -44,7 +60,7 @@ type AwardSpec = [
   partNumber?: string | null,
 ];
 
-interface Spec {
+export interface Spec {
   n: number;
   /** DIBBS solicitation number. */
   sol: string;
@@ -74,6 +90,8 @@ interface Spec {
   amendedDaysAgo?: number;
   shipTo: ShipTo;
   fit: number;
+  /** The DLA office that posted it. Absent is DLA Troop Support. */
+  buyer?: string;
 }
 
 const CONTACTS = {
@@ -134,7 +152,7 @@ function build(s: Spec): { order: MicroOrder; meta: OrderMeta } {
     dibbsStatus: s.status ?? "Open",
     postedOn: calendarDay(-s.postedDaysAgo),
     closesOn: s.closesInDays == null ? null : calendarDay(s.closesInDays),
-    buyer: "DLA Troop Support",
+    buyer: s.buyer ?? "DLA Troop Support",
     buyerContact: { name: s.contact[0], email: emailOf(s.contact[0]), phone: s.contact[1] },
     partNumbers: [...new Set(s.approved.map(([, part]) => part))].join(", ") || null,
     approvedSources: s.approved.map(([k, part]) => ({ cage: SUPPLIERS[k].cage, partNumber: part })),
@@ -143,7 +161,7 @@ function build(s: Spec): { order: MicroOrder; meta: OrderMeta } {
   return { order, meta: { shipTo: s.shipTo, fit: s.fit } };
 }
 
-const SPECS: Spec[] = [
+const CATERER_SPECS: Spec[] = [
   // ── Open to Haddad Catering ───────────────────────────────────────────────
   {
     n: 101,
@@ -675,6 +693,8 @@ const SPECS: Spec[] = [
     fit: 40,
   },
 ];
+
+const SPECS: Spec[] = byMember({ caterer: CATERER_SPECS, pack: pack.SPECS });
 
 export const ORDER_META: ReadonlyMap<string, OrderMeta> = new Map();
 export const ORDERS: MicroOrder[] = [];

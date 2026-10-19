@@ -11,7 +11,7 @@
 
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { getGrantBrief } from "@/demo/story/grantBriefs";
-import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
+import { getOpportunity } from "@/demo/story/opportunities";
 import { PERSONA } from "@/demo/story/persona";
 import type { OpenQuestion, Pin, RoadmapItem, TrailGroup } from "@/lib/grant/types";
 import { encodeBrief, type Extras, type RowSpec } from "./encode";
@@ -21,8 +21,14 @@ import { CERTIFIED, COOKS, factsFor, PARTNER, PP, shareWords, UNCERTIFIED, usd, 
 import { rt, pinComputed, pinPublic } from "./rich";
 import { clausePin, naicsLabel, type Solicitation } from "./solicitation";
 import { solicitationFor } from "./detail";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { byMember, own } from "@/demo/member";
 
-type Maker = (f: OppFacts, sol: Solicitation) => Extras;
+const { HERO_EXTRAS: PACK_EXTRAS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/analyses")>("/src/demo/members/*/grant/analyses.ts", { eager: true }),
+);
+
+export type Maker = (f: OppFacts, sol: Solicitation) => Extras;
 
 const pct = (n: number): string => `${Math.round(n * 100)}%`;
 const revenue = usd(PERSONA.annualRevenue);
@@ -535,7 +541,7 @@ const restrictedSite: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
   const annual = f.annual ?? 0;
   // The days left on Camp Mackall field meals: the quote the first roadmap step points at.
-  const days = factsFor(getOpportunity(HERO_IDS.fieldMeals)!).daysLeft;
+  const days = factsFor(getOpportunity(CATERER_HERO.hero)!).daysLeft;
   const roadmap: RoadmapItem[] = [
     {
       item: rt("**Bid on Camp Mackall field meals** first"),
@@ -708,14 +714,17 @@ const sourcesSought: Maker = (f, sol) => {
   };
 };
 
-export const HERO_EXTRAS: Record<string, Maker> = {
-  [HERO_IDS.fieldMeals]: fieldMeals,
+const CATERER_EXTRAS: Record<string, Maker> = {
+  [CATERER_HERO.hero]: fieldMeals,
   "FAYNC-2026-R-08": cafe,
   "CUMCO-2026-014": detention,
-  [HERO_IDS.fortBraggDining]: fortBraggDining,
-  [HERO_IDS.classifiedSite]: restrictedSite,
+  [CATERER_HERO.teamUp]: fortBraggDining,
+  [CATERER_HERO.twin]: restrictedSite,
   "W912EE-27-S-0004": sourcesSought,
 };
+
+/** DEMO: the agency's are in src/demo/members/agency/grant/analyses.ts. */
+export const HERO_EXTRAS: Record<string, Maker> = byMember({ pack: PACK_EXTRAS, caterer: CATERER_EXTRAS });
 
 /** Grant's hand-written review of an opportunity, or null when it has none. */
 export function heroAnalysis(f: OppFacts) {

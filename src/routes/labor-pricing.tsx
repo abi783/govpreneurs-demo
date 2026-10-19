@@ -7,6 +7,11 @@ import { WhatThisMeansCard } from "../components/Market/WhatThisMeansCard";
 import { PrevailingWageTable } from "../components/Market/PrevailingWageTable";
 import { LcatBenchmark } from "../components/Market/LcatBenchmark";
 import { JargonGloss } from "../components/Layout/JargonGloss";
+import { MEMBER, own } from "../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export const Route = createFileRoute("/labor-pricing")({
   head: () => ({
@@ -49,6 +54,9 @@ function LaborPricingPage() {
           </>
         }
       >
+        {MEMBER !== "caterer" ? (
+          copy.LABOR_PRICING.list
+        ) : (
         <ul className="market-what-list">
           <li>
             There are <strong>two pricing worlds</strong>. <strong>Food service</strong> contracts
@@ -71,6 +79,7 @@ function LaborPricingPage() {
             what similar jobs went for.</em> Price between, closer to the median of the comps.
           </li>
         </ul>
+        )}
       </WhatThisMeansCard>
 
       <div style={{ marginTop: "var(--s-5)" }}>
@@ -88,8 +97,10 @@ function LaborPricingPage() {
           <div>
             <div className="lcat-disclosure-title">Service-contract labor benchmarks (LCAT)</div>
             <div className="lcat-disclosure-sub">
-              Full hourly-rate benchmarking tool — for professional service contracts, not meals.
-              Available if you need it later.
+              {/* DEMO: for the agency, this is the main way its work is priced. */}
+              {MEMBER !== "caterer"
+                ? copy.LABOR_PRICING.lcatLine
+                : "Full hourly-rate benchmarking tool — for professional service contracts, not meals. Available if you need it later."}
             </div>
           </div>
         </button>
