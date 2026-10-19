@@ -21,13 +21,14 @@ import type { PlaceKey } from "./places";
 import { MEMBER, type MemberId } from "../member";
 import * as agency from "../members/agency/opportunities";
 import * as caterer from "../members/caterer/opportunities";
+import * as construction from "../members/construction/opportunities";
 
 // Every member's opportunities. Static imports, not a glob: the QA specs load
 // this file outside Vite. A new member adds one line here.
 const MEMBER_FILES: Record<
   MemberId,
   { HERO_IDS: { readonly hero: string; readonly twin: string; readonly teamUp: string }; OPPORTUNITIES: StoryOpportunity[] }
-> = { agency, caterer };
+> = { agency, caterer, construction };
 const member = MEMBER_FILES[MEMBER];
 
 export type NoticeType =
