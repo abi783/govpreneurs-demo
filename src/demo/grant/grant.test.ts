@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { byMember, MEMBER } from "@/demo/member";
 import { getGrantBrief, GRANT_BRIEFS } from "@/demo/story/grantBriefs";
-import { OPPORTUNITIES, getOpportunity } from "@/demo/story/opportunities";
+import { HERO_IDS, OPPORTUNITIES, getOpportunity } from "@/demo/story/opportunities";
 import type { GrantAnalysis } from "@/lib/grant/types";
 import { buildAnalysis } from "./analysis";
 import { buildDetail, documentsFor, tierAndScore } from "./detail";
-import { renderDocument, renderGenericDocument } from "./documents";
+import { blocksFor, renderDocument, renderGenericDocument } from "./documents";
 import { DOMAIN_OF } from "./domains";
 import { localize } from "./encode";
 import { factsFor } from "./facts";
@@ -14,8 +15,13 @@ import { missingBold, plain } from "./rich";
 import { railReply } from "./rail";
 import { buildOldTake } from "./takeOld";
 
-/** Words that must never reach a screen: the old sample member, and the wrong mentor. */
-const FORBIDDEN = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i;
+/** Words that must never reach a screen: production's old sample firm, the wrong mentor, and the other member's trade. */
+const FORBIDDEN = byMember({
+  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i,
+  // The same list as demo-storyboard/tools/scan-member.mjs uses for the agency's pages.
+  agency:
+    /\broof(ing|er|s)?\b|Williams Construction|\b238160\b|Diana|DEMO-[A-Z]+-\d+|HigherGov|\b(cater\w*|meals?|kitchen|food[- ]?(service|handler)?|cooks?|dining|menus?|ServSafe|HACCP|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+});
 
 /** Every string in a value, flattened. */
 function strings(v: unknown, out: string[] = []): string[] {
@@ -96,7 +102,7 @@ describe("Grant's call agrees across the page, the mentor dialog and the story",
 
 describe("the three story briefs and the three written here appear in the analysis, field by field", () => {
   const briefs = [...GRANT_BRIEFS, ...Object.values(AUTHORED_BRIEFS)];
-  it("covers six hand-written reviews", () => {
+  it("covers every hand-written review (six for the caterer, three for the agency)", () => {
     expect(new Set(briefs.map((b) => b.oppId))).toEqual(new Set(OPPORTUNITIES.filter((o) => o.grant.authored).map((o) => o.id)));
     expect(Object.keys(HERO_EXTRAS).sort()).toEqual(briefs.map((b) => b.oppId).sort());
   });
@@ -175,7 +181,11 @@ describe("dates are relative to now", () => {
 
 describe("documents download as real PDFs", () => {
   it("renders every document of a hero and of a generated opportunity", async () => {
-    for (const id of ["SP4701-26-Q-0021", "W912EE-27-S-0004", "FAYNC-2026-R-08", "N62470-26-R-0153"]) {
+    const ids = byMember({
+      caterer: ["SP4701-26-Q-0021", "W912EE-27-S-0004", "FAYNC-2026-R-08", "N62470-26-R-0153"],
+      agency: [HERO_IDS.hero, HERO_IDS.twin, HERO_IDS.teamUp, "MWR-FB-27-0006", "FAY-TR-2027-04"],
+    });
+    for (const id of ids) {
       const f = factsFor(getOpportunity(id)!);
       for (const spec of documentsFor(f)) {
         const file = await renderDocument(id, spec.fileName);
@@ -184,7 +194,7 @@ describe("documents download as real PDFs", () => {
         expect(file!.bytes.length).toBeGreaterThan(1500);
       }
     }
-    expect(await renderDocument("SP4701-26-Q-0021", "nope.pdf")).toBeNull();
+    expect(await renderDocument(ids[0], "nope.pdf")).toBeNull();
     const generic = await renderGenericDocument("SO-12345", "Paper.docx");
     expect(generic.fileName).toBe("Paper.pdf");
     expect(new TextDecoder().decode(generic.bytes.slice(0, 5))).toBe("%PDF-");
@@ -192,40 +202,46 @@ describe("documents download as real PDFs", () => {
 });
 
 describe("the rail", () => {
+  /** A generated review, and one with no brief, for the member on stage. */
+  const GENERATED = byMember({ caterer: "NCNG-2026-21", agency: "MWR-FB-27-0006" });
+  const NO_BRIEF = byMember({ caterer: "DUR-CO-2026-12", agency: "NCDOT-GHSP-2027-08" });
+
   it("answers an unknown question with the nearest questions, never an error", () => {
-    const r = railReply("NCNG-2026-21", "blorp zzz quux");
+    const r = railReply(GENERATED, "blorp zzz quux");
     expect(r.kind).toBe("interrogate");
     expect(r.reply).toMatch(/I can answer these/);
     expect(r.reply).not.toMatch(/undefined|NaN/);
   });
 
   it("answers a typed version of a chip", () => {
-    const r = railReply("SP4701-26-Q-0021", "what are my chances of winning this?");
+    const r = railReply(HERO_IDS.hero, "what are my chances of winning this?");
     expect(r.reply).toMatch(/No one can promise that/);
   });
 
   it("builds an answer for an opportunity with no brief", () => {
     for (const q of ["Can I win it?", "Do I have enough time?", "Where am I weak?", "Can I fix this in time?", "Should I team up?", "What does it pay?"]) {
-      const r = railReply("DUR-CO-2026-12", q);
+      const r = railReply(NO_BRIEF, q);
       expect(r.reply.length, q).toBeGreaterThan(30);
       expect(r.reply).not.toMatch(/undefined|NaN|\[object/);
     }
   });
 
   it("refuses an off-topic question politely", () => {
-    expect(railReply("NCNG-2026-21", "tell me a joke").kind).toBe("offscope");
+    expect(railReply(GENERATED, "tell me a joke").kind).toBe("offscope");
   });
 
   it("an answer to an open question moves it to 'You told me' and lifts the confidence", () => {
-    const before = buildAnalysis("W912EE-26-R-0066") as GrantAnalysis;
-    expect(before.rail.openQuestions.length).toBe(2);
+    const id = HERO_IDS.teamUp;
+    const before = buildAnalysis(id) as GrantAnalysis;
+    const asked = byMember({ caterer: 2, agency: 1 });
+    expect(before.rail.openQuestions.length).toBe(asked);
     const dots = before.verdict.confidence.dots!;
     const q = before.rail.openQuestions[0];
-    const reply = railReply("W912EE-26-R-0066", "Yes", plain(q.question));
+    const reply = railReply(id, "Yes", plain(q.question));
     expect(reply.kind).toBe("supply");
     expect(reply.fact?.value).toBe("Yes");
-    const after = buildAnalysis("W912EE-26-R-0066") as GrantAnalysis;
-    expect(after.rail.openQuestions.length).toBe(1);
+    const after = buildAnalysis(id) as GrantAnalysis;
+    expect(after.rail.openQuestions.length).toBe(asked - 1);
     expect(after.rail.answeredQuestions?.[0].value).toBe("Yes");
     expect(after.verdict.confidence.dots).toBe(dots + 1);
     expect(after.verdict.value).toBe(before.verdict.value);
@@ -248,5 +264,65 @@ describe("the old six-field take card", () => {
       expect(JSON.stringify(t)).not.toMatch(FORBIDDEN);
     }
     expect(buildOldTake("NOT-AN-ID")).toBeNull();
+  });
+});
+
+// The agency's own story (demo-storyboard/marketing-agency-pack.md). Run with DEMO_MEMBER=agency.
+describe.runIf(MEMBER === "agency")("the agency's reviews", () => {
+  const QUESTIONS = ["Can I win it?", "Do I have enough time?", "Where am I weak?", "Can I fix this in time?", "Should I team up?", "What does it pay?", "How far is it?", "Is it too big?", "Am I eligible?", "Do I need a bond?", "What should my response say?", "What should I bid instead?"];
+  /** Every word the agency can see for one opportunity: the page, Grant, the documents and the rail. */
+  const everything = (id: string): string => {
+    const f = factsFor(getOpportunity(id)!);
+    const a = buildAnalysis(id)!;
+    const asked = [...a.rail.suggestedChips.filter((c) => c.kind === "ask").map((c) => c.label), ...QUESTIONS];
+    return [
+      ...strings(buildDetail(id)),
+      ...strings(a),
+      ...documentsFor(f).flatMap((spec) => strings(blocksFor(f, spec))),
+      ...asked.map((q) => railReply(id, q).reply),
+    ].join("\n");
+  };
+
+  it("no opportunity shows a catering word, never cites the limits on subcontracting, and the twin never says who it was written for", () => {
+    for (const o of OPPORTUNITIES) {
+      const text = everything(o.id);
+      expect(text, o.id).not.toMatch(FORBIDDEN);
+      expect(text, o.id).not.toMatch(/125\.6|limitations? on subcontracting|subcontracting limit/i);
+      if (o.id === HERO_IDS.twin) expect(text).not.toMatch(/rigged|wired|written for|unfair|favou?rs?\b|steer/i);
+    }
+  }, 60_000);
+
+  it("the hero: Bid as prime, and the fix-it answer the story uses", () => {
+    const a = buildAnalysis(HERO_IDS.hero)!;
+    expect(a.verdict.value).toBe("bid");
+    expect(a.verdict.path).toBe("prime");
+    expect(a.rail.suggestedChips.map((c) => c.label)).toEqual(["Can I fix this in time?", "Where am I weak?", "What should my response say?"]);
+    expect(railReply(HERO_IDS.hero, "Can I fix this in time?").reply).toMatch(/^Yes\. Ask the app question in Q&A/);
+    expect(documentsFor(factsFor(getOpportunity(HERO_IDS.hero)!)).map((d) => d.title)).toContain("Wage determination");
+  });
+
+  it("the twin: No-bid on the provider lock, pointing at the hero", () => {
+    const a = buildAnalysis(HERO_IDS.twin)!;
+    expect(a.verdict.value).toBe("no-bid");
+    expect(a.reads.find((r) => r.status === "blocking")?.name).toBe("Can you do the work?");
+    expect(a.action.primary.target).toBe(`/opportunities/${HERO_IDS.hero}`);
+    expect(railReply(HERO_IDS.twin, "Why can't I bid this?").reply).toMatch(/subscriber app/);
+    expect(railReply(HERO_IDS.twin, "What should I bid instead?").reply).toMatch(/print and digital campaign/);
+    expect((a.postNoBidRoadmap ?? []).length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the team-up: prime no-go, subcontract go, and Bluestone on Partners", () => {
+    const a = buildAnalysis(HERO_IDS.teamUp)!;
+    expect(a.verdict.path).toBe("sub");
+    expect(a.action.primary.target).toBe("/partners");
+    expect(railReply(HERO_IDS.teamUp, "Who could I team with?").reply).toMatch(/^Bluestone Veteran Media Group, a service-disabled veteran-owned firm/);
+    expect(plain(a.verdict.gist)).toMatch(/six times your revenue/);
+  });
+
+  it("a deciding risk names the call on generated reviews", () => {
+    const choose = buildAnalysis("36C10X27Q0007")!;
+    expect(plain(choose.verdict.headline[0])).toBe("The GSA schedule puts this one out of reach today.");
+    expect(choose.reads.find((r) => r.limiting)?.name).toBe("Can you win it?");
+    expect(plain(buildAnalysis("NCDOT-GHSP-2027-08")!.rail.briefing[1])).toMatch(/media-buy margin/);
   });
 });

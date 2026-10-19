@@ -14,6 +14,7 @@ import { cap, driveText, factsFor, longDate, type OppFacts, shareWords, termText
 import { keyDateBullets, keyDatesFor, type KeyDate } from "./dates";
 import { HERO_DETAILS } from "./heroDetails";
 import { buildSolicitation, type ClausePatch, type Solicitation } from "./solicitation";
+import { V } from "./vocab";
 
 export type DocKind = "solicitation" | "pws" | "wage" | "price" | "menu" | "sites" | "amendment" | "custom";
 
@@ -102,11 +103,7 @@ function eligibilityBullets(f: OppFacts, d: Domain): string[] {
   } else {
     out.push("A vendor registration with the buyer, complete before award.");
   }
-  out.push("A food service permit from the local health department.");
-  if (d.key !== "staffing" && d.key !== "construction") {
-    out.push("A food-handler certificate for each person who prepares food.");
-  }
-  out.push("General liability insurance of $1M for each occurrence, commercial vehicle insurance, and workers' compensation.");
+  out.push(...V.eligibility(d));
   if (opp.clearanceRequired) out.push(opp.clearanceRequired);
   return out;
 }
@@ -141,7 +138,7 @@ function submissionBullets(f: OppFacts): string[] {
     offer === "bid"
       ? "Send one document: the signed price schedule. Add proof of insurance and the required certificates."
       : offer === "quote"
-        ? "Send the price schedule, a short technical plan of up to three pages, and the certificates and references."
+        ? `Send the price schedule, a short technical plan of up to three pages, and ${V.attachments}.`
         : "Send a technical volume of up to ten pages, a past performance volume with three references, and the price schedule.",
     "Send questions in writing before the question deadline. The buyer answers them in an amendment.",
   ];
@@ -151,8 +148,8 @@ function checklistBullets(f: OppFacts, d: Domain): string[] {
   const offer = offerWord(f.opp);
   const out = [
     `Read the ${offer === "reply" ? "notice" : "solicitation"} and the work statement in full.`,
-    d.key === "field" || d.key === "boxed" ? "Write a delivery plan with your vans and drive times." : "Write a staffing plan for each shift.",
-    "Collect certificates, insurance proof and references.",
+    d.plan ?? (d.key === "field" || d.key === "boxed" ? "Write a delivery plan with your vans and drive times." : "Write a staffing plan for each shift."),
+    V.collect,
   ];
   if (!f.isSourcesSought) out.push("Ask your questions before the question deadline.", `Price the ${offer} line by line.`);
   out.push(`Send the ${offer} before ${dueTimeOf(f.opp)} on the due date.`);
@@ -163,13 +160,13 @@ function placeBullets(f: OppFacts, d: Domain): string[] {
   return [
     ...d.needs,
     f.years > 0 ? `The contract is ${termText(f.years)}.` : "This notice does not start a contract.",
-    `Work is in ${f.placeText}, ${f.miles <= 5 ? "in your hometown" : `${f.miles} miles from your kitchen`}.`,
+    V.wide(f) ?? `Work is in ${f.placeText}, ${f.miles <= 5 ? "in your hometown" : `${f.miles} miles from ${V.base}`}.`,
   ];
 }
 
 function riskBullets(f: OppFacts, d: Domain): string[] {
   const out = [...d.risks];
-  if (f.miles > 60) out.push(`${f.placeText} is ${f.miles} miles from your kitchen, ${driveText(f.miles)} each way. A daily run adds cost.`);
+  if (f.miles > 60 && !V.wide(f)) out.push(`${f.placeText} is ${f.miles} miles from ${V.base}, ${driveText(f.miles)} each way. ${V.travelRisk}`);
   if (f.share !== null && f.share >= 1) out.push(`The yearly value is ${shareWords(f.share)}. Check your capacity before you commit.`);
   return out;
 }
@@ -271,7 +268,7 @@ export function buildDetail(id: string): DiscoverV2DetailDto | null {
     responseDeadline: f.closesAtISO,
     setAside: setAsideText(f),
     naicsCode: opp.naics,
-    classificationCode: f.isFederal && d.key !== "construction" && d.key !== "staffing" ? PSC_FOOD : undefined,
+    classificationCode: f.isFederal && d.key !== "construction" && d.key !== "staffing" ? (d.psc ?? PSC_FOOD) : undefined,
     solNumber: opp.id,
     placeOfPerformance: { city: f.place.city, state: f.place.state },
     pointOfContact: f.contact,

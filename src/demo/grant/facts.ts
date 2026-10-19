@@ -4,6 +4,7 @@
 // opportunities, clock). Nothing is typed twice: if the story changes, the page,
 // the documents and Grant's analysis change with it.
 
+import { byMember } from "@/demo/member";
 import { deadlineDate, deadlineIso, postedDate, postedIso } from "./calendar";
 import {
   getOpportunity,
@@ -40,6 +41,9 @@ export const PP = {
 /** The customer's name without the agency tail: "Womack Army Medical Center". */
 export const customerShort = (p: PastPerformance): string => p.customerName.split(",")[0].replace(/ \(prime\)$/, "");
 
+// The caterer's trade facts below (meals, guests, cooks, certificates) are read only
+// by caterer content. Words the generator shares between members are in vocab.ts.
+
 /** Meals a day the kitchen has cooked, from the persona: 1100. */
 export const MEALS_PER_DAY = Number(
   (/([\d,]+) meals a day/.exec(PERSONA.differentiators[0]) ?? [, "1100"])[1].replace(/,/g, ""),
@@ -54,10 +58,12 @@ export const MENTOR_FIRST = MENTOR.firstName;
 export const MENTOR_NAME = MENTOR.name;
 export const PARTNER = KEY_PARTNER;
 
-/** Holders of a food-handler certificate, and how many cooks she has. */
-export const COOKS = PERSONA.employeesW2;
+/** Staff on the payroll. */
+export const STAFF = PERSONA.employeesW2;
+/** Holders of a food-handler certificate, and how many cooks she has. A trade with no such certificate has no gap. */
+export const COOKS = STAFF;
 export const CERTIFIED = PERSONA.foodHandlerCertified ?? 0;
-export const UNCERTIFIED = COOKS - CERTIFIED;
+export const UNCERTIFIED = PERSONA.foodHandlerCertified === undefined ? 0 : COOKS - CERTIFIED;
 
 // ── Money, dates and words ───────────────────────────────────────────────
 
@@ -130,6 +136,8 @@ export function parseTermYears(opp: StoryOpportunity): number {
       opp.summary,
     );
   if (m) return 1 + WORD_TO_N[m[1].toLowerCase()];
+  if (/\b(?:12|twelve) months\b|\bnext school year\b/i.test(opp.summary)) return 1;
+  if (/\btwo years\b/i.test(opp.summary)) return 2;
   return 3;
 }
 
@@ -157,7 +165,8 @@ const ARMY_TEAM: Person[] = [
   { name: "Martin Whitfield", title: "Contract Specialist" },
   { name: "Beatrice Calhoun", title: "Contracting Officer" },
   { name: "Terrence Boyle", title: "Contract Specialist" },
-  { name: "Janelle Okafor", title: "Contracting Officer" },
+  // The agency's owner is Dana Okafor, so its Army buyer must not share her name.
+  { name: byMember({ agency: "Janelle Ostrander", caterer: "Janelle Okafor" }), title: "Contracting Officer" },
   { name: "Gregory Lindqvist", title: "Contract Specialist" },
 ];
 

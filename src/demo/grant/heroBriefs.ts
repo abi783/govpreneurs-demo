@@ -15,6 +15,8 @@ import { PLACES } from "@/demo/story/places";
 import type { AuthoredBrief } from "./encode";
 import { CERTIFIED, COOKS, customerShort, PARTNER, PP, shareWords, usd } from "./facts";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { AUTHORED_BRIEFS as AGENCY_BRIEFS } from "@/demo/members/agency/grant/briefs";
+import { byMember } from "@/demo/member";
 
 const dining = getOpportunity(CATERER_HERO.teamUp)!;
 const mackall = getOpportunity(CATERER_HERO.twin)!;
@@ -32,7 +34,7 @@ const BIG_JOBS = [PP.county, PP.cdg, PP.church, PP.womack].filter((p) => p.total
 const MACKALL_ANNUAL = Math.round((mackall.valueLow! + mackall.valueHigh!) / 2 / 3);
 const MACKALL_SHARE = MACKALL_ANNUAL / PERSONA.annualRevenue;
 
-export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
+const CATERER_BRIEFS: Record<string, AuthoredBrief> = {
   // ── Fort Bragg dining: bid as a subcontractor ────────────────────────
   [CATERER_HERO.teamUp]: {
     oppId: CATERER_HERO.teamUp,
@@ -322,3 +324,6 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
     },
   },
 };
+
+/** DEMO: the agency's are in src/demo/members/agency/grant/briefs.ts. */
+export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = byMember({ agency: AGENCY_BRIEFS, caterer: CATERER_BRIEFS });

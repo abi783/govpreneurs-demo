@@ -11,8 +11,10 @@ import { calendarDay } from "./calendar";
 import type { HeroDetail } from "./detail";
 import { longDate, type OppFacts, termText, usd } from "./facts";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { HERO_DETAILS as AGENCY_DETAILS } from "@/demo/members/agency/grant/details";
+import { byMember } from "@/demo/member";
 
-type Builder = (f: OppFacts) => HeroDetail;
+export type Builder = (f: OppFacts) => HeroDetail;
 
 const dateIn = (f: OppFacts, days: number): string =>
   longDate(calendarDay(DEMO_TODAY, days));
@@ -325,8 +327,7 @@ const sourcesSought: Builder = (f) => {
   };
 };
 
-/** The hand-written detail, by opportunity id. */
-export const HERO_DETAILS: Record<string, Builder> = {
+const CATERER_DETAILS: Record<string, Builder> = {
   [CATERER_HERO.hero]: fieldMeals,
   [CATERER_HERO.teamUp]: fortBraggDining,
   [CATERER_HERO.twin]: restrictedSite,
@@ -334,3 +335,6 @@ export const HERO_DETAILS: Record<string, Builder> = {
   "CUMCO-2026-014": detention,
   "W912EE-27-S-0004": sourcesSought,
 };
+
+/** The hand-written detail, by opportunity id. DEMO: the agency's are in src/demo/members/agency/grant/details.ts. */
+export const HERO_DETAILS: Record<string, Builder> = byMember({ agency: AGENCY_DETAILS, caterer: CATERER_DETAILS });

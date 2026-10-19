@@ -13,11 +13,12 @@ import type { RailReply } from "@/lib/grant/rail";
 import { acknowledge, findOpenQuestion } from "./answers";
 import { baseAnalysis, buildAnalysis } from "./analysis";
 import { domainFor, offerWord } from "./domains";
-import { COOKS, driveText, factsFor, PARTNER, shareWords, UNCERTIFIED, usd, usdAbout, type OppFacts } from "./facts";
+import { cap, COOKS, driveText, factsFor, shareWords, UNCERTIFIED, usd, usdAbout, type OppFacts } from "./facts";
 import { AUTHORED_BRIEFS } from "./heroBriefs";
 import { localize } from "./encode";
 import { plain } from "./rich";
 import { addRailMessages, getRail, getSkips, setAnswer } from "./state";
+import { V } from "./vocab";
 
 const norm = (s: string): string =>
   s
@@ -115,7 +116,9 @@ const TOPIC_READ: Partial<Record<Topic, string>> = {
 // ── Answers built from the facts ─────────────────────────────────────────
 
 function leadWith(f: OppFacts): string {
-  switch (domainFor(f.opp).key) {
+  const d = domainFor(f.opp);
+  if (d.leadWith) return d.leadWith;
+  switch (d.key) {
     case "field":
     case "boxed":
       return "your delivery plan: two vans and an early start";
@@ -168,10 +171,9 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
       const text = plain(a.verdict.warnings?.map((w) => w.summary).flat() ?? []);
       if (/certificate/i.test(text))
         return `Yes. A food-handler course takes one day, and the exam is the same day. Book your last ${UNCERTIFIED} cooks now, then upload the certificates to My Business.`;
-      if (/Distance/.test(text) || f.miles > 60)
+      if (/Distance/.test(text) || (f.miles > 60 && !V.wide(f)))
         return `Not by yourself: distance is a fact. A partner or a crew near ${f.place.city} can change it. Open Partners to see who looks for subcontractors.`;
-      if (/Size|bond/i.test(text))
-        return `Only with a partner or more staff. A surety needs weeks to build a bond line, and a second crew takes time to hire. Open Partners to find a prime.`;
+      if (/Size|bond/i.test(text)) return V.sizeFix;
       return `Most of it, yes. Start with the item that has the longest lead time, and ask Sarah to look at the draft before you send it.`;
     }
     case "draft":
@@ -179,13 +181,13 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
         ? `Ava drafts the ${offer}. Open it with the button on this page. Lead with ${leadWith(f)}, then your past performance, then your price.`
         : `I would not start a draft yet. ${verdict === "review" ? "Settle the open question first." : "This one is not worth your time."} If you do go ahead, lead with ${leadWith(f)}.`;
     case "money":
-      return `${readOf("Will you make money?")} ${f.annual !== null ? `At about ${usdAbout(f.annual)} a year, check each line of the price form against your real food cost.` : ""}`.trim();
+      return `${readOf("Will you make money?")} ${f.annual !== null ? `At about ${usdAbout(f.annual)} a year, check each line of the price form against ${V.cost}.` : ""}`.trim();
     case "bond":
       return a.complianceMatrix.some((r) => r.category === "bonding")
         ? `The notice asks for a bond near the annual price, about ${usd(f.annual ?? 0)}. Your largest bond is ${usd(PERSONA.largestBond)}. A surety needs weeks to approve a larger line, so this is a limit for you today.`
-        : `No bond is asked for. Your general liability and vehicle insurance are on file, and they meet the notice.`;
+        : V.insuranceLine;
     case "team":
-      return `Teaming is worth a call. ${opp.agency.includes("Army") ? `${PARTNER.name} looks for woman-owned subcontractors at Fort Bragg. ` : ""}Open Partners to see primes that look for subcontractors, and ask for their quote deadline. A prime usually needs your quote about a week before the due date.`;
+      return `Teaming is worth a call. ${V.partnerHint(opp)}Open Partners to see primes that look for subcontractors, and ask for their quote deadline. A prime usually needs your quote about a week before the due date.`;
     case "bid":
       return opp.grant.oneLine;
     case "range": {
@@ -201,12 +203,14 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
         : "Open Hunter and pick a match that Grant calls Bid.";
     }
     case "distance":
-      return `${f.placeText} is ${f.miles} miles from your kitchen, ${driveText(f.miles)} each way. ${f.miles > 60 ? "A daily run adds fuel and driver time." : "That is close enough for your two vans."}`;
+      return V.wide(f) ?? `${f.placeText} is ${f.miles} miles from ${V.base}, ${driveText(f.miles)} each way. ${f.miles > 60 ? V.farLine : V.nearLine}`;
     case "size":
       return f.annual !== null
-        ? `About ${usdAbout(f.annual)} a year. That is ${shareWords(f.share ?? 0)}. ${(f.share ?? 0) >= 0.95 ? "Your kitchen would need more staff and more cash." : "Your kitchen can carry it."}`
+        ? `About ${usdAbout(f.annual)} a year. That is ${shareWords(f.share ?? 0)}. ${cap(V.crew)} ${(f.share ?? 0) >= 0.95 ? "would need more staff and more cash." : "can carry it."}`
         : "The notice states no value, so I cannot size it.";
     case "setaside":
+      if (f.setAside && !f.eligibleSetAside)
+        return `This is a ${f.setAsideLabel}. You are not eligible for it, so you would join as a subcontractor to a firm that is.`;
       return f.setAside
         ? `This is a ${f.setAsideLabel.toLowerCase()}. You are eligible: you are a small business, and your woman-owned certification is active.`
         : "There is no set-aside. Any qualified firm can bid, so you compete with larger firms.";

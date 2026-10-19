@@ -22,8 +22,10 @@ import { rt, pinComputed, pinPublic } from "./rich";
 import { clausePin, naicsLabel, type Solicitation } from "./solicitation";
 import { solicitationFor } from "./detail";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { HERO_EXTRAS as AGENCY_EXTRAS } from "@/demo/members/agency/grant/analyses";
+import { byMember } from "@/demo/member";
 
-type Maker = (f: OppFacts, sol: Solicitation) => Extras;
+export type Maker = (f: OppFacts, sol: Solicitation) => Extras;
 
 const pct = (n: number): string => `${Math.round(n * 100)}%`;
 const revenue = usd(PERSONA.annualRevenue);
@@ -709,7 +711,7 @@ const sourcesSought: Maker = (f, sol) => {
   };
 };
 
-export const HERO_EXTRAS: Record<string, Maker> = {
+const CATERER_EXTRAS: Record<string, Maker> = {
   [CATERER_HERO.hero]: fieldMeals,
   "FAYNC-2026-R-08": cafe,
   "CUMCO-2026-014": detention,
@@ -717,6 +719,9 @@ export const HERO_EXTRAS: Record<string, Maker> = {
   [CATERER_HERO.twin]: restrictedSite,
   "W912EE-27-S-0004": sourcesSought,
 };
+
+/** DEMO: the agency's are in src/demo/members/agency/grant/analyses.ts. */
+export const HERO_EXTRAS: Record<string, Maker> = byMember({ agency: AGENCY_EXTRAS, caterer: CATERER_EXTRAS });
 
 /** Grant's hand-written review of an opportunity, or null when it has none. */
 export function heroAnalysis(f: OppFacts) {

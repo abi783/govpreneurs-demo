@@ -8,9 +8,11 @@
 // The call itself is the story's. The generator never changes it: it builds the
 // reads, limits and next move so they explain that call.
 
+import { byMember } from "@/demo/member";
+import { CAVEATS as AGENCY_CAVEATS } from "@/demo/members/agency/grant/vocab";
 import { dueTimeOf } from "@/demo/story/opportunities";
 import type { GrantCall } from "@/demo/story/opportunities";
-import { PERSONA } from "@/demo/story/persona";
+import { findPastPerformance, PERSONA, type PastPerformanceId } from "@/demo/story/persona";
 import type {
   CapturePath,
   ComplianceRow,
@@ -45,6 +47,7 @@ import {
 } from "./facts";
 import { boldIn, firstSentence, pinComputed, rt, sentences } from "./rich";
 import { clauseOf, clausePinMaybe, type Solicitation } from "./solicitation";
+import { V } from "./vocab";
 
 type Rating = "strong" | "good" | "watch" | "weak";
 const ORDER: Record<Rating, number> = { strong: 0, good: 1, watch: 2, weak: 3 };
@@ -66,6 +69,7 @@ const WITH_VANS = new Set(["field", "boxed", "senior", "detention", "hospital", 
 
 /** The past job that is the best reference for each kind of work. */
 function referenceFor(d: Domain) {
+  if (d.reference) return findPastPerformance(d.reference) ?? null;
   switch (d.key) {
     case "school":
     case "senior":
@@ -85,8 +89,36 @@ function referenceFor(d: Domain) {
   }
 }
 
+/** A risk the story's one-liner names that the facts alone do not show. */
+export interface Caveat {
+  limit: string;
+  kind: WarningKind;
+  change?: string;
+  /** The caveat is what the call turns on, even for Needs review or No-bid. */
+  decides?: boolean;
+  /** The caveat in a few words, when it decides: "the GSA schedule". */
+  phrase?: string;
+  /** No-bid: the first step of the roadmap, with one bold phrase in `item`. */
+  roadmap?: { item: string; why: string; takes: string };
+  /** A closer reference than the kind of work gives. */
+  ref?: PastPerformanceId;
+  /** Replaces the trail's set-aside line, for a notice limited to some firms another way. */
+  trail?: string;
+  /** The read the caveat rewrites, with one bold phrase inside `text`. */
+  read?: { name: Read["name"]; rating: Rating; text: string; bold?: string };
+  /** Needs review: the open question to ask, the word on its chip ("Answer the media question"), and what an answer changes. */
+  question?: {
+    id: string;
+    question: string;
+    payoff: string;
+    chip: string;
+    yes: { gist: string; ack: string };
+    no: { gist: string; ack: string };
+  };
+}
+
 /** Notes for opportunities where the story's one-liner names a risk that the facts alone do not show. */
-const CAVEATS: Record<string, { limit: string; kind: WarningKind; change?: string }> = {
+const CATERER_CAVEATS: Record<string, Caveat> = {
   "W912PM-26-Q-0017": {
     limit: "Large dinners: the notice includes dinners of up to 600 guests. Price staff, rentals and holding equipment for the largest ones.",
     kind: "winning-hurts",
@@ -120,6 +152,8 @@ const CAVEATS: Record<string, { limit: string; kind: WarningKind; change?: strin
   },
 };
 
+const CAVEATS: Record<string, Caveat> = byMember({ agency: AGENCY_CAVEATS, caterer: CATERER_CAVEATS });
+
 // ── The generator ────────────────────────────────────────────────────────
 
 export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis {
@@ -142,7 +176,13 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const range = `${usd(PERSONA.targetValueMin)} to ${usd(PERSONA.targetValueMax)}`;
   const miles = f.miles;
   const daily = DAILY.has(d.key);
-  const ref = referenceFor(d);
+  const caveat = CAVEATS[f.id];
+  const ref = (caveat?.ref ? findPastPerformance(caveat.ref) : undefined) ?? referenceFor(d);
+  /** Work not tied to one place, such as a statewide campaign run from the office (agency only). */
+  const wideLine = V.wide(f);
+  const wide = wideLine !== null;
+  /** A drive long enough to matter. */
+  const far = !wide && miles > 60;
   const subGo = call.prime === "no_go" && call.sub === "go";
   const cp = (kind: string, label?: string): Pin | null => clausePinMaybe(sol, kind, label);
   const pins = (...list: (Pin | null)[]): Pin[] => list.filter((p): p is Pin => p !== null);
@@ -151,7 +191,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     const hit = clauseOf(sol, kindOf);
     return hit ? `§${hit.clause.ref}` : "Notice";
   };
-  const outsideArea = miles > PERSONA.serviceRadiusMiles;
+  const outsideArea = !wide && miles > PERSONA.serviceRadiusMiles;
   const outOfState = f.place.state !== PERSONA.hqState;
   const shortDeadline = f.opp.closesInDays <= 10;
   const fitWeak = d.fit.rating === "weak";
@@ -175,7 +215,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     name: "Is it your kind of work?",
     rating: d.fit.rating,
     text: d.fit.text,
-    bold: fitBold[d.key],
+    bold: d.fitBold ?? fitBold[d.key],
     pins: pins(cp("scope"), pinComputed("Your codes", `The notice uses NAICS ${opp.naics}. Your codes: ${[PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)].join(", ")}.`)),
   };
 
@@ -183,10 +223,10 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     share < 0.12
       ? "It is easy to carry, and it adds little."
       : share < 0.6
-        ? `A year of it is ${shareWords(share)}. Your kitchen can carry it.`
+        ? `A year of it is ${shareWords(share)}. ${cap(V.crew)} can carry it.`
         : share < 0.95
           ? `A year of it is ${shareWords(share)}. Plan the staff first.`
-          : `A year of it is ${shareWords(share)}. It would stretch a ${COOKS}-person kitchen.`;
+          : `A year of it is ${shareWords(share)}. It would stretch ${V.teamOf}.`;
   const rangeSentence =
     band === "above" || band === "far"
       ? `That is ${ratioText} times your yearly revenue, and above your usual range of ${range}.`
@@ -203,22 +243,30 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     pins: pins(cp("value"), pinComputed("Size against revenue", `${usd(mid)} over ${f.years} years is ${usd(annual)} a year. Your yearly revenue is ${usd(PERSONA.annualRevenue)}. The total is ${ratioText} times it, and a year of it is ${Math.round(share * 100)}%.`)),
   };
 
-  const perform: Take = {
-    name: "Can you perform there?",
-    rating: miles <= 25 ? "strong" : miles <= 60 ? "good" : miles <= 110 ? "watch" : "weak",
-    text:
-      miles <= 5
-        ? `${place} is your hometown, ${miles} miles from your kitchen. ${cap(driveText(miles))} each way.`
-        : miles <= 60
-          ? `${place} is ${miles} miles from your kitchen, ${driveText(miles)} each way. Your two refrigerated vans can make the run in one trip.`
-          : outsideArea
-            ? `${place} is ${miles} miles from your kitchen. That is outside your ${PERSONA.serviceRadiusMiles}-mile service area.`
-            : daily
-              ? `${place} is ${miles} miles from your kitchen, ${driveText(miles)} each way. A daily run is hard to staff, and fuel and driver time add up.`
-              : `${place} is ${miles} miles from your kitchen, ${driveText(miles)} each way. Each event means a long haul for staff and food.`,
-    bold: miles <= 5 ? "your hometown" : outsideArea ? "outside your 200-mile service area" : `${miles} miles from your kitchen`,
-    pins: pins(cp("place"), pinComputed("Distance", `${PERSONA.physicalAddress} to ${f.placeText}: about ${miles} miles. Your service radius is ${PERSONA.serviceRadiusMiles} miles.`)),
-  };
+  const perform: Take = wideLine
+    ? {
+        name: "Can you perform there?",
+        rating: "good",
+        text: wideLine,
+        bold: firstSentence(wideLine),
+        pins: pins(cp("place")),
+      }
+    : {
+        name: "Can you perform there?",
+        rating: miles <= 25 ? "strong" : miles <= 60 ? "good" : miles <= 110 ? "watch" : "weak",
+        text:
+          miles <= 5
+            ? `${place} is your hometown, ${miles} miles from ${V.base}. ${cap(driveText(miles))} each way.`
+            : miles <= 60
+              ? `${place} is ${miles} miles from ${V.base}, ${driveText(miles)} each way. ${V.nearRun}`
+              : outsideArea
+                ? `${place} is ${miles} miles from ${V.base}. That is outside your ${PERSONA.serviceRadiusMiles}-mile service area.`
+                : daily
+                  ? `${place} is ${miles} miles from ${V.base}, ${driveText(miles)} each way. A daily run is hard to staff, and fuel and driver time add up.`
+                  : `${place} is ${miles} miles from ${V.base}, ${driveText(miles)} each way. ${V.farTrip}`,
+        bold: miles <= 5 ? "your hometown" : outsideArea ? "outside your 200-mile service area" : `${miles} miles from ${V.base}`,
+        pins: pins(cp("place"), pinComputed("Distance", `${PERSONA.physicalAddress} to ${f.placeText}: about ${miles} miles. Your service radius is ${PERSONA.serviceRadiusMiles} miles.`)),
+      };
 
   const certGap = VOLUME.has(d.key) && UNCERTIFIED > 0;
   const doText =
@@ -230,7 +278,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
           ? `The work needs a crew far larger than your ${COOKS} staff.`
           : certGap
             ? `Every cook needs a food-handler certificate. ${UNCERTIFIED} of your ${COOKS} cooks do not have one yet.`
-            : `Your kitchen and your ${COOKS}-person team can run this work.`;
+            : V.canRun;
   const doBold =
     d.key === "construction"
       ? "no construction license"
@@ -253,9 +301,9 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     subGo && call.prime === "no_go"
       ? `As a prime you would compete with firms far bigger than yours. As a subcontractor you ride the winning prime and share in the work.`
       : f.setAside === "WOSB"
-        ? `Only woman-owned small businesses can compete. That removes the large caterers.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
+        ? `Only woman-owned small businesses can compete. That removes the large ${V.peers}.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
         : f.setAside === "SBA"
-          ? `Only small businesses can compete. That removes the large national firms, but other small caterers will bid.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
+          ? `Only small businesses can compete. That removes the large national firms, but other small ${V.peers} will bid.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
           : priceOnly
             ? `The lowest price from a qualified bidder wins. Your cost is low if the kitchen is close.`
             : `No set-aside. Large and small firms can bid, so your record and your price decide it.${ref ? ` Your ${customerShort(ref)} record helps.` : " You have no past job of this kind."}`;
@@ -263,7 +311,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     subGo && call.prime === "no_go"
       ? "As a subcontractor you ride the winning prime"
       : f.setAside === "WOSB"
-        ? "removes the large caterers"
+        ? `removes the large ${V.peers}`
         : f.setAside === "SBA"
           ? "removes the large national firms"
           : priceOnly
@@ -283,17 +331,17 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       : d.key === "construction"
         ? "The build carries a bond and a long wait before the food service starts to pay."
         : outsideArea
-          ? "The long drive adds fuel and driver time. Price it before you decide, because it can erase the margin."
-          : miles > 60 && daily
+          ? `The long drive adds ${V.travelCost}. Price it before you decide, because it can erase the margin.`
+          : far && daily
             ? "The daily drive adds fuel and driver time. Price it before you commit."
             : band === "above" || band === "far" || share >= 0.95
-              ? "A contract this large pays slowly at first: you hire and buy food before the first invoice is paid."
+              ? `A contract this large pays slowly at first: ${V.frontCost} before the first invoice is paid.`
               : priceOnly
                 ? "A price-only bid is thin. Hold food cost low or walk away."
-                : "Price from your real food cost and the wage rates. A kitchen this close keeps delivery cost low.";
+                : V.priceAdvice;
   const money: Take = {
     name: "Will you make money?",
-    rating: d.key === "staffing" || d.key === "construction" || outsideArea ? "weak" : (miles > 60 && daily) || band === "above" || band === "far" || share >= 0.95 || priceOnly ? "watch" : "good",
+    rating: d.key === "staffing" || d.key === "construction" || outsideArea ? "weak" : (far && daily) || band === "above" || band === "far" || share >= 0.95 || priceOnly ? "watch" : "good",
     text: moneyText,
     bold: d.key === "staffing" ? "thin" : outsideArea ? "erase the margin" : undefined,
     pins: pins(cp("price"), cp("wage")),
@@ -308,7 +356,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
         ? `A win would be ${ratioText} times your yearly revenue. You would need a crew and cash far beyond what you have today.`
         : band === "above" || share >= 0.95
           ? `A win would add about as much work as you do in a year. You would need new staff and a cash cushion for the first 90 days.`
-          : `No bond is needed. A win fits your kitchen with the staff you have.`,
+          : `No bond is needed. ${V.fitsWin}`,
     bold: hasBond ? "a bond near the annual price" : band === "far" ? "far beyond what you have today" : band === "above" || share >= 0.95 ? "as much work as you do in a year" : "No bond is needed",
     pins: pins(cp("bond"), cp("term")),
   };
@@ -322,11 +370,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     pins: pins(cp("factors") ?? cp("evaluate"), cp("needs")),
   };
 
-  const isTarget =
-    Boolean(opp.targetAgency) ||
-    /Veterans/.test(opp.agency) ||
-    (/Army/.test(opp.agency) && /Fort Bragg|Camp Mackall|Pope/.test(place)) ||
-    (/Schools?/.test(opp.agency) && f.place.state === PERSONA.hqState);
+  const isTarget = V.isTarget(f);
   const forward: Take = {
     name: "Does this move you forward?",
     rating: isTarget ? "strong" : miles <= 60 ? "good" : "watch",
@@ -340,6 +384,8 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   };
 
   let takes: Take[] = [kind, size, perform, doWork, win, money, survive, intent, forward];
+  const told = caveat?.read;
+  if (told) takes = takes.map((t) => (t.name === told.name ? { ...t, rating: told.rating, text: told.text, bold: told.bold } : t));
 
   // Make the ratings agree with the story's call.
   if (verdict === "bid") {
@@ -352,7 +398,9 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     const worst = [...takes].sort((a, b) => ORDER[b.rating] - ORDER[a.rating])[0];
     takes = takes.map((t) => (t === worst ? { ...t, rating: "weak" as Rating } : t));
   }
-  const limitingTake = [...takes].sort((a, b) => ORDER[b.rating] - ORDER[a.rating] || takes.indexOf(a) - takes.indexOf(b))[0];
+  const limitingTake =
+    (caveat?.decides && told && takes.find((t) => t.name === told.name)) ||
+    [...takes].sort((a, b) => ORDER[b.rating] - ORDER[a.rating] || takes.indexOf(a) - takes.indexOf(b))[0];
   const limiting = ORDER[limitingTake.rating] >= ORDER.watch ? limitingTake : null;
 
   const reads: Read[] = takes.map((t, i) => {
@@ -385,14 +433,13 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const issues: Issue[] = [];
   const add = (key: Issue["key"], sev: number, kindOf: WarningKind, label: string, text: string) =>
     issues.push({ key, sev, w: { kind: kindOf, summary: [{ text: label, bold: true }, { text: `: ${text}` }] } });
-  const caveat = CAVEATS[f.id];
   if (hasBond) add("bond", 10, "responsibility", "Bond", `the notice asks for a bond near the annual price, about ${usdAbout(annual)}. Your largest bond is ${usd(PERSONA.largestBond)}.`);
   if (fitWeak) add("fit", 9, "proposal-weakness", "Fit", d.fit.text);
   if (band === "far") add("size", 9.5, "winning-hurts", "Size", `the total is ${ratioText} times your yearly revenue and above your usual range of ${range}.`);
-  else if (bigJob) add("size", 6.5, "winning-hurts", "Size", band === "above" ? `the total is above your usual range of ${range}. Your kitchen would need more staff and more cash.` : `a year of it is ${shareWords(share)}. Your kitchen would need more staff and more cash.`);
-  if (outsideArea) add("distance", 8, "responsibility", "Distance", `${place} is ${miles} miles from your kitchen, outside your ${PERSONA.serviceRadiusMiles}-mile service area.`);
-  else if (miles > 60) add("distance", 7, "winning-hurts", "Distance", `${place} is ${miles} miles from your kitchen, ${driveText(miles)} each way${daily ? `. A daily round trip is ${miles * 2} miles` : ""}.`);
-  if (caveat) add("caveat", 7.5, caveat.kind, caveat.limit.split(": ")[0], caveat.limit.split(": ").slice(1).join(": "));
+  else if (bigJob) add("size", 6.5, "winning-hurts", "Size", band === "above" ? `the total is above your usual range of ${range}. ${cap(V.crew)} would need more staff and more cash.` : `a year of it is ${shareWords(share)}. ${cap(V.crew)} would need more staff and more cash.`);
+  if (outsideArea) add("distance", 8, "responsibility", "Distance", `${place} is ${miles} miles from ${V.base}, outside your ${PERSONA.serviceRadiusMiles}-mile service area.`);
+  else if (far) add("distance", 7, "winning-hurts", "Distance", `${place} is ${miles} miles from ${V.base}, ${driveText(miles)} each way${daily ? `. A daily round trip is ${miles * 2} miles` : ""}.`);
+  if (caveat) add("caveat", caveat.decides ? 11 : 7.5, caveat.kind, caveat.limit.split(": ")[0], caveat.limit.split(": ").slice(1).join(": "));
   if (shortDeadline) add("deadline", 6, "responsibility", "Time", `only ${f.daysLeft} days are left. A short window leaves little room for questions and references.`);
   if (certGap && verdict !== "no-bid") add("certs", 5, "responsibility", "Food-handler certificates", `${UNCERTIFIED} of your ${COOKS} cooks need one before you send the ${offer}.`);
   if (outOfState) add("registration", 4, "responsibility", "Registration", `you need a vendor registration in ${f.place.state} before award.`);
@@ -415,8 +462,8 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     competition: "the competition",
     record: "your record",
   };
-  const mainKey: Issue["key"] = issues.find((i) => i.key !== "caveat" || verdict === "bid")?.key ?? "record";
-  const mainIssue = PHRASE[mainKey];
+  const mainKey: Issue["key"] = issues.find((i) => i.key !== "caveat" || verdict === "bid" || caveat?.decides)?.key ?? "record";
+  const mainIssue = mainKey === "caveat" && caveat?.phrase ? caveat.phrase : PHRASE[mainKey];
 
   // ── Compliance matrix ─────────────────────────────────────────────────
   const rows: ComplianceRow[] = [];
@@ -477,13 +524,13 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
 
   // ── Path, confidence, next move ──────────────────────────────────────
   const path: CapturePath = verdict === "no-bid" ? "skip" : subGo ? "sub" : verdict === "bid" ? "prime" : "shape-watch";
-  const dots = verdict === "bid" ? (share >= 0.6 || certGap ? 3 : 4) : verdict === "review" ? (miles > 140 ? 2 : 3) : outsideArea || fitWeak || band === "far" ? 5 : 4;
+  const dots = verdict === "bid" ? (share >= 0.6 || certGap ? 3 : 4) : verdict === "review" ? (!wide && miles > 140 ? 2 : 3) : outsideArea || fitWeak || band === "far" ? 5 : 4;
   const level: "high" | "medium" | "low" = dots >= 4 ? "high" : dots === 3 ? "medium" : "low";
 
   const thesis: RichLine[] =
     verdict === "bid"
       ? [
-          rt(`**${cap(d.service)}** fits your kitchen and your size.`),
+          rt(`**${cap(d.service)}** fits ${V.fitsYou}.`),
           rt(f.setAside ? `Only ${f.setAside === "WOSB" ? "woman-owned" : "small"} firms can bid, so the field is smaller.` : "Anyone can bid, so your record and your price must carry it."),
           rt(`Send the ${offer} before ${longDate(f.closes)}.`),
         ]
@@ -502,14 +549,16 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     wouldChange.push(
       certGap
         ? rt(`If your last ${UNCERTIFIED} cooks are not certified before the due date, I'd move this to **Needs review**.`)
-        : rt(`If an amendment adds sites or hours, I'd check that your kitchen **still covers them**.`),
+        : rt(`If an amendment adds sites or hours, I'd check that ${V.crew} **still covers them**.`),
     );
     wouldChange.push(rt(caveat?.change ?? "If the buyer changes the set-aside, I'd run all the checks again and tell you."));
   } else if (verdict === "review") {
     wouldChange.push(
-      subGo
+      caveat?.decides && caveat.change
+        ? rt(caveat.change)
+        : subGo
         ? rt(`If a prime that holds this kind of contract asks you to join its team, I'd move the **subcontract path** to Go.`)
-        : miles > 60
+        : far
           ? rt(`If you can place a crew near ${place}, or team with a local firm, I'd move this to **Bid**.`)
           : bigJob
             ? rt(`If you team with a prime, or add a second crew, I'd move this to **Bid**.`)
@@ -519,7 +568,9 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     );
     wouldChange.push(rt("If an amendment changes the scope or the set-aside, I'd run all the checks again and tell you."));
   } else {
-    wouldChange.push(rt(`If the buyer split out a **smaller part** that fits your kitchen, I'd look again.`));
+    wouldChange.push(
+      caveat?.decides && caveat.change ? rt(caveat.change) : rt(`If the buyer split out a **smaller part** that fits ${V.crew}, I'd look again.`),
+    );
     wouldChange.push(rt(subGo ? "If a prime asks you to join its team, I'd check the subcontract path first." : "If you teamed with a firm that fits this scope, I'd run the checks again."));
   }
 
@@ -527,7 +578,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const primary =
     verdict === "bid" && !subGo
       ? { label: `Build the ${offer} with Ava`, target: avaTarget }
-      : subGo || miles > 60 || bigJob
+      : subGo || far || bigJob
         ? { label: subGo ? "Find a prime on Partners" : "Find a partner on Partners", target: "/partners" }
         : { label: "Back to your matches", target: "/opportunities" };
   const rationale: RichLine =
@@ -543,7 +594,9 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       title: f.isSourcesSought ? "Reading the notice" : `Reading the ${offer === "bid" ? "invitation for bid" : "solicitation"}`,
       checkCount: 7,
       items: [
-        { glyph: f.setAside ? "ok" : "neutral", text: rt(f.setAside ? `Set-aside: **${f.setAsideLabel.replace(/ set-aside$/, "")}**. You are eligible.` : "No set-aside. Any qualified firm can bid."), source: srcOf("setAside") },
+        caveat?.trail
+          ? { glyph: "blocked" as const, text: rt(caveat.trail), source: srcOf("setAside") }
+          : { glyph: f.setAside ? "ok" : "neutral", text: rt(f.setAside ? `Set-aside: **${f.setAsideLabel.replace(/ set-aside$/, "")}**. You are eligible.` : "No set-aside. Any qualified firm can bid."), source: srcOf("setAside") },
         { glyph: "neutral", text: rt(`Scoring: ${priceOnly ? "**lowest price** from a qualified bidder" : d.scoring.map((s) => `${s.factor.toLowerCase()} ${s.weight}`).join(", ")}.`), source: srcOf("factors") !== "Notice" ? srcOf("factors") : srcOf("evaluate") },
         { glyph: hasBond ? "blocked" : "ok", text: rt(hasBond ? `A **bond near ${usd(annual)}** is required.` : "No bond is required."), source: hasBond ? srcOf("bond") : srcOf("insurance") },
         { glyph: "neutral", text: rt(`Key dates: due ${longDate(f.closes)}, ${dueTimeOf(f.opp)}.`), source: "Notice" },
@@ -562,7 +615,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       checkCount: 6,
       items: [
         { glyph: share < 0.95 ? "ok" : "warn", text: rt(`The yearly value, about ${usdAbout(annual)}, is ${shareWords(share)}.`), source: "Computed" },
-        { glyph: miles <= 60 ? "ok" : "warn", text: rt(`${place} is ${miles} miles from your kitchen.`), source: "Computed" },
+        { glyph: far ? "warn" : "ok", text: rt(wideLine ? firstSentence(wideLine) : `${place} is ${miles} miles from ${V.base}.`), source: "Computed" },
         { glyph: ref ? "ok" : "warn", text: rt(ref ? `Closest past job: ${customerShort(ref)}.` : "No past job of this kind on file."), source: "Your record" },
       ],
     },
@@ -572,19 +625,19 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     verdict === "bid"
       ? [
           {
-            challenge: rt(`Is a ${COOKS}-person kitchen enough for this?`),
+            challenge: rt(`Is ${V.teamOf} enough for this?`),
             resolution: boldIn(
               share < 0.6
-                ? `Yes. The yearly value is ${shareWords(share)}, which your kitchen can carry.`
+                ? `Yes. The yearly value is ${shareWords(share)}, which ${V.crew} can carry.`
                 : `Yes, with planning. The yearly value is ${shareWords(share)}. Hire before you start, not after.`,
-              share < 0.6 ? "your kitchen can carry" : "Hire before you start",
+              share < 0.6 ? `${V.crew} can carry` : "Hire before you start",
             ),
           },
           {
             challenge: rt(f.setAside ? "Could a large firm undercut you on price?" : "Could a large firm outspend you on this?"),
             resolution: boldIn(
-              f.setAside ? "No. The set-aside limits bidders to small firms." : "Yes, it can. Your edge is a close kitchen and a clean record.",
-              f.setAside ? "The set-aside limits bidders" : "a close kitchen and a clean record",
+              f.setAside ? "No. The set-aside limits bidders to small firms." : `Yes, it can. Your edge is ${V.edge}.`,
+              f.setAside ? "The set-aside limits bidders" : V.edge,
             ),
           },
         ]
@@ -605,28 +658,35 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const roadmap: RoadmapItem[] | undefined =
     verdict === "no-bid"
       ? [
-          {
-            item: rt(
-              miles > 60 || outsideArea
-                ? `A **partner or crew** near ${place}`
-                : fitWeak
-                  ? `A **kitchen-based** contract that fits`
-                  : `A **bonding line** and a second crew`,
-            ),
-            whyItMattered: rt(
-              miles > 60 || outsideArea
-                ? `${place} is ${miles} miles from your kitchen. A local partner makes a daily run possible.`
-                : fitWeak
-                  ? "This notice does not use your kitchen, so it does not build the record you want."
-                  : `The yearly value is ${shareWords(share)}. A larger contract needs more cash cover and more staff.`,
-            ),
-            whatItTakes: rt("A conversation with a mentor about who to team with, and a plan for the next year."),
-            cta: { kind: "mentor" },
-          },
+          caveat?.roadmap
+            ? {
+                item: rt(caveat.roadmap.item),
+                whyItMattered: rt(caveat.roadmap.why),
+                whatItTakes: rt(caveat.roadmap.takes),
+                cta: { kind: "mentor" },
+              }
+            : {
+                item: rt(
+                  far || outsideArea
+                    ? `A **partner or crew** near ${place}`
+                    : fitWeak
+                      ? `A **kitchen-based** contract that fits`
+                      : V.cashLine,
+                ),
+                whyItMattered: rt(
+                  far || outsideArea
+                    ? `${place} is ${miles} miles from ${V.base}. ${V.localPartner}`
+                    : fitWeak
+                      ? "This notice does not use your kitchen, so it does not build the record you want."
+                      : `The yearly value is ${shareWords(share)}. A larger contract needs more cash cover and more staff.`,
+                ),
+                whatItTakes: rt("A conversation with a mentor about who to team with, and a plan for the next year."),
+                cta: { kind: "mentor" },
+              },
           {
             item: rt("A **federal record** near home"),
-            whyItMattered: rt("A first federal prime near your kitchen is the record that larger buyers look for."),
-            whatItTakes: rt("Bid the matches that fit. Camp Mackall field meals is the first one."),
+            whyItMattered: rt(V.recordWhy),
+            whatItTakes: rt(`Bid the matches that fit. ${V.firstMatch} is the first one.`),
           },
           subGo
             ? {
@@ -647,7 +707,16 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   // ── Rail ──────────────────────────────────────────────────────────────
   const openQuestions: OpenQuestion[] = [];
   if (verdict === "review") {
-    if (subGo) {
+    if (caveat?.question) {
+      openQuestions.push({
+        id: caveat.question.id,
+        question: rt(caveat.question.question),
+        payoff: rt(caveat.question.payoff),
+        verdictSwing: 0.5,
+        input: { kind: "yesno" },
+        status: "open",
+      });
+    } else if (subGo) {
       openQuestions.push({
         id: "has-prime",
         question: rt("Do you know a **prime** that bids contracts like this one?"),
@@ -656,11 +725,11 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
         input: { kind: "yesno" },
         status: "open",
       });
-    } else if (miles > 60) {
+    } else if (far) {
       openQuestions.push({
         id: "local-crew",
-        question: rt(`Could you place a **crew or a partner** near ${place}?`),
-        payoff: rt("A yes shows whether the **daily drive** is a real limit."),
+        question: rt(V.localQuestion.question(place)),
+        payoff: rt(V.localQuestion.payoff),
         verdictSwing: 0.6,
         input: { kind: "yesno" },
         status: "open",
@@ -694,7 +763,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const slots = ["doubt", "improve", "act"] as const;
   const chips: SuggestedChip[] = chipsByVerdict[verdict].map((label, i) => ({ slot: slots[i], label, kind: "ask" as const }));
   if (openQuestions.length > 0) {
-    chips[1] = { slot: "improve", label: `Answer the ${openQuestions[0].id === "has-prime" ? "prime" : openQuestions[0].id === "local-crew" ? "crew" : openQuestions[0].id === "second-crew" ? "size" : "time"} question`, kind: "elicit", target: openQuestions[0].id };
+    chips[1] = { slot: "improve", label: `Answer the ${caveat?.question?.chip ?? (openQuestions[0].id === "has-prime" ? "prime" : openQuestions[0].id === "local-crew" ? "crew" : openQuestions[0].id === "second-crew" ? "size" : "time")} question`, kind: "elicit", target: openQuestions[0].id };
   }
 
   const when = analyzedAt(f);
@@ -702,7 +771,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const briefing: RichLine[] = [
     rt(`I read the ${docWord} and the work statement.`),
     verdict === "bid"
-      ? rt(`It fits your kitchen and your size. **${cap(mainIssue)}** is the one thing to watch.`)
+      ? rt(`It fits ${V.fitsYou}. **${cap(mainIssue)}** is the one thing to watch.`)
       : verdict === "review"
         ? rt(`The work fits, but **${mainIssue}** needs a decision. I would not commit yet.`)
         : rt(`**${cap(mainIssue)}** stops this one. I would not bid it.`),
@@ -743,10 +812,10 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       wouldChange,
       competitiveRisk: rt(
         f.setAside === "WOSB"
-          ? `the **other woman-owned caterers** near you who list your code`
+          ? `the **other woman-owned ${V.peers}** near you who list your code`
           : f.setAside === "SBA"
-            ? `**other small caterers** with a federal record`
-            : `**larger firms** with more federal food service work`,
+            ? `**other small ${V.peers}** with a federal record`
+            : `**larger firms** with more ${V.bigWork}`,
       ),
       confidence: {
         level,
