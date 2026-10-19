@@ -20,7 +20,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       },
       "Does the size fit?": {
         rating: "strong",
-        text: "About $620K a year, about a quarter of your revenue, for six techs and a site lead.",
+        text: "About $710K a year, about a quarter of your revenue, for six techs and a site lead.",
       },
       "Can you perform there?": {
         rating: "strong",

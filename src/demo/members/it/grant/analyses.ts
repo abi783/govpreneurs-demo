@@ -47,7 +47,8 @@ const COMMON_ROWS: RowSpec[] = [
 
 const helpDesk: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
-  const annual = f.annual ?? 0;
+  // Year one at the wage floor, as Ava prices it (six techs, a site lead, overhead); the range's midpoint is $715K.
+  const annual = 710_000;
   return {
     path: "prime",
     checks: [23, 7],
@@ -69,7 +70,7 @@ const helpDesk: Maker = (f, sol) => {
     },
     readPins: {
       "Is it your kind of work?": [cp("needs"), record("pp-bragg-helpdesk-seats", "Your Fort Bragg help-desk seats")],
-      "Does the size fit?": [cp("value"), pinComputed("Size against revenue", `${usd(annual)} a year divided by ${revenue} yearly revenue is ${pct(annual / PERSONA.annualRevenue)}. The Army's range is ${usd(f.opp.valueLow!)} to ${usd(f.opp.valueHigh!)} a year, for ${f.years} years.`)],
+      "Does the size fit?": [cp("value"), pinComputed("Size against revenue", `About ${usd(annual)} a year at the wage floor, divided by ${revenue} yearly revenue, is ${pct(annual / PERSONA.annualRevenue)}. The Army's range is ${usd(f.opp.valueLow!)} to ${usd(f.opp.valueHigh!)} a year, for ${f.years} years.`)],
       "Can you perform there?": [cp("place"), pinComputed("Distance", `${PERSONA.physicalAddress} to Fort Bragg: about ${f.miles} miles.`)],
       "Can you do the work?": [cp("security"), cp("phaseIn")],
       "Can you win it?": [cp("setAside"), cp("factors")],
