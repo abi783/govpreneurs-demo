@@ -10,6 +10,7 @@ import { stateName } from "../../lib/vocab/usStates";
 import { getSavedOpps } from "../state/workspace";
 import { deadlineIso, postedIso } from "./dates";
 import { naicsDescription } from "./naicsData";
+import { VOCAB } from "./vocab";
 
 /** The three tabs of the feed. */
 export type FeedTabId = "for_you" | "all" | "saved";
@@ -25,7 +26,7 @@ export interface FeedRow {
   closesAt: string;
   low: number | null;
   high: number | null;
-  /** The SAM set-aside code the card shows: "WOSB", "SBA" or "". */
+  /** The SAM set-aside code the card shows: "WOSB", "SBA", "SDVOSBC" or "". */
   setAside: string;
   /** The ids the drawer's set-aside filter uses. */
   setAsideIds: string[];
@@ -76,7 +77,11 @@ const NOTICE_IDS: Record<string, string[]> = {
 const SET_ASIDE_WORDS: Record<string, string> = {
   WOSB: "wosb woman-owned women-owned woman owned set-aside",
   SBA: "sba small business set-aside",
+  SDVOSBC: "sdvosb service-disabled veteran-owned set-aside",
 };
+
+/** The drawer's set-aside ids for a SAM code. */
+const SET_ASIDE_IDS: Record<string, string[]> = { WOSB: ["WOSB"], SBA: ["SB"], SDVOSBC: ["VOSB"] };
 
 const DOD = /army|navy|air force|marine/i;
 
@@ -114,10 +119,10 @@ function build(o: StoryOpportunity): FeedRow {
     low: o.valueLow,
     high: o.valueHigh,
     setAside,
-    setAsideIds: setAside === "WOSB" ? ["WOSB"] : setAside === "SBA" ? ["SB"] : ["FULL_OPEN"],
+    setAsideIds: SET_ASIDE_IDS[setAside] ?? ["FULL_OPEN"],
     noticeIds: NOTICE_IDS[o.noticeType] ?? ["solicitation"],
     naicsLabel,
-    psc: "S203",
+    psc: VOCAB.pscFor(o.naics),
     isDod: DOD.test(o.agency),
     haystack,
     words: new Set(haystack.split(/[^a-z0-9]+/).filter(Boolean)),

@@ -6,11 +6,12 @@
 // matched before a filter, so "what is a sources sought" explains the term and
 // "show only sources sought" changes the feed.
 
-import { KEY_PARTNER, PERSONA } from "../../story/persona";
+import { MENTOR, PERSONA } from "../../story/persona";
 import { PLACES } from "../../story/places";
 import { allRows, forYouRows, rowById, savedRows, universe, type FeedRow } from "../data";
 import { longDate } from "../dates";
 import {
+  FROM_BASE,
   RANGE_TEXT,
   aboutValue,
   cap,
@@ -50,7 +51,8 @@ import { findOpp, titleIn } from "./resolve";
 import { proposeProfileChange } from "./profile";
 import { readSession, updateSession } from "./session";
 import type { ChatCtx, Rule, Turn } from "./types";
-import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { VOCAB } from "../vocab";
+import { BUYER_LANE_LABEL } from "../../../lib/buyerLane";
 
 const has = (ctx: ChatCtx, rx: RegExp) => rx.test(ctx.norm);
 
@@ -166,9 +168,14 @@ export const startOver: Rule = {
       )
     )
       return null;
-    const n = forYouRows().length;
+    // The buyer lane is page state: a reset keeps it, so the count does too.
+    const lane = ctx.feed.lane;
+    const n = applyFilters(forYouRows(), ctx.feed.filters.scopes ? { scopes: ctx.feed.filters.scopes } : {}).length;
     return {
-      reply: `Done. I cleared your filters and your search. Your list shows all ${n} matches again.`,
+      reply:
+        lane === "all"
+          ? `Done. I cleared your filters and your search. Your list shows all ${n} matches again.`
+          : `Done. I cleared your filters and your search. You still see ${BUYER_LANE_LABEL[lane].toLowerCase()} buyers only, so your list shows ${n} matches.`,
       kind: "reset",
       data: {},
       chips: [chip.best, chip.top3, chip.fresh],
@@ -565,13 +572,13 @@ function aboutRuleFor(strict: boolean): Rule {
       }
       if (has(ctx, /\b(where|how far|miles|distance)\b/)) {
         return {
-          reply: `${t} is in ${opp.city}, ${opp.state}. That is ${opp.miles} miles from your kitchen in ${PERSONA.hqCity}.`,
+          reply: `${t} is in ${opp.city}, ${opp.state}. That is ${opp.miles} miles ${FROM_BASE} in ${PERSONA.hqCity}.`,
           chips: [chip.why(opp), chip.ready(opp), chip.top3],
         };
       }
       if (has(ctx, /\b(who|buyer|agency|incumbent|posted|buying)\b/)) {
         return {
-          reply: `The buyer for ${t} is ${opp.o.agency}, ${opp.o.office}. It is ${noticeText(opp)}, and ${setAsideText(opp)}.`,
+          reply: `The buyer for ${t.replace(/^The /, "the ")} is ${opp.o.agency}, ${opp.o.office}. It is ${noticeText(opp)}, and ${setAsideText(opp)}.`,
           chips: [chip.why(opp), chip.ready(opp), chip.top3],
         };
       }
@@ -605,14 +612,14 @@ const incumbentRule: Rule = {
       )
     )
       return null;
-    const hero = rowById(CATERER_HERO.teamUp)!;
-    const opp = has(ctx, /\bfort bragg\b.*\b(dining|dfac)\b|\b(dining|dfac)\b.*\bfort bragg\b/)
-      ? hero
-      : (findOpp(ctx.norm, ctx.visible) ?? undefined);
-    if (opp && opp.id === hero.id) {
+    // The one incumbent the story names, if this member's story names one.
+    const known = VOCAB.incumbent;
+    const held = known ? rowById(known.id) : undefined;
+    const opp = held && has(ctx, known!.rx) ? held : (findOpp(ctx.norm, ctx.visible) ?? undefined);
+    if (held && opp && opp.id === held.id) {
       about(opp);
       return {
-        reply: `${KEY_PARTNER.name} holds it now. ${KEY_PARTNER.holds}. They are looking for ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}, and you worked with them on Fort Bragg dining in 2024. Grant can tell you what that means for your options.`,
+        reply: known!.reply,
         chips: [chip.why(opp), chip.ready(opp), "What is a recompete?"],
       };
     }
@@ -655,14 +662,13 @@ const filterRule: Rule = {
         if (delta.states?.some((s) => s !== "NC")) {
           const nearest = [...rows].sort((a, b) => a.miles - b.miles)[0];
           notes.push(
-            `The nearest is ${titleOf(nearest)}, ${nearest.miles} miles from your kitchen. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`,
+            `The nearest is ${titleOf(nearest)}, ${nearest.miles} miles ${FROM_BASE}. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`,
           );
         }
         if (delta.setAsides?.includes("WOSB")) notes.push("You qualify for all of them.");
         if (delta.cities?.length === 1) {
           const place = Object.values(PLACES).find((p) => p.city === delta.cities![0]);
-          if (place)
-            notes.push(`${place.city} is ${place.milesFromBase} miles from your kitchen.`);
+          if (place) notes.push(`${place.city} is ${place.milesFromBase} miles ${FROM_BASE}.`);
         }
         if (delta.postedWithin) {
           const newest = [...rows].sort((a, b) => a.o.postedDaysAgo - b.o.postedDaysAgo)[0];
@@ -697,7 +703,7 @@ const searchFallback: Rule = {
     const hits = allRows().filter((r) => searchMatches(r, phrase));
     if (hits.length === 0) {
       return {
-        reply: `I found nothing for "${phrase}". Try a place, a buyer, a type of food service, or a size.`,
+        reply: `I found nothing for "${phrase}". Try a place, a buyer, ${VOCAB.searchHint}, or a size.`,
         chips: [chip.best, chip.near, chip.wosb],
       };
     }
@@ -708,30 +714,7 @@ const searchFallback: Rule = {
 // ── Unknown ─────────────────────────────────────────────────────────────────
 
 /** Questions that the engine answers well. The unknown rule offers the nearest three. */
-export const CANON: string[] = [
-  "What's out there for me right now?",
-  "What's new this week?",
-  "Which of these am I actually ready for?",
-  "Compare my top 3 — which should I chase?",
-  "How do you pick my matches?",
-  "What do you know about my business?",
-  "Show only woman-owned set-asides",
-  "Show only federal",
-  "Show only state and local",
-  "Show jobs under $500K",
-  "Show work near Fayetteville",
-  "Show work in Virginia and South Carolina",
-  "What closes first?",
-  "Show my saved ones",
-  "What is a Sources Sought notice?",
-  "What is a WOSB set-aside?",
-  "What is a NAICS code?",
-  "Do I qualify for these set-asides?",
-  "Show me Fort Bragg dining halls",
-  "Show catering jobs",
-  "Show me school meals",
-  "Start over",
-];
+export const CANON: string[] = VOCAB.canon;
 
 function overlap(a: string, b: string): number {
   const stems = (t: string) =>
@@ -833,8 +816,7 @@ const otherAgents: Rule = {
       )
     ) {
       return {
-        reply:
-          "I find and rank opportunities. Ava writes the quote or the proposal with you. Ava is already working on the Camp Mackall field meals quote, and she has questions for you. Open Ava from the menu.",
+        reply: `I find and rank opportunities. Ava writes the quote or the proposal with you. ${VOCAB.avaLine}`,
         chips: [chip.best, chip.top3, chip.readyList],
       };
     }
@@ -845,7 +827,7 @@ const otherAgents: Rule = {
       return {
         reply:
           "Your capability statement is on file, and I read it when I rank matches. To change it, open My Business. If you tell me a new fact, I can propose the change for you to save.",
-        chips: [chip.profile, "I can now cook 1,500 meals a day", chip.how],
+        chips: [chip.profile, VOCAB.profile.chip, chip.how],
       };
     }
     if (
@@ -855,8 +837,7 @@ const otherAgents: Rule = {
       )
     ) {
       return {
-        reply:
-          "You already hold Small Business and Woman-Owned (WOSB) status. If you want another certification, the Roadmap lists the steps, and your mentor Sarah Mitchell can help you through them.",
+        reply: `${VOCAB.certLine} If you want another certification, the Roadmap lists the steps, and your mentor ${MENTOR.name} can help you through them.`,
         chips: ["Do I qualify for these set-asides?", chip.how, chip.best],
       };
     }
@@ -867,8 +848,7 @@ const otherAgents: Rule = {
       )
     ) {
       return {
-        reply:
-          "I do not track who else will answer. Grant reads the competition on each opportunity. Open one and ask him. On the Fort Bragg dining halls, for example, the firm that holds the job now is Carolina Dining Group.",
+        reply: `I do not track who else will answer. Grant reads the competition on each opportunity. Open one and ask him.${VOCAB.competitionExample}`,
         chips: [chip.top3, chip.readyList, chip.best],
       };
     }

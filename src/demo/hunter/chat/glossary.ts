@@ -1,11 +1,15 @@
 // DEMO (Hunter chat): plain-English answers to "what is a ...?" questions.
-// Each answer ends with what the term means for Amira, from the story.
+// Each answer ends with what the term means for the member, from the story and
+// the member's own words (src/demo/members/<member>/hunter/vocab.ts).
 
 import { money } from "../../../lib/money";
-import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "../../story/persona";
+import { PAST_PERFORMANCE, PERSONA } from "../../story/persona";
 import { allRows, forYouRows, type FeedRow } from "../data";
 import { RANGE_TEXT } from "../facts";
+import { VOCAB } from "../vocab";
 import type { Turn } from "./types";
+
+const G = VOCAB.glossary;
 
 interface Definition {
   id: string;
@@ -32,7 +36,7 @@ export const DEFINITIONS: Definition[] = [
           "A Sources Sought notice is an early notice. The agency asks which businesses could do the work. It is not a bid, and nobody awards a contract from it.\n" +
           "You reply with a short statement about your business. A good reply can put you on the buyer's list before the real bid opens.\n" +
           (n > 0
-            ? `You have ${n} on this list now: Fort Bragg asks which small caterers could run its dining program.`
+            ? `You have ${n} on this list now: ${G.sourcesSought}`
             : "None is on this list right now."),
         chips: ["Show only Sources Sought", "What's new this week?"],
       };
@@ -92,10 +96,13 @@ export const DEFINITIONS: Definition[] = [
       const wosb = count(rows, (r) => r.setAside === "WOSB");
       const sba = count(rows, (r) => r.setAside === "SBA");
       const open = count(rows, (r) => !r.setAside);
+      const vet = count(rows, (r) => r.setAside === "SDVOSBC");
       return {
         reply:
           "A set-aside is a contract that the buyer keeps for one kind of business, such as small businesses or woman-owned firms. Other firms cannot compete for it.\n" +
-          `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, and ${open} open to every business. You qualify for the first two.`,
+          (vet
+            ? `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, ${vet} veteran-owned, and ${open} open to every business. You qualify for all but the veteran-owned.`
+            : `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, and ${open} open to every business. You qualify for the first two.`),
         chips: ["What is a WOSB set-aside?", "Show only woman-owned set-asides"],
       };
     },
@@ -109,7 +116,7 @@ export const DEFINITIONS: Definition[] = [
         `Your main code is ${PERSONA.primaryNaics}, ${PERSONA.primaryNaicsLabel}. You also hold ${PERSONA.secondaryNaics
           .map((n) => `${n.code} (${n.label})`)
           .join(", ")}.`,
-      chips: ["How do you pick my matches?", "Show me Food Service Contractors work in NC"],
+      chips: ["How do you pick my matches?", `Show me ${PERSONA.primaryNaicsLabel} work in NC`],
     }),
   },
   {
@@ -118,7 +125,7 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A PSC is a Product and Service Code. It names what the government buys. NAICS names what you do; PSC names what the buyer wants.\n" +
-        "Food service work often uses S203, Housekeeping - Food.",
+        G.psc,
       chips: ["What is a NAICS code?", "How do you pick my matches?"],
     }),
   },
@@ -130,7 +137,7 @@ export const DEFINITIONS: Definition[] = [
       return {
         reply:
           "An RFQ is a Request for Quote. The buyer asks for a price. It is usually quicker and simpler than a full proposal.\n" +
-          `${n} opportunit${n === 1 ? "y" : "ies"} on this list ${n === 1 ? "is an RFQ" : "are RFQs"}. The Camp Mackall field meals job is one.`,
+          `${n} opportunit${n === 1 ? "y" : "ies"} on this list ${n === 1 ? "is an RFQ" : "are RFQs"}.${G.rfqExample}`,
         chips: ["Show only RFQs", "What is an RFP?"],
       };
     },
@@ -208,11 +215,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "The incumbent is the firm that holds the job now. A recompete is when the buyer opens that job to new offers.\n" +
-        `${KEY_PARTNER.name} is the incumbent for Fort Bragg dining. It has held the contract since 2019 and is looking for woman-owned subcontractors for the recompete. Grant can tell you what that means for you.`,
-      chips: [
-        "Why does the Run two Fort Bragg dining halls match me?",
-        "What is a prime and a sub?",
-      ],
+        G.incumbent.line,
+      chips: G.incumbent.chips,
     }),
   },
   {
@@ -221,8 +225,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A prime holds the contract with the government. A sub does part of the work for the prime and is paid by the prime.\n" +
-        "On a job that is too big to hold alone, a small firm can team up as a sub. That is how you worked on Fort Bragg dining halls with Carolina Dining Group.",
-      chips: ["Why does the Run two Fort Bragg dining halls match me?", "What is a recompete?"],
+        G.primeSub.line,
+      chips: G.primeSub.chips,
     }),
   },
   {
@@ -231,11 +235,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A bond is a promise from an insurer to pay the buyer if you do not finish the job. Some large jobs require one.\n" +
-        `Your largest bond so far is ${money(PERSONA.largestBond)}. The Fort Bragg dining halls need a bond of 100% of the yearly price, which is about $2M.`,
-      chips: [
-        "Am I ready to bid the Run two Fort Bragg dining halls?",
-        "What is a prime and a sub?",
-      ],
+        G.bond.line,
+      chips: G.bond.chips,
     }),
   },
   {
@@ -244,11 +245,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A security clearance is a government check that lets a person work on a restricted site. It takes months, and the buyer often will not pay for it.\n" +
-        "Your team holds no clearances. So I mark any job that needs them, such as the restricted Camp Mackall site.",
-      chips: [
-        "Am I ready to bid the Dining support at a restricted Camp Mackall site?",
-        "What's out there for me right now?",
-      ],
+        G.clearance.line,
+      chips: G.clearance.chips,
     }),
   },
   {

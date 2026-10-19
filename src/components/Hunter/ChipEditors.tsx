@@ -1,16 +1,9 @@
 import { useState, type ChangeEvent } from "react";
 import { Input } from "@/components/ui";
+import { VOCAB } from "@/demo/hunter/vocab";
 
-// DEMO: work types for Haddad Catering, a food-service contractor.
-export const WORK_TYPE_OPTIONS = [
-  "Food service contracts",
-  "Event and ceremony catering",
-  "Mobile food service",
-  "Therapeutic and patient diets",
-  "School and community meals",
-  "Specialty food production",
-  "Other",
-];
+// DEMO: the sample member's work types (src/demo/members/<member>/hunter/vocab.ts).
+export const WORK_TYPE_OPTIONS = VOCAB.ui.workTypes;
 
 export const REGION_OPTIONS = [
   "NC only",

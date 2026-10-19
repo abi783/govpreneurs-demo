@@ -12,6 +12,7 @@ import { daysToDay } from "../../explore/dates";
 import { forecastRecord } from "../../explore/forecastData";
 import { setSaved } from "../../state/workspace";
 import { joinList } from "../facts";
+import { VOCAB } from "../vocab";
 import { chip } from "./answers";
 import {
   definitions,
@@ -39,7 +40,8 @@ function money(n: number): string {
 function estimateOf(oppKey: string): string {
   const r = forecastRecord(oppKey);
   if (!r || (r.valLow == null && r.valHigh == null)) return "Not shared";
-  if (r.valLow != null && r.valHigh != null && r.valLow !== r.valHigh) return `${money(r.valLow)} to ${money(r.valHigh)}`;
+  if (r.valLow != null && r.valHigh != null && r.valLow !== r.valHigh)
+    return `${money(r.valLow)} to ${money(r.valHigh)}`;
   return money((r.valHigh ?? r.valLow) as number);
 }
 
@@ -104,7 +106,7 @@ const whyForecast: Rule = {
     return {
       reply:
         `${v.title}${v.location ? ` (${v.location})` : ""} is a forecast on your list. I rank a forecast the way I rank a notice.\n` +
-        `• Your codes: food service and catering work (NAICS ${PERSONA.primaryNaics} and your other three).\n` +
+        `• Your codes: ${VOCAB.forecastCodes}.\n` +
         `• Your area: ${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles from ${PERSONA.hqCity}.\n` +
         "• Your set-asides: Small Business and Woman-Owned (WOSB).\n" +
         "Open it to read the buyer's plan and the expected timing. Grant reads it in full when the notice posts.",
@@ -156,8 +158,16 @@ const compareForecasts: Rule = {
       })),
       rows: [
         { field: "Place", values: picked.map((v) => v.location ?? "Not stated"), winner: null },
-        { field: "Buyer's estimate", values: picked.map((v) => estimateOf(v.oppKey)), winner: null },
-        { field: "Buyer expects bids", values: picked.map((v) => expectedOf(v.oppKey)), winner: null },
+        {
+          field: "Buyer's estimate",
+          values: picked.map((v) => estimateOf(v.oppKey)),
+          winner: null,
+        },
+        {
+          field: "Buyer expects bids",
+          values: picked.map((v) => expectedOf(v.oppKey)),
+          winner: null,
+        },
         { field: "Status", values: picked.map(() => "Forecast: not posted yet"), winner: null },
       ],
       verdict: undefined as unknown as ComparePayload["verdict"],

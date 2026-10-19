@@ -2,13 +2,10 @@ import { useEffect, useRef, useState, forwardRef } from "react";
 import { Search, Sparkles, X } from "lucide-react";
 // `Command` icon was only used by the Ctrl+K badge (disabled below).
 
-// DEMO: the examples are true for Haddad Catering, a woman-owned caterer in Fayetteville, NC.
-const ROTATING_PLACEHOLDERS = [
-  "Catering under $500K near Fayetteville…",
-  "Fort Bragg dining and field meals…",
-  "Woman-owned set-asides closing this month…",
-  "School and hospital meal programs in NC…",
-];
+import { VOCAB } from "../../demo/hunter/vocab";
+
+// DEMO: the examples are true for the sample member (src/demo/members/<member>/hunter/vocab.ts).
+const ROTATING_PLACEHOLDERS = VOCAB.ui.searchPlaceholders;
 
 export const HeroSearchField = forwardRef<
   HTMLInputElement,

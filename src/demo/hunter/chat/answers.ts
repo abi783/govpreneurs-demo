@@ -5,7 +5,6 @@
 // call: that is Grant's, and each answer says so where it matters.
 
 import type {
-  ActPayload,
   ComparePayload,
   EligibilityPayload,
   EligibilityRow,
@@ -14,11 +13,13 @@ import type {
   ProfilePayload,
 } from "../../../lib/hunterChat";
 import { money } from "../../../lib/money";
+import { HERO_IDS } from "../../story/opportunities";
 import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "../../story/persona";
 import { PLACES } from "../../story/places";
 import { forYouRows, savedRows, universe, type FeedRow } from "../data";
 import { longDate, shortDate } from "../dates";
 import {
+  FROM_BASE,
   RANGE_TEXT,
   cap,
   fitSentence,
@@ -29,32 +30,40 @@ import {
   pastJobText,
   rangeStatus,
   reasonList,
+  setAsideName,
   setAsideText,
   valueText,
   aboutValue,
   closesText,
   codePhrase,
-  distanceShort,
 } from "../facts";
+import { VOCAB } from "../vocab";
 import type { ChatCtx, Turn } from "./types";
 
-/** The plain title that the card shows. */
-export const titleOf = (row: FeedRow): string => row.o.plainTitle;
+/** The plain title that the card shows. A title that asks a question drops its "?" mid-sentence. */
+export const titleOf = (row: FeedRow): string => row.o.plainTitle.replace(/\?$/, "");
 
 /**
  * How a button names an opportunity. Most plain titles read as a noun phrase
  * ("Field meals for Camp Mackall training rotations"). The title of a Sources
  * Sought notice is a sentence, so the button names it by its place and type.
  */
+/** Where a Sources Sought notice is from: its city, or its buyer when it covers many sites. */
+function whereFrom(row: FeedRow): string {
+  return /^Multiple/.test(row.city) ? row.o.agency.replace(/^Department of (the )?/, "") : row.city;
+}
+
 /** The name of an opportunity at the start of a sentence. */
 export function nameOf(row: FeedRow): string {
   return row.o.noticeType === "Sources Sought"
-    ? `The ${row.city} Sources Sought notice`
+    ? `The ${whereFrom(row)} Sources Sought notice`
     : titleOf(row);
 }
 
 export function refOf(row: FeedRow): string {
-  return row.o.noticeType === "Sources Sought" ? `${row.city} Sources Sought notice` : titleOf(row);
+  return row.o.noticeType === "Sources Sought"
+    ? `${whereFrom(row)} Sources Sought notice`
+    : titleOf(row);
 }
 
 export const chip = {
@@ -103,20 +112,27 @@ export function whyMatch(row: FeedRow): Turn {
   const lead = rank
     ? `${nameOf(row)} is number ${rank} on your list. Here is why:`
     : `${nameOf(row)} is on the All opportunities tab, not on your For You list. Here is how it fits:`;
-  const concern = fit?.some((f) => f.kind === "clearanceGap");
+  const has = (kind: string) => fit?.some((f) => f.kind === kind);
+  const close = has("clearanceGap")
+    ? "That is why I rank it lower."
+    : has("providerLock")
+      ? "Read the point about the provider before you spend time on it."
+      : has("setAsideGap")
+        ? "So it is a team-up, not a job to hold alone."
+        : "I explain the fit.";
   return {
-    reply:
-      `${lead}\n${sentences.map((s) => `• ${s}`).join("\n")}\n` +
-      (concern
-        ? `That is why I rank it lower. ${GRANT_POINTER}`
-        : `I explain the fit. ${GRANT_POINTER}`),
+    reply: `${lead}\n${sentences.map((s) => `• ${s}`).join("\n")}\n${close} ${GRANT_POINTER}`,
     kind: "matches",
     data: matchesPayload([row]),
     chips: [
       chip.ready(row),
       chip.top3,
-      ...(row.setAside === "WOSB" ? ["What is a WOSB set-aside?"] : [chip.how]),
-    ].slice(0, 3),
+      row.setAside === "WOSB"
+        ? "What is a WOSB set-aside?"
+        : has("setAsideGap")
+          ? "What is a prime and a sub?"
+          : chip.how,
+    ],
   };
 }
 
@@ -138,8 +154,8 @@ function fallbackReasons(row: FeedRow): string[] {
   else out.push("The notice states no value yet.");
   out.push(
     row.miles > PERSONA.serviceRadiusMiles
-      ? `The site is ${row.miles} miles from your kitchen. That is outside your ${PERSONA.serviceRadiusMiles}-mile area.`
-      : `The site is ${row.miles} miles from your kitchen in ${PERSONA.hqCity}.`,
+      ? `${VOCAB.place} is ${row.miles} miles ${FROM_BASE}. That is outside your ${PERSONA.serviceRadiusMiles}-mile area.`
+      : `${VOCAB.place} is ${row.miles} miles ${FROM_BASE} in ${PERSONA.hqCity}.`,
   );
   return out;
 }
@@ -161,8 +177,8 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
       ? {
           field: "Set-aside",
           value: holdsSetAside(row)
-            ? `${row.setAside === "WOSB" ? "Woman-owned (WOSB)" : "Small business"}. You qualify.`
-            : "You do not hold this status.",
+            ? `${setAsideName(row)}. You qualify.`
+            : `${setAsideName(row)} only. You do not hold this status.`,
           status: holdsSetAside(row) ? "pass" : "fail",
         }
       : {
@@ -184,18 +200,18 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
       !(PERSONA.serviceStates as readonly string[]).includes(row.state)
       ? {
           field: "Place",
-          value: `${row.city}, ${row.state}: ${away} miles from your kitchen. That is outside your ${PERSONA.serviceRadiusMiles}-mile area.`,
+          value: `${row.city}, ${row.state}: ${away} miles ${FROM_BASE}. That is outside your ${PERSONA.serviceRadiusMiles}-mile area.`,
           status: "fail",
         }
       : away > 60
         ? {
             field: "Place",
-            value: `${row.city}, ${row.state}: ${away} miles. That is inside your area, but a long daily haul.`,
+            value: `${row.city}, ${row.state}: ${away} miles. That is inside your area, but ${VOCAB.longWay}.`,
             status: "warn",
           }
         : {
             field: "Place",
-            value: `${row.city}, ${row.state}: ${away} miles from your kitchen.`,
+            value: `${row.city}, ${row.state}: ${away} miles ${FROM_BASE}.`,
             status: "pass",
           },
   );
@@ -237,6 +253,14 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
     });
   }
 
+  if (o.exclusiveProvider) {
+    rows.push({
+      field: "Who can do it",
+      value: `The work names one provider: ${o.exclusiveProvider.charAt(0).toLowerCase()}${o.exclusiveProvider.slice(1)} You are not that provider.`,
+      status: "fail",
+    });
+  }
+
   const share = bondShare(row);
   if (share !== null && o.valueLow !== null) {
     const need = Math.round(o.valueLow * share);
@@ -255,39 +279,13 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
   if (o.noticeType === "Sources Sought") {
     rows.push({
       field: "Notice type",
-      value:
-        "Sources Sought. An early notice, not a bid yet. You reply to say that you can do the work.",
+      value: holdsSetAside(row)
+        ? "Sources Sought. An early notice, not a bid yet. You reply to say that you can do the work."
+        : "Sources Sought. An early notice, not a bid yet. The buyer asks which firms could do the work.",
       status: "neutral",
     });
   }
   return rows;
-}
-
-/** Food-handler gap: the one closable gap that the story names for the Camp Mackall job. */
-function actFor(row: FeedRow): ActPayload | undefined {
-  if (row.id !== "SP4701-26-Q-0021") return undefined;
-  const missing = PERSONA.employeesW2 - (PERSONA.foodHandlerCertified ?? 0);
-  return {
-    gap: {
-      kind: "set_aside",
-      oppKey: row.id,
-      title: titleOf(row),
-      setAsideName: "Food-handler",
-      note: `${PERSONA.foodHandlerCertified} of your ${PERSONA.employeesW2} cooks hold a food-handler certificate. The quote asks for proof for every cook. ${missing} still need one.`,
-    },
-    trustLevel: "high",
-    offers: [],
-    bidChecklist: [
-      { label: `SAM.gov registration active until April 2027`, done: true },
-      { label: "Woman-owned small business status on file", done: true },
-      { label: "HACCP food-safety plan", done: true },
-      { label: "Insurance for the kitchen and both vans", done: true },
-      {
-        label: `Food-handler certificates for all ${PERSONA.employeesW2} cooks (${PERSONA.foodHandlerCertified} done)`,
-        done: false,
-      },
-    ],
-  };
 }
 
 export function readiness(row: FeedRow): Turn {
@@ -312,15 +310,33 @@ export function readiness(row: FeedRow): Turn {
   if (early && fails.length === 0) label = "Eligible to reply";
 
   let reply: string;
-  if (fails.length > 0) {
-    reply = `Not today. ${fails.map((f) => f.value).join(" ")} That is why ${t} sits low on your list. ${GRANT_POINTER}`;
+  const failed = fails.map((f) => f.value).join(" ");
+  if (fails.length > 0 && !holdsSetAside(row)) {
+    // Set aside for a group she is not in: the way in is a team, not a bid of her own.
+    label = "Not eligible as prime";
+    const partner =
+      row.id === HERO_IDS.teamUp
+        ? ` ${KEY_PARTNER.name} wants ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}.`
+        : "";
+    const why = fails
+      .filter((f) => f.field === "Set-aside" || f.field === "Contract size")
+      .map((f) => f.value)
+      .join(" ");
+    reply = `Not as prime. ${why} The way in is as a subcontractor to a firm that holds the set-aside.${partner} ${GRANT_POINTER}`;
+  } else if (fails.length > 0) {
+    const rank = row.o.hunter.forYouRank;
+    const where =
+      rank && rank <= forYouRows().length / 2
+        ? `The rest fits, which is why ${t} still ranks number ${rank}.`
+        : `That is why ${t} sits low on your list.`;
+    reply = `Not today. ${failed} ${where} ${GRANT_POINTER}`;
   } else if (early) {
     reply = `There is nothing to bid yet. This is a Sources Sought notice. You can reply to say that you can do the work. It is free, and it puts you on the buyer's list. ${GRANT_POINTER}`;
   } else if (range === "above") {
     reply =
       `You meet the set-aside and the work is yours. The problem is size: ${valueText(row)} is above your ${RANGE_TEXT} range` +
       (bondShare(row) !== null ? `, and the bond is more than you have held.` : `.`) +
-      ` A team bid may fit better. ${KEY_PARTNER.name} holds the job now and looks for woman-owned subcontractors. ${GRANT_POINTER}`;
+      ` A team bid may fit better.${VOCAB.aboveRangeTeam} ${GRANT_POINTER}`;
   } else if (warns.length > 0) {
     const care = warns.map((w) =>
       w.field === "Time to respond"
@@ -342,14 +358,12 @@ export function readiness(row: FeedRow): Turn {
     rows,
     note: "Hunter checks fit and eligibility only. Grant makes the go or no-go call: open this opportunity and ask him.",
   };
-  const act = actFor(row);
+  const gap = VOCAB.readinessAct?.(row);
   return {
-    reply: act
-      ? `${reply} One thing needs work before you answer: food-handler certificates. ${PERSONA.foodHandlerCertified} of your ${PERSONA.employeesW2} cooks hold one.`
-      : reply,
+    reply: gap ? `${reply}${gap.note}` : reply,
     kind: "eligibility",
     data,
-    actPayload: act,
+    actPayload: gap?.act,
     chips: [chip.why(row), chip.top3, chip.how],
   };
 }
@@ -392,7 +406,7 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
         ),
       },
       {
-        field: "Miles from your kitchen",
+        field: `Miles from your ${VOCAB.base}`,
         values: picked.map((r) => `${r.miles} miles`),
         winner: bestIdx(
           picked.map((r) => r.miles),
@@ -407,14 +421,20 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
             ? "Woman-owned only"
             : r.setAside === "SBA"
               ? "Small business only"
-              : "Every business",
+              : r.setAside === "SDVOSBC"
+                ? "Veteran-owned only"
+                : "Every business",
         ),
         winner: bestIdx(
-          picked.map((r) => (r.setAside ? 1 : 0)),
+          picked.map((r) => (r.setAside && holdsSetAside(r) ? 1 : 0)),
           (a, b) => a > b,
         ),
         notes: picked.map((r) =>
-          r.setAside ? "Fewer firms compete" : "Large firms can compete too",
+          !holdsSetAside(r)
+            ? "You do not hold this status"
+            : r.setAside
+              ? "Fewer firms compete"
+              : "Large firms can compete too",
         ),
       },
       {
@@ -520,12 +540,13 @@ export function bestMatches(): Turn {
 type Readiness = "ready" | "stretch" | "early" | "blocked";
 
 export function readinessClass(row: FeedRow): Readiness {
-  if (row.o.clearanceRequired) return "blocked";
+  if (row.o.clearanceRequired || row.o.exclusiveProvider) return "blocked";
+  // A set-aside she does not hold is a team job, even on an early notice.
+  if (!holdsSetAside(row)) return "stretch";
   if (row.o.noticeType === "Sources Sought") return "early";
   const tier = row.o.hunter.tier;
   if (tier === "stretch" || tier === "low") return "stretch";
-  if (rangeStatus(row) === "above" || row.miles > PERSONA.serviceRadiusMiles || !holdsSetAside(row))
-    return "stretch";
+  if (rangeStatus(row) === "above" || row.miles > PERSONA.serviceRadiusMiles) return "stretch";
   return "ready";
 }
 
@@ -555,7 +576,13 @@ export function readyList(rows: FeedRow[]): Turn {
     );
   if (groups.blocked.length)
     parts.push(
-      `Not possible today (${groups.blocked.length}): ${names(groups.blocked)}. It needs cleared staff.`,
+      `Not possible today (${groups.blocked.length}): ${names(groups.blocked)}. ${
+        groups.blocked.every((r) => r.o.clearanceRequired)
+          ? "It needs cleared staff."
+          : groups.blocked.every((r) => r.o.exclusiveProvider)
+            ? "The work names one provider's own platform and crew."
+            : "Each needs cleared staff or one named provider."
+      }`,
     );
   parts.push(GRANT_POINTER);
   const shown = [...groups.ready, ...groups.stretch, ...groups.early].sort(
@@ -581,7 +608,7 @@ export function listBy(rows: FeedRow[], by: "closing" | "value" | "near", n = 4)
     lead = `These are the largest. ${titleOf(sorted[0])} is ${valueText(sorted[0])}.`;
   } else {
     sorted.sort((a, b) => a.miles - b.miles);
-    lead = `These are the closest to your kitchen. ${titleOf(sorted[0])} is ${sorted[0].miles} miles away in ${sorted[0].city}.`;
+    lead = `These are the closest to your ${VOCAB.base}. ${titleOf(sorted[0])} is ${sorted[0].miles} miles away in ${sorted[0].city}.`;
   }
   const top = sorted.slice(0, n);
   return {
@@ -600,7 +627,7 @@ export function aboutOpp(row: FeedRow): Turn {
     reply:
       `${titleOf(row)}\n` +
       `${o.summary}\n` +
-      `Buyer: ${o.agency}, ${o.office}. Place: ${row.city}, ${row.state}, ${row.miles} miles from your kitchen. Value: ${valueText(row)}. ` +
+      `Buyer: ${o.agency}, ${o.office}. Place: ${row.city}, ${row.state}, ${row.miles} miles ${FROM_BASE}. Value: ${valueText(row)}. ` +
       `It is ${noticeText(row)}, ${setAsideText(row)}, and ${closesText(row)}.`,
     kind: "matches",
     data: matchesPayload([row]),
@@ -646,8 +673,8 @@ export function profileCard(): Turn {
       },
       { label: "Target contract size", value: `${RANGE_TEXT}`, source: "you_told_us" },
       {
-        label: "Team and kitchen",
-        value: `${PERSONA.employeesW2} employees, ${PERSONA.foodHandlerCertified} with food-handler certificates. ${PERSONA.kitchen}.`,
+        label: VOCAB.profile.teamLabel,
+        value: `${PERSONA.employeesW2} employees${PERSONA.foodHandlerCertified === undefined ? "" : `, ${PERSONA.foodHandlerCertified} with food-handler certificates`}. ${PERSONA.kitchen}.`,
         source: "capability_statement",
       },
       {
@@ -668,7 +695,16 @@ export function profileCard(): Turn {
         items: [...PERSONA.targetAgencies],
         source: "you_told_us",
       },
-      { label: "Largest bond", value: money(PERSONA.largestBond), source: "you_told_us" },
+      // A member who has never carried a bond has no row to show.
+      ...(PERSONA.largestBond > 0
+        ? [
+            {
+              label: "Largest bond",
+              value: money(PERSONA.largestBond),
+              source: "you_told_us" as const,
+            },
+          ]
+        : []),
     ],
     hiddenCount: 0,
     notOnFile: [],
@@ -677,11 +713,11 @@ export function profileCard(): Turn {
   };
   return {
     reply:
-      `I know ${PERSONA.businessName}. You are a woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, with ${PERSONA.employeesW2} employees and one kitchen that cooks ${PERSONA.differentiators[0].match(/[\d,]+ meals a day/)?.[0] ?? "1,100 meals a day"}.\n` +
+      `I know ${PERSONA.businessName}. You are a woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, with ${VOCAB.profile.intro}.\n` +
       "Each fact on the card shows where I read it. If one is wrong, tell me and I will propose a change for you to save.",
     kind: "profile",
     data,
-    chips: [chip.how, "I can now cook 1,500 meals a day", chip.best],
+    chips: [chip.how, VOCAB.profile.chip, chip.best],
   };
 }
 
@@ -690,7 +726,7 @@ export function howIPick(): Turn {
     reply:
       "I score every new notice on four things.\n" +
       `• Scope fit: how close the work is to your codes (${PERSONA.primaryNaicsLabel}, ${PERSONA.secondaryNaics.map((n) => n.label).join(", ")}).\n` +
-      `• Location: how far the site is from your kitchen in ${PERSONA.hqCity}. Your area is ${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles.\n` +
+      `• Location: how far the ${VOCAB.place.replace(/^The /, "").toLowerCase()} is ${FROM_BASE} in ${PERSONA.hqCity}. Your area is ${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles.\n` +
       "• Certification fit: the set-asides you hold, which are Small Business and Woman-Owned (WOSB).\n" +
       `• Past performance: your ${PAST_PERFORMANCE.length} finished jobs.\n` +
       "Then I sort each into Priority, Strong, Stretch or Low, and say why. I read your capability statement and SAM.gov registration. I do not decide whether to bid. Grant does.",
@@ -702,10 +738,13 @@ export function setAsideStatus(rows: FeedRow[]): Turn {
   const wosb = rows.filter((r) => r.setAside === "WOSB").length;
   const sba = rows.filter((r) => r.setAside === "SBA").length;
   const open = rows.filter((r) => !r.setAside).length;
+  const notHers = rows.filter((r) => !holdsSetAside(r)).length;
   return {
     reply:
       "You qualify for two kinds of set-aside. You are a small business, and you are woman-owned (WOSB).\n" +
-      `On this list: ${wosb} woman-owned, ${sba} small business, ${open} open to every business. You qualify for ${wosb + sba} of the ${rows.length}.\n` +
+      (notHers
+        ? `On this list: ${wosb} woman-owned, ${sba} small business, ${notHers} veteran-owned, ${open} open to every business. You can compete for all but the ${notHers} veteran-owned.\n`
+        : `On this list: ${wosb} woman-owned, ${sba} small business, ${open} open to every business. You qualify for ${wosb + sba} of the ${rows.length}.\n`) +
       "You do not qualify for veteran-owned (SDVOSB), 8(a), HUBZone or tribal set-asides.",
     chips: [chip.wosb, "What is a WOSB set-aside?", chip.best],
   };
