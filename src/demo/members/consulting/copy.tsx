@@ -55,7 +55,7 @@ export const ROADMAP_DONE_DATES: Record<string, { started?: number; done: number
 export const CMMC_SCOPE = "Office, survey and 360-assessment systems";
 
 /** The size of her capability statement in public/demo-files (scripts/make-capability-statement.ts writes it). */
-export const CAPABILITY_STATEMENT_BYTES = 3305;
+export const CAPABILITY_STATEMENT_BYTES = 3449;
 
 /** What she calls a job when she says how many she can run at once (My Business, "Tell us"). */
 export const JOB_WORDS = /\b(jobs|projects|contracts|cohorts|engagements|clients)\b/i;

@@ -1,19 +1,22 @@
-// THE AGENCY: Dana Okafor's starting My Business record (read through
+// THE CONSULTANT: Simone Strayhorn's starting My Business record (read through
 // src/demo/sc/business/seed.ts, which picks the member on stage).
 //
-// Every fact comes from the story (members/agency/persona.ts, workspace.ts) or the
-// approved pack (demo-storyboard/marketing-agency-pack.md, section 9). The record is
-// 44 of 51, on purpose, with the pack's real gaps:
-//   - no GSA schedule: she told Sarah so on the positioning call ("Anything else");
-//   - no performance rating (CPARS) for the NC Guard job: the job says so;
-//   - no project manager and alternate on file: "Who does what on your team" is open;
-//   - no line of credit to front ad buys while the government takes about 30 days
-//     to pay: "Cash flow" limits her, and Hunter's suggestion waits for a yes;
-//   - the woman-owned certification (WOSB) renews in 41 days, the same date as
-//     the Stay Ready page.
+// Every fact comes from the story (members/consulting/persona.ts, workspace.ts) or
+// the approved pack (demo-storyboard/consulting-pack.md, section 9). The record is
+// not complete, on purpose, with the pack's real gaps:
+//   - no GSA schedule, and not on OASIS+ or the Army's HR Solutions contract: she
+//     told Sarah so on the positioning call ("Anything else"). The twin shows the cost;
+//   - no performance rating (CPARS) for the Fort Bragg ACS job: the job says so;
+//   - 7 of her trainers are contract (1099) facilitators: "What limits you" names
+//     staffing, a 50%-rule risk on every set-aside;
+//   - no Program Manager and Lead Facilitator on file: "Who does what on your team"
+//     is open, and it is Ava's first question on the hero bid;
+//   - VetCert eligibility ends 14 Jan 2027, in 87 days, the same date as the Stay
+//     Ready page and the task.
 // Also open: her tax number, owner citizenship, five years of receipts, licenses,
-// state programs (North Carolina ended HUB certification in 2026) and the words
-// buyers search for ("Tell Hunter everything" fills the last one).
+// clearances (she has none, so she skips clearance-only work), state programs
+// (North Carolina ended HUB certification in 2026) and the words buyers search for
+// ("Tell Hunter everything" fills the last one).
 // Three suggestions wait for a yes or a no: equipment and PSC codes read off her
 // capability statement, and the credit line from her chat with Hunter.
 //
@@ -51,30 +54,38 @@ import {
 
 /** The sample sentence "Say it out loud" types into the box (D56: no microphone). */
 export const TELL_SAMPLE =
-  "We make short videos and run paid social for public agencies from our studio on Person Street. We have a two-person video crew. We want our second federal prime in the next 90 days. We can wait 30 days to be paid.";
+  "We run leadership programs, Lean reviews and strategic plans for the VA and Fort Bragg from our office on Green Street. We have four facilitators and three coaches. We want our first VA contract in the next 90 days. We can wait 30 days to be paid.";
 
 /** The starting logo: a drawn mark with her initials, so no file can go missing. */
 const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
-<rect width="160" height="160" rx="30" fill="#24324f"/>
-<rect x="34" y="34" width="92" height="92" rx="16" fill="none" stroke="#f2b84b" stroke-width="3" opacity="0.7"/>
-<text x="80" y="98" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="700" fill="#f7efe0">LR</text>
+<rect width="160" height="160" rx="30" fill="#2b2f3a"/>
+<circle cx="80" cy="80" r="50" fill="none" stroke="#c7814a" stroke-width="3" opacity="0.8"/>
+<text x="80" y="97" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="700" fill="#f2ece2">CA</text>
 </svg>`;
 export const LOGO_URL = `data:image/svg+xml;utf8,${encodeURIComponent(LOGO_SVG)}`;
 
 /** Her top three services. The capability statement names the same ones. */
 const CORE_SERVICES = [
-  "Short captioned videos, shot and edited in-house",
-  "Paid social, search and display ads",
-  "Print buying, landing pages and lead routing",
+  "Leadership programs for new supervisors, with 360s and coaching",
+  "Lean process reviews and staff training",
+  "Strategic plans and HR studies for public offices",
 ] as const;
 
-/** The pack's customer types, in the record's words. */
-function agencyJob(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
+/** The pack's customer types and places, in the record's words. */
+function consultingJob(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
   const base = jobFor(pp);
+  const place =
+    pp.id === "pp-acs-lean-review"
+      ? "Fort Bragg, NC"
+      : pp.id === "pp-halyard-family-readiness"
+        ? "Virtual classes across the Southeast"
+        : pp.id === "pp-hope-mills-plan"
+          ? "Hope Mills, NC"
+          : `${PERSONA.hqCity}, ${PERSONA.hqState}`;
   return {
     ...base,
-    customerType: pp.customerType === "local" ? "local" : pp.customerType === "commercial" ? "private" : "federal",
-    place: pp.id === "pp-ncng-recruiting" ? "Statewide, North Carolina" : `${PERSONA.hqCity}, ${PERSONA.hqState}`,
+    customerType: pp.customerType === "commercial" ? "private" : pp.customerType === "local" ? "local" : base.customerType,
+    place,
   };
 }
 
@@ -97,7 +108,7 @@ export function businessRows(): DemoFieldRow[] {
   add("email", text(PERSONA.email), contact);
   add("phone", text(PERSONA.phone), typed(JOINED_DAYS_AGO - 2));
   add("home_address", { kind: "address", address: mailingParts() }, typed(JOINED_DAYS_AGO - 2));
-  add("tshirt_size", choice("m", "M"), typed(JOINED_DAYS_AGO - 2));
+  add("tshirt_size", choice("l", "L"), typed(JOINED_DAYS_AGO - 2));
   add("primary_contact_title", text(PERSONA.ownerTitle), typed(JOINED_DAYS_AGO - 2));
   add("legal_company_name", text(PERSONA.businessName), sam(PERSONA.businessName, "Legal business name:", `UEI: ${PERSONA.uei}`));
   add("company_email", text(PERSONA.email), typed(JOINED_DAYS_AGO - 5));
@@ -144,23 +155,24 @@ export function businessRows(): DemoFieldRow[] {
   add("owners", list(`${PERSONA.ownerName}, 100%`), typed(JOINED_DAYS_AGO - 6));
   add("total_employees", count(PERSONA.employeesW2, "people"), typed(JOINED_DAYS_AGO - 6));
   add("size_status", text(`Yes. A small business under the size standard for NAICS ${PERSONA.primaryNaics}.`), {
-    ...sam("Small Business", "Business types:", "Woman-Owned Small Business (WOSB)"),
+    ...sam("Small Business", "Business types:", "Service-Disabled Veteran-Owned Business"),
   });
   add(
     "socioeconomic_certifications",
     papers(
       { id: "small_biz", kind: "certification", name: "Small business", issuer: "SAM.gov" },
       {
-        id: "wosb",
+        id: "vetcert-sdvosb",
         kind: "certification",
-        name: "Woman-owned (WOSB)",
+        name: "Service-disabled veteran-owned (SBA VetCert)",
         issuer: "U.S. Small Business Administration",
-        issuedAt: dateDaysFromNow(-1054),
-        // The same date as the Stay Ready page: 41 days from now (the pack's gap 5).
-        expiresAt: dateDaysFromNow(41),
+        // Certified 14 Jan 2024; eligibility ends 87 days from now (14 Jan 2027), the
+        // same date as the Stay Ready page and the task (the pack's gap 5).
+        issuedAt: "2024-01-14",
+        expiresAt: dateDaysFromNow(87),
       },
     ),
-    sam("Woman-Owned Small Business (WOSB)", "Business types: Small Business,", `Active until ${samActiveLabel()}`),
+    sam("Service-Disabled Veteran-Owned Business", "Business types: Small Business, Veteran-Owned Business,", `Active until ${samActiveLabel()}`),
   );
 
   // ── What you sell ──
@@ -168,7 +180,7 @@ export function businessRows(): DemoFieldRow[] {
   add(
     "business_description",
     text(
-      `${PERSONA.businessName} is a woman-owned ad agency in ${PERSONA.hqCity}, ${PERSONA.hqState}, 12 miles from Fort Bragg. We make short captioned videos, run paid social, search and display ads, buy print, and build landing pages and lead forms for public agencies and businesses in ${PERSONA.serviceStates.join(", ")}. We have been in business since ${PERSONA.formedOn.slice(-4)}.`,
+      `${PERSONA.businessName} is a service-disabled veteran-owned consulting firm in ${PERSONA.hqCity}, ${PERSONA.hqState}, 12 miles from Fort Bragg. Our founder ran HR for an Army corps. We run leadership programs for new supervisors, Lean process reviews, strategic plans and HR studies for Army, VA and public offices in ${PERSONA.serviceStates.join(", ")}. We have been in business since ${PERSONA.formedOn.slice(-4)}.`,
       true,
     ),
     typed(JOINED_DAYS_AGO - 3),
@@ -176,13 +188,13 @@ export function businessRows(): DemoFieldRow[] {
   add(
     "primary_industry",
     codes(
-      { system: "NAICS", code: "", label: "Marketing, Advertising & Media Production" },
+      { system: "NAICS", code: "", label: "Management Consulting and Training" },
       NAICS(PERSONA.primaryNaics, PERSONA.primaryNaicsLabel, true),
       ...PERSONA.secondaryNaics.map((n) => NAICS(n.code, n.label)),
     ),
     typed(JOINED_DAYS_AGO - 3),
   );
-  add("commodity_codes", codes({ system: "NIGP", code: "91503", label: "Advertising and public relations services" }), typed(JOINED_DAYS_AGO - 10));
+  add("commodity_codes", codes({ system: "NIGP", code: "918", label: "Consulting services" }), typed(JOINED_DAYS_AGO - 10));
   add("differentiators", list(...PERSONA.differentiators), typed(JOINED_DAYS_AGO - 7));
   add("service_delivery_mode", choice("both", "Both"), typed(JOINED_DAYS_AGO - 7));
   add("current_customer_types", pick("current_customer_types", "businesses", "government"), typed(JOINED_DAYS_AGO - 7));
@@ -190,7 +202,7 @@ export function businessRows(): DemoFieldRow[] {
   add("service_to_sell_to_government", choice(CORE_SERVICES[0]), typed(JOINED_DAYS_AGO - 3));
   add(
     "doc_llc_paperwork",
-    { kind: "file", file: file("doc-llc", "lantern-row-creative-articles-of-organization.pdf", 176_128, INTAKE_SENT_DAYS_AGO + 3, 4) },
+    { kind: "file", file: file("doc-llc", "coppervale-advisory-articles-of-organization.pdf", 168_960, INTAKE_SENT_DAYS_AGO + 3, 4) },
     { originKey: "member.typed", daysAgo: INTAKE_SENT_DAYS_AGO + 3 },
   );
   add(
@@ -210,28 +222,30 @@ export function businessRows(): DemoFieldRow[] {
   );
   add(
     "doc_marketing",
-    { kind: "file", file: file("doc-work-samples", "lantern-row-creative-work-samples.pdf", 2_412_544, POSITIONING_CALL_DAYS_AGO + 2, 14) },
+    { kind: "file", file: file("doc-program-outline", "coppervale-advisory-program-outline.pdf", 131_072, POSITIONING_CALL_DAYS_AGO + 2, 6) },
     typed(POSITIONING_CALL_DAYS_AGO + 2),
   );
 
   // ── What you can take on ──
   add(
     "geographic_coverage",
-    { kind: "area", area: { states: [...PERSONA.serviceStates], counties: [], cities: [], rung: "state_plus_neighbors" } },
+    { kind: "area", area: { states: [...PERSONA.serviceStates], counties: [], cities: [], rung: "state" } },
     typed(JOINED_DAYS_AGO - 3),
   );
-  add("concurrent_contract_capacity", count(Math.max(1, Math.floor(PERSONA.employeesW2 / 2)), "jobs at once"), typed(JOINED_DAYS_AGO - 8));
+  // Two cohort programs and two review or plan jobs at once, on 11 staff.
+  add("concurrent_contract_capacity", count(4, "projects at once"), typed(JOINED_DAYS_AGO - 8));
   add("payment_terms_tolerance", count(30, "days"), typed(JOINED_DAYS_AGO - 8));
-  add("working_capital", money(60_000), typed(JOINED_DAYS_AGO - 8));
-  add("bonding_capacity", text("None so far. Our work has never needed a bond."), typed(JOINED_DAYS_AGO - 8));
+  add("working_capital", money(220_000), typed(JOINED_DAYS_AGO - 8));
+  add("bonding_capacity", text("None so far. Our consulting and training work has never needed a bond."), typed(JOINED_DAYS_AGO - 8));
   add("proposal_support", choice("me", "I write them"), typed(JOINED_DAYS_AGO - 8));
   add("pursuing_as", choice("both", "Both"), typed(JOINED_DAYS_AGO - 3));
-  // A two-person crew, and no credit line to front an ad buy until the government pays.
-  add("constraints", pick("constraints", "cashflow", "crew"), typed(JOINED_DAYS_AGO - 8));
+  // 7 of her trainers are contract facilitators: on a set-aside, they may count
+  // toward the half of the work that can go to others (the pack's gap 4).
+  add("constraints", pick("constraints", "crew"), typed(JOINED_DAYS_AGO - 8));
 
   // ── Work you have done ──
-  add("past_performance", entries(...PAST_PERFORMANCE.map(agencyJob)), typed(JOINED_DAYS_AGO - 3));
-  add("public_sector_experience", pick("public_sector_experience", "city", "federal"), typed(JOINED_DAYS_AGO - 9));
+  add("past_performance", entries(...PAST_PERFORMANCE.map(consultingJob)), typed(JOINED_DAYS_AGO - 3));
+  add("public_sector_experience", pick("public_sector_experience", "city", "federal", "prime"), typed(JOINED_DAYS_AGO - 9));
   add("years_of_experience", choice("5to10", "5 to 10 years"), typed(JOINED_DAYS_AGO - 3));
   add("has_active_commercial_contracts", choice("yes", "Yes"), typed(JOINED_DAYS_AGO - 9));
   add(
@@ -241,17 +255,20 @@ export function businessRows(): DemoFieldRow[] {
   );
   add(
     "ninety_day_goal",
-    text("Bid on Army family-program campaigns at Fort Bragg, and keep the NC Guard as a customer.", true),
+    text("Win the Fayetteville VA supervisor program, and start our GSA schedule offer.", true),
     typed(JOINED_DAYS_AGO - 3),
   );
   add(
     "best_first_opportunity",
-    text("An Army Community Service campaign at Fort Bragg. We already reach military families.", true),
+    text("A VA training program set aside for service-disabled veteran-owned firms, close to our office.", true),
     typed(JOINED_DAYS_AGO - 9),
   );
   add(
     "anything_else",
-    text("We do not have a GSA schedule yet. Some federal ad buys are open only to schedule holders.", true),
+    text(
+      "We have no GSA schedule, and we are not on OASIS+ or the Army's HR Solutions contract. Much of Fort Bragg's consulting work is open only to schedule holders.",
+      true,
+    ),
     typed(POSITIONING_CALL_DAYS_AGO),
   );
 
@@ -273,8 +290,9 @@ export function businessRows(): DemoFieldRow[] {
         kind: "insurance",
         name: "Professional liability (errors and omissions) insurance",
         issuedAt: dateDaysFromNow(-155),
+        // The same date as the Stay Ready page: 210 days from now.
         expiresAt: dateDaysFromNow(210),
-        limits: [{ label: "Per claim", amountUSD: 1_000_000 }],
+        limits: [{ label: "Per claim", amountUSD: 2_000_000 }],
       },
     ),
     typed(JOINED_DAYS_AGO - 12),
@@ -283,7 +301,7 @@ export function businessRows(): DemoFieldRow[] {
   // in 2026, and she holds no other state certification.
   add(
     "doc_w9",
-    { kind: "file", file: file("doc-w9", "lantern-row-creative-w9.pdf", 94_208, JOINED_DAYS_AGO - 14, 2) },
+    { kind: "file", file: file("doc-w9", "coppervale-advisory-w9.pdf", 94_208, JOINED_DAYS_AGO - 14, 2) },
     typed(JOINED_DAYS_AGO - 14),
   );
 
@@ -295,33 +313,33 @@ export function businessProposals(): DemoProposal[] {
     proposal(
       "prop-equipment",
       "equipment",
-      list("Two cinema cameras, a drone and location lighting"),
+      list("A 30-seat training room, projectors and a 360 survey platform"),
       "capability_statement",
       null,
-      capabilitySource("Two cinema cameras, a drone and location lighting", "Studio and edit suite on Person Street."),
+      capabilitySource("A 30-seat training room, projectors and a 360 survey platform", "Office on Green St."),
       POSITIONING_CALL_DAYS_AGO + 1,
     ),
     proposal(
       "prop-psc",
       "psc_codes",
       codes(
-        { system: "PSC", code: "R701", label: "Support- Management: Advertising" },
-        { system: "PSC", code: "T006", label: "Photo/Map/Print/Publication- Film/Video Tape Production" },
+        { system: "PSC", code: "R408", label: "Support- Professional: Program Management or Support" },
+        { system: "PSC", code: "U008", label: "Education/Training- Training/Curriculum Development" },
       ),
       "capability_statement",
       null,
-      capabilitySource("PSC R701 · T006", "Company data:"),
+      capabilitySource("PSC R408 · U008", "Company data:"),
       POSITIONING_CALL_DAYS_AGO + 1,
     ),
     proposal(
       "prop-credit-line",
       "line_of_credit",
-      choice("no", "I do not have one"),
+      choice("yes", "I have one"),
       "hunter.learned",
-      "We don't have a credit line, so a big ad buy comes out of our own cash until the government pays.",
+      "We have a $150,000 line of credit at the bank. It covers payroll until the government pays.",
       hunterChatSource(
-        "We don't have a credit line, so a big ad buy comes out of our own cash until the government pays.",
-        "Got it. No line of credit, so you front ad buys from your own cash.",
+        "We have a $150,000 line of credit at the bank. It covers payroll until the government pays.",
+        "Got it. A $150,000 line of credit covers payroll until you're paid.",
       ),
       9,
     ),
