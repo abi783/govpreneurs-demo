@@ -1,11 +1,13 @@
 // Builds the member's one-page capability statement PDF from the story, at the
 // path the persona points to (PERSONA.capabilityStatementFile, in public/).
-// Run: DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
+// Run: DEMO_MEMBER=<id> bun scripts/make-capability-statement.ts (a new member adds its lines to COPY)
+//      DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
 //      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
-import { PAST_PERFORMANCE, PERSONA } from "../src/demo/story/persona";
+// The member's own persona file: story/persona.ts picks it with import.meta.glob, which only Vite runs.
+const { PAST_PERFORMANCE, PERSONA } = (await import(`../src/demo/members/${MEMBER}/persona.ts`)) as typeof import("../src/demo/members/agency/persona");
 
 /** What only one member's statement says. Everything else is read from the persona. */
 const COPY = {

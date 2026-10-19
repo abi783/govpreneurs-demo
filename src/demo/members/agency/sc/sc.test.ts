@@ -18,7 +18,10 @@ import { TASKS } from "../../../story/workspace";
 
 const FOOD_KEYS = ["health_permits", "food_manager_certifications", "food_handler_cards", "doc_haccp_plan", "health_inspection_score", "facilities", "max_daily_output"];
 
-describe(`My Business seed (${MEMBER})`, () => {
+// A pack folder's tests run in every member's mode: these hold for the agency and the caterer only.
+const ONSTAGE = MEMBER === "agency" || MEMBER === "caterer";
+
+describe.runIf(ONSTAGE)(`My Business seed (${MEMBER})`, () => {
   const seed = buildSeed();
   const payload = buildPayload(seed);
   const score = readyScore(payload.fields, undefined, payload.media);
@@ -62,7 +65,7 @@ describe(`My Business seed (${MEMBER})`, () => {
   });
 });
 
-describe(`Success Center (${MEMBER})`, () => {
+describe.runIf(ONSTAGE)(`Success Center (${MEMBER})`, () => {
   it("the first open task is Ava's three questions on the hero bid", () => {
     const tasks = buildTasksPayload();
     expect(tasks.sections.all.tasks[0]?.title).toMatch(/^Answer Ava's 3 questions/);
