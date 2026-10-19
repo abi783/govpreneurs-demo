@@ -30,7 +30,8 @@ import {
   visibleAsks,
   requirementChangedBy,
 } from "./derive";
-import { AVA_BIDS } from "./fixtures";
+// DEMO: the lab seeds every member's sample bids, whichever story is on stage.
+import { ALL_AVA_BIDS as AVA_BIDS } from "./fixtures";
 import { approvalTotal, linePrices, priceOf, sheetTotal } from "./price";
 import { decisionKey, emptyState, type AskAnswer, type BidState } from "./store";
 import type { Ask, AvaBid, EnterField } from "./types";

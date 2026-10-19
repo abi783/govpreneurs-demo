@@ -20,11 +20,16 @@ import {
 import { daysToClose, findOpportunity, OPPS, STORY_BID_IDS } from "./opportunity";
 import { daysFromToday } from "../../lib/ava/dates";
 import { getAvaStory, STORY_BIDS } from "./story";
+import { MEMBER } from "../member";
+import { HERO_IDS as AGENCY_IDS } from "../members/agency/opportunities";
 
 const MACKALL = "SP4701-26-Q-0021";
 const FAYETTEVILLE = "FAYNC-2026-R-08";
 const CUMBERLAND = "CUMCO-2026-014";
 const REPLY = "W912EE-27-S-0004";
+/** DEMO: the agency's hero bid, the one Ava bid in its story. */
+const AGENCY_HERO = AGENCY_IDS.hero;
+const CATERER = MEMBER === "caterer";
 
 describe("the story, as Ava reads it", () => {
   test("every opportunity in the story is one Ava can open", () => {
@@ -56,7 +61,15 @@ describe("the story, as Ava reads it", () => {
     expect(findOpportunity("NOT-A-BID-123")).toBeUndefined();
   });
 
-  test("the four bids are the story's four, soonest due first", () => {
+  test.runIf(!CATERER)("the agency's one bid is its hero, with 3 questions waiting", () => {
+    expect(STORY_BID_IDS).toEqual([AGENCY_HERO]);
+    expect(STORY_BIDS[0].statusLine).toBe(
+      "Ava has 3 questions for you about your team, the videos and the app line.",
+    );
+    expect(STORY_BIDS[0].value).toBe("$190K–$240K a year");
+  });
+
+  test.runIf(CATERER)("the four bids are the story's four, soonest due first", () => {
     expect(STORY_BID_IDS).toEqual([FAYETTEVILLE, CUMBERLAND, MACKALL, REPLY]);
     expect(STORY_BIDS.map((b) => b.statusLine)).toEqual([
       "Sarah Mitchell reviewed your proposal. Read her notes, then send it.",
@@ -143,32 +156,41 @@ describe("Grant's read", () => {
 });
 
 describe("the mentor reviews", () => {
-  test("Sarah's review of the Fayetteville proposal is a finished review of her bid", () => {
-    const r = getReviewByOpportunity(FAYETTEVILLE, "bid");
-    expect(r?.id).toBe("rev-fayetteville-proposal");
-    expect(r?.status).toBe("responded");
-    expect(r?.mentorName).toBe(MENTOR.name);
-    expect(r?.messages.at(-1)?.from).toBe("mentor");
-    expect(getReviewByOpportunity(FAYETTEVILLE, "bid")).toBe(r);
-  });
+  test.runIf(CATERER)(
+    "Sarah's review of the Fayetteville proposal is a finished review of her bid",
+    () => {
+      const r = getReviewByOpportunity(FAYETTEVILLE, "bid");
+      expect(r?.id).toBe("rev-fayetteville-proposal");
+      expect(r?.status).toBe("responded");
+      expect(r?.mentorName).toBe(MENTOR.name);
+      expect(r?.messages.at(-1)?.from).toBe("mentor");
+      expect(getReviewByOpportunity(FAYETTEVILLE, "bid")).toBe(r);
+    },
+  );
 
-  test("Sarah's read of the Camp Mackall opportunity says Pursue, and is not a review of her bid", () => {
-    const r = getReviewByOpportunity(MACKALL);
-    expect(r?.id).toBe("rev-mackall-pursue");
-    expect(r?.verdict).toBe("pursue");
-    expect(getReviewByOpportunity(MACKALL, "bid")).toBeNull();
-  });
+  test.runIf(CATERER)(
+    "Sarah's read of the Camp Mackall opportunity says Pursue, and is not a review of her bid",
+    () => {
+      const r = getReviewByOpportunity(MACKALL);
+      expect(r?.id).toBe("rev-mackall-pursue");
+      expect(r?.verdict).toBe("pursue");
+      expect(getReviewByOpportunity(MACKALL, "bid")).toBeNull();
+    },
+  );
 
   test("the mentor is Sarah Mitchell", () => {
     expect(ADAPTER_MENTOR.name).toBe("Sarah Mitchell");
   });
 
   test("sending her bid charges the wallet once, and a second send finds the first", () => {
+    // DEMO: the member on stage's hero bid. Dana's has no mentor read yet.
+    const hero = CATERER ? MACKALL : AGENCY_HERO;
+    const read = CATERER ? "rev-mackall-pursue" : undefined;
     const before = getWalletBalance();
     expect(before).toBe(WALLET.balance);
     expect(sendCheck()).toMatchObject({ cost: 97, enough: true });
     const r = createReview({
-      opportunityId: MACKALL,
+      opportunityId: hero,
       opportunityTitle: "Field Feeding Support",
       note: "Please read my bid.",
       subject: "bid",
@@ -177,7 +199,7 @@ describe("the mentor reviews", () => {
     expect(r.subject).toBe("bid");
     expect(getWalletBalance()).toBe(before - 97);
     const again = createReview({
-      opportunityId: MACKALL,
+      opportunityId: hero,
       opportunityTitle: "Field Feeding Support",
       note: "Again.",
       subject: "bid",
@@ -185,7 +207,7 @@ describe("the mentor reviews", () => {
     expect(again.id).toBe(r.id);
     expect(getWalletBalance()).toBe(before - 97);
     // It never replaces Sarah's read of the opportunity.
-    expect(getReviewByOpportunity(MACKALL)?.id).toBe("rev-mackall-pursue");
+    expect(getReviewByOpportunity(hero)?.id).toBe(read);
   });
 });
 

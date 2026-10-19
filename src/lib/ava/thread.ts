@@ -285,6 +285,11 @@ function ack(bid: AvaBid, s: BidState, key: string): string | null {
     const a = s.answers[key.slice(4)];
     if (ask && a?.status === "forwarded")
       return `Thank you. I keep writing while we wait for ${OWNER_WORDS[ask.owner]}.`;
+    // DEMO: a choice that carries a risk says so at once (AnswerChoice.warn).
+    if (ask?.answer.type === "answer" && a?.status === "done") {
+      const warn = ask.answer.choices.find((c) => c.id === a.choiceId)?.warn;
+      if (warn) return warn;
+    }
   }
   if (key === "price") return "Thank you. Your price is in your bid.";
   return null;

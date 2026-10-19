@@ -296,6 +296,9 @@ export interface AnswerChoice {
   gives?: { status: ReqStatus; evidence?: string };
   /** A follow-up ask this answer opens ("Did you sign the attendance sheet?"). */
   opensAskId?: string;
+  /** DEMO: what Ava says right after this choice, when it carries a risk the
+   *  member should hear now ("That is a risk…"). Absent = Ava says nothing. */
+  warn?: string;
 }
 
 export type AskAnswerSpec =

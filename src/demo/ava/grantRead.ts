@@ -12,7 +12,10 @@
 // here, and each states a fact that is true of the member in persona.ts.
 
 import { dayFromNow } from "../../lib/ava/dates";
+import { byMember } from "../member";
+import { HERO_IDS } from "../members/agency/opportunities";
 import { getGrantBrief } from "../story/grantBriefs";
+import { getOpportunity } from "../story/opportunities";
 import { PERSONA } from "../story/persona";
 import { findOpportunity, type AvaOpportunity } from "./opportunity";
 import { KNOCKOUT_FACT, PROOF_FACT, type GrantFacts } from "./grantFacts";
@@ -65,6 +68,9 @@ export interface GrantRead {
 }
 
 const active = `Active until ${formatSamEnd()}`;
+
+/** DEMO: the agency's hero bid (src/demo/members/agency). */
+const AGENCY_HERO = HERO_IDS.hero;
 
 function formatSamEnd(): string {
   const [y, m, d] = PERSONA.samActiveUntil.split("-").map(Number);
@@ -266,6 +272,65 @@ const SAMPLES: Record<string, GrantSample> = {
     ],
   },
 
+  // DEMO: the agency's hero, Family Advocacy print and digital ads: a federal
+  // quote set aside for woman-owned firms. Rows follow Grant's hand-written
+  // brief (members/agency/grantBriefs.ts, `compliance`), with Dana's facts.
+  [AGENCY_HERO]: {
+    rows: [
+      row(
+        "ga-setaside",
+        "Certified woman-owned small business when you quote",
+        "§1.2",
+        "WOSB",
+        "Certified in SBA's MySBA Certifications",
+        "have",
+      ),
+      row(
+        "ga-size",
+        "Small under the size standard for industry code 541810",
+        "§1.2",
+        "Small",
+        "Small, as your registration says",
+        "have",
+      ),
+      row(
+        "ga-sam",
+        "Active federal registration when you quote, and through award",
+        "§5.2",
+        "Active",
+        active,
+        "have",
+      ),
+      row(
+        "ga-app",
+        "Ads on the contractor's own mobile app",
+        "PWS 3.4",
+        "Own app",
+        "No app on file. Ask in Q&A whether a news partner's app counts",
+        "missing",
+      ),
+      row(
+        "ga-pm",
+        "Named project manager and alternate",
+        "PWS 4.1",
+        "Named",
+        "Not named yet. No résumés on file",
+        "confirm",
+      ),
+      row(
+        "ga-insurance",
+        "General liability insurance before work starts",
+        "§5.5",
+        "$500,000",
+        "General liability $1M per occurrence, on file",
+        "have",
+      ),
+    ],
+    warnings: limits(AGENCY_HERO, []),
+    deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 5, subQuoteDays: 0, writingDays: 3 },
+    questions: [],
+  },
+
   // Fort Bragg sources sought: a reply by email, not a bid.
   "W912EE-27-S-0004": {
     rows: [
@@ -313,7 +378,11 @@ function genericRows(opp: AvaOpportunity): GrantRow[] {
       "g-naics",
       "Industry code",
       "Notice",
-      "Food service",
+      // DEMO: the agency's bids span several codes, so its row names the notice's own.
+      byMember({
+        caterer: "Food service",
+        agency: getOpportunity(opp.noticeId)?.naics ?? "Notice",
+      }),
       `${PERSONA.primaryNaics} is your main code`,
       "have",
     ),

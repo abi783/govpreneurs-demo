@@ -12,6 +12,7 @@
 // label on the package and checklist, never in the files.
 
 import { findOpportunity } from "../../demo/ava/opportunity";
+import { byMember } from "../../demo/member";
 import type { BidState } from "./store";
 import {
   askResolved,
@@ -486,7 +487,13 @@ export function exactChecks(bid: AvaBid, s: BidState): CheckResult {
       });
     }
   } else if (delivery.covers) {
-    passed.push("The price pays for the crew, the food and every cost Ava knows about.");
+    // DEMO: in the member's own trade.
+    passed.push(
+      byMember({
+        caterer: "The price pays for the crew, the food and every cost Ava knows about.",
+        agency: "The price pays for your team, the ads you buy and every cost Ava knows about.",
+      }),
+    );
   }
 
   // 9 · Promises in the writing approved by you.

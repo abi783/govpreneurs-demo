@@ -7,6 +7,7 @@ import { pendingAddenda, PRICE_YOURSELF_KEY } from "../../lib/ava/derive";
 import { NO_GRANT_KEY } from "../../lib/ava/grant";
 import { REPLY_SIMPLE_KEY } from "../../lib/ava/scope";
 import { resetGrantFacts } from "../../demo/ava/grantFacts";
+import { STORY_BID_IDS } from "../../demo/ava/opportunity";
 import { ava, avaDemo, type BidState } from "../../lib/ava/store";
 import { CASES } from "../../lib/ava/cases";
 import type { AvaBid } from "../../lib/ava/types";
@@ -41,32 +42,37 @@ export function DemoBar({ ctx }: { ctx: AvaContext }) {
   const { fixture, id } = ctx;
   const yours = !!ctx.s.fixes[PRICE_YOURSELF_KEY];
   const noGrant = !!ctx.s.fixes[NO_GRANT_KEY];
+  // DEMO: only the screens of the member on stage's own bids (the design's
+  // screens are all the caterer's).
+  const cases = CASES.filter((c) => STORY_BID_IDS.includes(c.noticeId));
   return (
     <aside className="ava-demo ava-demo--float" aria-label="Prototype controls">
       <span className="ava-demo__label">Prototype controls</span>
-      <label className="ava-demo__note">
-        Screens from the design:{" "}
-        <select
-          className="ava-demo__select"
-          value=""
-          onChange={(e) => {
-            const c = CASES.find((x) => x.id === e.target.value);
-            if (c)
-              void navigate({
-                to: "/ava/$noticeId",
-                params: { noticeId: c.noticeId },
-                search: { case: c.id },
-              });
-          }}
-        >
-          <option value="">Choose a screen</option>
-          {CASES.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.title}
-            </option>
-          ))}
-        </select>
-      </label>
+      {cases.length > 0 ? (
+        <label className="ava-demo__note">
+          Screens from the design:{" "}
+          <select
+            className="ava-demo__select"
+            value=""
+            onChange={(e) => {
+              const c = cases.find((x) => x.id === e.target.value);
+              if (c)
+                void navigate({
+                  to: "/ava/$noticeId",
+                  params: { noticeId: c.noticeId },
+                  search: { case: c.id },
+                });
+            }}
+          >
+            <option value="">Choose a screen</option>
+            {cases.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <button
         type="button"
         className="btn btn-ghost btn-sm"
