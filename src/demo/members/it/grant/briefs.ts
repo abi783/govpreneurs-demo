@@ -1,244 +1,241 @@
-// THE AGENCY: Grant's written reviews of the two story opportunities that
-// members/agency/grantBriefs.ts does not brief: the look-alike twin (No-bid) and
-// the VA team-up (prime no-go, subcontract go). The hero's brief is in
-// members/agency/grantBriefs.ts.
+// THE IT SERVICES FIRM: Grant's written reviews of the two story opportunities
+// that members/it/grantBriefs.ts does not brief: the look-alike twin (No-bid) and
+// the hospital IT team-up (prime no-go, subcontract go). The hero's brief is in
+// members/it/grantBriefs.ts.
 //
-// Source: demo-storyboard/marketing-agency-pack.md (approved 19 Oct 2026).
+// Source: demo-storyboard/it-services-pack.md, sections 4 and 5.
 // Rules for these words:
-// - The twin is said neutrally. The work statement names one provider's own app,
-//   crew and data; Grant says what that means for Dana, never why the Army wrote it.
-// - No subcontracting-limit argument anywhere (13 CFR 125.6 can exclude mass-media
-//   purchases, so it is not a sound No-bid reason).
+// - The twin is said plainly: only ITES-3S holders can quote, and ITES-3S takes
+//   no new firms. Grant never says why the Army runs its work that way.
+// - The hospital is "Fort Bragg's Army medical center", never by name.
 // - No promise of a win.
 
 import type { AuthoredBrief } from "@/demo/grant/encode";
-import { numWord, PARTNER, shareWords, STAFF, usd } from "@/demo/grant/facts";
+import { PARTNER, usd } from "@/demo/grant/facts";
 import { getOpportunity } from "@/demo/story/opportunities";
-import { findPastPerformance, PERSONA } from "@/demo/story/persona";
 import { PLACES } from "@/demo/story/places";
 import { HERO_IDS } from "../opportunities";
+import { PERSONA } from "../persona";
 
 const hero = getOpportunity(HERO_IDS.hero)!;
 const twin = getOpportunity(HERO_IDS.twin)!;
 const teamUp = getOpportunity(HERO_IDS.teamUp)!;
 
-const mid = (o: typeof hero): number => Math.round((o.valueLow! + o.valueHigh!) / 2);
-const TWIN_ANNUAL = mid(twin);
-const TEAM_ANNUAL = mid(teamUp);
-/** "six": a year of the VA campaign against her yearly revenue. */
-const TIMES = numWord(Math.round(TEAM_ANNUAL / PERSONA.annualRevenue));
-/** "Bluestone": the partner's short name. */
+const mid = (o: typeof twin): number => Math.round((o.valueLow! + o.valueHigh!) / 2);
+const TWIN_MID = mid(twin);
+const TEAM_MID = mid(teamUp);
+/** "Brackwater": the partner's short name. */
 const BLUE = PARTNER.name.split(" ")[0];
-const HIRES = /(\d+) hires/.exec(findPastPerformance("pp-longleaf-hiring")?.scopeDescription ?? "")?.[1] ?? "140";
-const FORT_BRAGG_MILES = PLACES[twin.place].milesFromBase;
+const BRAGG_MILES = PLACES[twin.place].milesFromBase;
+/** "1.6": a year of the hospital order against his yearly revenue. */
+const TEAM_TIMES = (TEAM_MID / PERSONA.annualRevenue).toFixed(1);
 
 export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
-  // ── The twin: Family Advocacy TV and streaming ads — No-bid ────────────
+  // ── The twin: Army Reserve SharePoint support, ITES-3S holders only — No-bid ──
   [HERO_IDS.twin]: {
     oppId: HERO_IDS.twin,
     confidence: 5,
     gist: twin.grant.oneLine,
     thesis:
-      "The work statement names one provider's own streaming app, production team and viewer data. Only that provider can deliver all three, so you would be reselling a package you don't control. Spend this month on the print and digital campaign instead.",
+      "Only holders of the Army's ITES-3S contract can quote, and you are not one. ITES-3S takes no new firms, so nothing you send changes that. Spend the time on the help desk quote, and start on a team for ITES-4S.",
     reads: {
       "Is it your kind of work?": {
         rating: "good",
-        text: "Commercials for the Family Advocacy Program are your advertising code, and your crew makes captioned video. Here, though, the provider's own team makes the ads.",
+        text: "SharePoint and Microsoft 365 admin is work your team does for the clinics. Here, though, only ITES-3S holders can quote.",
       },
       "Does the size fit?": {
         rating: "good",
-        text: `About ${usd(TWIN_ANNUAL)} a year, ${shareWords(TWIN_ANNUAL / PERSONA.annualRevenue)} and inside your range. On size alone it fits.`,
+        text: `About ${usd(TWIN_MID)} a year, about a quarter of your revenue. On size alone it fits.`,
       },
       "Can you perform there?": {
         rating: "strong",
-        text: `Fort Bragg is ${FORT_BRAGG_MILES} miles from your office, and the ads reach households around post.`,
+        text: `Marshall Hall is ${BRAGG_MILES} miles from your office, the same building as the help desk.`,
       },
       "Can you do the work?": {
-        rating: "weak",
-        text: "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three.",
+        rating: "good",
+        text: "Your admins could run the sites. What stops you is who can quote, not the work.",
       },
       "Can you win it?": {
         rating: "weak",
-        text: "Only the provider that owns that app, crew and data can meet all three. Any other firm would be reselling its package.",
+        text: "Only small-business holders of the Army's ITES-3S contract may submit. You are not one, so you can't send a quote.",
       },
       "Will you make money?": {
-        rating: "weak",
-        text: "As a reseller you would add a markup to the provider's own price. The provider can quote the same package without one.",
+        rating: "watch",
+        text: "Not as prime. As a sub to a holder you'd price only your admins' hours, on the holder's terms.",
       },
       "Can you survive winning?": {
-        rating: "watch",
-        text: "Every deliverable would come from another company: its app, its crew and its reports. Your name would be on the contract.",
+        rating: "good",
+        text: "No bond, and the staff would be one or two admins. Winning is not the problem; quoting is.",
       },
       "Do you understand the buyer's intent?": {
         rating: "good",
-        text: "The Family Advocacy Program wants its messages on the screens families around post watch, with viewer numbers it can report.",
+        text: "The Army Reserve has ordered this work through ITES-3S since 2021, so the holders get the orders. The way in is to be on the next contract.",
       },
       "Does this move you forward?": {
-        rating: "weak",
-        text: "Not much. Reselling another firm's package builds no video record of your own. The print and digital campaign does.",
+        rating: "watch",
+        text: "Not this cycle. The help desk quote is the same office and the same customer, and it is open to 8(a) firms like yours.",
       },
     },
     limits: [
-      "Provider lock: the work statement requires one local provider's own subscriber app, production team and viewer data. You don't own any of them.",
-      "Reselling: any other firm would pass that provider's package through with a markup, and control none of the work.",
+      "Holders only: this requirement will be competed as a task order under the Army ITES-3S IDIQ. Only small-business ITES-3S holders may submit, and you are not one.",
+      "Closed: ITES-3S takes no new firms, and ITES-4S, the Army's next IT contract, is not awarded yet.",
     ],
     wouldChange: [
-      `If an amendment lets other platforms and production teams qualify, an "or equal", I'd read the notice again and tell you.`,
-      "If the provider asked you to produce its spots, I'd look at that as a subcontract.",
+      "If the Army reposts this work open-market, as it did in 2018, I'd read it again.",
+      "If an ITES-3S holder asks you to staff the SharePoint work, I'd look at that as a subcontract.",
     ],
     nextMove: {
-      label: "Go to the print and digital campaign",
+      label: "Go to the help desk quote",
       to: `/opportunities/${HERO_IDS.hero}`,
-      rationale: "Same office, same program, and only woman-owned firms can bid. Spend this month on that quote.",
+      rationale: `Same office and same customer, and only 8(a) firms can quote. Its due date is ${hero.closesInDays} days out; spend this week there.`,
     },
     secondaryMove: { label: "Add the next step to my Roadmap", to: "/roadmap" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
-      { requirement: "Total small business set-aside", status: "have", note: "You are a small business." },
-      { requirement: "Registered under NAICS 541810", status: "have", note: "Your primary code." },
-      { requirement: "Streaming through the provider's own subscriber app", status: "missing", note: "You don't own it." },
-      { requirement: "Commercials made by the provider's production team", status: "missing", note: "Your crew is not that team." },
-      { requirement: "The provider's viewer data and dashboard", status: "missing", note: "Only the provider holds it." },
+      { requirement: "Small business under the size standard", status: "have", note: "You are small." },
+      { requirement: `Registered under NAICS ${twin.naics}`, status: "have", note: "Your primary code." },
+      { requirement: "Holder of the Army's ITES-3S contract", status: "missing", note: "You are not one, and it takes no new firms." },
       { requirement: "General liability insurance, $1M per occurrence", status: "have", note: "On file." },
     ],
     redTeam: [
       {
-        challenge: `Am I too quick to pass on ${usd(TWIN_ANNUAL)} a year?`,
-        answer: `No. Your share would be a markup on another company's package, not ${usd(TWIN_ANNUAL)} of your own work.`,
+        challenge: `Am I too quick to pass on ${usd(TWIN_MID)} a year?`,
+        answer: `No. You can't send a quote, so there is no ${usd(TWIN_MID)} to pass on. The help desk quote is the part open to you.`,
       },
       {
-        challenge: "Could I team with the provider?",
-        answer: "Only if it asks. The work statement names its own production team, so it does not need a producer.",
+        challenge: "Could I team with a holder?",
+        answer: "Yes, as a sub. Larkspur Federal IT is a small-business ITES-3S holder. Ask whether it is quoting this order and needs SharePoint admins.",
       },
       {
-        challenge: "Can a buyer name one provider?",
-        answer: `Yes. A buyer can ask for a platform when it needs that audience or that data. The time to ask for "or equal" is the sources sought, before the work statement is written.`,
+        challenge: "How do I get onto the Army's IT contracts?",
+        answer: "Not ITES-3S; it is closed. ITES-4S comes next. A partner or a mentor-protégé joint venture is the realistic way onto it.",
       },
     ],
     keyDates: [
-      { label: "Questions due", inDays: twin.closesInDays - 12 },
+      { label: "Questions due", inDays: twin.closesInDays - 10 },
       { label: "Quotes due", inDays: twin.closesInDays },
-      { label: "Expected award", inDays: twin.closesInDays + 21 },
     ],
     railBriefing: [
-      "I read the quote request and the work statement.",
-      "I stopped at the streaming clause. It names one provider's own app, crew and viewer data.",
-      "Ask me anything, or pick a question below. There is no bid here this cycle.",
+      "I read the task order request and the work statement.",
+      "I stopped at the clause on who can quote. Only ITES-3S holders can.",
+      "Ask me anything, or pick a question below. There is no quote here for you this cycle.",
     ],
-    chips: ["Why can't I bid this?", "What should I bid instead?", "How do I get in next time?"],
+    chips: ["Why can't I bid this?", "How do I get on ITES-4S?", "What should I bid instead?"],
     railAnswers: {
       "Why can't I bid this?":
-        "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three, so you could only resell that provider's package.",
-      "What should I bid instead?": `The print and digital campaign for the same program. Same office, only woman-owned firms can bid, about ${usd(mid(hero))} a year, and it is open for ${hero.closesInDays} days. Open it from the button on this page.`,
-      "How do I get in next time?": `Watch for the next sources sought for Family Advocacy video. Reply, and ask the Army to accept "or equal" platforms and production teams. That is when a work statement can still change.`,
-      "What would put me in range?": `A reply to the next sources sought for this work, asking for "or equal" platforms and production teams. Until then, the print and digital campaign is the one to bid.`,
+        "It will be competed as a task order under the Army's ITES-3S contract, and only small-business ITES-3S holders may submit. You are not one, and ITES-3S takes no new firms.",
+      "How do I get on ITES-4S?":
+        "ITES-4S is the Army's next IT contract. Awards are not expected before late 2027. A partner that is bidding it, or a mentor-protégé joint venture, is the realistic way on. Ask Sarah where to start.",
+      "What should I bid instead?":
+        "The Army Reserve help desk. Same office and same customer, and only 8(a) firms can quote. Open it from the button on this page.",
       "Why not bid?":
-        "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three, so you could only resell that provider's package.",
-      "Where am I weak?": "Here it is not your work. It is the provider lock: the app, the crew and the viewer data belong to one company.",
-      "How do I team with them?": "Only if the provider asks. Its own production team is named, so it does not need one. Spend the time on the print and digital campaign.",
-      "Can I win it?": "No. You can't deliver the provider's own app, crew or viewer data, so the Army could not award it to you.",
-      "Do I have enough time?": `Time is not the problem. The notice is open for ${twin.closesInDays} days, but the requirement names another company's app and crew.`,
+        "It will be competed as a task order under the Army's ITES-3S contract, and only small-business ITES-3S holders may submit. You are not one, and ITES-3S takes no new firms.",
+      "Who could I staff it for?":
+        "A small-business ITES-3S holder. Larkspur Federal IT is one. Ask whether it is quoting this order and needs SharePoint admins.",
+      "Where am I weak?": "Here it is not your work. It is who can quote: only ITES-3S holders.",
+      "Can I win it?": "No. You can't send a quote, because only ITES-3S holders can.",
+      "Do I have enough time?": `Time is not the problem. The order is open for ${twin.closesInDays} days, but only ITES-3S holders can quote.`,
     },
   },
 
-  // ── The team-up: VA hiring campaign — prime no-go, subcontract go ──────
+  // ── The team-up: the Army medical center's IT follow-on — prime no-go, subcontract go ──
   [HERO_IDS.teamUp]: {
     oppId: HERO_IDS.teamUp,
     confidence: 3,
     gist: teamUp.grant.oneLine,
-    thesis: `The work fits, but the prime seat is not yours: the VA expects to set it aside for service-disabled veteran-owned firms, and a year of it is about ${TIMES} times your revenue. Team with ${PARTNER.name} and run the Southeast video shoots.`,
+    thesis: `The work fits, but the prime seat is not yours: only STARS III holders can quote it, and each year is about ${TEAM_TIMES} times your revenue. Team with ${PARTNER.name} and run the desk-side techs at the medical center.`,
     reads: {
       "Is it your kind of work?": {
         rating: "strong",
-        text: `Hiring campaigns are your record: ${HIRES} hires for Longleaf Home Health, with recruiting videos, paid social and a lead form. The VA's campaign is the same work at national size.`,
+        text: "Desk-side support and imaging is the work your techs do at Seymour Johnson, rated Very Good.",
       },
       "Does the size fit?": {
         rating: "weak",
-        text: `About ${usd(TEAM_ANNUAL)} a year. That is about ${TIMES} times your revenue. As a subcontractor you take a share sized for your team.`,
+        text: `About ${usd(TEAM_MID)} a year, about ${TEAM_TIMES} times your yearly revenue. As a sub you'd run nine desk-side techs, about $900K a year.`,
       },
       "Can you perform there?": {
-        rating: "good",
-        text: "The shoots are at VA medical centers across the Southeast, including Fayetteville, Durham and Salisbury. Your crew can reach most of the NC, VA and SC sites in a day.",
+        rating: "strong",
+        text: `The medical center is on Fort Bragg, ${PLACES[teamUp.place].milesFromBase} miles from your office. Your techs can be on site every day.`,
       },
       "Can you do the work?": {
         rating: "watch",
-        text: `A national campaign needs strategy, a national media buy, a hiring website and shoots in many states. Your ${STAFF}-person team can run the Southeast shoots, not the whole program.`,
+        text: "Your techs can do the desk-side work. Nine more seats on top of the help desk means hiring, and clinics can't wait for a fix.",
       },
       "Can you win it?": {
         rating: "weak",
-        text: `As a prime you can't compete: the VA expects only service-disabled veteran-owned firms to be eligible. As a subcontractor you share in the work if ${BLUE} wins.`,
+        text: `As a prime you can't quote: the agency expects to order it through 8(a) STARS III, and you hold no seat. As a subcontractor you share in the work if ${BLUE} wins.`,
       },
       "Will you make money?": {
         rating: "watch",
-        text: "A subcontract pays for your crew's shoot and edit days, not the media buy. The margin is in that work, and you carry none of the national media cost.",
+        text: "A subcontract pays for your nine techs. Price them at or above the wage floor, and agree on your rate before the quote.",
       },
       "Can you survive winning?": {
-        rating: "good",
-        text: `No bond. ${BLUE} pays you after the VA pays it, often 30 days later, so price for a longer wait.`,
+        rating: "watch",
+        text: `Nine new hires need payroll before the first payment, and you have no credit line. Price for being paid after ${BLUE} is paid.`,
       },
       "Do you understand the buyer's intent?": {
         rating: "strong",
-        text: "The VA wants doctors, nurses and staff to apply when the current contract ends in September 2027. Local stories filmed at each center are part of the work it describes.",
+        text: "The agency wants clinicians back at work fast: techs at the desk, not a queue. A team with local techs on post fits that.",
       },
       "Does this move you forward?": {
         rating: "strong",
-        text: "A VA subcontract adds a second federal buyer and a national program to your record. It is the step toward priming VA work in your region.",
+        text: "A hospital IT job on your record, with a second Defense buyer. Teaming is how you get in while STARS III is closed.",
       },
     },
     limits: [
-      "Set-aside: the VA expects to set the follow-on aside for service-disabled veteran-owned firms. You can't hold the prime contract.",
-      `Size: about ${usd(TEAM_ANNUAL)} a year, about ${TIMES} times your revenue.`,
-      `Teaming: nothing is signed with ${PARTNER.name} yet. A teaming agreement sets your share before the RFP.`,
+      "Contract: the agency expects to order this through GSA's 8(a) STARS III. You hold no seat, so you can't quote as prime.",
+      `Size: about ${usd(TEAM_MID)} a year, about ${TEAM_TIMES} times your yearly revenue.`,
+      `Teaming: nothing is signed with ${PARTNER.name} yet. A teaming agreement sets your share before the quote.`,
     ],
     wouldChange: [
-      "If the VA opens the follow-on to all small businesses, I'd check it again, but the size still points to a subcontract.",
-      `If ${BLUE} does not reply, I'd look for another veteran-owned prime on Partners.`,
+      "If the agency competes the follow-on outside STARS III, I'd check it again, but the size still points to a subcontract.",
+      `If ${BLUE} does not reply, I'd look for another STARS III holder on Partners.`,
     ],
     nextMove: {
       label: `See ${PARTNER.name} on Partners`,
       to: "/partners",
-      rationale: `${BLUE} wants a woman-owned video crew for VA medical center shoots in NC, VA and SC. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the RFP.`,
+      rationale: `${BLUE} wants a local firm for nine desk-side techs. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the quote.`,
     },
     secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "One of your codes." },
-      { requirement: "Service-disabled veteran-owned small business (SDVOSB), expected", status: "missing", note: "You are woman-owned, not veteran-owned." },
+      { requirement: "Holder of GSA's 8(a) STARS III contract, expected", status: "missing", note: "You are 8(a), but you hold no STARS III seat." },
       { requirement: "Capability statement", status: "have", note: "On file in My Business." },
-      { requirement: "Recruitment campaign record", status: "have", note: `Longleaf Home Health: ${HIRES} hires.` },
-      { requirement: "Teaming agreement with a veteran-owned prime", status: "partial", note: `${BLUE} asked for a woman-owned crew. Nothing is signed yet.` },
+      { requirement: "Similar jobs, with a contact for each", status: "have", note: "Your Seymour Johnson desktop support, rated Very Good." },
+      { requirement: "Teaming agreement with a STARS III holder", status: "partial", note: `${BLUE} wants a local firm. Nothing is signed yet.` },
     ],
     redTeam: [
       {
-        challenge: "Could I lead it with a veteran-owned partner?",
-        answer: `Not as the lead. The veteran-owned firm has to lead, and a year of this is about ${TIMES} times your revenue.`,
+        challenge: "Could I quote it myself, as an 8(a) firm?",
+        answer: "Not as the lead. Only STARS III holders can quote, and a year of the work is more than your revenue.",
       },
       {
-        challenge: "Is a subcontract worth it?",
-        answer: "Yes. A national VA program on your record is worth more than the margin. It is what lets you prime VA work in your region later.",
+        challenge: "Can I staff nine more techs?",
+        answer: "With time, yes. The award is not before 28 February 2027. Hire through the spring, and don't pull techs off the help desk.",
       },
       {
         challenge: `Does ${BLUE} need me?`,
-        answer: "It says it does: it wants a woman-owned crew for shoots in NC, VA and SC. Your hiring videos for Longleaf Home Health are the proof to send.",
+        answer: "It says it does: it runs hospital IT at two Navy medical centers, but it has no techs near Fort Bragg. Your Seymour Johnson work is the proof to send.",
       },
     ],
     keyDates: [{ label: "Replies due", inDays: teamUp.closesInDays }],
     railBriefing: [
-      "I read the sources sought notice and the work it describes.",
-      "You can do part of this work, but not as prime. The set-aside and the size decide it.",
+      "I read the request for information and the draft work statement.",
+      "You can do part of this work, but not as prime. The contract and the size decide it.",
       "I have a question for you, or pick one below.",
     ],
     chips: ["Why not as prime?", "Who could I team with?", { label: `Tell Grant about ${BLUE}`, kind: "elicit", target: "talked-to-partner" }],
     railAnswers: {
-      "Why not as prime?": `Two reasons. The VA expects to set the follow-on aside for service-disabled veteran-owned firms, and you are woman-owned. And a year of it is about ${usd(TEAM_ANNUAL)}, about ${TIMES} times your revenue.`,
-      "Who could I team with?": `${PARTNER.name}, a service-disabled veteran-owned firm in ${PARTNER.city}. It runs ${PARTNER.holds.charAt(0).toLowerCase()}${PARTNER.holds.slice(1)}, and it wants a woman-owned video crew for VA medical center shoots in NC, VA and SC. ${PARTNER.contact}, its ${PARTNER.contactTitle.toLowerCase()}, is your contact.`,
-      "How do I team with them?": `Open Partners and reply to ${PARTNER.contact}. Send your hiring videos for Longleaf Home Health and ask for a teaming agreement that names your share: the Southeast shoots and edits.`,
-      "What should my reply say?": `You don't need to reply to the VA: the notice asks who could run the whole campaign, and ${BLUE} replies. Send ${BLUE} a one-page note instead: your woman-owned certification, your 2-person video crew, the Longleaf hiring campaign and the NC Guard recruiting videos.`,
-      "What should my response say?": `You don't need to reply to the VA: the notice asks who could run the whole campaign, and ${BLUE} replies. Send ${BLUE} a one-page note instead: your woman-owned certification, your 2-person video crew, the Longleaf hiring campaign and the NC Guard recruiting videos.`,
-      "Can I win it?": `No one can promise that. As a prime, no: the set-aside rules you out. As a subcontractor, you share in the work if ${BLUE} wins it.`,
-      "Do I have enough time?": `Yes. Replies are due in ${teamUp.closesInDays} days, and the contract itself comes later. Reply to ${PARTNER.contact} this week so your name is in ${BLUE}'s reply.`,
-      "Where am I weak?": `Size and federal record. A year of this is about ${TIMES} times your revenue, and your only federal prime is the NC Guard campaign. A subcontract with ${BLUE} builds both.`,
-      "Is this a bid?": "No. A sources sought asks which firms could do the work. There is no price and no award. The bid comes later, as a request for proposals.",
+      "Why not as prime?": `Two reasons. The agency expects to order it through 8(a) STARS III, and you hold no seat on it. And at about ${usd(TEAM_MID)} a year, it is about ${TEAM_TIMES} times your yearly revenue.`,
+      "Who could I team with?": `${PARTNER.name}, an 8(a) firm in ${PARTNER.city} that holds STARS III. It runs hospital IT at two Navy medical centers, and it wants ${PARTNER.seeking.charAt(0).toLowerCase()}${PARTNER.seeking.slice(1)}. ${PARTNER.contact}, its ${PARTNER.contactTitle.toLowerCase()}, is your contact.`,
+      "How do I team with them?": `Open Partners and reply to ${PARTNER.contact}. Send your Seymour Johnson desktop support and its rating, and ask for a teaming agreement that names your share: the nine desk-side techs.`,
+      "What should my reply say?": `You don't need to reply alone: ${BLUE} replies as the prime and names you as its partner. Send ${BLUE} a one-page note: your 8(a) status, your Security+ techs, your Seymour Johnson work and how fast you can hire.`,
+      "What should my response say?": `You don't need to reply alone: ${BLUE} replies as the prime and names you as its partner. Send ${BLUE} a one-page note: your 8(a) status, your Security+ techs, your Seymour Johnson work and how fast you can hire.`,
+      "Can I win it?": `No one can promise that. As a prime, no: only STARS III holders can quote. As a subcontractor, you share in the work if ${BLUE} wins it.`,
+      "Do I have enough time?": `Yes. Replies are due in ${teamUp.closesInDays} days, and the quote comes in about 90. Reply to ${PARTNER.contact} this week so your name is in ${BLUE}'s reply.`,
+      "Where am I weak?": `The contract and the size. You hold no STARS III seat, and nine new techs need payroll before the first payment. A teaming agreement with ${BLUE} settles the first; hiring early settles the second.`,
+      "Is this a bid?": "No. A request for information asks which firms could do the work. There is no price and no award. The quote comes later.",
     },
   },
 };

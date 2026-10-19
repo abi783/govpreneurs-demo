@@ -43,6 +43,10 @@ const NAICS: CodeRow[] = [
   { code: "311423", description: "Dried and Dehydrated Food Manufacturing" },
   { code: "312111", description: "Soft Drink Manufacturing" },
   { code: "312112", description: "Bottled Water Manufacturing" },
+  {
+    code: "423430",
+    description: "Computer and Computer Peripheral Equipment and Software Merchant Wholesalers",
+  },
   { code: "424410", description: "General Line Grocery Merchant Wholesalers" },
   { code: "424420", description: "Packaged Frozen Food Merchant Wholesalers" },
   { code: "424430", description: "Dairy Product (except Dried or Canned) Merchant Wholesalers" },

@@ -15,6 +15,7 @@ import { byMember, own } from "@/demo/member";
 import type { StoryOpportunity } from "@/demo/story/opportunities";
 import type { AgencyDomainKey } from "@/demo/members/agency/grant/domains";
 import type { AgencyDomainKey as ConstructionDomainKey } from "@/demo/members/construction/grant/domains";
+import type { AgencyDomainKey as ItDomainKey } from "@/demo/members/it/grant/domains";
 import type { PastPerformanceId } from "@/demo/story/persona";
 import { customerShort, EVENT_RANGE, MEALS_PER_DAY, PP } from "./facts";
 
@@ -37,7 +38,7 @@ export type CatererDomainKey =
   | "staffing"
   | "construction";
 
-type PackDomainKey = AgencyDomainKey | ConstructionDomainKey;
+type PackDomainKey = AgencyDomainKey | ConstructionDomainKey | ItDomainKey;
 
 export type DomainKey = CatererDomainKey | PackDomainKey;
 
