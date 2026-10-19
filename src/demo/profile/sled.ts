@@ -1,10 +1,14 @@
 // DEMO: the state-by-state SLED (state and local) vendor registrations.
 
-import { byMember } from "../member";
+import { byMember, own } from "../member";
 import { PERSONA } from "../story/persona";
 import { isoDaysFromNow } from "../story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "./store";
 import { getDfyOrders } from "./dfy";
+
+const copy = own(
+  import.meta.glob<typeof import("../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export const STATE_NAMES: Record<string, string> = {
   NC: "North Carolina",
@@ -30,7 +34,7 @@ const KEY = "profile.sled";
  */
 const REGISTERED = byMember<Record<string, { vendorId: string; registeredDaysAgo: number } | undefined>>({
   caterer: {},
-  pack: { NC: { vendorId: "0001048772", registeredDaysAgo: 262 } },
+  pack: copy.SLED_REGISTERED,
 });
 
 function seed(): SledRegistration[] {

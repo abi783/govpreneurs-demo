@@ -15,15 +15,15 @@ import {
 } from "./partnersData";
 import { KEY_PARTNER, PERSONA, PAST_PERFORMANCE } from "@/demo/story/persona";
 import { byMember, MEMBER } from "@/demo/member";
+import { withOtherMembersWords } from "@/demo/members/words";
 import { getOpportunity, HERO_IDS } from "@/demo/story/opportunities";
 import { VEHICLES } from "@/lib/mock/vehicles";
 import { COMPARABLE_FOOD_AWARDS, LCAT_RATES, PREVAILING_WAGES_CUMBERLAND_NC } from "@/lib/mock/laborRates";
 
-// DEMO: Marcus Hale is the agency's partner contact, so only the caterer bans "Marcus" (an old sample
-// member). The agency bans the caterer's trade words (demo-storyboard/tools/scan-member.mjs).
+// DEMO: a pack member bans every other member's words (src/demo/members/words.ts).
 const BANNED = byMember({
   caterer: /sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|\bmarcus\b|williams construction|238160|amira's kitchen|diana potts|DEMO-[A-Z]+-\d+/i,
-  pack: /sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|williams construction|238160|DEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|ServSafe|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+  pack: withOtherMembersWords(/sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|williams construction|238160|DEMO-[A-Z]+-\d+/i),
 });
 const caterer = MEMBER === "caterer";
 const agency = MEMBER === "agency";

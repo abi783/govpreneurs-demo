@@ -12,7 +12,7 @@ import { byMember, own } from "../member";
 import { CATERER_VOCAB } from "../members/caterer/hunter/vocab";
 import type { FeedRow } from "./data";
 
-const { AGENCY_VOCAB: PACK_VOCAB } = own(
+const { VOCAB: PACK_VOCAB } = own(
   import.meta.glob<typeof import("../members/agency/hunter/vocab")>("/src/demo/members/*/hunter/vocab.ts", { eager: true }),
 );
 

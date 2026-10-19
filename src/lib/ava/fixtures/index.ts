@@ -27,11 +27,15 @@ import { AVA_BIDS as STORY_AVA_BIDS } from "../../../demo/story/opportunities";
 import { registerSeeds, type AskAnswer } from "../store";
 import type { AvaBid } from "../types";
 import { cumberlandBid } from "./cumberland";
-import { familyAdvocacyAnswers, familyAdvocacyBid } from "./familyAdvocacy";
 import { fayettevilleBid } from "./fayetteville";
 import { fortBraggReplyBid } from "./fortBraggReply";
 import { mackallBid } from "./mackall";
 import { startingState } from "../start";
+
+// Every pack member's hero bid (src/demo/members/<id>/ava/index.ts).
+const PACK_AVA = Object.values(
+  import.meta.glob<typeof import("../../../demo/members/agency/ava")>("/src/demo/members/*/ava/index.ts", { eager: true }),
+);
 
 function withStory(bid: AvaBid): AvaBid {
   const o = findOpportunity(bid.noticeId);
@@ -41,7 +45,7 @@ function withStory(bid: AvaBid): AvaBid {
 
 /** Every member's sample bids, by notice number. */
 export const ALL_AVA_BIDS: Record<string, AvaBid> = Object.fromEntries(
-  [fayettevilleBid, cumberlandBid, mackallBid, fortBraggReplyBid, familyAdvocacyBid].map((b) => [
+  [fayettevilleBid, cumberlandBid, mackallBid, fortBraggReplyBid, ...PACK_AVA.map((p) => p.HERO_BID)].map((b) => [
     b.noticeId,
     withStory(b),
   ]),
@@ -62,8 +66,8 @@ export function getAvaBid(noticeId: string): AvaBid | null {
 
 /** DEMO: the answers the member really gave, for a bid whose fixture keeps
  *  them, so a bid played forward (play.ts: the presenter's jump to a segment)
- *  reads as hers. Only the agency's bid is here: the caterer's bids play with
+ *  reads as hers. Only the pack members' bids are here: the caterer's bids play with
  *  the sample answers they always used. */
-export const MEMBER_ANSWERS: Record<string, Record<string, AskAnswer>> = {
-  [familyAdvocacyBid.noticeId]: familyAdvocacyAnswers,
-};
+export const MEMBER_ANSWERS: Record<string, Record<string, AskAnswer>> = Object.fromEntries(
+  PACK_AVA.map((p) => [p.HERO_BID.noticeId, p.HERO_ANSWERS]),
+);

@@ -12,16 +12,13 @@
 // here, and each states a fact that is true of the member in persona.ts.
 
 import { dayFromNow } from "../../lib/ava/dates";
-import { byMember, own } from "../member";
+import { byMember } from "../member";
 import { getGrantBrief } from "../story/grantBriefs";
 import { getOpportunity } from "../story/opportunities";
 import { PERSONA } from "../story/persona";
 import { findOpportunity, type AvaOpportunity } from "./opportunity";
 import { KNOCKOUT_FACT, PROOF_FACT, type GrantFacts } from "./grantFacts";
 
-const { HERO_IDS } = own(
-  import.meta.glob<typeof import("../members/agency/opportunities")>("/src/demo/members/*/opportunities.ts", { eager: true }),
-);
 
 export type GrantRowStatus = "have" | "missing" | "confirm" | "unknown";
 
@@ -72,9 +69,6 @@ export interface GrantRead {
 
 const active = `Active until ${formatSamEnd()}`;
 
-/** DEMO: the agency's hero bid (src/demo/members/agency). */
-const AGENCY_HERO = HERO_IDS.hero;
-
 function formatSamEnd(): string {
   const [y, m, d] = PERSONA.samActiveUntil.split("-").map(Number);
   const months = [
@@ -104,6 +98,18 @@ function row(
 ): GrantRow {
   return { id, requirement, ref, requiredValue, firmValue, status };
 }
+
+/** What a pack member's written read (members/<id>/ava/grantRead.ts) is built with. */
+export interface GrantReadKit {
+  row: typeof row;
+  active: string;
+  limits: typeof limits;
+}
+
+// Every pack member's written read for its hero bid, so any member can open it by its number.
+const PACK_READS = Object.values(
+  import.meta.glob<typeof import("../members/agency/ava/grantRead")>("/src/demo/members/*/ava/grantRead.ts", { eager: true }),
+);
 
 function limits(oppId: string, fallback: string[]): string[] {
   return getGrantBrief(oppId)?.limits ?? fallback;
@@ -275,65 +281,6 @@ const SAMPLES: Record<string, GrantSample> = {
     ],
   },
 
-  // DEMO: the agency's hero, Family Advocacy print and digital ads: a federal
-  // quote set aside for woman-owned firms. Rows follow Grant's hand-written
-  // brief (members/agency/grantBriefs.ts, `compliance`), with Dana's facts.
-  [AGENCY_HERO]: {
-    rows: [
-      row(
-        "ga-setaside",
-        "Certified woman-owned small business when you quote",
-        "§1.2",
-        "WOSB",
-        "Certified in SBA's MySBA Certifications",
-        "have",
-      ),
-      row(
-        "ga-size",
-        "Small under the size standard for industry code 541810",
-        "§1.2",
-        "Small",
-        "Small, as your registration says",
-        "have",
-      ),
-      row(
-        "ga-sam",
-        "Active federal registration when you quote, and through award",
-        "§5.2",
-        "Active",
-        active,
-        "have",
-      ),
-      row(
-        "ga-app",
-        "Ads on the contractor's own mobile app",
-        "PWS 3.4",
-        "Own app",
-        "No app on file. Ask in Q&A whether a news partner's app counts",
-        "missing",
-      ),
-      row(
-        "ga-pm",
-        "Named project manager and alternate",
-        "PWS 4.1",
-        "Named",
-        "Not named yet. No résumés on file",
-        "confirm",
-      ),
-      row(
-        "ga-insurance",
-        "General liability insurance before work starts",
-        "§5.5",
-        "$500,000",
-        "General liability $1M per occurrence, on file",
-        "have",
-      ),
-    ],
-    warnings: limits(AGENCY_HERO, []),
-    deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 5, subQuoteDays: 0, writingDays: 3 },
-    questions: [],
-  },
-
   // Fort Bragg sources sought: a reply by email, not a bid.
   "W912EE-27-S-0004": {
     rows: [
@@ -419,7 +366,8 @@ function genericRows(opp: AvaOpportunity): GrantRow[] {
 /** The sample for an opportunity: written for Ava's bids, generic elsewhere. */
 export function sampleFor(opp: AvaOpportunity): GrantSample {
   return (
-    SAMPLES[opp.noticeId] ?? {
+    SAMPLES[opp.noticeId] ??
+    PACK_READS.find((p) => p.HERO_ID === opp.noticeId)?.grantRead({ row, active, limits }) ?? {
       rows: genericRows(opp),
       warnings: [],
       deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 3, subQuoteDays: 0, writingDays: 3 },

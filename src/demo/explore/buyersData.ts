@@ -607,4 +607,4 @@ const catererBuyers = (): GovBuyer[] => [
 ];
 
 /** The active member's buyer directory. */
-export const BUYER_SEED: GovBuyer[] = MEMBER === "agency" ? PACK_BUYERS : catererBuyers();
+export const BUYER_SEED: GovBuyer[] = MEMBER !== "caterer" ? PACK_BUYERS : catererBuyers();

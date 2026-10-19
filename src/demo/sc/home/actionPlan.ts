@@ -15,7 +15,7 @@ import { TASKS } from "@/demo/story/workspace";
 import { getPlaybookState } from "./store";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
-const { agencyPlan } = own(
+const { homePlan } = own(
   import.meta.glob<typeof import("@/demo/members/agency/sc/home")>("/src/demo/members/*/sc/home.ts", { eager: true }),
 );
 
@@ -136,7 +136,7 @@ function catererPlan(): PlanContent {
 }
 
 function plan(): PlanContent {
-  return byMember({ caterer: catererPlan, pack: agencyPlan })();
+  return byMember({ caterer: catererPlan, pack: homePlan })();
 }
 
 function seedStatuses(): Record<string, string> {

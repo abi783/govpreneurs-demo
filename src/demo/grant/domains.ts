@@ -92,7 +92,7 @@ export const DOMAIN_OF: Record<string, DomainKey> = byMember<Record<string, Doma
 });
 
 export function domainOf(opp: StoryOpportunity): DomainKey {
-  return DOMAIN_OF[opp.id] ?? byMember<DomainKey>({ pack: "campaign", caterer: "dining" });
+  return DOMAIN_OF[opp.id] ?? byMember<DomainKey>({ pack: pack.DEFAULT_DOMAIN, caterer: "dining" });
 }
 
 /** The word a notice type uses for what the cook sends. */

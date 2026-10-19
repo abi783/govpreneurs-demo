@@ -44,17 +44,14 @@ function sizeOf(valHigh: number | null): Size {
   return valHigh <= 3_000_000 ? "mid" : "large";
 }
 
-/** The agency's codes, in the names NAICS gives them. */
-const AGENCY_NAICS_LABEL: Record<string, string> = {
-  "541810": "Advertising Agencies",
-  "541613": "Marketing Consulting Services",
-  "541430": "Graphic Design Services",
-  "512110": "Motion Picture and Video Production",
-  "541820": "Public Relations Agencies",
-};
+/** The member's codes, in the names NAICS gives them. */
+const MEMBER_NAICS_LABEL: Record<string, string> = Object.fromEntries([
+  [PERSONA.primaryNaics, PERSONA.primaryNaicsLabel],
+  ...PERSONA.secondaryNaics.map((n) => [n.code, n.label]),
+]);
 
 function naicsLabel(code: string): string {
-  if (MEMBER === "agency") return AGENCY_NAICS_LABEL[code] ?? "Advertising and Related Services";
+  if (MEMBER !== "caterer") return MEMBER_NAICS_LABEL[code] ?? PERSONA.primaryNaicsLabel;
   if (code === "722320") return "Caterers";
   if (code === "722330") return "Mobile Food Services";
   return "Food Service Contractors";
@@ -278,7 +275,7 @@ export function buildForecastTake(oppKey: string): ForecastTakeResponse | null {
     subUse: NOT_CHECKED,
   };
 
-  if (MEMBER === "agency" && record.lane === "federal" && AGENCY_TRADE.has(record.naicsCode ?? "")) {
+  if (MEMBER !== "caterer" && record.lane === "federal" && AGENCY_TRADE.has(record.naicsCode ?? "")) {
     agencyCounted(record, counted);
   }
 

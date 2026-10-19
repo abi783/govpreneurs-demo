@@ -249,7 +249,7 @@ export function PresenterPanel() {
                   title={m.label}
                   onClick={() => m.id !== MEMBER && switchMember(m.id)}
                 >
-                  {m.id === "agency" ? "Ad agency" : "Caterer"}
+                  {m.short}
                 </button>
               ))}
             </div>

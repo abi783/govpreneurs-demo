@@ -4,10 +4,14 @@
 // real system: it is saved in the demo store, the field it is about moves to
 // "Our team is preparing this", and the visitor sees when it will be ready.
 
-import { byMember } from "../member";
+import { byMember, own } from "../member";
 import { PERSONA } from "../story/persona";
 import { isoDaysFromNow } from "../story/clock";
 import { newId, patchField, useDemoState, readDemoState, updateDemoState } from "./store";
+
+const copy = own(
+  import.meta.glob<typeof import("../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type DfyServiceId =
   | "sbs-visibility"
@@ -119,7 +123,7 @@ function seedOrders(): DfyOrder[] {
   // registered in North Carolina (sled.ts), so hers is Virginia, where the VA work is.
   const { id, state } = byMember({
     caterer: { id: "dfy_seed_sled_nc", state: PERSONA.hqState },
-    pack: { id: "dfy_seed_sled_va", state: "VA" },
+    pack: { id: `dfy_seed_sled_${copy.DFY_SLED_STATE.toLowerCase()}`, state: copy.DFY_SLED_STATE },
   });
   const s = DFY_SERVICES[state === "VA" ? "sled-va" : "sled-nc"];
   return [

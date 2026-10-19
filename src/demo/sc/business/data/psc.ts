@@ -6,7 +6,11 @@
 // "code you already have" box all work. Titles follow the published PSC manual.
 // The agency also gets the advertising, public relations and video groups.
 
-import { byMember } from "../../../member";
+import { byMember, own } from "../../../member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type PscSegment = "product" | "service" | "randd";
 
@@ -26,46 +30,13 @@ export interface PscGroupRow {
   count: number;
 }
 
-interface GroupDef {
+export interface GroupDef {
   groupCode: string;
   groupTitle: string;
   segment: PscSegment;
   category: string;
   codes: [string, string][];
 }
-
-/**
- * DEMO: the groups an ad agency searches (checked against the PSC manual's code
- * list, Oct 2026). The agency sees them first; the caterer's list is unchanged.
- */
-const AGENCY_GROUPS: GroupDef[] = [
-  {
-    groupCode: "R7",
-    groupTitle: "Support Services (Management)",
-    segment: "service",
-    category: "Professional, Administrative and Management Support Services",
-    codes: [
-      ["R701", "Support- Management: Advertising"],
-      ["R702", "Support- Management: Data Collection"],
-      ["R708", "Support- Management: Public Relations"],
-      ["R799", "Support- Management: Other"],
-    ],
-  },
-  {
-    groupCode: "T0",
-    groupTitle: "Photographic, Mapping, Printing, and Publication Services",
-    segment: "service",
-    category: "Photographic, Mapping, Printing, and Publication Services",
-    codes: [
-      ["T001", "Photo/Map/Print/Publication- Arts/Graphics"],
-      ["T006", "Photo/Map/Print/Publication- Film/Video Tape Production"],
-      ["T011", "Photo/Map/Print/Publication- Print/Binding"],
-      ["T015", "Photo/Map/Print/Publication- General Photographic: Motion"],
-      ["T016", "Photo/Map/Print/Publication- Audio/Visual"],
-      ["T099", "Photo/Map/Print/Publication- Other"],
-    ],
-  },
-];
 
 const FOOD_GROUPS: GroupDef[] = [
   {
@@ -157,7 +128,7 @@ const FOOD_GROUPS: GroupDef[] = [
   },
 ];
 
-const GROUPS: GroupDef[] = byMember({ caterer: FOOD_GROUPS, pack: [...AGENCY_GROUPS, ...FOOD_GROUPS] });
+const GROUPS: GroupDef[] = byMember({ caterer: FOOD_GROUPS, pack: [...copy.PSC_GROUPS, ...FOOD_GROUPS] });
 
 export const PSC_CODES: PscCode[] = GROUPS.flatMap((g) =>
   g.codes.map(([code, description]) => ({

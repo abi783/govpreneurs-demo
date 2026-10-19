@@ -47,10 +47,14 @@ import {
   type PscSearchResult,
 } from "@sc/lib/businessProfile/pscDescriptions";
 // DEMO: the search hint names the member's own kind of work (D85).
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 const PSC_SEARCH_HINT = byMember({
   caterer: "Search a group or a code — housekeeping, catering, guard…",
-  pack: "Search a group or a code — advertising, video, printing…",
+  pack: copy.PSC_SEARCH_HINT,
 });
 
 /** Long enough that typing a word does not fire a request per keystroke. */

@@ -59,7 +59,7 @@ const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" 
 <rect x="34" y="34" width="92" height="92" rx="16" fill="none" stroke="#f2b84b" stroke-width="3" opacity="0.7"/>
 <text x="80" y="98" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="700" fill="#f7efe0">LR</text>
 </svg>`;
-export const AGENCY_LOGO_URL = `data:image/svg+xml;utf8,${encodeURIComponent(LOGO_SVG)}`;
+export const LOGO_URL = `data:image/svg+xml;utf8,${encodeURIComponent(LOGO_SVG)}`;
 
 /** Her top three services. The capability statement names the same ones. */
 const CORE_SERVICES = [
@@ -78,7 +78,7 @@ function agencyJob(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
   };
 }
 
-export function agencyRows(): DemoFieldRow[] {
+export function businessRows(): DemoFieldRow[] {
   const out: DemoFieldRow[] = [];
   const add = (fieldKey: string, mb: MbValue, opts?: RowOptions) => out.push(...rowsFor(fieldKey, mb, opts));
   const contact: RowOptions = { originKey: "ghl.contact", freshnessLabel: FRESHNESS_ON_FILE, daysAgo: JOINED_DAYS_AGO };
@@ -290,7 +290,7 @@ export function agencyRows(): DemoFieldRow[] {
   return out;
 }
 
-export function agencyProposals(): DemoProposal[] {
+export function businessProposals(): DemoProposal[] {
   return [
     proposal(
       "prop-equipment",

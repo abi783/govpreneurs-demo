@@ -9,14 +9,15 @@ import {
   fmtMoney,
 } from "../../lib/mock/laborRates";
 import { JargonGloss } from "../Layout/JargonGloss";
-import { byMember } from "../../demo/member";
+import { byMember, own } from "../../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: each member's words. The agency's determination is real; the caterer's is sample.
 const COPY = byMember({
-  pack: {
-    floor: "you can pay staff in these titles on a federal service contract here. You can pay more — you can't pay less. From the current Department of Labor determination.",
-    compare: "Wage floors are the bottom; here's where comparable NC advertising jobs landed on total price.",
-  },
+  pack: copy.WAGE_TABLE,
   caterer: {
     floor: "you can pay on a federal food service contract here. You can pay more — you can't pay less. These are sample figures.",
     compare: "Wage floors are the bottom; here's where comparable NC food service jobs landed on total price.",

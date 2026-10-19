@@ -13,6 +13,10 @@ import { extract, amountIn, daysIn, saidNumbers, sentences, type Extraction } fr
 import { readTellReply } from "@sc/lib/businessProfile/tellModel";
 import { byMember, own } from "../../member";
 
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
 const { TELL_SAMPLE: PACK_SAMPLE } = own(
   import.meta.glob<typeof import("../../members/agency/sc/business")>("/src/demo/members/*/sc/business.ts", { eager: true }),
 );
@@ -68,19 +72,8 @@ type FactRule = { field: string; read: (s: string) => unknown | undefined };
 /** Things one member names when she says how many jobs she can run at once. */
 const JOB_WORDS = byMember({
   caterer: /\b(jobs|contracts|events|orders)\b/i,
-  pack: /\b(jobs|contracts|campaigns|clients|shoots)\b/i,
+  pack: copy.JOB_WORDS,
 });
-
-/** The ad agency's services, as a buyer would search for them. */
-const AGENCY_SERVICES =
-  /\b(?:short |recruiting |captioned |explainer )?videos?\b|\bpaid (?:social|search)\b|\b(?:search|display|social|print|streaming) ads\b|\blanding pages?\b|\bprint buying\b|\blead forms?\b|\bpublic relations\b|\bgraphic design\b|\bgeofenced ads\b/gi;
-
-/** "We make short videos and run paid social" → ["short videos", "paid social"]. */
-function agencyServices(sentence: string): string[] | undefined {
-  if (!/\b(we|i) (make|run|do|produce|create|design|buy|build|shoot)\b/i.test(sentence)) return undefined;
-  const found = [...new Set([...sentence.matchAll(AGENCY_SERVICES)].map((m) => m[0].toLowerCase()))];
-  return found.length > 0 ? found : undefined;
-}
 
 /** Rules every member's words go through, in this order. */
 const SHARED_FIRST: FactRule[] = [
@@ -150,26 +143,19 @@ const CATERER_RULES: FactRule[] = [
   },
 ];
 
-/** The agency's own rules: the crew, the cameras, what it makes and runs, who it reaches. */
-const AGENCY_RULES: FactRule[] = [
+/** A pack member's rules, from her pack's words (copy.TELL_RULES). */
+const PACK_RULES: FactRule[] = [
+  { field: "key_personnel", read: (s) => (copy.TELL_RULES.personnel.test(s) ? [clause(s)] : undefined) },
+  { field: "equipment", read: (s) => (copy.TELL_RULES.equipment.test(s) ? [clause(s)] : undefined) },
   {
-    field: "key_personnel",
-    read: (s) =>
-      /\b(crew|project manager|account director|producer|editors?|designers?|copywriters?|media buyers?)\b/i.test(s)
-        ? [clause(s)]
-        : undefined,
+    field: "search_keywords",
+    read: (s) => {
+      if (!copy.TELL_RULES.serviceVerbs.test(s)) return undefined;
+      const found = [...new Set([...s.matchAll(copy.TELL_RULES.services)].map((m) => m[0].toLowerCase()))];
+      return found.length > 0 ? found : undefined;
+    },
   },
-  {
-    field: "equipment",
-    read: (s) =>
-      /\b(cameras?|drones?|lighting|lights|lenses|edit suite|microphones?|gimbals?|teleprompters?)\b/i.test(s) ? [clause(s)] : undefined,
-  },
-  { field: "search_keywords", read: agencyServices },
-  {
-    field: "differentiators",
-    read: (s) =>
-      /\b(military families|army spouse|bilingual|spanish|captioned|within (?:5|five) minutes)\b/i.test(s) ? [clause(s)] : undefined,
-  },
+  { field: "differentiators", read: (s) => (copy.TELL_RULES.differentiators.test(s) ? [clause(s)] : undefined) },
 ];
 
 const SHARED_LAST: FactRule[] = [
@@ -186,7 +172,7 @@ const SHARED_LAST: FactRule[] = [
 /** Rules that turn one sentence into one fact. The first rule that fits wins. */
 const FACT_RULES: FactRule[] = [
   ...SHARED_FIRST,
-  ...byMember({ caterer: CATERER_RULES, pack: AGENCY_RULES }),
+  ...byMember({ caterer: CATERER_RULES, pack: PACK_RULES }),
   ...SHARED_LAST,
 ];
 
@@ -213,9 +199,7 @@ const UPLOAD_RULES: { field: string; test: RegExp }[] = byMember({
   ],
   pack: [
     ...SHARED_UPLOADS,
-    { field: "doc_past_performance", test: /\b(CPARS|performance rating)\b/i },
-    { field: "state_diversity_certifications", test: /\b(small business enterprise|NCSBE|state certification)\b/i },
-    { field: "doc_marketing", test: /\b(reel|portfolio|work samples)\b/i },
+    ...copy.UPLOAD_EXTRAS,
   ],
 });
 

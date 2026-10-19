@@ -4,11 +4,15 @@
 // tab, Stay Ready (renewal confirmations) and the capability statement builder all
 // read and write this one list.
 
-import { byMember } from "../demo/member";
+import { byMember, own } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { isoDaysFromNow } from "../demo/story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "../demo/runtime/store";
 import { CAP_STATEMENT_FILE_NAME } from "./capStatementState";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type ConnectorId = "gdrive" | "gdocs" | "dropbox";
 export type SourceKind = ConnectorId | "upload" | "generated";
@@ -52,57 +56,7 @@ export const CONNECTOR_META: Record<ConnectorId, { label: string }> = {
   dropbox: { label: "Dropbox" },
 };
 
-type ConnectorFiles = Record<ConnectorId, Omit<KnowledgeSource, "id" | "addedAt" | "status">[]>;
-
-/** DEMO: the agency's files — certificates, rate card, campaign results, studio kit. */
-const AGENCY_FILES: ConnectorFiles = {
-  gdrive: [
-    {
-      kind: "gdrive",
-      connectorId: "gdrive",
-      name: "SAM.gov registration — active.pdf",
-      sizeKB: 212,
-      mime: "pdf",
-      filledFields: ["UEI", "CAGE", "registration expiry"],
-    },
-    {
-      kind: "gdrive",
-      connectorId: "gdrive",
-      name: "WOSB certification letter.pdf",
-      sizeKB: 188,
-      mime: "pdf",
-      filledFields: ["certifications", "renewal date"],
-    },
-  ],
-  gdocs: [
-    {
-      kind: "gdocs",
-      connectorId: "gdocs",
-      name: "Rate card for video, paid media and print buying.docx",
-      sizeKB: 84,
-      mime: "docx",
-      filledFields: ["services and prices"],
-    },
-    {
-      kind: "gdocs",
-      connectorId: "gdocs",
-      name: "Campaign results: NC Guard and stormwater.docx",
-      sizeKB: 156,
-      mime: "docx",
-      filledFields: ["past projects", "results"],
-    },
-  ],
-  dropbox: [
-    {
-      kind: "dropbox",
-      connectorId: "dropbox",
-      name: "Studio and camera equipment list.pdf",
-      sizeKB: 72,
-      mime: "pdf",
-      filledFields: ["facilities", "equipment"],
-    },
-  ],
-};
+export type ConnectorFiles = Record<ConnectorId, Omit<KnowledgeSource, "id" | "addedAt" | "status">[]>;
 
 /** The files each source brings in when it connects. Fictional files for a fictional business. */
 const CATERER_FILES: ConnectorFiles = {
@@ -154,7 +108,7 @@ const CATERER_FILES: ConnectorFiles = {
   ],
 };
 
-const CONNECTOR_FILES: ConnectorFiles = byMember({ caterer: CATERER_FILES, pack: AGENCY_FILES });
+const CONNECTOR_FILES: ConnectorFiles = byMember({ caterer: CATERER_FILES, pack: copy.CONNECTOR_FILES });
 
 function seed(): KnowledgeState {
   // Drive synced a couple of hours before the demo opened.

@@ -11,7 +11,7 @@
 // marketing buyers; `buysFood` and `getFoodAwardsForBuyer` keep their names but mean
 // "buys the member's trade".
 
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 import { OPPORTUNITIES } from "@/demo/story/opportunities";
 import { PLACES } from "@/demo/story/places";
 import { isoDaysFromNow } from "@/demo/story/clock";
@@ -19,9 +19,13 @@ import { allAwardRecords } from "@/demo/explore/awardsData";
 import type { AwardRecord } from "@/lib/awardsApi";
 import { BUYER_SEED } from "@/demo/explore/buyersData";
 
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
 /** DEMO: the member's trade, in the words the buyer pages use. */
 export const TRADE = byMember({
-  pack: { label: "Marketing and advertising", phrase: "marketing and advertising" },
+  pack: copy.BUYER_TRADE,
   caterer: { label: "Food service", phrase: "food service" },
 });
 

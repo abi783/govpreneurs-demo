@@ -88,7 +88,7 @@ function doneInAva(id: string): boolean {
       (id === "task-send-reply" && !!avaSentAt("W912EE-27-S-0004")) ||
       (id === "task-certificates" && cumberlandCertificatesIn()),
     // A quote she has sent had its three questions answered.
-    pack: () => id === "task-ava-family-advocacy" && !!avaSentAt(HERO_IDS.hero),
+    pack: () => id === TASKS.find((t) => t.to === `/ava/${HERO_IDS.hero}`)?.id && !!avaSentAt(HERO_IDS.hero),
   })();
 }
 

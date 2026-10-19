@@ -4,36 +4,17 @@ import { X, Mail, CheckCircle2, Copy } from "lucide-react";
 import type { GovBuyer, BuyerOfficer } from "@/lib/mock/governmentBuyers";
 import { logBuyerOutreach } from "@/lib/outreachLog";
 import { PERSONA, PAST_PERFORMANCE } from "@/demo/story/persona";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: each member's intro speaks for her own business.
-const defaultIntro = byMember({ pack: agencyIntro, caterer: catererIntro });
+const defaultIntro = byMember({ pack: copy.buyerIntro, caterer: catererIntro });
 
 function k(n: number): string {
   return `$${Math.round(n / 1000)}K`;
-}
-
-function agencyIntro(buyer: GovBuyer, officer: BuyerOfficer): string {
-  const past = PAST_PERFORMANCE.slice(0, 3).map((p) => p.projectTitle).join("; ");
-  return `Subject: Introduction — ${PERSONA.businessName} (WOSB, ${PERSONA.hqCity})
-
-Dear ${officer.name},
-
-My name is ${PERSONA.ownerName}. I'm the ${PERSONA.ownerTitle.toLowerCase()} of ${PERSONA.businessName}, a ${PERSONA.hqCity}-based, woman-owned small business (NAICS ${PERSONA.primaryNaics}). We make campaigns that reach military families: short captioned videos, paid social and search, print buying and lead forms that reach a recruiter or caseworker within 5 minutes. We'd like to be on your radar for upcoming marketing and advertising work at ${buyer.name}.
-
-In short:
-  • WOSB · Small Business · ${PERSONA.hqCity}-local
-  • Work: campaigns, video production, paid social, search and display, print buying, landing pages
-  • Past work: ${past}
-  • Typical job size: ${k(PERSONA.targetValueMin)}–${k(PERSONA.targetValueMax)}
-  • SAM-registered (UEI ${PERSONA.uei}, CAGE ${PERSONA.cage}), a 2-person video crew and an in-house edit suite
-
-I've attached our capability statement. If there's a better person to speak with about ${buyer.location} marketing work — or an upcoming industry day you'd recommend we attend — I'd be grateful for the pointer.
-
-Thank you for your time,
-${PERSONA.ownerName}
-${PERSONA.businessName}
-${PERSONA.email} · ${PERSONA.phone}`;
 }
 
 function catererIntro(buyer: GovBuyer, officer: BuyerOfficer): string {

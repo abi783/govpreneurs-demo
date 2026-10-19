@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { byMember, MEMBER } from "@/demo/member";
+import { withOtherMembersWords } from "@/demo/members/words";
 import { CAROLINA_DINING, OTHER_FIRMS } from "./firms";
 import { FORECAST_RECORDS, SCORED_ROWS, FORECAST_MEMBER } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY } from "./forecastLocalSeeds";
@@ -8,10 +9,10 @@ import { cardTakeLine, forecastGrantReply } from "./forecastChat";
 import { daysToDay } from "./dates";
 import { captureStatus } from "@/lib/forecasts/engine";
 
-// DEMO: the agency's words must not show the caterer's trade (demo-storyboard/tools/scan-member.mjs).
+// DEMO: a pack member's words must not show another member's (src/demo/members/words.ts).
 const BAD_WORDS = byMember({
   caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|HigherGov|\bDEMO-[A-Z]+-\d+/i,
-  pack: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+  pack: withOtherMembersWords(/\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+/i),
 });
 const REAL_FIRMS = /sodexo|aramark|compass group|eurest/i;
 const COUNT = byMember({ caterer: 48, pack: 14 });

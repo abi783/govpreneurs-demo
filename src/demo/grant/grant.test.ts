@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { byMember, MEMBER } from "@/demo/member";
+import { withOtherMembersWords } from "@/demo/members/words";
 import { getGrantBrief, GRANT_BRIEFS } from "@/demo/story/grantBriefs";
 import { HERO_IDS, OPPORTUNITIES, getOpportunity } from "@/demo/story/opportunities";
 import type { GrantAnalysis } from "@/lib/grant/types";
@@ -18,9 +19,8 @@ import { buildOldTake } from "./takeOld";
 /** Words that must never reach a screen: production's old sample firm, the wrong mentor, and the other member's trade. */
 const FORBIDDEN = byMember({
   caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i,
-  // The same list as demo-storyboard/tools/scan-member.mjs uses for the agency's pages.
-  pack:
-    /\broof(ing|er|s)?\b|Williams Construction|\b238160\b|Diana|DEMO-[A-Z]+-\d+|HigherGov|\b(cater\w*|meals?|kitchen|food[- ]?(service|handler)?|cooks?|dining|menus?|ServSafe|HACCP|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+  // Every other member's words too (src/demo/members/words.ts), as demo-storyboard/tools/scan-member.mjs checks the pages.
+  pack: withOtherMembersWords(/\broof(ing|er|s)?\b|Williams Construction|\b238160\b|Diana|DEMO-[A-Z]+-\d+|HigherGov/i),
 });
 
 /** Every string in a value, flattened. */

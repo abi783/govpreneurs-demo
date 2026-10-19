@@ -41,9 +41,13 @@ import {
 import { PSC_GROUPS, pscDescriptions, pscGroupCodes, searchPsc } from "../sc/business/data/psc";
 import { addressForPlace, citiesFor, suggestAddresses } from "../sc/business/data/geo";
 // DEMO: trade words for the command palette, per member (D85).
-import { byMember } from "../member";
-const SELL_WORDS = byMember({ caterer: ["menus"], pack: ["portfolio", "reel"] });
-const PAPER_WORDS = byMember({ caterer: ["food handler", "haccp"], pack: ["releases", "music licenses"] });
+import { byMember, own } from "../member";
+
+const copy = own(
+  import.meta.glob<typeof import("../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+const SELL_WORDS = byMember({ caterer: ["menus"], pack: copy.PALETTE_WORDS.sell });
+const PAPER_WORDS = byMember({ caterer: ["food handler", "haccp"], pack: copy.PALETTE_WORDS.papers });
 
 // The command palette can open every part of My Business.
 registerSearchEntries([

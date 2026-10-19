@@ -33,7 +33,7 @@ const CODE_NAMES: WorkType[] = [
 
 const VA_SOURCES_SOUGHT = "the Veterans Affairs Sources Sought notice";
 
-export const AGENCY_VOCAB: HunterVocab = {
+export const VOCAB: HunterVocab = {
   base: "office",
   hometown: "across town",
   place: "The work",

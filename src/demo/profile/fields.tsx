@@ -5,13 +5,17 @@
 // demo store (store.ts) and laid over these starting values.
 
 import type { ReactNode } from "react";
-import { MEMBER, byMember } from "../member";
+import { MEMBER, byMember, own } from "../member";
 import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../story/persona";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
 import { SAM_CHECKED_DAYS_AGO } from "../sc/timeline";
 import type { FieldOverride, FieldState, FieldValue } from "./store";
 import type { DfyServiceId } from "./dfy";
+
+const copy = own(
+  import.meta.glob<typeof import("../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type EditInputType =
   | "text"
@@ -106,15 +110,10 @@ const CORE_CAPABILITIES = byMember({
     "Halal and allergen-labeled menus",
     "Event and ceremony catering",
   ],
-  pack: [
-    "Short captioned videos, shot and edited in-house",
-    "Paid social, search and display ads",
-    "Print buying for local papers",
-    "Landing pages and lead routing to a recruiter or caseworker",
-  ],
+  pack: copy.CORE_CAPABILITIES,
 });
-const NAICS_EXAMPLE = byMember({ caterer: "722310 Food Service Contractors", pack: "541810 Advertising Agencies" });
-const PSC_EXAMPLE = byMember({ caterer: "S203, S206", pack: "R701, T006" });
+const NAICS_EXAMPLE = `${PERSONA.primaryNaics} ${PERSONA.primaryNaicsLabel}`;
+const PSC_EXAMPLE = byMember({ caterer: "S203, S206", pack: copy.PSC_EXAMPLE });
 
 // ── validation ───────────────────────────────────────────────────────────────
 

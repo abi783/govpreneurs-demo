@@ -19,10 +19,14 @@ import {
   type AwardRecord,
 } from "../lib/awardsApi";
 // DEMO: how the member knows the partner, and what to ask (D85).
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 const KNOWN_PARTNER_NOTE = byMember({
   caterer: "from your 2024 subcontract. Ask him about the recompete.",
-  pack: "who wrote to you about the VA campaign. Ask him which shoots he needs a crew for.",
+  pack: copy.KNOWN_PARTNER_NOTE,
 });
 
 interface DetailSearch {

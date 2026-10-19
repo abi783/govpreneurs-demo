@@ -11,6 +11,10 @@ import {
 import { JargonGloss } from "../Layout/JargonGloss";
 import { byMember, own } from "../../demo/member";
 
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
 const { LOCAL_DESIGNER_MEDIAN } = own(
   import.meta.glob<typeof import("../../demo/members/agency/market/laborRates")>("/src/demo/members/*/market/laborRates.ts", { eager: true }),
 );
@@ -19,20 +23,13 @@ const EXP_OPTIONS: (ExperienceTier | "all")[] = ["all", "0–3 yrs", "3–7 yrs"
 const EDU_OPTIONS: (EducationLevel | "all")[] = ["all", "HS", "Associate", "Bachelor", "Master", "PhD"];
 // DEMO: the agency's rates are GSA ceiling rates, which are not tied to a place.
 const LOC_OPTIONS: (LcatLocation | "all")[] = byMember<(LcatLocation | "all")[]>({
-  pack: ["all", "Nationwide"],
+  pack: copy.LCAT_LOCATIONS,
   caterer: ["all", "Nationwide", "Fayetteville", "Raleigh-Durham", "Charlotte", "Norfolk"],
 });
 
 // DEMO: each member's note above the table.
 const BANNER = byMember({
-  pack: (
-    <span>
-      This is how most federal <strong>marketing work</strong> is priced: people billed by the hour.
-      These are GSA schedule ceiling rates, the most a firm may bill. For scale, a Fayetteville graphic
-      designer&apos;s median pay is {fmtRate(LOCAL_DESIGNER_MEDIAN)} an hour (BLS, May 2025); the gap pays for
-      benefits, overhead and profit.
-    </span>
-  ),
+  pack: copy.LCAT_BANNER,
   caterer: (
     <span>
       This is for <strong>professional service contracts</strong> (people billed by the hour) —

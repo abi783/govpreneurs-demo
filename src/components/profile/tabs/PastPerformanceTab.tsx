@@ -18,7 +18,11 @@ import {
 } from "../../../demo/profile/pastPerformance";
 import { fmtMonthYear, fmtMoneyShort } from "../../../demo/profile/dates";
 import { saveTextFile } from "../../../demo/profile/downloads";
-import { byMember } from "../../../demo/member";
+import { byMember, own } from "../../../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: the projects come from the story (PAST_PERFORMANCE) and live in the demo store.
 function toCardEntry(e: PpEntry): CardEntry {
@@ -48,7 +52,7 @@ const TEMPLATE = [
     caterer:
       '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
     pack:
-      '"Example: recruiting video campaign","Example County",45000,2024-03-01,2024-09-30,541810,Prime,"Made four 30-second videos and ran paid social for six months. 1,200 people filled in the lead form."',
+      copy.PAST_PERFORMANCE_EXAMPLE,
   }),
 ].join("\n");
 

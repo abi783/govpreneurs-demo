@@ -4,7 +4,7 @@
 // comes from src/demo/story or the profile store.
 
 import { useMemo } from "react";
-import { byMember } from "../demo/member";
+import { byMember, own } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { FIELD_DEFS, effectiveField, valueToText } from "../demo/profile/fields";
 import { getFieldOverrides, useFieldOverrides } from "../demo/profile/store";
@@ -12,6 +12,10 @@ import { fmtLong, fmtMonthYear, fmtUsd } from "../demo/profile/dates";
 import { getPastPerformance, usePastPerformance, type PpEntry } from "../demo/profile/pastPerformance";
 import type { PastPerformanceRecord } from "./state/microPurchases";
 import { usd, usablePrice } from "./microPurchases/pricing";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type CapSectionId =
   | "overview"
@@ -140,18 +144,7 @@ const TRADE = byMember({
       `One commercial kitchen and ${m.employees} staff mean a buyer deals with one team from the first menu to the last tray.`,
     ],
   },
-  pack: {
-    tagline: "Woman-owned ad agency 12 miles from Fort Bragg",
-    place: (m: CapFacts) => `${m.employees} staff, three freelancers, and a studio with a two-person video crew.`,
-    work: (list: string) =>
-      `We make video, run paid social and search, buy print, and build landing pages and lead routing for campaigns that reach military families across ${list}.`,
-    standard: "Leads routed to a recruiter or caseworker within 5 minutes; captions on every video",
-    proof: () => [],
-    alternate: (m: CapFacts) => [
-      `${m.businessName} is a woman-owned ad agency based in ${m.city}, ${m.state}, 12 miles from Fort Bragg.`,
-      `Video, paid media and print buying under one roof mean a buyer deals with one team from the first shoot to the last lead.`,
-    ],
-  },
+  pack: copy.CAP_STATEMENT,
 });
 
 function tagline(m: CapFacts): string {

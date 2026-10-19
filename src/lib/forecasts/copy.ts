@@ -10,7 +10,11 @@ import { money } from "../money";
 import type { UnsupportedFilter, UnsupportedFilterKey } from "./hunterFilters";
 // DEMO: the code example uses the member's own trade (D85).
 import { byMember } from "../../demo/member";
-const CODE_EXAMPLE = byMember({ caterer: "7223 does not show 722310.", pack: "5418 does not show 541810." });
+import { PERSONA } from "../../demo/story/persona";
+const CODE_EXAMPLE = byMember({
+  caterer: "7223 does not show 722310.",
+  pack: `${PERSONA.primaryNaics.slice(0, 4)} does not show ${PERSONA.primaryNaics}.`,
+});
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

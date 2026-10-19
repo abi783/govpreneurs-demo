@@ -1,13 +1,17 @@
 import { Sparkles, ArrowRight, Info } from "lucide-react";
 import { useKnowledgeHub } from "../../lib/knowledgeHub";
-import { byMember } from "../../demo/member";
+import { byMember, own } from "../../demo/member";
 import { PAST_PERFORMANCE, PERSONA } from "../../demo/story/persona";
 import { fmtLong, fmtMoneyShort } from "../../demo/profile/dates";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: what Hunter learned, from the files in the knowledge base and from the
 // profile. Every fact comes from the story. A fact from a file shows only while the
 // file is in the list, and links back to that file.
-interface LearnedFact {
+export interface LearnedFact {
   text: string;
   /** Matches a file name; the fact is hidden when no file matches. */
   fromFile?: string;
@@ -34,12 +38,7 @@ const FACTS: LearnedFact[] = [
       { text: "Allergen labels and halal handling are standard on every tray.", fromFile: "allergen" },
       { text: `${PERSONA.kitchen}.`, fromFile: "kitchen" },
     ],
-    pack: [
-      { text: "Certified woman-owned (WOSB). The certification renews in 41 days.", fromFile: "wosb certification letter" },
-      { text: "Rates for video, paid social and search, and print buying.", fromFile: "rate card" },
-      { text: "Results from the NC Guard recruiting and stormwater campaigns.", fromFile: "campaign results" },
-      { text: `${PERSONA.kitchen}.`, fromFile: "studio" },
-    ],
+    pack: copy.LEARNED_FACTS,
   }),
   { text: `${PERSONA.businessName}, ${PERSONA.hqCity} ${PERSONA.hqState}. ${PERSONA.certifications.join(" · ")}.` },
   { text: `Targeting ${PERSONA.targetAgencies.join(", ")}.` },

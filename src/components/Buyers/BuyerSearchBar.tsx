@@ -1,10 +1,14 @@
 // DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { Search, MapPin, UtensilsCrossed, Megaphone } from "lucide-react";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 import { TRADE } from "@/lib/mock/governmentBuyers";
 
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
 // DEMO: the "buys my trade" pill names the member's trade.
-const TradeIcon = byMember({ pack: Megaphone, caterer: UtensilsCrossed });
+const TradeIcon = byMember({ pack: copy.TRADE_ICON, caterer: UtensilsCrossed });
 
 export function BuyerSearchBar({
   q,

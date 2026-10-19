@@ -23,7 +23,7 @@ const step = (s: Partial<PlanContent["steps"][number]> & Pick<PlanContent["steps
   ...s,
 });
 
-export function agencyPlan(): PlanContent {
+export function homePlan(): PlanContent {
   const hero = getOpportunity(HERO_IDS.hero)!;
   return {
     id: "playbook-fort-bragg-and-guard",
@@ -103,7 +103,7 @@ export function agencyPlan(): PlanContent {
 }
 
 /** Sarah's closed answers, which the shared feed (unread replies only) does not show. */
-export function agencyActivity(): ActivityItem[] {
+export function homeActivity(): ActivityItem[] {
   const out: ActivityItem[] = [];
   const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-visitnc-pass");
   if (pass) {

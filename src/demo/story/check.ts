@@ -3,6 +3,7 @@
 // Hunter gives is true" a fact rather than a hope.
 
 import { MEMBER } from "../member";
+import { OTHER_MEMBERS_WORDS } from "../members/words";
 import {
   AVA_BIDS,
   FOR_YOU,
@@ -121,8 +122,8 @@ export function checkStory(): string[] {
     if (o.postedDaysAgo < 0) p(o, "posted in the future");
     if (o.valueLow !== null && o.valueHigh !== null && o.valueLow > o.valueHigh) p(o, "value low > high");
     if (/\b(Amira's Kitchen|Marcus|Williams Construction|roof)/i.test(JSON.stringify(o))) p(o, "old persona text");
-    // The agency's story must never fall back to the caterer's words.
-    if (MEMBER === "agency" && /\b(cater\w*|meals?|kitchen|food|cooks?|dining)\b/i.test(JSON.stringify(o))) p(o, "catering word in the agency story");
+    // A pack member's story must never fall back to another member's words.
+    if (MEMBER !== "caterer" && OTHER_MEMBERS_WORDS.test(JSON.stringify(o))) p(o, "another member's word in the story");
 
     const { line, fit, forYouRank } = o.hunter;
     if (forYouRank !== undefined) {

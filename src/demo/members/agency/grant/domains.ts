@@ -11,6 +11,9 @@ import type { Domain } from "../../../grant/domains";
 export type AgencyDomainKey = "campaign" | "awareness" | "recruiting" | "media" | "video" | "design" | "pr" | "broadcast";
 
 /** Which kind of work each of the agency's opportunities is. A new story entry needs a line here. */
+/** The kind of work a story opportunity is when DOMAIN_OF does not name it. */
+export const DEFAULT_DOMAIN: AgencyDomainKey = "campaign";
+
 export const DOMAIN_OF: Record<string, AgencyDomainKey> = {
   "W91247-27-Q-0108": "campaign",
   "W91242-27-Q-0014": "recruiting",

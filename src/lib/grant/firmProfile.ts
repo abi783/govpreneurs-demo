@@ -6,8 +6,12 @@
 // per sample member (src/demo/member.ts): Haddad Catering or Lantern Row Creative.
 // Every figure is read from the story persona or is a plain fact about that firm.
 
-import { MEMBER } from "@/demo/member";
+import { MEMBER, own } from "@/demo/member";
 import { PERSONA } from "@/demo/story/persona";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type InsuranceCoverageType =
   | "gl" // Commercial General Liability
@@ -35,23 +39,9 @@ export interface InsuranceBonding {
   bonding: { single: number; aggregate: number } | null;
 }
 
-/** The agency carries general liability, workers' compensation and professional
- *  liability (the cover ad agencies hold for claims about the work itself). It has
- *  no vehicles and has never been bonded, so its bonding is not on file. */
-function agencyInsurance(): InsuranceBonding {
-  return {
-    coverages: [
-      { type: "gl", perOccurrence: 1_000_000, aggregate: 2_000_000, carrier: "Piedmont Mutual", amBest: "A (XV)", basis: "occurrence", expiry: "2027-05-31" },
-      { type: "workers-comp", perOccurrence: 1_000_000, aggregate: null, carrier: "Piedmont Mutual", amBest: "A (XV)", basis: "occurrence", expiry: "2027-05-31" },
-      { type: "professional-eo", perOccurrence: 1_000_000, aggregate: 1_000_000, carrier: "Atlantic Specialty Underwriters", amBest: "A (XIII)", basis: "claims-made", expiry: "2027-05-31" },
-    ],
-    bonding: PERSONA.largestBond > 0 ? { single: PERSONA.largestBond, aggregate: PERSONA.largestBond } : null,
-  };
-}
-
 /** The member's insurance and bonding. */
 export function firmInsurance(): InsuranceBonding {
-  return MEMBER === "agency" ? agencyInsurance() : catererInsurance();
+  return MEMBER === "caterer" ? catererInsurance() : copy.insurance();
 }
 
 /** The caterer carries general liability, workers' compensation and vehicle cover for

@@ -11,8 +11,12 @@ import {
   type PrimeCandidate,
 } from "../../lib/partnersApi";
 // DEMO: what the member already shares with the partner she knows (D85).
-import { byMember } from "@/demo/member";
-const KNOWN_CONTACT_HOOK = byMember({ caterer: "the work you did together in 2024", pack: "his note to you about the VA campaign" });
+import { byMember, own } from "@/demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+const KNOWN_CONTACT_HOOK = byMember({ caterer: "the work you did together in 2024", pack: copy.KNOWN_CONTACT_HOOK });
 
 /**
  * One company, in full — the detail behind a ranked card.

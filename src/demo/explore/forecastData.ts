@@ -51,7 +51,7 @@ function plainDate(days: number): string {
 
 /** How close the industry code is to the member's own, 0 to 1. Null: no code. */
 function categoryFitOf(code: string | null): number | null {
-  if (MEMBER === "agency") return pack.categoryFit(code, FORECAST_MEMBER.naics);
+  if (MEMBER !== "caterer") return pack.categoryFit(code, FORECAST_MEMBER.naics);
   if (!code) return null;
   if (FORECAST_MEMBER.naics.includes(code)) return 1;
   if (/^(7223|7225|311)/.test(code)) return 0.8;

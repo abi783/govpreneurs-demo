@@ -7,23 +7,15 @@ import { VEHICLES, vehiclesByFit } from "../lib/mock/vehicles";
 import { WhatThisMeansCard } from "../components/Market/WhatThisMeansCard";
 import { VehiclesList } from "../components/Market/VehiclesList";
 import { JargonGloss } from "../components/Layout/JargonGloss";
-import { byMember } from "../demo/member";
+import { byMember, own } from "../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: each member's words for the page.
 const COPY = byMember({
-  pack: {
-    meta: "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for an ad agency.",
-    lead: "an ad agency like yours.",
-    fitsLabel: "Fits my work (marketing)",
-    famous: "For an ad agency: the most famous vehicles (",
-    path: (
-      <>
-        The ones that fit: <strong>GSA&apos;s Marketing and Public Relations schedule</strong> (you are not on
-        it yet), the <strong>woman-owned set-asides</strong> you already qualify for, and{" "}
-        <strong>teaming with a prime</strong> on work you can&apos;t bid alone. We&apos;ve defaulted you to those.
-      </>
-    ),
-  },
+  pack: copy.VEHICLES_PAGE,
   caterer: {
     meta: "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for a food service business.",
     lead: "a food service business like yours.",
@@ -39,7 +31,7 @@ const COPY = byMember({
     ),
   },
 });
-const NOT_FOR = byMember({ pack: "not for ad work", caterer: "not for food service" });
+const NOT_FOR = byMember({ pack: copy.VEHICLES_NOT_FOR, caterer: "not for food service" });
 
 export const Route = createFileRoute("/vehicles")({
   head: () => ({

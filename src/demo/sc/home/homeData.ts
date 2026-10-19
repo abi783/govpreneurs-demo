@@ -32,7 +32,7 @@ import {
 import { CONTACT_TIMEZONE } from "./time";
 import type { GHLAppointment, MainStepProgress, WalletUsageItem } from "./types";
 
-const { agencyActivity } = own(
+const { homeActivity } = own(
   import.meta.glob<typeof import("@/demo/members/agency/sc/home")>("/src/demo/members/*/sc/home.ts", { eager: true }),
 );
 
@@ -176,7 +176,7 @@ function activityFeed(): ActivityItem[] {
 
   // DEMO: lines only one member's story has (the agency: Sarah's Pass on Visit NC
   // and her answer on the NC Guard rating).
-  items.push(...byMember({ caterer: () => [], pack: agencyActivity })());
+  items.push(...byMember({ caterer: () => [], pack: homeActivity })());
 
   for (const a of getActivity()) {
     items.push({

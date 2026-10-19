@@ -61,6 +61,10 @@ import type {
 } from "./types";
 import { MEDIA_LOGO_URL } from "./media";
 
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
 const pack = own(
   import.meta.glob<typeof import("../../members/agency/sc/business")>("/src/demo/members/*/sc/business.ts", { eager: true }),
 );
@@ -110,7 +114,7 @@ export function file(id: string, name: string, sizeBytes: number, daysAgo: numbe
 /** The capability statement is the real sample file in `public/demo-files`. */
 export const CAPABILITY_STATEMENT_NAME = PERSONA.capabilityStatementFile.split("/").pop()!;
 // The agency's number is the size of the file scripts/make-capability-statement.ts writes.
-export const CAPABILITY_STATEMENT_BYTES = byMember({ caterer: 2960, pack: 3305 });
+export const CAPABILITY_STATEMENT_BYTES = byMember({ caterer: 2960, pack: copy.CAPABILITY_STATEMENT_BYTES });
 
 // ── timeline ───────────────────────────────────────────────────────────────
 
@@ -694,7 +698,7 @@ function naicsBySource(): NaicsBySource {
 
 /** The logo the record starts with: a drawn mark with the business's initials. */
 export function startingLogo(): string {
-  return byMember({ caterer: MEDIA_LOGO_URL, pack: pack.AGENCY_LOGO_URL });
+  return byMember({ caterer: MEDIA_LOGO_URL, pack: pack.LOGO_URL });
 }
 
 export function buildSeed(): DemoBusinessState {
@@ -704,8 +708,8 @@ export function buildSeed(): DemoBusinessState {
     ...PERSONA.secondaryNaics.map((n) => n.code),
   ];
   return {
-    rows: byMember({ caterer: catererRows, pack: pack.agencyRows })(),
-    proposals: byMember({ caterer: catererProposals, pack: pack.agencyProposals })(),
+    rows: byMember({ caterer: catererRows, pack: pack.businessRows })(),
+    proposals: byMember({ caterer: catererProposals, pack: pack.businessProposals })(),
     intakeSentAt: isoDaysFromNow(-INTAKE_SENT_DAYS_AGO),
     intakeSentMentor: MENTOR.name,
     media: { photoUrl: null, logoUrl: startingLogo() },
