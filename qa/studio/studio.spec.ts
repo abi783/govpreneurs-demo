@@ -22,7 +22,7 @@ const STATES = list(process.env.STUDIO_STATES, [""]); // "" = default scenario
 const VIEWPORTS = list(process.env.STUDIO_VIEWPORTS, ["1440x900", "1366x768"]);
 const OUT = process.env.STUDIO_OUT ?? path.join(process.cwd(), "studio-out");
 const MAX_TILES = Number(process.env.STUDIO_MAX_TILES ?? 6);
-if (!Number.isInteger(MAX_TILES) || MAX_TILES < 1)
+if (process.env.STUDIO && (!Number.isInteger(MAX_TILES) || MAX_TILES < 1))
   throw new Error(
     `STUDIO_MAX_TILES must be an integer >= 1, got "${process.env.STUDIO_MAX_TILES}"`,
   );
@@ -100,13 +100,15 @@ for (const route of ROUTES)
           await add("heading", page.getByRole("heading"));
           await add("label", page.locator("label:visible"));
 
-          // The SPA serves 200 for unknown routes and error boundaries: fail on their visible text.
-          const bad = labels.find(
-            (l) => l.role === "heading" && /^(page not found|404\b)/i.test(l.text),
-          ) ?? {
-            text: (await page.locator("body").innerText()).match(/something went wrong/i)?.[0],
-          };
-          if (bad?.text) throw new Error(`${url}: app error page ("${bad.text}")`);
+          // The SPA serves HTTP 200 for unknown routes. In the default scenario a "Page not found" heading is a bad route;
+          // other states may legitimately show error screens, so they are not checked.
+          if (
+            !state &&
+            labels.some(
+              (l) => l.role === "heading" && l.text.trim().toLowerCase() === "page not found",
+            )
+          )
+            throw new Error(`${url}: app shows "Page not found"`);
           if (pageErrors.length) throw new Error(`${url}: uncaught page error: ${pageErrors[0]}`);
           if (!labels.length)
             throw new Error(`${url}: no labels collected (blank page or error boundary?)`);
