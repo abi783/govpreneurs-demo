@@ -57,7 +57,8 @@ function legalLight(matrix: ComplianceRow[]): GateLight {
       {
         text: closable
           ? "required, and not on file yet."
-          : "required, and it can't be cleared inside this bid window.",
+          : // DEMO: "met", not "cleared": the blocker can be an app or a crew, not only a clearance.
+            "required, and it can't be met inside this bid window.",
       },
     ];
     return {
