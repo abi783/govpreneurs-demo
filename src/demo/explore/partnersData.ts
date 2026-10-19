@@ -4,18 +4,17 @@
 // (persona.ts): woman-owned, five staff, largest job $340K, Fayetteville NC, serves
 // NC, VA and SC. Money, places and counts come from the award record in
 // awardsData.ts, so a company file and an award never disagree.
+//
+// DEMO: two members. The caterer's partners are below; the agency's are in
+// src/demo/members/agency/market/partners.ts. The functions are shared.
 
+import { byMember } from "@/demo/member";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { calendarDay, daysToDay } from "./dates";
 import { getOpportunity } from "@/demo/story/opportunities";
 import { PAST_PERFORMANCE, findPastPerformance, PERSONA, KEY_PARTNER } from "@/demo/story/persona";
-import {
-  AGENCY_LABEL,
-  agencyIdOf,
-  allAwardRecords,
-  awardsWonBy,
-  AWARD_SEEDS,
-} from "./awardsData";
+import { allAwardRecords, awardsWonBy, AWARD_SEEDS, buyerLabelOf } from "./awardsData";
+import { PARTNERS as AGENCY_PARTNERS } from "@/demo/members/agency/market/partners";
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING, type Firm } from "./firms";
 import type { AwardRecord } from "@/lib/awardsApi";
 import type {
@@ -35,7 +34,7 @@ const MY_STATES = PERSONA.serviceStates as readonly string[];
 
 type Breakdown = Record<string, number>;
 
-interface Spec {
+export interface PartnerSpec {
   firm: Firm;
   tier: PartnerTier;
   verdict: PartnerVerdict;
@@ -43,9 +42,33 @@ interface Spec {
   bench: PartnerBench;
   momentum: number | null;
   breakdown: Breakdown;
-  /** Reasons that come from Amira's own story. They go first, in this order. */
+  /** Reasons that come from the member's own story. They go first, in this order. */
   storyReasons: RankReason[];
   flags: PrimeCandidate["flags"];
+}
+type Spec = PartnerSpec;
+
+/** A company that is in Awards but fails a gate. Opened by key, never in the ranked feed. */
+export interface NonCandidate {
+  key: number;
+  reasons: string[];
+  trade: PrimeCandidate["trade"];
+  bench: PartnerBench;
+}
+
+/** One member's partner record. */
+export interface MemberPartners {
+  /** The member's own trade, for her own company file. */
+  tradeDirect: PrimeCandidate["trade"];
+  /** The evidence line under "They buy the kind of work you do". */
+  workEvidence: string;
+  specs: PartnerSpec[];
+  nonCandidates: NonCandidate[];
+  /** What the member's own story signals (W…) mean in "why above the next". */
+  signalLabels: Record<string, string>;
+  /** The lane's totals for the market strip. */
+  market: Pick<MarketSummary, "totalAwardedUsd12mo" | "awardCount12mo" | "medianAwardUsd">;
+  initialPipeline: () => PipelineEntry[];
 }
 
 const TRADE_DIRECT: PrimeCandidate["trade"] = { proximity: "direct", naicsCodes: ["722310", "722320"] };
@@ -57,7 +80,7 @@ function fortBraggRfpDays(): number {
 
 const pastCdg = findPastPerformance("pp-cdg-sub")!;
 
-const SPECS: Spec[] = [
+const CATERER_SPECS: Spec[] = [
   {
     firm: CAROLINA_DINING,
     tier: "strong",
@@ -246,7 +269,7 @@ const SPECS: Spec[] = [
 ];
 
 /** Companies that are in Awards but fail a gate. Opened by key, never in the ranked feed. */
-const NON_CANDIDATES: { key: number; reasons: string[]; trade: PrimeCandidate["trade"]; bench: PartnerBench }[] = [
+const CATERER_NON_CANDIDATES: NonCandidate[] = [
   {
     key: 4101,
     reasons: ["We have no record of them hiring outside firms."],
@@ -272,6 +295,26 @@ const NON_CANDIDATES: { key: number; reasons: string[]; trade: PrimeCandidate["t
     bench: { distinctSubs: 2, repeatSubs: 0, trend: "unknown" },
   },
 ];
+
+/** The caterer's partner record, in the shape both members share. */
+const CATERER: MemberPartners & { otherWorkEvidence: string } = {
+  tradeDirect: TRADE_DIRECT,
+  workEvidence: "their work: Food Service Contractors, Caterers",
+  otherWorkEvidence: "their work: Food Service Contractors",
+  specs: CATERER_SPECS,
+  nonCandidates: CATERER_NON_CANDIDATES,
+  signalLabels: {},
+  // The lane is wider than the ten wins below, so the totals are set here.
+  market: { totalAwardedUsd12mo: 41_800_000, awardCount12mo: 63, medianAwardUsd: 410_000 },
+  initialPipeline: () => catererPipeline(),
+};
+
+const ACTIVE: MemberPartners & { otherWorkEvidence?: string } = byMember<MemberPartners & { otherWorkEvidence?: string }>({
+  agency: AGENCY_PARTNERS,
+  caterer: CATERER,
+});
+const SPECS = ACTIVE.specs;
+const NON_CANDIDATES = ACTIVE.nonCandidates;
 
 // ── Facts worked out from the award record ──────────────────────────────────
 
@@ -340,9 +383,9 @@ function reasonsFor(spec: Spec, geo: PrimeCandidate["geography"], econ: PrimeCan
     adjacent: "They buy work close to yours.",
     tangential: "They buy work a bit like yours.",
   }[spec.trade.proximity];
-  out.push({ signal: "S2", text: tradeText, evidence: "their work: Food Service Contractors, Caterers" });
+  out.push({ signal: "S2", text: tradeText, evidence: ACTIVE.workEvidence });
   const share = geo.inStateAwardShare;
-  // A company that works far from her kitchen gets no "near you" line.
+  // A company that works far from her base gets no "near you" line.
   if (share !== null && share > 0 && !spec.flags.some((f) => f.id === "far")) {
     out.push({
       signal: "S3",
@@ -407,7 +450,7 @@ export function rankedPartners(): PrimeCandidate[] {
 
 // ── Why one company ranks above the next (the production wording) ───────────
 
-const SIGNAL_LABEL: Record<string, string> = {
+const CATERER_SIGNAL_LABEL: Record<string, string> = {
   S1: "they hire more small firms",
   S2: "they buy work closer to yours",
   S3: "more of their work is near you",
@@ -422,6 +465,9 @@ const SIGNAL_LABEL: Record<string, string> = {
   W6: "they beat you on a job you bid",
   W7: "they hold work the buyer is asking for again",
 };
+
+/** The S labels are shared; each member names its own story signals (W…). */
+const SIGNAL_LABEL: Record<string, string> = { ...CATERER_SIGNAL_LABEL, ...ACTIVE.signalLabels };
 
 export function whyAboveNext(own: Breakdown, next: Breakdown | null): string | null {
   if (!next) return null;
@@ -471,7 +517,7 @@ export function companyByKey(key: number): { company: PrimeCandidate; inMatches:
         isCandidate: false,
         gateFailureReasons: ["This is your own company. You won this job."],
         bench: { distinctSubs: 0, repeatSubs: 0, trend: "unknown" },
-        trade: TRADE_DIRECT,
+        trade: ACTIVE.tradeDirect,
         geography,
         economics,
         tier: "stretch",
@@ -507,7 +553,7 @@ export function companyByKey(key: number): { company: PrimeCandidate; inMatches:
       score: 0,
       scoreBreakdown: {},
       reasons: [
-        { signal: "S2", text: "They buy work close to yours.", evidence: "their work: Food Service Contractors" },
+        { signal: "S2", text: "They buy work close to yours.", evidence: ACTIVE.otherWorkEvidence ?? ACTIVE.workEvidence },
       ],
       flags: [],
       asOf: calendarDay(-1),
@@ -533,11 +579,10 @@ export function marketSummary(): MarketSummary {
     )
     .sort((a, b) => (a.recency.daysSinceAward ?? 0) - (b.recency.daysSinceAward ?? 0));
   const events: MarketEvent[] = near.slice(0, 10).map((a) => {
-    const id = agencyIdOf(a);
     return {
       awardId: a.awardId,
       title: a.title,
-      agency: id ? AGENCY_LABEL[id] : a.agency.name,
+      agency: buyerLabelOf(a) ?? a.agency.name,
       winner: { name: a.winner.name, awardeeKey: a.winner.awardeeKey },
       obligated: a.obligated,
       awardedAt: a.recency.awardedAt,
@@ -545,20 +590,18 @@ export function marketSummary(): MarketSummary {
       state: a.location.state,
     };
   });
-  return {
-    // The lane is wider than the ten wins below, so the totals are set here.
-    totalAwardedUsd12mo: 41_800_000,
-    awardCount12mo: 63,
-    medianAwardUsd: 410_000,
-    events,
-    state: "ok",
-  };
+  return { ...ACTIVE.market, events, state: "ok" };
 }
 
 // ── The partner pipeline (My partners) ──────────────────────────────────────
 
-/** Where the board starts: two companies Amira has already looked at. */
+/** Where the board starts: two companies the member has already looked at. */
 export function initialPartnerPipeline(): PipelineEntry[] {
+  return ACTIVE.initialPipeline();
+}
+
+/** The caterer's board: two companies Amira has already looked at. */
+function catererPipeline(): PipelineEntry[] {
   const longleaf = anyFirmByKey(4002)!;
   const tarheel = anyFirmByKey(4004)!;
   return [

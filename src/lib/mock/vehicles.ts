@@ -3,6 +3,11 @@
 // Amira Haddad, a caterer in Fayetteville, NC (woman-owned, NAICS 722310).
 // Some vehicles are real programs (GSA schedules, DLA programs). Others are sample
 // names for contracts like the ones that exist at Fort Bragg, the VA and the Navy.
+// DEMO: two members. The agency's vehicles (all real) are in
+// src/demo/members/agency/market/vehicles.ts.
+
+import { byMember } from "@/demo/member";
+import * as agency from "@/demo/members/agency/market/vehicles";
 
 export type VehicleType = "IDIQ" | "GWAC" | "GSA MAS" | "BPA" | "MATOC" | "Program";
 
@@ -16,13 +21,13 @@ export interface Vehicle {
   scope: string; // plain-English what it covers
   openToNewEntrants: "Open now" | "Closed — next on-ramp not announced" | "On-ramp expected" | "Closed";
   recompeteWindow?: string; // human readable, e.g. "FY27 Q2"
-  /** True when the vehicle buys the kind of work Amira does (food service and catering). */
+  /** True when the vehicle buys the kind of work the member does (food service; for the agency, marketing). */
   fitsFood: boolean;
   fitReason: string; // plain-English why it fits or doesn't
   pursueLink?: { label: string; href: string };
 }
 
-export const VEHICLES: Vehicle[] = [
+const CATERER_VEHICLES: Vehicle[] = [
   // ── Fits a caterer ─────────────────────────────────────────────────
   {
     id: "veh-fortbragg-events-idiq",
@@ -177,6 +182,8 @@ export const VEHICLES: Vehicle[] = [
   },
 ];
 
+export const VEHICLES: Vehicle[] = byMember({ agency: agency.VEHICLES, caterer: CATERER_VEHICLES });
+
 export function vehiclesByFit(vehicles: Vehicle[], fitsOnly: boolean): Vehicle[] {
   return fitsOnly ? vehicles.filter((v) => v.fitsFood) : vehicles;
 }
@@ -189,7 +196,7 @@ export function formatCeiling(v: number): string {
   return `$${v}`;
 }
 
-export const VEHICLE_TYPE_GLOSS: Record<VehicleType, string> = {
+const CATERER_TYPE_GLOSS: Record<VehicleType, string> = {
   IDIQ:
     "Indefinite Delivery / Indefinite Quantity — a pre-approved contract the agency uses to order work as needed, up to a ceiling.",
   GWAC:
@@ -203,3 +210,9 @@ export const VEHICLE_TYPE_GLOSS: Record<VehicleType, string> = {
   Program:
     "A government program, not one contract. It sets rules for who can buy, who can team up, or how a group of contracts work.",
 };
+
+/** DEMO: the agency's glosses name its own trade. */
+export const VEHICLE_TYPE_GLOSS: Record<VehicleType, string> = byMember({
+  agency: { ...CATERER_TYPE_GLOSS, ...agency.TYPE_GLOSS },
+  caterer: CATERER_TYPE_GLOSS,
+});

@@ -9,10 +9,35 @@ import {
   type LcatLocation,
 } from "../../lib/mock/laborRates";
 import { JargonGloss } from "../Layout/JargonGloss";
+import { byMember } from "../../demo/member";
+import { LOCAL_DESIGNER_MEDIAN } from "../../demo/members/agency/market/laborRates";
 
 const EXP_OPTIONS: (ExperienceTier | "all")[] = ["all", "0–3 yrs", "3–7 yrs", "7–15 yrs", "15+ yrs"];
 const EDU_OPTIONS: (EducationLevel | "all")[] = ["all", "HS", "Associate", "Bachelor", "Master", "PhD"];
-const LOC_OPTIONS: (LcatLocation | "all")[] = ["all", "Nationwide", "Fayetteville", "Raleigh-Durham", "Charlotte", "Norfolk"];
+// DEMO: the agency's rates are GSA ceiling rates, which are not tied to a place.
+const LOC_OPTIONS: (LcatLocation | "all")[] = byMember<(LcatLocation | "all")[]>({
+  agency: ["all", "Nationwide"],
+  caterer: ["all", "Nationwide", "Fayetteville", "Raleigh-Durham", "Charlotte", "Norfolk"],
+});
+
+// DEMO: each member's note above the table.
+const BANNER = byMember({
+  agency: (
+    <span>
+      This is how most federal <strong>marketing work</strong> is priced: people billed by the hour.
+      These are GSA schedule ceiling rates, the most a firm may bill. For scale, a Fayetteville graphic
+      designer&apos;s median pay is {fmtRate(LOCAL_DESIGNER_MEDIAN)} an hour (BLS, May 2025); the gap pays for
+      benefits, overhead and profit.
+    </span>
+  ),
+  caterer: (
+    <span>
+      This is for <strong>professional service contracts</strong> (people billed by the hour) —
+      not how meals and catering are usually priced. Browse for context; don't use it to bid
+      your jobs.
+    </span>
+  ),
+});
 
 export function LcatBenchmark() {
   const [q, setQ] = useState("");
@@ -35,11 +60,7 @@ export function LcatBenchmark() {
     <div className="lcat-block">
       <div className="lcat-banner" role="note">
         <Info size={13} aria-hidden />
-        <span>
-          This is for <strong>professional service contracts</strong> (people billed by the hour) —
-          not how meals and catering are usually priced. Browse for context; don't use it to bid
-          your jobs.
-        </span>
+        {BANNER}
       </div>
 
       <div className="lcat-toolbar">

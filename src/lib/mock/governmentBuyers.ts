@@ -7,6 +7,11 @@
 // from src/demo/explore/awardsData.ts, so the counts on this page match the
 // Opportunities feed and the Awards page.
 
+// DEMO: two members (src/demo/member.ts). The agency's buyers are advertising and
+// marketing buyers; `buysFood` and `getFoodAwardsForBuyer` keep their names but mean
+// "buys the member's trade".
+
+import { byMember } from "@/demo/member";
 import { OPPORTUNITIES } from "@/demo/story/opportunities";
 import { PLACES } from "@/demo/story/places";
 import { isoDaysFromNow } from "@/demo/story/clock";
@@ -14,13 +19,21 @@ import { allAwardRecords } from "@/demo/explore/awardsData";
 import type { AwardRecord } from "@/lib/awardsApi";
 import { BUYER_SEED } from "@/demo/explore/buyersData";
 
+/** DEMO: the member's trade, in the words the buyer pages use. */
+export const TRADE = byMember({
+  agency: { label: "Marketing and advertising", phrase: "marketing and advertising" },
+  caterer: { label: "Food service", phrase: "food service" },
+});
+
 export type BuyerType = "federal" | "sled";
 
 export type OfficerRole =
   | "Contracting Officer"
   | "Small-Business Liaison"
   | "Contract Specialist"
-  | "Food Program Manager";
+  | "Food Program Manager"
+  /** DEMO: the agency's program-side contact (a campaign's owner at the buyer). */
+  | "Program Manager";
 
 export interface BuyerOfficer {
   id: string;

@@ -12,6 +12,8 @@ import { PAST_PERFORMANCE, findPastPerformance } from "@/demo/story/persona";
 import { getOpportunity } from "@/demo/story/opportunities";
 import type { AwardBench, AwardRecord } from "@/lib/awardsApi";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+import { byMember } from "@/demo/member";
+import * as agencyMarket from "@/demo/members/agency/market/awards";
 
 interface Agency {
   name: string;
@@ -70,13 +72,14 @@ export function agencyIdOf(award: { agency: { abbrev: string | null } }): Agency
   return hit ?? null;
 }
 
-interface Seed {
+/** One award. `A` is the member's buyer table (the caterer's AGENCIES, or the agency's). */
+export interface AwardSeed<A extends string = AgencyId> {
   id: string;
   solicitationId?: string;
   title: string;
   /** The winner's awardeeKey (firms.ts). */
   winner: number;
-  agency: AgencyId;
+  agency: A;
   obligated: number;
   currentValue?: number;
   ceiling?: number;
@@ -85,6 +88,8 @@ interface Seed {
   startedOn?: string;
   /** Days from today that the current period ends (the job comes up for bid again). */
   endsInDays?: number;
+  /** A fixed end date, for a contract whose end the story names (the VA hiring campaign). */
+  endsOn?: string;
   /** The next contract is already open for bids: the story's Fort Bragg dining notice. */
   rebidIsOpen?: boolean;
   city: string | null;
@@ -111,7 +116,7 @@ const AMIRA = AMIRA_FIRM.key;
 const womack = findPastPerformance("pp-womack")!;
 const cdgSub = findPastPerformance("pp-cdg-sub")!;
 
-const SEEDS: Seed[] = [
+const CATERER_SEEDS: AwardSeed[] = [
   // ── Carolina Dining Group (4001) ───────────────────────────────────────
   {
     id: "W91247-19-C-0021",
@@ -751,19 +756,35 @@ const SEEDS: Seed[] = [
   },
 ];
 
-export const AWARD_SEEDS: readonly Seed[] = SEEDS;
+type AnySeed = AwardSeed<string>;
+
+// DEMO: two members. The agency's awards and buyers are in src/demo/members/agency/market/awards.ts.
+const SEEDS: readonly AnySeed[] = byMember<readonly AnySeed[]>({ agency: agencyMarket.AWARD_SEEDS, caterer: CATERER_SEEDS });
+const BUYERS: Record<string, Agency> = byMember<Record<string, Agency>>({ agency: agencyMarket.AWARD_AGENCIES, caterer: AGENCIES });
+const BUYER_LABELS: Record<string, string> = byMember<Record<string, string>>({
+  agency: agencyMarket.AWARD_AGENCY_LABEL,
+  caterer: AGENCY_LABEL,
+});
+
+export const AWARD_SEEDS: readonly AnySeed[] = SEEDS;
+
+/** The buyer of an award in a sentence ("the Army contracting office at Fort Bragg"), or null. */
+export function buyerLabelOf(award: { agency: { abbrev: string | null } }): string | null {
+  const id = Object.keys(BUYERS).find((k) => BUYERS[k].abbrev === award.agency.abbrev);
+  return id ? BUYER_LABELS[id] : null;
+}
 
 /** Whole days between two ISO dates (a later than b gives a positive number). */
 function daysBetween(laterIso: string, earlierIso: string): number {
   return Math.round((new Date(laterIso).getTime() - new Date(earlierIso).getTime()) / 86_400_000);
 }
 
-function startedOn(s: Seed): string {
+function startedOn(s: AnySeed): string {
   if (s.startedOn) return s.startedOn;
   return calendarDay(-(s.startedDaysAgo ?? 365));
 }
 
-function benchOf(s: Seed): AwardBench | null {
+function benchOf(s: AnySeed): AwardBench | null {
   if (!s.bench) return null;
   return {
     distinctSubs: s.bench.distinct,
@@ -776,18 +797,24 @@ function benchOf(s: Seed): AwardBench | null {
 }
 
 /** The Army is already taking bids for the next Fort Bragg dining contract. The days come from the story's notice. */
-function openNowNote(): string {
+function catererOpenNowNote(): string {
   const notice = getOpportunity(CATERER_HERO.teamUp)!;
   return `The Army is taking bids for this job again now. Proposals are due in ${notice.closesInDays} days. Grant says to bid as a subcontractor.`;
 }
 
+const openNowNote: (awardId: string) => string | undefined = byMember({
+  agency: agencyMarket.openNowNote,
+  caterer: () => catererOpenNowNote(),
+});
+
 /** The award as the page reads it, with recency counted from today. */
-export function toAwardRecord(s: Seed): AwardRecord {
+export function toAwardRecord(s: AnySeed): AwardRecord {
   const winner = anyFirmByKey(s.winner)!;
-  const agency = AGENCIES[s.agency];
+  const agency = BUYERS[s.agency];
   const awardedAt = startedOn(s);
   const days = Math.max(0, daysBetween(calendarDay(0), awardedAt));
-  const recompeteAt = s.endsInDays !== undefined ? calendarDay(s.endsInDays) : null;
+  const recompeteAt = s.endsOn ?? (s.endsInDays !== undefined ? calendarDay(s.endsInDays) : null);
+  const note = s.rebidIsOpen ? openNowNote(s.id) : undefined;
   const months = recompeteAt ? daysToDay(recompeteAt) / 30 : null;
   return {
     awardId: s.id,
@@ -804,7 +831,7 @@ export function toAwardRecord(s: Seed): AwardRecord {
       justAwarded: days <= 90,
       comingUpAgain: months !== null && months > 0 && months <= 12,
       recompeteAt,
-      ...(s.rebidIsOpen ? { openNowNote: openNowNote() } : {}),
+      ...(note ? { openNowNote: note } : {}),
       reportingLagNote: agency.isDefense
         ? "Defense awards are usually published about three months after they are signed, so this job may be older than it looks."
         : "Awards are usually published about a month after they are signed, so this may be a little older than it looks.",
