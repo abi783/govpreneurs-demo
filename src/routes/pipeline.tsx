@@ -213,11 +213,11 @@ function BidsHeader() {
   return (
     <header style={{ marginBottom: "var(--s-4)" }}>
       <div className="t-label" style={{ marginBottom: "var(--s-3)" }}>
-        Workspace
+        Pipeline
       </div>
-      <h1 className="t-display-lg">Pipeline</h1>
+      <h1 className="t-display-lg">Your bids</h1>
       <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 640 }}>
-        Every pursuit, its stage, and its next move — saved, reviewed, drafted, decided.
+        Each bid you are working on, and its next step.
       </p>
     </header>
   );
