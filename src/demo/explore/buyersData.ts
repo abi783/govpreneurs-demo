@@ -2,7 +2,12 @@
 // Haddad's kitchen in Fayetteville, NC. The offices are real. The people are made up,
 // and their addresses end in ".example" so no one mistakes them for real contacts.
 // The spend figures are sample figures, like the contacts.
+//
+// DEMO: two members. The caterer's buyers are below; the agency's (advertising and
+// marketing buyers, with real spend) are in src/demo/members/agency/market/buyers.ts.
 
+import { MEMBER } from "@/demo/member";
+import { BUYERS as AGENCY_BUYERS } from "@/demo/members/agency/market/buyers";
 import { AGENCIES, allAwardRecords } from "./awardsData";
 import { anyFirmByKey } from "./firms";
 import { PLACES } from "@/demo/story/places";
@@ -84,7 +89,8 @@ function analysis(
 const A = AGENCIES;
 const ab = (...k: Abbrev[]) => k as string[];
 
-export const BUYER_SEED: GovBuyer[] = [
+/** Built on demand: it names caterer firms that the agency's roster does not have. */
+const catererBuyers = (): GovBuyer[] => [
   {
     id: "bragg-micc",
     agencyKey: 5001,
@@ -596,3 +602,6 @@ export const BUYER_SEED: GovBuyer[] = [
     ),
   },
 ];
+
+/** The active member's buyer directory. */
+export const BUYER_SEED: GovBuyer[] = MEMBER === "agency" ? AGENCY_BUYERS : catererBuyers();

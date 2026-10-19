@@ -7,6 +7,7 @@ import { WhatThisMeansCard } from "../components/Market/WhatThisMeansCard";
 import { PrevailingWageTable } from "../components/Market/PrevailingWageTable";
 import { LcatBenchmark } from "../components/Market/LcatBenchmark";
 import { JargonGloss } from "../components/Layout/JargonGloss";
+import { MEMBER } from "../demo/member";
 
 export const Route = createFileRoute("/labor-pricing")({
   head: () => ({
@@ -49,6 +50,28 @@ function LaborPricingPage() {
           </>
         }
       >
+        {MEMBER === "agency" ? (
+          // DEMO: the agency's pricing world is people billed by the hour.
+          <ul className="market-what-list">
+            <li>
+              Most federal <strong>marketing work</strong> is priced <em>per person per hour</em>, by
+              labor category, or as a fixed price built from those hours. Contracting officers check
+              your rates against GSA schedule rates for the same roles — the benchmark below.
+            </li>
+            <li>
+              Some titles also carry a legal floor: the government&apos;s{" "}
+              <JargonGloss term="wage determination">
+                The hourly rate set by the U.S. Department of Labor under the Service Contract Act for
+                each job title and county. The legal minimum on federal service contracts.
+              </JargonGloss>{" "}
+              sets minimum pay for graphic artists, illustrators and photographers in your county.
+            </li>
+            <li>
+              Quick answer to "what should I charge": <em>your costs set the bottom, the median GSA
+              rate for each role is a fair top.</em> Price between, and check what similar jobs went for.
+            </li>
+          </ul>
+        ) : (
         <ul className="market-what-list">
           <li>
             There are <strong>two pricing worlds</strong>. <strong>Food service</strong> contracts
@@ -71,6 +94,7 @@ function LaborPricingPage() {
             what similar jobs went for.</em> Price between, closer to the median of the comps.
           </li>
         </ul>
+        )}
       </WhatThisMeansCard>
 
       <div style={{ marginTop: "var(--s-5)" }}>
@@ -88,8 +112,10 @@ function LaborPricingPage() {
           <div>
             <div className="lcat-disclosure-title">Service-contract labor benchmarks (LCAT)</div>
             <div className="lcat-disclosure-sub">
-              Full hourly-rate benchmarking tool — for professional service contracts, not meals.
-              Available if you need it later.
+              {/* DEMO: for the agency, this is the main way its work is priced. */}
+              {MEMBER === "agency"
+                ? "GSA schedule rates for account directors, designers, video producers and more. This is how most marketing work is priced."
+                : "Full hourly-rate benchmarking tool — for professional service contracts, not meals. Available if you need it later."}
             </div>
           </div>
         </button>

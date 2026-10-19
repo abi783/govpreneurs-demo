@@ -16,6 +16,7 @@ import {
 import {
   getOpenOppsForBuyer,
   getFoodAwardsForBuyer,
+  TRADE,
   type GovBuyer,
   type BuyerOfficer,
   type OfficerRole,
@@ -50,6 +51,9 @@ const ROLE_GLOSS: Record<OfficerRole, string> = {
     "Works under a contracting officer; often the first person actually reading your emails.",
   "Food Program Manager":
     "Runs the dining program day to day, and tells the contracting office what the meals must be like.",
+  // DEMO: the agency's program-side contact.
+  "Program Manager":
+    "Runs the program the campaign is for, and tells the contracting office what the work must do.",
 };
 
 export function BuyerDetailPanel({
@@ -127,7 +131,8 @@ export function BuyerDetailPanel({
             <JargonGloss term="Contracting Officer">
               {ROLE_GLOSS["Contracting Officer"]}
             </JargonGloss>{" "}
-            for food service work.
+            {/* DEMO: the member's trade. */}
+            for {TRADE.phrase} work.
           </li>
           <li>
             <strong>Why:</strong> COs don't take cold pitches well — they're heads-down on active
@@ -228,7 +233,7 @@ export function BuyerDetailPanel({
         <p className="sample-data-note">Contact details shown are sample data for demo purposes.</p>
       </section>
 
-      {/* Recent food service awards (collapsed) */}
+      {/* Recent awards in the member's trade (collapsed) */}
       <section className="gov-buyer-section">
         <button
           type="button"
@@ -238,7 +243,7 @@ export function BuyerDetailPanel({
         >
           {openAwards ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
           <Trophy size={12} />
-          <span>Recent food service awards by this buyer</span>
+          <span>Recent {TRADE.phrase} awards by this buyer</span>
           <span className="gov-buyer-disclosure-count">{awards.length}</span>
         </button>
         {openAwards && (

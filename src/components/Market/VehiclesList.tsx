@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, ExternalLink, Check, AlertCircle } from "luc
 import { type Vehicle, formatCeiling } from "../../lib/mock/vehicles";
 import { VehicleTypeChip } from "./VehicleTypeChip";
 import { crossPageClick } from "../../lib/ghlNav";
+import { byMember } from "../../demo/member";
 
 // DEMO: a pursue link may carry a query string. Split it so the router gets a path and a search object.
 function pursuePath(href: string): string {
@@ -66,7 +67,8 @@ function VehicleRow({ v }: { v: Vehicle }) {
         <div className="veh-row-fit">
           {v.fitsFood ? (
             <span className="veh-fit-badge veh-fit-badge--yes">
-              <Check size={11} aria-hidden /> Fits food service
+              {/* DEMO: the member's trade. */}
+              <Check size={11} aria-hidden /> {byMember({ agency: "Fits your work", caterer: "Fits food service" })}
             </span>
           ) : (
             <span className="veh-fit-badge veh-fit-badge--no">

@@ -1,5 +1,10 @@
 // DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
-import { Search, MapPin, UtensilsCrossed } from "lucide-react";
+import { Search, MapPin, UtensilsCrossed, Megaphone } from "lucide-react";
+import { byMember } from "@/demo/member";
+import { TRADE } from "@/lib/mock/governmentBuyers";
+
+// DEMO: the "buys my trade" pill names the member's trade.
+const TradeIcon = byMember({ agency: Megaphone, caterer: UtensilsCrossed });
 
 export function BuyerSearchBar({
   q,
@@ -43,7 +48,7 @@ export function BuyerSearchBar({
           onClick={() => onBuysChange(buys === "food" ? "all" : "food")}
           aria-pressed={buys === "food"}
         >
-          <UtensilsCrossed size={11} /> Buys · Food service
+          <TradeIcon size={11} /> Buys · {TRADE.label}
         </button>
       </div>
     </div>

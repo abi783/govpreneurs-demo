@@ -5,8 +5,11 @@
 // words on each card are NOT written here: the page works them out from the
 // record and from the member's facts below, exactly as it does in production.
 // So a line like "the right size for you" is true because the numbers say so.
+// DEMO: for the agency, the 14 forecasts of src/demo/members/agency/market/forecasts.ts.
 
 import { calendarDay } from "./dates";
+import { byMember, MEMBER } from "@/demo/member";
+import * as agency from "@/demo/members/agency/market/forecasts";
 import { PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
 import type {
   ForecastListRowDto,
@@ -43,8 +46,9 @@ function plainDate(days: number): string {
   return calendarDay(d);
 }
 
-/** How close the industry code is to Amira's own, 0 to 1. Null: no code. */
+/** How close the industry code is to the member's own, 0 to 1. Null: no code. */
 function categoryFitOf(code: string | null): number | null {
+  if (MEMBER === "agency") return agency.categoryFit(code, FORECAST_MEMBER.naics);
   if (!code) return null;
   if (FORECAST_MEMBER.naics.includes(code)) return 1;
   if (/^(7223|7225|311)/.test(code)) return 0.8;
@@ -88,7 +92,12 @@ function toRecord(seed: ForecastSeed): ForecastRecordDto {
   };
 }
 
-const ALL_SEEDS: ForecastSeed[] = [...LOCAL_SEEDS, ...RECORDED_SEEDS];
+// DEMO: two members. The caterer has 48 forecasts; the agency's 14 are in
+// src/demo/members/agency/market/forecasts.ts.
+const ALL_SEEDS: ForecastSeed[] = byMember({
+  agency: agency.FORECAST_SEEDS,
+  caterer: [...LOCAL_SEEDS, ...RECORDED_SEEDS],
+});
 
 /** Every forecast, in the order of the seeds. */
 export const FORECAST_RECORDS: ForecastRecordDto[] = ALL_SEEDS.map(toRecord);

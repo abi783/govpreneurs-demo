@@ -1,17 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { OTHER_FIRMS } from "./firms";
+import { byMember, MEMBER } from "@/demo/member";
+import { CAROLINA_DINING, OTHER_FIRMS } from "./firms";
 import { FORECAST_RECORDS, SCORED_ROWS, FORECAST_MEMBER } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY } from "./forecastLocalSeeds";
 import { buildForecastTake } from "./forecastTakes";
 import { cardTakeLine, forecastGrantReply } from "./forecastChat";
+import { daysToDay } from "./dates";
+import { captureStatus } from "@/lib/forecasts/engine";
 
-const BAD_WORDS = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|HigherGov|\bDEMO-[A-Z]+-\d+/i;
+// DEMO: the agency's words must not show the caterer's trade (demo-storyboard/tools/scan-member.mjs).
+const BAD_WORDS = byMember({
+  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|HigherGov|\bDEMO-[A-Z]+-\d+/i,
+  agency: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+});
 const REAL_FIRMS = /sodexo|aramark|compass group|eurest/i;
+const COUNT = byMember({ caterer: 48, agency: 14 });
+const BIGGEST = FORECAST_MEMBER.biggestPastJob ?? 0;
+const statusOnTheDay = (dueOn: string | null) => captureStatus(dueOn ? daysToDay(dueOn) : null);
 
 describe("the demo forecasts", () => {
-  it("holds 48 forecasts with unique keys, and the id is the key", () => {
-    expect(FORECAST_RECORDS).toHaveLength(48);
-    expect(new Set(FORECAST_RECORDS.map((r) => r.oppKey)).size).toBe(48);
+  it(`holds ${COUNT} forecasts with unique keys, and the id is the key`, () => {
+    expect(FORECAST_RECORDS).toHaveLength(COUNT);
+    expect(new Set(FORECAST_RECORDS.map((r) => r.oppKey)).size).toBe(COUNT);
     for (const r of FORECAST_RECORDS) expect(r.id).toBe(r.oppKey);
   });
 
@@ -24,11 +34,34 @@ describe("the demo forecasts", () => {
     }
   });
 
-  it("gives Amira's facts to the rules", () => {
+  it.runIf(MEMBER === "caterer")("gives Amira's facts to the rules", () => {
     expect(FORECAST_MEMBER.naics).toContain("722310");
     expect(FORECAST_MEMBER.states).toEqual(["NC", "VA", "SC"]);
     expect(FORECAST_MEMBER.certs).toEqual(["wosb"]);
     expect(FORECAST_MEMBER.biggestPastJob).toBe(340_000);
+  });
+
+  it.runIf(MEMBER === "agency")("gives Dana's facts to the rules", () => {
+    expect(FORECAST_MEMBER.naics).toEqual(["541810", "541613", "541430", "512110", "541820"]);
+    expect(FORECAST_MEMBER.states).toEqual(["NC", "VA", "SC"]);
+    expect(FORECAST_MEMBER.certs).toEqual(["wosb"]);
+    expect(FORECAST_MEMBER.biggestPastJob).toBe(312_000);
+  });
+
+  it.runIf(MEMBER === "agency")("puts the VA hiring campaign first, set aside for veteran-owned firms, in about 200 days", () => {
+    const top = [...SCORED_ROWS].sort((a, b) => (b.match?.finalScore ?? -1) - (a.match?.finalScore ?? -1))[0];
+    expect(top.record.oppKey).toBe(FORT_BRAGG_FORECAST_KEY);
+    expect(top.record.setAsideCode).toBe("SDVOSBC");
+    expect(top.record.valLow).toBe(35_000_000);
+    expect(top.record.valHigh).toBe(45_000_000);
+    expect(statusOnTheDay(top.record.dueOn)).toBe("position_early");
+    expect(forecastGrantReply(FORT_BRAGG_FORECAST_KEY, "should I team up")).toContain(CAROLINA_DINING.name);
+  });
+
+  // The engine's "today" is pinned in tests (vitest.config.ts), so count from the demo's own today.
+  it.runIf(MEMBER === "agency")("mixes act now, start capture, position early and watch", () => {
+    const statuses = new Set(FORECAST_RECORDS.map((r) => statusOnTheDay(r.dueOn)));
+    for (const s of ["act_now", "start_capture", "position_early", "watch"]) expect(statuses).toContain(s);
   });
 
   it("puts the Fort Bragg dining forecast on For you as a team bid", () => {
@@ -41,7 +74,7 @@ describe("the demo forecasts", () => {
   it("never rates work above five times her largest job as a good fit", () => {
     for (const row of SCORED_ROWS) {
       const high = row.record.valHigh ?? 0;
-      if (high > 5 * 340_000 && row.record.oppKey !== FORT_BRAGG_FORECAST_KEY) {
+      if (high > 5 * BIGGEST && row.record.oppKey !== FORT_BRAGG_FORECAST_KEY) {
         expect(["stretch", "low"]).toContain(row.match?.tier ?? "low");
       }
     }
@@ -64,7 +97,9 @@ describe("the demo forecasts", () => {
     expect(winners?.state).toBe("counted");
     const names =
       winners?.state === "counted" ? (winners.source.provenance.tally?.firms ?? []).map((f) => f.name) : [];
-    expect(names[0]).toBe("Carolina Dining Group");
+    if (MEMBER === "caterer") expect(names[0]).toBe("Carolina Dining Group");
+    // The agency's take ranks by number of awards; Bluestone, the VA campaign's holder, is among the top three.
+    else expect(names).toContain("Bluestone Veteran Media Group");
     for (const n of names) {
       expect(n).not.toMatch(REAL_FIRMS);
     }
