@@ -4,6 +4,7 @@
 // survives a reload and "Reset demo" restores the start. Dates come from the demo
 // clock, so nothing in the list falls into the past between sales calls.
 
+import { byMember } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { daysFromNow as clockDaysFromNow, daysUntil as clockDaysUntil, isoDaysFromNow } from "../demo/story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "../demo/runtime/store";
@@ -53,21 +54,77 @@ export const STAY_READY_CHANGED_EVENT = "stay-ready-changed";
 const KEY = "profile.stayReady";
 
 function seed(): TrackedItem[] {
+  return byMember({ caterer: catererItems, agency: agencyItems })();
+}
+
+function samItem(): TrackedItem {
+  return {
+    id: "sam",
+    kind: "sam",
+    name: "SAM.gov registration",
+    shortName: "SAM.gov",
+    // The story says SAM is active until this date (PERSONA.samActiveUntil).
+    dueDate: new Date(`${PERSONA.samActiveUntil}T00:00:00`).toISOString(),
+    dfyAvailable: true,
+    dfyPriceUSD: 290,
+    smsOptIn: true,
+    stakes:
+      "SAM must stay active to be awarded contracts. If it lapses, you can't win work until it's renewed.",
+    govLink: "https://sam.gov",
+  };
+}
+
+/**
+ * DEMO: the agency has no kitchen permit. Her woman-owned certification renews in
+ * 41 days (the story pack's gap), on the same date as My Business; her two
+ * insurance policies match My Business too.
+ */
+function agencyItems(): TrackedItem[] {
   return [
+    samItem(),
     {
-      id: "sam",
-      kind: "sam",
-      name: "SAM.gov registration",
-      shortName: "SAM.gov",
-      // The story says SAM is active until this date (PERSONA.samActiveUntil).
-      dueDate: new Date(`${PERSONA.samActiveUntil}T00:00:00`).toISOString(),
+      id: "wosb-cert",
+      kind: "wosb-cert",
+      name: "WOSB certification",
+      shortName: "WOSB cert",
+      dueDate: isoDaysFromNow(41, 0),
       dfyAvailable: true,
-      dfyPriceUSD: 290,
+      dfyPriceUSD: 250,
       smsOptIn: true,
       stakes:
-        "SAM must stay active to be awarded contracts. If it lapses, you can't win work until it's renewed.",
-      govLink: "https://sam.gov",
+        "Your woman-owned status is how you compete on set-aside work, such as the Family Advocacy campaign at Fort Bragg. If it lapses, you lose access to WOSB-only solicitations until you recertify.",
+      govLink: "https://certify.sba.gov",
     },
+    {
+      id: "insurance",
+      kind: "insurance",
+      name: "General liability insurance",
+      shortName: "insurance",
+      dueDate: isoDaysFromNow(120, 0),
+      dfyAvailable: false,
+      dfyPriceUSD: 0,
+      smsOptIn: false,
+      stakes:
+        "Most federal and state solicitations require active liability insurance. An expired policy means you can't submit.",
+    },
+    {
+      id: "insurance-professional",
+      kind: "insurance",
+      name: "Professional liability insurance",
+      shortName: "professional liability",
+      dueDate: isoDaysFromNow(210, 0),
+      dfyAvailable: false,
+      dfyPriceUSD: 0,
+      smsOptIn: false,
+      stakes:
+        "Ad and outreach buys often ask for errors and omissions cover. If it lapses, a claim about a campaign is yours to pay.",
+    },
+  ];
+}
+
+function catererItems(): TrackedItem[] {
+  return [
+    samItem(),
     {
       id: "health-permit",
       kind: "permit",

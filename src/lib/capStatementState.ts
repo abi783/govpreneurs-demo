@@ -1,7 +1,7 @@
 // Shared "Capability Statement" state for the profile pages and Hunter.
 // DEMO: kept in the demo store (key `profile.capStatement`), so it survives a
-// reload and "Reset demo" restores it. Amira starts with a capability statement
-// on file (public/demo-files/haddad-catering-capability-statement.pdf).
+// reload and "Reset demo" restores it. The member starts with a capability statement
+// on file (PERSONA.capabilityStatementFile in public/demo-files/).
 
 import { PERSONA } from "../demo/story/persona";
 import { isoDaysFromNow } from "../demo/story/clock";

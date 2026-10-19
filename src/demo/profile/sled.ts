@@ -1,6 +1,8 @@
 // DEMO: the state-by-state SLED (state and local) vendor registrations.
 
+import { byMember } from "../member";
 import { PERSONA } from "../story/persona";
+import { isoDaysFromNow } from "../story/clock";
 import { readDemoState, updateDemoState, useDemoState } from "./store";
 import { getDfyOrders } from "./dfy";
 
@@ -22,8 +24,21 @@ export interface SledRegistration {
 
 const KEY = "profile.sled";
 
+/**
+ * DEMO: states she is already registered in. The agency is on North Carolina's
+ * eVP vendor list (she has done city and state work), as My Business shows.
+ */
+const REGISTERED = byMember<Record<string, { vendorId: string; registeredDaysAgo: number } | undefined>>({
+  caterer: {},
+  agency: { NC: { vendorId: "0001048772", registeredDaysAgo: 262 } },
+});
+
 function seed(): SledRegistration[] {
   return PERSONA.serviceStates.map((state) => {
+    const held = REGISTERED[state];
+    if (held) {
+      return { state, status: "registered" as const, vendorId: held.vendorId, registeredAt: isoDaysFromNow(-held.registeredDaysAgo, 10) };
+    }
     const order = getDfyOrders().find((o) => o.target.kind === "sled" && o.target.state === state);
     return order
       ? { state, status: "pending_dfy" as const, orderId: order.id }

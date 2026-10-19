@@ -18,6 +18,7 @@ import {
 } from "../../../demo/profile/pastPerformance";
 import { fmtMonthYear, fmtMoneyShort } from "../../../demo/profile/dates";
 import { saveTextFile } from "../../../demo/profile/downloads";
+import { byMember } from "../../../demo/member";
 
 // DEMO: the projects come from the story (PAST_PERFORMANCE) and live in the demo store.
 function toCardEntry(e: PpEntry): CardEntry {
@@ -40,9 +41,15 @@ function toCardEntry(e: PpEntry): CardEntry {
   };
 }
 
+// DEMO: the example row fits the member's own work.
 const TEMPLATE = [
   "title,customer,value,start,end,naics,role,scope",
-  '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
+  byMember({
+    caterer:
+      '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
+    agency:
+      '"Example: recruiting video campaign","Example County",45000,2024-03-01,2024-09-30,541810,Prime,"Made four 30-second videos and ran paid social for six months. 1,200 people filled in the lead form."',
+  }),
 ].join("\n");
 
 /** Reads a CSV the visitor chose. Returns the projects it could read. */

@@ -1,9 +1,10 @@
-// Deterministic cap-statement draft generator. Built from Amira's profile facts
+// Deterministic cap-statement draft generator. Built from the member's profile facts
 // (the story, plus whatever she has changed on the Business Profile) — never a blank
 // prompt, never fabricated. DEMO: no roofing, no Marcus Williams: every fact below
 // comes from src/demo/story or the profile store.
 
 import { useMemo } from "react";
+import { byMember } from "../demo/member";
 import { PERSONA } from "../demo/story/persona";
 import { FIELD_DEFS, effectiveField, valueToText } from "../demo/profile/fields";
 import { getFieldOverrides, useFieldOverrides } from "../demo/profile/store";
@@ -126,8 +127,35 @@ export function useCapFacts(): CapFacts {
 
 const STATE_NAME: Record<string, string> = { NC: "North Carolina", VA: "Virginia", SC: "South Carolina", GA: "Georgia" };
 
+/** DEMO: the words that say what kind of business it is, per member. */
+const TRADE = byMember({
+  caterer: {
+    tagline: "Woman-owned food service and catering contractor",
+    place: (m: CapFacts) => `${m.employees} staff and one commercial kitchen.`,
+    work: (list: string) => `We cook, pack and deliver meals for government buyers across ${list}.`,
+    standard: "HACCP food-safety plan, USDA meal-pattern menus and daily temperature logs",
+    proof: (m: CapFacts) => [`Food-handler certificates: ${m.foodHandlers} of ${m.employees} staff`, `Largest bond carried: ${fmtUsd(m.largestBond)}`],
+    alternate: (m: CapFacts) => [
+      `${m.businessName} is a woman-owned food service contractor based in ${m.city}, ${m.state}.`,
+      `One commercial kitchen and ${m.employees} staff mean a buyer deals with one team from the first menu to the last tray.`,
+    ],
+  },
+  agency: {
+    tagline: "Woman-owned ad agency 12 miles from Fort Bragg",
+    place: (m: CapFacts) => `${m.employees} staff, three freelancers, and a studio with a two-person video crew.`,
+    work: (list: string) =>
+      `We make video, run paid social and search, buy print, and build landing pages and lead routing for campaigns that reach military families across ${list}.`,
+    standard: "Leads routed to a recruiter or caseworker within 5 minutes; captions on every video",
+    proof: () => [],
+    alternate: (m: CapFacts) => [
+      `${m.businessName} is a woman-owned ad agency based in ${m.city}, ${m.state}, 12 miles from Fort Bragg.`,
+      `Video, paid media and print buying under one roof mean a buyer deals with one team from the first shoot to the last lead.`,
+    ],
+  },
+});
+
 function tagline(m: CapFacts): string {
-  return `Woman-owned food service and catering contractor · Small Business · ${m.city}, ${m.state}`;
+  return `${TRADE.tagline} · Small Business · ${m.city}, ${m.state}`;
 }
 
 function pastPerformanceBody(m: CapFacts): string {
@@ -144,16 +172,13 @@ function overviewBody(m: CapFacts): string {
   const list = places.length > 1 ? `${places.slice(0, -1).join(", ")} and ${places[places.length - 1]}` : places[0];
   return [
     `${m.businessName} is a woman-owned small business in ${m.city}, ${m.state}, founded ${m.formedOn}.`,
-    `${m.employees} staff and one commercial kitchen.`,
-    `We cook, pack and deliver meals for government buyers across ${list}.`,
+    TRADE.place(m),
+    TRADE.work(list),
   ].join(" ");
 }
 
 function competenciesBody(m: CapFacts): string {
-  return [
-    ...m.coreCapabilities,
-    "HACCP food-safety plan, USDA meal-pattern menus and daily temperature logs",
-  ].join("\n");
+  return [...m.coreCapabilities, TRADE.standard].join("\n");
 }
 
 function differentiatorsBody(m: CapFacts): string {
@@ -168,8 +193,7 @@ function certificationsBody(m: CapFacts): string {
     m.secondaryNaics.length ? `Other NAICS: ${m.secondaryNaics.join(" · ")}` : "",
     `SAM.gov: ${m.samLine}`,
     m.certifications.length ? `Certifications: ${m.certifications.join(" · ")}` : "",
-    `Food-handler certificates: ${m.foodHandlers} of ${m.employees} staff`,
-    `Largest bond carried: ${fmtUsd(m.largestBond)}`,
+    ...TRADE.proof(m),
   ]
     .filter(Boolean)
     .join("\n");
@@ -182,10 +206,7 @@ function contactBody(m: CapFacts): string {
 // A second take on some sections — used by "Regenerate".
 function alternates(m: CapFacts): Partial<Record<CapSectionId, string>> {
   return {
-    overview: [
-      `${m.businessName} is a woman-owned food service contractor based in ${m.city}, ${m.state}.`,
-      `One commercial kitchen and ${m.employees} staff mean a buyer deals with one team from the first menu to the last tray.`,
-    ].join(" "),
+    overview: TRADE.alternate(m).join(" "),
     differentiators: m.differentiators.slice(0, 3).map((d) => `• ${d}.`).join("\n"),
     competencies: [m.coreCapabilities.join(" · ") + "."].join("\n"),
   };
