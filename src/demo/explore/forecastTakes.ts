@@ -157,6 +157,10 @@ const AGENCY_BUYER_OF: [RegExp, string][] = [
   [/Program Contracting Activity Central/, "VA PCAC"],
   [/Network Contracting Office 6/, "VA NCO 6"],
   [/MARSOC/, "MARSOC"],
+  [/Wilmington District/, "USACE Wilmington"],
+  [/Savannah District/, "USACE Savannah"],
+  [/763rd Enterprise Sourcing Squadron/, "763 ESS Pope"],
+  [/Federal Aviation Administration/, "FAA"],
 ];
 
 function fiscalYear(day: string): number {
@@ -187,7 +191,11 @@ function agencyCounted(record: ForecastRecordDto, counted: Record<ForecastTakeCo
   if (rows.length === 0) return;
   const fys = rows.map((a) => a.recency.awardedAt).filter((d): d is string => !!d).map(fiscalYear);
   const years = `FY${Math.min(...fys)}–FY${Math.max(...fys)}`;
-  const matchedOn = "Advertising, marketing, design and video awards (NAICS 541810, 541613, 541430, 512110, 541820), NC, VA and SC";
+  // DEMO: the agency's wording is kept; other pack members name their own codes and states.
+  const matchedOn =
+    MEMBER === "agency"
+      ? "Advertising, marketing, design and video awards (NAICS 541810, 541613, 541430, 512110, 541820), NC, VA and SC"
+      : `Awards in your codes (NAICS ${[...AGENCY_TRADE].join(", ")}), ${AGENCY_STATES.join(", ")}`;
   const values = rows.map((a) => a.obligated ?? 0);
   const t = (kind: AwardTally["kind"], over: Partial<AwardTally> & Pick<AwardTally, "figure" | "countedOver">) =>
     tally(kind, matchedOn, { yearsCovered: years, ...over });

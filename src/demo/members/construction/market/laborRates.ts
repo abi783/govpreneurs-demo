@@ -1,93 +1,97 @@
-// THE AGENCY's labor pricing (read through src/lib/mock/laborRates.ts, which picks the
-// active member). Every rate is real:
+// THE CONTRACTOR's labor pricing (read through src/lib/mock/laborRates.ts, which picks
+// the active member). Source: demo-storyboard/construction-pack.md, "Wage rules".
+// Every rate is real:
 //
-// 1. The wage floor: the Service Contract Act wage determination for Cumberland and
-//    Hoke counties, NC, WD 2015-4377, Revision 33 (20 Aug 2026), for the creative
-//    titles it lists. Health and welfare is $5.92 an hour ($5.42 where Executive Order
-//    13706 paid sick leave applies). https://sam.gov/wage-determination/2015-4377/33
-//    (raw text: https://sam.gov/api/prod/wdol/v1/wd/2015-4377/33)
+// 1. The wage floor: Davis-Bacon general wage decision NC20260122, Mod 1 (18 May 2026),
+//    Building, Cumberland and Hoke counties, NC. It has no HVAC mechanic class;
+//    unlisted classes are added after award (29 CFR 5.5(a)(1)(iii)).
+//    https://sam.gov/wage-determination/NC20260122/1
+//    (raw text: https://sam.gov/api/prod/wdol/v1/wd/NC20260122/1)
 // 2. Comparable awards: the award record in awards.ts (each modeled on a real award).
-// 3. Labor categories: GSA CALC+ ceiling rates, current year, pulled 19 Oct 2026,
-//    for rows on the Marketing and Public Relations SINs (541810, 541430, 541613,
-//    512110, 541910, 541820). Low = 25th percentile, median, high = 75th percentile.
-//    Education is the most common stated minimum; experience is the median minimum.
-//    https://api.gsa.gov/acquisition/calc/v3/api/ceilingrates/?keyword=graphic%20designer&page=1&page_size=500
-// 4. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
-//    NC metro area (22180): graphic designers' median wage $23.63 an hour (series
-//    OEUM002218000000027102408). https://data.bls.gov/oes/
+// 3. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
+//    NC metro area (22180), hourly: low = 25th percentile, median, high = 75th
+//    percentile (series OEUM0022180000000<SOC><07|08|09>, pulled 19 Oct 2026).
+//    https://api.bls.gov/publicAPI/v2/timeseries/data/
+//    Education and experience are the usual entry for each trade, not from BLS.
+//
+// Base rates sit below local medians, but the pipefitter package ($47.44 an hour)
+// is far above local plumber and pipefitter pay. NC has no state prevailing-wage
+// law, so school and university jobs pay market wages.
 
 import type { ComparableAward, LcatRate, PrevailingWage } from "@/lib/mock/laborRates";
 
-const HEALTH_AND_WELFARE = 5.92;
-
 export const PREVAILING_WAGES: PrevailingWage[] = [
-  { trade: "Graphic Artist", baseHourly: 23.63, fringeHourly: HEALTH_AND_WELFARE, notes: "Layouts, production art and social graphics" },
-  { trade: "Illustrator II", baseHourly: 25.81, fringeHourly: HEALTH_AND_WELFARE, notes: "Designs ads and infographics from a brief" },
-  { trade: "Illustrator III", baseHourly: 31.57, fringeHourly: HEALTH_AND_WELFARE, notes: "Leads the design work on a campaign" },
-  { trade: "Photographer II", baseHourly: 19.35, fringeHourly: HEALTH_AND_WELFARE, notes: "Event and portrait shoots" },
-  { trade: "Photographer III", baseHourly: 23.97, fringeHourly: HEALTH_AND_WELFARE, notes: "Planned shoots, lighting and editing" },
-  { trade: "Photographer IV", baseHourly: 29.33, fringeHourly: HEALTH_AND_WELFARE, notes: "Senior photographer or videographer" },
-  { trade: "Media Specialist II", baseHourly: 20.83, fringeHourly: HEALTH_AND_WELFARE, notes: "Runs audiovisual and media equipment" },
+  { trade: "Electrician", baseHourly: 22.15, fringeHourly: 5.93, notes: "Panels, switchboards, feeders and controls wiring" },
+  { trade: "Pipefitter", baseHourly: 33.96, fringeHourly: 13.48, notes: "Price refrigerant and chilled-water piping here until the contracting officer names the class" },
+  { trade: "Sheet Metal Worker", baseHourly: 19.67, fringeHourly: 13.27, notes: "Ductwork and air handler connections" },
+  { trade: "Plumber", baseHourly: 23.4, fringeHourly: 0, notes: "Domestic water and drains" },
+  { trade: "Carpenter", baseHourly: 19.8, fringeHourly: 4.89, notes: "Framing, ceilings and patching after the trades" },
+  { trade: "Ironworker", baseHourly: 29.75, fringeHourly: 18, notes: "Steel supports and frames for new equipment" },
+  { trade: "Painter", baseHourly: 15.55, fringeHourly: 1.05 },
+  { trade: "Laborer (common)", baseHourly: 15, fringeHourly: 4.76, notes: "Demolition, cleanup and moving equipment" },
 ];
 
 export const PREVAILING_WAGE_META = {
-  county: "Cumberland County, NC",
-  determination: "WD 2015-4377, Rev. 33",
-  effectiveDate: "2026-08-20",
-  source: "U.S. Dept. of Labor — Service Contract Act wage determination (SAM.gov)",
+  county: "Cumberland and Hoke counties, NC",
+  determination: "NC20260122, Mod 1 (Building)",
+  effectiveDate: "2026-05-18",
+  source: "U.S. Dept. of Labor — Davis-Bacon general wage decision (SAM.gov)",
 };
 
 export const COMPARABLE_AWARDS: ComparableAward[] = [
   {
-    awardId: "W91247-19-P-1874",
-    title: "Print and digital advertisements, Army Community Service, Fort Bragg",
-    agency: "Army / MICC Fort Bragg",
-    awardValue: 356_624,
-    unitNote: "Two years of weekly print and digital ads, about $178K a year",
+    awardId: "W912PM26C0017",
+    title: "HVAC replacement, Special Operations building, Fort Bragg",
+    agency: "Army / USACE Wilmington District",
+    awardValue: 1_098_843,
+    unitNote: "A HUBZone sealed bid; the lowest of 9 bids won",
     location: "Fort Bragg, NC",
   },
   {
-    awardId: "W91242-25-P-A118",
-    title: "Digital recruiting campaign: NC Army National Guard (yours)",
-    agency: "Army / NC Army National Guard",
-    awardValue: 86_400,
-    unitNote: "12 months of videos, geofenced ads and lead routing, $7,200 a month",
-    location: "Raleigh, NC",
+    awardId: "FA445225C0019",
+    title: "HVAC and electrical repair, Pope office building (yours)",
+    agency: "Air Force / 763 ESS, Pope Army Airfield",
+    awardValue: 186_400,
+    unitNote: "Six heat pumps and a new 400A panel, one of 5 offers",
+    location: "Pope Army Airfield, NC",
   },
   {
-    awardId: "H92257-25-P-0041",
-    title: "Geofencing and lead-generation recruiting campaign, MARSOC",
-    agency: "Special Operations / MARSOC",
-    awardValue: 129_712,
-    unitNote: "The first year; up to $688K with the option years",
-    location: "Camp Lejeune, NC",
-  },
-  {
-    awardId: "36C24626P2971",
-    title: "Patient-education and outreach video production, Durham VA",
+    awardId: "36C24626C0093",
+    title: "Replace auxiliary chiller, Fayetteville VA",
     agency: "VA / Network Contracting Office 6",
-    awardValue: 200_000,
-    unitNote: "The first year; up to $800K with the option years",
-    location: "Durham, NC",
+    awardValue: 682_942,
+    unitNote: "One chiller and its pumps; 4 veteran-owned bids",
+    location: "Fayetteville, NC",
+  },
+  {
+    awardId: "6973GH24C00187",
+    title: "HVAC upgrade, FAA radar site, Raeford",
+    agency: "Transportation / FAA",
+    awardValue: 215_808,
+    unitNote: "A small job that drew 16 offers",
+    location: "Raeford, NC",
+  },
+  {
+    awardId: "FA445225P0057",
+    title: "Electrical and bathroom repair, Pope Army Airfield",
+    agency: "Air Force / 763 ESS, Pope Army Airfield",
+    awardValue: 63_863,
+    unitNote: "A small repair quote, one of 6 offers",
+    location: "Pope Army Airfield, NC",
   },
 ];
 
-// GSA CALC+ ceiling rates on the marketing SINs: 25th percentile, median, 75th percentile.
+// BLS local pay, Fayetteville metro, May 2025: 25th percentile, median, 75th percentile.
 export const LCAT_RATES: LcatRate[] = [
-  { id: "lcat-account-director", category: "Account Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 179.73, median: 205.8, high: 230.57 },
-  { id: "lcat-creative-director", category: "Creative Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 154.25, median: 185.53, high: 217.88 },
-  { id: "lcat-art-director", category: "Art Director", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 122.59, median: 145.95, high: 167.86 },
-  { id: "lcat-project-manager", category: "Project Manager (marketing)", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 119.72, median: 144.63, high: 177.22 },
-  { id: "lcat-account-executive", category: "Account Executive", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 107.06, median: 129.81, high: 157.88 },
-  { id: "lcat-copywriter", category: "Copywriter", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 105.58, median: 133.53, high: 153.05 },
-  { id: "lcat-video-producer", category: "Video Producer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 100.78, median: 123.56, high: 138.62 },
-  { id: "lcat-video-editor", category: "Video Editor", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 85.12, median: 93.13, high: 108.61 },
-  { id: "lcat-graphic-designer", category: "Graphic Designer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 87.58, median: 108.61, high: 132.93 },
-  { id: "lcat-media-buyer", category: "Media Buyer / Media Planner", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 98.72, median: 121.23, high: 146.6 },
-  { id: "lcat-social-media", category: "Social Media Manager / Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 102.87, median: 125.5, high: 142.02 },
-  { id: "lcat-digital-marketing", category: "Digital Marketing Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 131.52, median: 151.49, high: 167.12 },
-  { id: "lcat-web-developer", category: "Web Developer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 113.01, median: 138.08, high: 164.55 },
+  { id: "lcat-construction-supervisor", category: "Construction trades supervisor", experience: "7–15 yrs", education: "HS", location: "Fayetteville", low: 28.7, median: 33.74, high: 40.84 },
+  { id: "lcat-electrician", category: "Electrician", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 22.54, median: 27.74, high: 32.01 },
+  { id: "lcat-hvac-mechanic", category: "HVAC mechanic and installer", experience: "3–7 yrs", education: "Associate", location: "Fayetteville", low: 22.52, median: 27.03, high: 30.22 },
+  { id: "lcat-plumber-pipefitter", category: "Plumber, pipefitter and steamfitter", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 21.68, median: 24.87, high: 29.92 },
+  { id: "lcat-carpenter", category: "Carpenter", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 20.5, median: 22.5, high: 27.31 },
+  { id: "lcat-sheet-metal", category: "Sheet metal worker", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 21.84, median: 22.12, high: 26.69 },
+  { id: "lcat-painter", category: "Painter (construction)", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 16.87, median: 20, high: 22.51 },
+  { id: "lcat-laborer", category: "Construction laborer", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 17.31, median: 21.03, high: 23.41 },
 ];
 
-/** BLS, May 2025: a Fayetteville graphic designer's median pay, an hour. */
-export const LOCAL_DESIGNER_MEDIAN = 23.63;
+/** BLS, May 2025: a Fayetteville electrician's median pay, an hour. (The name is the agency's export.) */
+export const LOCAL_DESIGNER_MEDIAN = 27.74;
