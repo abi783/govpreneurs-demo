@@ -31,6 +31,8 @@ export const FOR_YOU_NAICS = ["541810", "541613", "541430", "512110", "541820"];
  */
 export const FOR_YOU_NOTE = {
   hunter: "DLA's small orders are parts and supplies. None fit an ad agency, so I'm not showing you any.",
+  emptyHead: "Nothing on this board fits your business.",
+  emptyBody: "DLA buys parts and supplies here. Small video and design jobs are on Opportunities.",
   link: { label: "See video and design jobs", to: "/opportunities" },
 } as const;
 
