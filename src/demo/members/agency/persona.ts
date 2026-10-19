@@ -138,7 +138,7 @@ export const MENTOR: MentorProfile = {
 /** The veteran-owned prime at the center of the VA team-up. Fictional. */
 export const KEY_PARTNER: Partner = {
   name: "Bluestone Veteran Media Group",
-  contact: "Marcus Hale",
+  contact: "Andre Hale",
   contactTitle: "Capture Director",
   city: "Arlington, VA",
   holds: "Recruitment and outreach campaigns for federal health and veterans agencies",

@@ -153,7 +153,7 @@ export const TAKE_COPY = {
   setAside: (s: number, e: number, capped: boolean) =>
     capped
       ? `**${s} of ${e}** awards read for this office carried a set-aside. The office has at least ${e} awards on record.`
-      : `**${s} of ${e}** awards on record for this office carried a set-aside.`,
+      : `**${s} of ${e}** ${e === 1 ? "award" : "awards"} on record for this office carried a set-aside.`,
   upcoming: (n: string, naics: string | null, bold: boolean) => {
     const count = bold ? `**${n}**` : n;
     const other = n === "1" ? "other active forecast" : "other active forecasts";

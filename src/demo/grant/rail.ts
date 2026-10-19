@@ -163,7 +163,7 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
       return `No one can promise a win. ${readOf("Can you win it?")} ${a.verdict.competitiveRisk ? `Your main competition: ${plain(a.verdict.competitiveRisk)}.` : ""}`.trim();
     case "time": {
       const { lead, runway } = runwayOf(a, f);
-      return `The ${offer} is due in ${f.daysLeft} days. After ${lead} days for references, writing and quotes, you have about ${Math.max(runway, 0)} days. ${runway <= 7 ? "That is tight." : "That is enough if you start now."}${UNCERTIFIED > 0 && d.personnel.length > 0 && /certificate/i.test(plain(a.verdict.warnings?.map((w) => w.summary).flat() ?? [])) ? ` The item with a lead time is the food-handler certificates for your last ${UNCERTIFIED} cooks.` : ""}`;
+      return `The ${offer} is due in ${f.daysLeft} days. After ${lead} days for references, writing and quotes, you have about ${Math.max(runway, 0)} ${runway === 1 ? "day" : "days"}. ${runway <= 7 ? "That is tight." : "That is enough if you start now."}${UNCERTIFIED > 0 && d.personnel.length > 0 && /certificate/i.test(plain(a.verdict.warnings?.map((w) => w.summary).flat() ?? [])) ? ` The item with a lead time is the food-handler certificates for your last ${UNCERTIFIED} cooks.` : ""}`;
     }
     case "weak":
       return `${mainLimit(a)} ${a.verdict.warnings?.[1] ? plain(a.verdict.warnings[1].summary) : ""}`.trim();
