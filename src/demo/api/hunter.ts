@@ -28,6 +28,7 @@ import { takesFor } from "../hunter/takes";
 import { naicsDescriptions, searchNaics, searchPsc } from "../hunter/naicsData";
 import { completePayload, enrichmentState } from "../hunter/enrichment";
 import { MEMBER_CODES } from "../hunter/facts";
+import { VOCAB } from "../hunter/vocab";
 import { handleHunterMessage, resetChat } from "../hunter/chat/engine";
 import { confirmProposal, rejectProposal } from "../hunter/chat/profile";
 import { STATES } from "../../lib/vocab/usStates";
@@ -145,7 +146,7 @@ export const routes: DemoRouteDef[] = [
         hasCapabilityStatement: true,
         hasLiveMatches: true,
         hasProfileVector: true,
-        alliedNaics: [...MEMBER_CODES, "722410", "722511", "722513", "722514", "722515", "561210"],
+        alliedNaics: [...MEMBER_CODES, ...VOCAB.api.alliedNaics],
       };
       return res;
     },
@@ -190,7 +191,7 @@ export const routes: DemoRouteDef[] = [
         naics: [...MEMBER_CODES],
         states: [...PERSONA.serviceStates],
         setAsides: ["WOSB", "SB"],
-        trades: ["food_service_and_catering"],
+        trades: [VOCAB.api.trade],
         cities: [{ city: PERSONA.hqCity, state: PERSONA.hqState }],
         serviceArea: "state_plus_neighbors",
       },

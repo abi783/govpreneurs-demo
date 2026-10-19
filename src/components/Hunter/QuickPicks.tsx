@@ -1,11 +1,7 @@
-// DEMO: examples for Haddad Catering, a woman-owned caterer in Fayetteville, NC.
-const PICKS = [
-  "Catering NC $250K–$1M",
-  "Woman-owned set-asides closing in 30 days",
-  "Fort Bragg dining and field meals",
-  "VA patient meals I qualify for",
-  "Partner opportunities — local NC primes",
-];
+import { VOCAB } from "../../demo/hunter/vocab";
+
+// DEMO: examples true for the sample member (src/demo/members/<member>/hunter/vocab.ts).
+const PICKS = VOCAB.ui.quickPicks;
 
 export function QuickPicks({ onPick }: { onPick: (text: string) => void }) {
   return (

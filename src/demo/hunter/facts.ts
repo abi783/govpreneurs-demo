@@ -3,10 +3,14 @@
 // (`persona.ts`, `opportunities.ts`, `places.ts`). Nothing is typed twice.
 
 import { money } from "../../lib/money";
-import { PAST_PERFORMANCE, findPastPerformance, PERSONA, type PastPerformance } from "../story/persona";
+import { findPastPerformance, PERSONA, type PastPerformance } from "../story/persona";
 import type { FitFact } from "../story/opportunities";
 import { longDate } from "./dates";
 import type { FeedRow } from "./data";
+import { VOCAB } from "./vocab";
+
+/** "from your kitchen", "from your office". */
+export const FROM_BASE = `from your ${VOCAB.base}`;
 
 /** The member's NAICS codes, primary first. */
 export const MEMBER_CODES: string[] = [
@@ -54,32 +58,38 @@ export function aboutValue(row: FeedRow): string {
   return `about ${money(mid)}${row.o.valueBasis === "per_year" ? " a year" : ""}`;
 }
 
-/** How far the place is from the kitchen, in words. */
-export function distanceText(row: FeedRow): string {
-  if (row.miles <= 5) return "in your own town";
-  if (row.miles <= 60)
-    return row.miles <= 20
-      ? `${row.miles} miles from your kitchen`
-      : `${row.miles} miles from your kitchen, under an hour`;
-  return `${row.miles} miles from your kitchen`;
-}
-
 /** The short form for a fit line. */
 export function distanceShort(row: FeedRow): string {
-  if (row.miles <= 5) return "in your hometown";
-  if (row.miles <= 60) return "under an hour from your kitchen";
-  if (row.miles <= PERSONA.serviceRadiusMiles) return `${row.miles} miles from your kitchen`;
+  if (row.miles <= 5) return VOCAB.hometown;
+  if (row.miles <= 60) return `under an hour ${FROM_BASE}`;
+  if (row.miles <= PERSONA.serviceRadiusMiles) return `${row.miles} miles ${FROM_BASE}`;
   return `${row.miles} miles away, outside your ${PERSONA.serviceRadiusMiles}-mile area`;
+}
+
+/** Who a set-aside is for, by SAM code. */
+const SET_ASIDE_FOR: Record<string, { name: string; firms: string }> = {
+  WOSB: { name: "Woman-owned (WOSB)", firms: "woman-owned small businesses" },
+  SBA: { name: "Small business", firms: "small businesses" },
+  SDVOSBC: {
+    name: "Service-disabled veteran-owned (SDVOSB)",
+    firms: "service-disabled veteran-owned firms",
+  },
+};
+
+/** "Woman-owned (WOSB)", for the readiness card. */
+export function setAsideName(row: FeedRow): string {
+  return SET_ASIDE_FOR[row.setAside]?.name ?? row.setAside;
 }
 
 /** Plain name of the set-aside, and whether the member holds it. */
 export function setAsideText(row: FeedRow): string {
   if (row.setAside === "WOSB") return "a woman-owned set-aside";
   if (row.setAside === "SBA") return "a small-business set-aside";
+  if (row.setAside === "SDVOSBC") return "a service-disabled veteran-owned set-aside";
   return "open to every business";
 }
 
-/** The member holds every set-aside the story uses (WOSB and small business). */
+/** True when the member can compete for the set-aside (or there is none). */
 export function holdsSetAside(row: FeedRow): boolean {
   if (!row.setAside) return true;
   return (PERSONA.setAsideEligibility as readonly string[]).includes(row.setAside);
@@ -87,19 +97,8 @@ export function holdsSetAside(row: FeedRow): boolean {
 
 /** A past job that matches this notice, by what the notice is about. */
 export function pastJobFor(row: FeedRow): PastPerformance | undefined {
-  const text = `${row.o.plainTitle} ${row.o.agency} ${row.o.office}`.toLowerCase();
-  const byId = (id: PastPerformance["id"]) => findPastPerformance(id);
-  if (row.o.naics === "722320") return byId("pp-church");
-  if (/patient|hospital|medical|nutrition|veterans/.test(text)) return byId("pp-womack");
-  if (/school|cafeteria|child nutrition|senior|detention|meal program|meals for/.test(text)) {
-    return byId("pp-county-schools");
-  }
-  if (
-    /fort bragg|camp mackall|pope|dining|army|mess|barracks|airfield|flight line|lodging/.test(text)
-  ) {
-    return byId("pp-cdg-sub");
-  }
-  return byId("pp-county-schools");
+  const id = VOCAB.pastJobId(row);
+  return id ? findPastPerformance(id) : undefined;
 }
 
 /** One past job as a short phrase: "Cumberland County Schools summer meals, $198K". */
@@ -139,7 +138,8 @@ export function noticeText(row: FeedRow): string {
 export function fitSentence(row: FeedRow, f: FitFact): string {
   switch (f.kind) {
     case "naics":
-      return `It uses your food-service code, NAICS ${f.code} (${row.naicsLabel}).`;
+      // The story's own words for the code ("your food-service code"), as the card's line says them.
+      return `It uses ${f.says}, NAICS ${f.code} (${row.naicsLabel}).`;
     case "setAside":
       return f.code === "WOSB"
         ? "Only woman-owned small businesses can compete for it, and you are one."
@@ -147,13 +147,13 @@ export function fitSentence(row: FeedRow, f: FitFact): string {
     case "providerLock":
       return "The work is written around one provider's own platform and crew, so other firms can't meet it as written.";
     case "setAsideGap":
-      return "It is set aside for a group you are not in, so the way in is as a subcontractor.";
+      return `It is set aside for ${SET_ASIDE_FOR[row.setAside]?.firms ?? "a group you are not in"}, and you are not one, so the way in is as a subcontractor.`;
     case "valueInRange":
       return `The value is ${aboutValue(row)}. That is inside your ${RANGE_TEXT} range.`;
     case "valueAboveRange":
       return `The value is ${aboutValue(row)}. That is above your ${RANGE_TEXT} range, so it may be a team job.`;
     case "distance":
-      return `The site is ${row.miles} miles from your kitchen in ${PERSONA.hqCity}.`;
+      return `${VOCAB.place} is ${row.miles} miles ${FROM_BASE} in ${PERSONA.hqCity}.`;
     case "pastPerformance": {
       const p = findPastPerformance(f.id);
       return p
@@ -191,6 +191,9 @@ export function reasonList(row: FeedRow): string[] {
     const ordered = [...fit].sort(
       (a, b) => Number(a.kind === "clearanceGap") - Number(b.kind === "clearanceGap"),
     );
+    // A provider lock or a set-aside she does not hold always shows, in third place.
+    const gap = fit.find((f) => f.kind === "providerLock" || f.kind === "setAsideGap");
+    if (gap) return [...ordered.filter((f) => f !== gap).slice(0, 2), gap].map(reasonOf);
     return ordered.slice(0, 3).map(reasonOf);
   }
   const out: string[] = [];
@@ -202,10 +205,7 @@ export function reasonList(row: FeedRow): string[] {
 
 /** "your food-service code" for the member's primary code, and so on. */
 export function codePhrase(row: FeedRow): string {
-  if (row.o.naics === PERSONA.primaryNaics) return "your food-service code";
-  if (row.o.naics === "722320") return "your catering code";
-  if (row.o.naics === "722330") return "your mobile-food code";
-  return "one of your codes";
+  return VOCAB.codePhrases[row.o.naics] ?? "one of your codes";
 }
 
 /** The Hunter line for a card: the story line, or a short true line built from the story facts. */
@@ -241,7 +241,7 @@ export function generatedLine(row: FeedRow): string {
   } else if (row.miles <= 60) {
     parts.push(distanceShort(row));
   } else {
-    tail.push(`it is ${row.miles} miles from your kitchen`);
+    tail.push(`it is ${row.miles} miles ${FROM_BASE}`);
   }
   const lead = `${cap(o.plainTitle)}: ${joinList(parts)}.`;
   if (tail.length === 0) return lead;

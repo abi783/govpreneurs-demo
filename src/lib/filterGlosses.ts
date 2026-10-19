@@ -3,6 +3,7 @@
 // each filter without GovCon knowledge.
 
 import { setAsideDisplayLabel } from "./oppDisplay";
+import { VOCAB } from "../demo/hunter/vocab";
 
 export type Gloss = { label: string; gloss: string };
 
@@ -35,8 +36,8 @@ export const FACET_GLOSS: Record<string, Gloss> = {
   },
   naics: {
     label: "NAICS code",
-    // DEMO: the sample member's own code is 722310, Food Service Contractors.
-    gloss: "The government's industry codes — we've prefilled yours (722310 Food Service Contractors).",
+    // DEMO: the sample member's own code (src/demo/members/<member>/hunter/vocab.ts).
+    gloss: VOCAB.ui.naicsGloss,
   },
   psc: {
     label: "PSC / FSC code",

@@ -5,8 +5,10 @@
 import type { HunterFilterDelta } from "../../../lib/hunterChat";
 import { money } from "../../../lib/money";
 import { PERSONA } from "../../story/persona";
+import { OPPORTUNITIES } from "../../story/opportunities";
 import { PLACES } from "../../story/places";
 import { stateName } from "../../../lib/vocab/usStates";
+import { VOCAB } from "../vocab";
 
 export interface ParsedFilters {
   delta: HunterFilterDelta;
@@ -121,11 +123,12 @@ const INSTALLATIONS: { rx: RegExp; search: string }[] = [
   { rx: /\bjoint base charleston\b/, search: "Joint Base Charleston" },
 ];
 
-/** The cities that are no more than `miles` from the kitchen. */
+/** The cities that are no more than `miles` from the member's base, among the places her notices name. */
 export function citiesWithin(miles: number): string[] {
+  const used = new Set<string>(OPPORTUNITIES.map((o) => o.place));
   const out = new Set<string>();
-  for (const p of Object.values(PLACES)) {
-    if (p.milesFromBase <= miles && !/Multiple/.test(p.city)) out.add(p.city);
+  for (const [key, p] of Object.entries(PLACES)) {
+    if (used.has(key) && p.milesFromBase <= miles && !/Multiple/.test(p.city)) out.add(p.city);
   }
   return [...out];
 }
@@ -319,9 +322,14 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
 
   // Places: installations first, then cities, then states
   const within = norm.match(/\bwithin\s+(\d{1,3})\s*(?:miles|mi)\b/);
+  // "State and local" names a buyer lane, not a place near her.
+  const placeWords = norm.replace(
+    /\bstate (and|&|or) local\b|\blocal (government|buyers?)\b/g,
+    " ",
+  );
   const near =
-    /\b(near|nearby|close to|closest|around|local|close by|around me|near me|near my kitchen|near my place|short drive)\b/.test(
-      norm,
+    /\b(near|nearby|close to|closest|around|local|close by|around me|near me|near my (kitchen|office|studio|place)|short drive)\b/.test(
+      placeWords,
     );
   const installation = INSTALLATIONS.find((i) => i.rx.test(norm));
   const cityHits = CITY_NAMES.filter((c) => c.rx.test(norm)).map((c) => c.city);
@@ -331,21 +339,21 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   } else if (within) {
     const miles = Number(within[1]);
     delta.cities = citiesWithin(miles);
-    mods.push(`within ${miles} miles of your kitchen`);
+    mods.push(`within ${miles} miles of your ${VOCAB.base}`);
   } else if (cityHits.length > 0 && near && cityHits.includes("Fayetteville")) {
     delta.cities = citiesWithin(NEAR_MILES);
-    mods.push(`within ${NEAR_MILES} miles of your kitchen in ${PERSONA.hqCity}`);
+    mods.push(`within ${NEAR_MILES} miles of your ${VOCAB.base} in ${PERSONA.hqCity}`);
   } else if (cityHits.length > 0) {
     delta.cities = cityHits;
     mods.push(`in ${cityHits.join(" and ")}`);
   } else if (
     near &&
-    /\b(me|my kitchen|my place|my area|my town|my location|close by|nearby|home)\b|^(show|find|give).*\b(near|nearby|local|close)\b/.test(
-      norm,
+    /\b(me|my kitchen|my office|my studio|my place|my area|my town|my location|close by|nearby|home)\b|^(show|find|give).*\b(near|nearby|local|close)\b/.test(
+      placeWords,
     )
   ) {
     delta.cities = citiesWithin(NEAR_MILES);
-    mods.push(`within ${NEAR_MILES} miles of your kitchen`);
+    mods.push(`within ${NEAR_MILES} miles of your ${VOCAB.base}`);
   }
   const states = stateCodes(raw, norm).filter(() => !installation && !delta.cities);
   if (states.length > 0) {
@@ -353,34 +361,12 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
     mods.push(`in ${states.map((s) => stateName(s)).join(" and ")}`);
   }
 
-  // Work type
-  if (/\bfood service contractors?\b|\bfood service work\b/.test(norm)) {
-    delta.naics = [PERSONA.primaryNaics];
-    nouns.push(`${PERSONA.primaryNaicsLabel} work (NAICS ${PERSONA.primaryNaics})`);
-  } else if (/\bmobile food|food trucks?\b/.test(norm)) {
-    delta.naics = ["722330"];
-    nouns.push("Mobile Food Services work (NAICS 722330)");
-  } else if (/\b(catering|caterers?)\b/.test(norm)) {
-    search.push("catering");
-    nouns.push("catering opportunities");
-  } else if (/\bdining (halls?|facilit\w+)\b|\bdfacs?\b/.test(norm)) {
-    search.push("dining");
-    nouns.push("dining facility opportunities");
-  } else if (/\bschools?\b|\bchild nutrition\b|\bstudents?\b/.test(norm)) {
-    search.push("school");
-    nouns.push("school meal opportunities");
-  } else if (/\bhospitals?\b|\bpatients?\b|\bmedical center\b|\bnutrition\b/.test(norm)) {
-    search.push("patient");
-    nouns.push("hospital and patient meal opportunities");
-  } else if (/\bcafeterias?\b|\bcafe\b/.test(norm)) {
-    search.push("cafeteria");
-    nouns.push("cafeteria opportunities");
-  } else if (/\b(boxed|box|grab and go|grab-and-go|field meals?|field feeding)\b/.test(norm)) {
-    search.push("meals");
-    nouns.push("meal-delivery opportunities");
-  } else if (/\bsenior\w*\b/.test(norm)) {
-    search.push("senior");
-    nouns.push("senior meal opportunities");
+  // Work type: the member's own work words, first match wins.
+  const work = VOCAB.workTypes.find((w) => w.rx.test(norm));
+  if (work) {
+    if (work.naics) delta.naics = work.naics;
+    if (work.search) search.push(work.search);
+    nouns.push(work.noun);
   }
 
   if (search.length > 0) delta.search = [...new Set(search)].join(" ");

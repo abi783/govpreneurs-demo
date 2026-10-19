@@ -6,10 +6,11 @@
 // uses, the codes of every trade in the Filters drawer, and the common codes
 // that a visitor may type, so a search always finds something real.
 //
-// The member's own four codes sit first in every result list. The list leaves out
+// The member's own codes sit first in every result list. The list leaves out
 // the trade code of the old sample member, because it is not this member's business.
 
 import { PERSONA } from "../story/persona";
+import { VOCAB } from "./vocab";
 
 export interface CodeRow {
   code: string;
@@ -102,8 +103,24 @@ const NAICS: CodeRow[] = [
     code: "541715",
     description: "Research and Development in the Physical, Engineering, and Life Sciences",
   },
+  // Advertising, marketing and media: the agency's lane
   { code: "541810", description: "Advertising Agencies" },
   { code: "541820", description: "Public Relations Agencies" },
+  { code: "541613", description: "Marketing Consulting Services" },
+  { code: "541430", description: "Graphic Design Services" },
+  { code: "541490", description: "Other Specialized Design Services" },
+  { code: "541830", description: "Media Buying Agencies" },
+  { code: "541840", description: "Media Representatives" },
+  { code: "541850", description: "Indoor and Outdoor Display Advertising" },
+  { code: "541860", description: "Direct Mail Advertising" },
+  { code: "541870", description: "Advertising Material Distribution Services" },
+  { code: "541890", description: "Other Services Related to Advertising" },
+  { code: "541910", description: "Marketing Research and Public Opinion Polling" },
+  { code: "541921", description: "Photography Studios, Portrait" },
+  { code: "541922", description: "Commercial Photography" },
+  { code: "512110", description: "Motion Picture and Video Production" },
+  { code: "512191", description: "Teleproduction and Other Postproduction Services" },
+  { code: "323111", description: "Commercial Printing (except Screen and Books)" },
   { code: "541930", description: "Translation and Interpretation Services" },
   { code: "541990", description: "All Other Professional, Scientific, and Technical Services" },
   {
@@ -210,6 +227,10 @@ const PSC: CodeRow[] = [
   { code: "S208", description: "HOUSEKEEPING- LANDSCAPING/GROUNDSKEEPING" },
   { code: "S209", description: "HOUSEKEEPING- LAUNDRY/DRY CLEANING" },
   { code: "S216", description: "HOUSEKEEPING- FACILITIES OPERATIONS SUPPORT" },
+  // Advertising and media
+  { code: "R701", description: "SUPPORT- MANAGEMENT: ADVERTISING" },
+  { code: "R708", description: "SUPPORT- MANAGEMENT: PUBLIC RELATIONS" },
+  { code: "T001", description: "PHOTO/MAP/PRINT/PUBLICATION- ARTS/GRAPHICS" },
   // Professional and administrative support
   { code: "R408", description: "SUPPORT- PROFESSIONAL: PROGRAM MANAGEMENT/SUPPORT" },
   { code: "R499", description: "SUPPORT- PROFESSIONAL: OTHER" },
@@ -301,6 +322,23 @@ const ALIASES: Record<string, string[]> = {
   cyber: ["computer systems", "computer related"],
   lodging: ["hotels", "accommodation"],
   hotel: ["hotels"],
+  // Marketing words
+  ad: ["advertising"],
+  ads: ["advertising"],
+  marketing: ["marketing", "advertising"],
+  branding: ["advertising", "marketing", "design"],
+  campaign: ["advertising", "marketing"],
+  video: ["video", "teleproduction"],
+  film: ["motion picture", "video"],
+  pr: ["public relations"],
+  publicity: ["public relations"],
+  graphics: ["graphic design"],
+  logo: ["graphic design"],
+  social: ["advertising", "marketing", "media"],
+  media: ["media", "advertising", "marketing"],
+  digital: ["advertising", "marketing"],
+  billboard: ["outdoor display"],
+  photo: ["photography"],
 };
 
 /** A word cut to its root, so "catering" and "caterers" meet at "cater". */
@@ -324,7 +362,10 @@ function scoreRow(row: CodeRow, queryTokens: string[]): number {
   for (const t of queryTokens) {
     const s = stem(t);
     const alias = (ALIASES[t] ?? []).some((a) => row.description.toLowerCase().includes(a));
-    const prefix = words.some((w) => w.startsWith(t)) || wordStems.some((w) => w.startsWith(s));
+    // A two-letter word ("pr", "ad") is an abbreviation, not the start of every word.
+    const prefix =
+      t.length > 2 &&
+      (words.some((w) => w.startsWith(t)) || wordStems.some((w) => w.startsWith(s)));
     const inside = row.description.toLowerCase().includes(t);
     if (prefix) score += 3;
     else if (alias) score += 2;
@@ -365,9 +406,9 @@ export function searchNaics(q: string, limit = 20): CodeRow[] {
   );
 }
 
-/** PSC codes that match a code prefix or words. The food codes come first. */
+/** PSC codes that match a code prefix or words. The member's main code comes first. */
 export function searchPsc(q: string, limit = 20): CodeRow[] {
-  return search(PSC, q, limit, (r) => (r.code === "S203" ? 4 : 0));
+  return search(PSC, q, limit, (r) => (r.code === VOCAB.mainPsc ? 4 : 0));
 }
 
 /** Every NAICS code the demo holds. The tests read it. */
