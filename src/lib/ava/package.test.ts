@@ -47,8 +47,10 @@ function model(fixture: AvaBid, s: BidState) {
 
 describe("page 3: the package", () => {
   test("a file name reads as the part she sends", () => {
-    expect(partLabel(BIDS[0], "1_Proposal_HaddadCatering.pdf")).toBe("Proposal");
-    expect(partLabel(BIDS[0], "4_Certificates_HaddadCatering.pdf")).toBe("Certificates");
+    // DEMO: the member on stage's name closes the file name.
+    const name = BIDS[0].samLegalName.replace(/\s+LLC$/, "").replace(/[^A-Za-z]/g, "");
+    expect(partLabel(BIDS[0], `1_Proposal_${name}.pdf`)).toBe("Proposal");
+    expect(partLabel(BIDS[0], `4_Certificates_${name}.pdf`)).toBe("Certificates");
   });
 
   test("copies of the original are not parts of their own", () => {

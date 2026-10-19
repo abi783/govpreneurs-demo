@@ -24,11 +24,17 @@ export interface ReferenceContact {
   email: string;
 }
 
-/** The member's three references. Janet Reyes matches the Government Buyers page. */
+/** Each member's references, one phone and one email each. Janet Reyes matches
+ *  the Government Buyers page. DEMO: the caterer's three come first; the
+ *  agency's three (fixtures/familyAdvocacy.ts) follow. Owen Pryor is the
+ *  officer her NC Guard contract names; the other two are on her jobs list. */
 export const REFERENCE_CONTACTS = {
   janetReyes: { phone: "(910) 555-0183", email: "j.reyes@ccs.k12.nc.us.sample" },
   mikeSutton: { phone: "(910) 555-0172", email: "mike.sutton@carolinadininggroup.example" },
   pastorHall: { phone: "(910) 555-0191", email: "pastor.hall@riversidefellowship.example" },
+  owenPryor: { phone: "(919) 555-0148", email: "owen.pryor@army.mil.example" },
+  teresaWynn: { phone: "(910) 555-0126", email: "teresa.wynn@fayettevillenc.gov.example" },
+  gloriaPratt: { phone: "(910) 555-0159", email: "gloria.pratt@longleafhomehealth.example" },
 } as const satisfies Record<string, ReferenceContact>;
 
 /** The member's tax ID, as she types it on a W-9. One number for every bid. */

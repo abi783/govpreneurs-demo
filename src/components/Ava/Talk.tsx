@@ -28,6 +28,7 @@ import { fullDate } from "../../lib/ava/dates";
 import { buyerWord } from "../../lib/ava/flow";
 import { threadOf, type Turn } from "../../lib/ava/thread";
 import { currentMember } from "../../demo/ava/member";
+import { byMember } from "../../demo/member";
 import { openOutside } from "./outside";
 import { keepPaper } from "./paperFiles";
 import { SendToMentorModal } from "./SendToMentorModal";
@@ -444,7 +445,12 @@ export function Talk({
     const ask = q.ask;
     if (ask?.answer.type === "enter" && ask.answer.fields.length === 1) {
       const f = ask.answer.fields[0];
-      if (f.unit === "text") return "We cook every meal fresh in our own kitchen.";
+      // DEMO: a sample answer in the member's own trade.
+      if (f.unit === "text")
+        return byMember({
+          caterer: "We cook every meal fresh in our own kitchen.",
+          agency: "We shoot, edit and caption every video in our own studio.",
+        });
       if (f.unit === "phone") return "(910) 555-0100";
       if (f.unit === "email") return "name@example.com";
       return String(f.floor ? Math.ceil(f.floor.value) : 12);

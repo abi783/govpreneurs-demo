@@ -5,7 +5,7 @@
 // the product can really get into.
 
 import { DEMO, effectiveBid } from "./derive";
-import { getAvaBid } from "./fixtures";
+import { getAvaBid, MEMBER_ANSWERS } from "./fixtures";
 import {
   checkFixes,
   checkSig,
@@ -42,9 +42,14 @@ export function answerQuestion(bid: AvaBid, s: BidState, q: Question): BidState 
     return { ...s, mustHave: { ...s.mustHave, [q.rule!.id]: { says: "have", at } }, trail };
   }
   if ((q.kind === "ask" || q.kind === "must") && q.ask) {
+    // DEMO: a bid that keeps the member's own answers plays with them.
+    const hers = MEMBER_ANSWERS[bid.noticeId]?.[q.ask.id];
     return {
       ...s,
-      answers: { ...s.answers, [q.ask.id]: sampleAnswer(q.ask, roleFloors(bid), at) },
+      answers: {
+        ...s.answers,
+        [q.ask.id]: hers ? { ...hers, at } : sampleAnswer(q.ask, roleFloors(bid), at),
+      },
       trail,
     };
   }
