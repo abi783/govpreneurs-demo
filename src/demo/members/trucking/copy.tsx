@@ -15,14 +15,15 @@ import { fmtRate, type LcatLocation } from "@/lib/mock/laborRates";
 import type { MicroState } from "@/lib/state/microPurchases";
 import type { TrackedItem } from "@/lib/stayReady";
 import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
+import { LOCAL_DESIGNER_MEDIAN } from "./market/laborRates";
 import { PAST_PERFORMANCE, PERSONA } from "./persona";
 
 function k(n: number): string {
   return n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M` : `${Math.round(n / 1000)}K`;
 }
 
-/** Fayetteville metro median hourly pay for heavy and tractor-trailer drivers, BLS May 2025 (trucking-pack.md, Wage rules). */
-const LOCAL_TRUCK_DRIVER_MEDIAN = 24.03;
+/** Fayetteville metro median hourly pay for heavy and tractor-trailer drivers, BLS May 2025 (market/laborRates.ts). */
+const LOCAL_TRUCK_DRIVER_MEDIAN = LOCAL_DESIGNER_MEDIAN;
 
 /** Days before the demo opens (sc/timeline.ts). */
 export const HISTORY = {
@@ -55,12 +56,8 @@ export const ROADMAP_DONE_DATES: Record<string, { started?: number; done: number
 /** What her CMMC Level 1 self-assessment covers. */
 export const CMMC_SCOPE = "Dispatch, GPS tracking, billing and office systems";
 
-/**
- * The size of her capability statement in public/demo-files
- * (scripts/make-capability-statement.ts writes it). Still the agency's number:
- * the Success Center pass adds her COPY lines and resets it.
- */
-export const CAPABILITY_STATEMENT_BYTES = 3305;
+/** The size of her capability statement in public/demo-files (scripts/make-capability-statement.ts writes it). */
+export const CAPABILITY_STATEMENT_BYTES = 3501;
 
 /** What she calls a job when she says how many she can run at once (My Business, "Tell us"). */
 export const JOB_WORDS = /\b(jobs|routes|runs|loads|contracts|lanes)\b/i;

@@ -5,6 +5,9 @@
 //      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
 //      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
 //      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
+//      DEMO_MEMBER=trucking bun scripts/make-capability-statement.ts     (Rockfish Run Freight)
+//      DEMO_MEMBER=janitorial bun scripts/make-capability-statement.ts   (Gray Owl Facility Services)
+//      DEMO_MEMBER=consulting bun scripts/make-capability-statement.ts   (Coppervale Advisory Group)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -50,17 +53,60 @@ const COPY = {
       ["Bonding", `$${(PERSONA.bondLine?.single ?? 0) / 1_000_000}M a job · $${(PERSONA.bondLine?.aggregate ?? 0) / 1_000_000}M in total`],
     ] as [string, string][],
   },
-  // The pack's line (it-services-pack.md §1).
+  // The pack's line (it-services-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/it/sc/business.ts).
   it: {
     who: `8(a) IT services firm 12 miles from Fort Bragg: help desk, desktop and video-conference support, Microsoft 365 and SharePoint admin, and network support, with Security+ techs who already work on Army and Air Force networks. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, South Carolina and Virginia.`,
     capabilities: [
       ...PERSONA.differentiators,
+      "Office and repair bench on Raeford Rd. Four imaging stations, 40 loaner laptops and cable testers",
       "Imaging and asset tracking, from one office to 4,800 devices in a summer",
       "CMMC Level 1 (Self), affirmed in SPRS",
     ],
     extraRows: [
       ["PSC", "PSC DE01 · DG01"],
       ["Contract vehicles", "GSA MAS, SIN 54151S"],
+    ] as [string, string][],
+  },
+  // The pack's line (trucking-pack.md §1). The fleet and PSC lines are what
+  // My Business reads off this file (members/trucking/sc/business.ts).
+  trucking: {
+    who: `Service-disabled veteran-owned trucking company 12 miles from Fort Bragg: scheduled box-truck routes, dry-van and refrigerated truckload across NC, SC and VA, and on-call trailer and container moves, run by a former Army truck driver. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff, 12 of them drivers.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Truck yard and shop on Gillespie St. 7 tractors, 9 trailers, 4 box trucks with lift gates and a cargo van",
+      "Our own drivers in our own trucks; we don't broker loads",
+    ],
+    extraRows: [
+      ["PSC", "PSC V111 · V119"],
+      ["Authority", "USDOT and MC operating authority since 2017 · SCAC"],
+      ["Contract vehicles", "None yet (not in SDDC's carrier program)"],
+    ] as [string, string][],
+  },
+  // The pack's line (janitorial-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/janitorial/sc/business.ts).
+  janitorial: {
+    who: `HUBZone janitorial and facilities firm 12 miles from Fort Bragg: night custodial crews, floor care, and hot-water pressure washing with wash-water recovery. Crews badged for Fort Bragg and Seymour Johnson. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, within ${PERSONA.serviceRadiusMiles} miles of our yard.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office and equipment yard on Gillespie St. Two hot-water pressure-washing trailers (3,500 psi), a wash-water recovery kit, burnishers and carpet extractors",
+      "Wash water kept out of storm drains; child-safe chemicals where buildings need them",
+    ],
+    extraRows: [
+      ["PSC", "PSC S201 · S299"],
+      ["Contract vehicles", "Pressure-washing BPA, Seymour Johnson AFB (FA480924A0007)"],
+  // The pack's line (consulting-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/consulting/sc/business.ts).
+  consulting: {
+    who: `Service-disabled veteran-owned consulting firm in ${PERSONA.hqCity}: leadership programs, Lean process reviews, strategic plans and HR studies for Army, VA and NC public offices, led by a retired Army HR officer. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff and seven contract facilitators. We work across North Carolina, South Carolina and Virginia.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office on Green St. A 30-seat training room, projectors and a 360 survey platform",
+      "PMP, Lean Six Sigma Black Belt and SHRM-SCP; ICF-credentialed coaches",
+    ],
+    extraRows: [
+      ["PSC", "PSC R408 · U008"],
+      ["Contract vehicles", "None yet (no GSA schedule)"],
     ] as [string, string][],
   },
 }[MEMBER];

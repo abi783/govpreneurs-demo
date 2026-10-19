@@ -1,10 +1,10 @@
-// THE AGENCY: Dana's Success Center home — Sarah's action plan, and the lines
-// "Recent activity" adds to the ones every member gets (src/demo/sc/home/).
+// THE IT SERVICES FIRM: Hector's Success Center home — Sarah's action plan, and
+// the lines "Recent activity" adds to the ones every member gets (src/demo/sc/home/).
 //
-// The hero (the Family Advocacy campaign) has no mentor review yet: Tim sends it
+// The hero (the Army Reserve help desk) has no mentor review yet: Tim sends it
 // live on the call. So the plan's review step is open, and the activity shows
-// Sarah's other two verdicts instead: Discuss on the FAST proposal (today, from the
-// shared feed) and Pass on Visit NC, plus her answer on the NC Guard rating.
+// Sarah's other answers instead: Discuss on the Pope sources sought (today, from
+// the shared feed), Pass on the Hoke County Chromebook purchase, and her SPRS how-to.
 
 import { getOpportunity } from "../../../story/opportunities";
 import { KEY_PARTNER, MENTOR, PERSONA } from "../../../story/persona";
@@ -26,12 +26,12 @@ const step = (s: Partial<PlanContent["steps"][number]> & Pick<PlanContent["steps
 export function homePlan(): PlanContent {
   const hero = getOpportunity(HERO_IDS.hero)!;
   return {
-    id: "playbook-fort-bragg-and-guard",
-    title: "Your Fort Bragg and NC Guard plan: the next 30 days",
+    id: "playbook-fort-bragg-it",
+    title: "Your Fort Bragg IT plan: the next 30 days",
     description:
-      `**From ${MENTOR.name}.** After your positioning call, these are the seven things that will move ${PERSONA.businessShortName} toward Army family programs at Fort Bragg, the NC Guard and the VA.\n\n` +
+      `**From ${MENTOR.name}.** After your positioning call, these are the seven things that will move ${PERSONA.businessShortName} toward Army IT support at Fort Bragg, the Seymour Johnson follow-on and the Army hospital's IT work.\n\n` +
       `Work from the top down. Check off each step when it is done. Your **Tasks** page shows the same work, with due dates.\n\n` +
-      `> Army family programs buy outreach every year. Have your rating, your rates and your team named *before* the solicitation posts.`,
+      `> Army help desk quotes at Fort Bragg are checked against the wage floor first. Have every tech priced at or above it, and every tech's Security+ named, *before* you send.`,
     doneAtStart: ["step-cap-statement"],
     steps: [
       step({
@@ -46,55 +46,56 @@ export function homePlan(): PlanContent {
       }),
       step({
         id: "step-hero-review",
-        title: `Send the ${hero.plainTitle} to ${MENTOR.firstName} for review`,
+        title: `Send the help desk quote to ${MENTOR.firstName} for review`,
         content:
-          `Grant says bid it. Before Ava finishes the quote, ask ${MENTOR.firstName}: pursue or pass?\n\n` +
+          `${hero.plainTitle}: Grant says bid it. Before Ava finishes the quote, ask ${MENTOR.firstName}: pursue or pass?\n\n` +
           `A review is $${WALLET.mentorReviewPrice} from your wallet. She answers within one business day.`,
         resourceUrl: `/opportunities/${hero.id}`,
         sortOrder: 1,
       }),
       step({
         id: "step-ava",
-        title: `Answer Ava's questions on the ${hero.plainTitle}`,
+        title: "Answer Ava's questions on the help desk quote",
         content:
-          `Ava has 3 questions: who your **project manager and alternate** are, how you will make the **24 videos**, and how you cover the **app line**. She cannot finish the quote without them. Due ${dueText("task-ava-family-advocacy")}.`,
+          `Ava has 3 questions: who your **site lead and alternate** are, how you **staff six seats** in the 30-day phase-in, and how you **price the techs**. She cannot finish the quote without them. Due ${dueText("task-ava-help-desk")}.`,
         resourceUrl: `/ava/${hero.id}`,
         sortOrder: 2,
       }),
       step({
         id: "step-grant-fixes",
-        title: "Fix Grant's two things: the app line and the print rates",
+        title: "Fix Grant's two things: Security+ and the wage floor",
         content:
-          `1. Ask the contract specialist before questions close: *"Does a local news partner's app meet the app requirement?"* Every bidder sees the answer, so ask it plainly. Due ${dueText("task-app-question")}.\n` +
-          `2. Get a signed rate quote from each of the four local papers, locked for 12 months, with a stated increase for each option year. Due ${dueText("task-print-quotes")}.\n` +
-          `3. Upload the quotes here as one PDF. Ava uses them to price the print line.`,
+          `1. Book Security+ exams for the two techs who don't have it, and name all six techs in the quote. Due ${dueText("task-security-plus")}.\n` +
+          `2. Price every tech at or above the wage floor: $37.50 an hour plus $5.92 health and welfare for a PC support technician. Show it line by line. Due ${dueText("task-wage-floor")}.\n` +
+          `3. Ask the contract specialist before questions close: *"Does the Army issue laptops and tools to the techs?"* Every bidder sees the answer. Due ${dueText("task-gear-question")}.\n` +
+          `4. Upload the two exam bookings here. Ava uses them in the quote.`,
         allowMemberUpload: true,
         sortOrder: 3,
       }),
       step({
         id: "step-partner",
-        title: `Reply to ${KEY_PARTNER.name} about the VA campaign`,
+        title: `Reply to ${KEY_PARTNER.name} about the Army hospital IT`,
         content:
-          `${KEY_PARTNER.name}, a veteran-owned firm in ${KEY_PARTNER.city}, runs the VA's current hiring campaign. For the next one, they want ${lowerFirst(KEY_PARTNER.seeking)}.\n\n` +
-          `Write to ${KEY_PARTNER.contact}, their ${KEY_PARTNER.contactTitle.toLowerCase()}. Keep it short. Due ${dueText("task-bluestone")}.\n\n` +
-          `> "We are a woman-owned agency in ${PERSONA.hqCity} with a two-person video crew. We would like to run your Southeast shoots."`,
+          `${KEY_PARTNER.name}, an 8(a) IT firm in ${KEY_PARTNER.city}, plans to quote the Army hospital's IT support at Fort Bragg. Only 8(a) STARS III holders can quote it, and they hold it. They want ${lowerFirst(KEY_PARTNER.seeking)}.\n\n` +
+          `Write to ${KEY_PARTNER.contact}, their ${KEY_PARTNER.contactTitle.toLowerCase()}. Keep it short. Due ${dueText("task-brackwater")}.\n\n` +
+          `> "We are an 8(a) IT firm in ${PERSONA.hqCity} with Security+ techs. We run desktop support at Seymour Johnson AFB today, and we would like to run the deskside techs on your hospital job."`,
         resourceUrl: "/partners",
         sortOrder: 4,
       }),
       step({
-        id: "step-rating",
-        title: "Ask the Army for an interim rating on your NC Guard campaign",
+        id: "step-cmmc",
+        title: "Close 4 of your 9 open CMMC items",
         content:
-          `The campaign ended in February and has no performance rating yet. Grant uses one as past performance on the Guard's next campaign.\n\n` +
-          `Email the contracting officer with ${MENTOR.firstName}'s template: the contract number, the dates, and one line on what you delivered. Due ${dueText("task-rating")}.`,
-        resourceUrl: "/mentors/rev-ncng-rating",
+          `Your CMMC Level 2 self-assessment scores 92 of 110. Any Army job that touches controlled information will ask for it. Close the 4 quickest items, then post the new score in SPRS and have it affirmed.\n\n` +
+          `Bring the list to ${MENTOR.firstName} if you get stuck. Due ${dueText("task-cmmc-items")}.`,
+        resourceUrl: "/my-business",
         sortOrder: 5,
       }),
       step({
         id: "step-targeting",
         title: `Book your quarterly targeting call with ${MENTOR.firstName}`,
         content:
-          `In 30 minutes, ${MENTOR.firstName} plans your next quarter of bids around Fort Bragg, the NC Guard and the VA. Pick a time on the **Mentors** page.`,
+          `In 30 minutes, ${MENTOR.firstName} plans your next quarter of bids around Fort Bragg, Pope and Seymour Johnson, and your answer to the Pope sources sought. Pick a time on the **Mentors** page.`,
         resourceUrl: "/find-a-mentor",
         sortOrder: 6,
       }),
@@ -105,11 +106,11 @@ export function homePlan(): PlanContent {
 /** Sarah's closed answers, which the shared feed (unread replies only) does not show. */
 export function homeActivity(): ActivityItem[] {
   const out: ActivityItem[] = [];
-  const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-visitnc-pass");
+  const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-hoke-chromebooks");
   if (pass) {
     const opp = pass.oppId ? getOpportunity(pass.oppId) : undefined;
     out.push({
-      id: "act-visitnc-pass",
+      id: "act-hoke-chromebooks-pass",
       kind: "mentor",
       title: `${MENTOR.name} advised you to pass: ${opp?.plainTitle ?? pass.title}`,
       detail: pass.outcome,
@@ -117,15 +118,15 @@ export function homeActivity(): ActivityItem[] {
       to: `/mentors/${pass.id}`,
     });
   }
-  const rating = MENTOR_REVIEWS.find((r) => r.id === "rev-ncng-rating");
-  if (rating) {
+  const howTo = MENTOR_REVIEWS.find((r) => r.id === "rev-sprs-howto");
+  if (howTo) {
     out.push({
-      id: "act-ncng-rating",
+      id: "act-sprs-howto",
       kind: "mentor",
-      title: `${MENTOR.name} answered your question about the NC Guard rating`,
-      detail: rating.outcome,
-      at: isoDaysFromNow(-rating.lastMessageDaysAgo, 14),
-      to: `/mentors/${rating.id}`,
+      title: `${MENTOR.name} answered your question about posting your CMMC score in SPRS`,
+      detail: howTo.outcome,
+      at: isoDaysFromNow(-howTo.lastMessageDaysAgo, 14),
+      to: `/mentors/${howTo.id}`,
     });
   }
   return out;

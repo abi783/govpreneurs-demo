@@ -95,6 +95,31 @@ const DUE_REASON: Record<string, string> = {
   "task-sandblasting-question": "before questions close",
   "task-blasting-sub": "so sandblasting fits your price",
   "task-cor-letter": "while the COR remembers the job",
+  // DEMO: the trucking company's tasks (members/trucking/workspace.ts).
+  "task-ava-va-routes": "so Ava can finish the quote",
+  "task-license-question": "before questions close",
+  "task-fuel-price": "so you can price five years of diesel",
+  "task-courier-notes": "so you can use her notes in your quote",
+  "task-brightwater": "so a team bid is still possible",
+  "task-interim-rating": "while the contracting officer remembers the job",
+  // DEMO: the IT services firm's tasks (members/it/workspace.ts).
+  "task-ava-help-desk": "so Ava can finish the quote",
+  "task-security-plus": "so all six techs hold it on day one",
+  "task-brackwater": "so a team bid is still possible",
+  "task-wage-floor": "so your price passes the first check",
+  "task-gear-question": "before questions close",
+  "task-seymour-cpars": "so it goes in with your quote",
+  "task-pope-sources-sought": "before the sources sought closes",
+  "task-cmmc-items": "before a job asks for your score",
+  // DEMO: the consulting firm's tasks (members/consulting/workspace.ts).
+  "task-ava-va-program": "so Ava can finish the quote",
+  "task-count-hours": "so your own staff carry half the work",
+  "task-halyard-point": "so a team bid is still possible",
+  "task-coach-question": "before Q&A closes",
+  "task-interim-cpars": "while the contracting officer remembers the job",
+  "task-sub-certificate": "so it goes in with your quote",
+  "task-vetcert-renewal": "so VA sees it active at award",
+  "task-gsa-offer": "because an offer takes months",
 };
 
 /** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */

@@ -46,6 +46,10 @@ import type { Addendum, AvaBid, Span } from "./types";
 
 const DAY = 86_400_000;
 const BIDS = Object.values(AVA_BIDS);
+const PACK_AVA = import.meta.glob<typeof import("../../demo/members/agency/ava")>(
+  "/src/demo/members/*/ava/index.ts",
+  { eager: true },
+);
 const CATERER_IDS = ["FAYNC-2026-R-08", "CUMCO-2026-014", "SP4701-26-Q-0021", "W912EE-27-S-0004"];
 /** Where each bid starts in the demo (src/lib/ava/start.ts). */
 const SEEDS: Record<string, Partial<BidState>> = Object.fromEntries(
@@ -198,17 +202,15 @@ describe("fixtures", () => {
     const caterer = CATERER_IDS.map((id) => ALL_AVA_BIDS[id]);
     expect(caterer.every(Boolean)).toBe(true);
     expect(new Set(caterer.map((b) => b.kind)).size).toBe(4);
-    expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual(
-      [...CATERER_IDS, FAMILY_ADVOCACY_ID, CONSTRUCTION_IDS.hero].sort(),
-    );
+    // Every pack member that has built its own hero bid adds one (a pack still
+    // holding the agency's copy adds none).
+    const packHeroes = [...new Set(Object.values(PACK_AVA).map((p) => p.HERO_BID.noticeId))];
+    expect(packHeroes).toContain(FAMILY_ADVOCACY_ID);
+    expect(packHeroes).toContain(CONSTRUCTION_IDS.hero);
+    expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual([...CATERER_IDS, ...packHeroes].sort());
     for (const [id, bid] of Object.entries(ALL_AVA_BIDS)) expect(bid.noticeId).toBe(id);
-    expect(BIDS.map((b) => b.noticeId)).toEqual(
-      MEMBER === "caterer"
-        ? CATERER_IDS
-        : MEMBER === "agency"
-          ? [FAMILY_ADVOCACY_ID]
-          : [CONSTRUCTION_IDS.hero],
-    );
+    if (MEMBER === "caterer") expect(BIDS.map((b) => b.noticeId)).toEqual(CATERER_IDS);
+    else expect(BIDS).toHaveLength(1);
   });
 
   for (const bid of BIDS) {
