@@ -1,36 +1,29 @@
-// THE AGENCY's buyer directory for Government Buyers: offices that buy advertising
-// and marketing near Lantern Row Creative's studio in Fayetteville, NC (read through
-// src/demo/explore/buyersData.ts, which picks the active member).
+// THE JANITORIAL FIRM's buyer directory for Government Buyers: offices that buy
+// cleaning, grounds and exterior work near Gray Owl's office in Fayetteville, NC (read
+// through src/demo/explore/buyersData.ts, which picks the active member).
 //
-// The offices are real, and so is what they buy (sources below). The people are
-// made up, and their addresses end in ".example". Where an opportunity page already
-// names a buyer's contracting staff (Grant's contacts, src/demo/grant/facts.ts), the
-// same people are read from there, so both pages name the same person.
+// Source: demo-storyboard/janitorial-pack.md, section 13. The offices are real, and so
+// is what they buy. The people are made up, and their addresses end in ".example".
+// Where an opportunity page already names a buyer's contracting staff (Grant's
+// contacts, src/demo/grant/facts.ts), the same people are read from there, so both
+// pages name the same person.
 //
-// Spend figures are real: federal obligations for NAICS 541810, 541613, 541430,
-// 512110, 541820 and 541890, fiscal years 2023 to 2025, from USAspending (pulled
-// 19 Oct 2026; office matched by its award-id prefix, so treat them as close, not
-// exact). One story fact is added: Dana's own NC Guard award ($86,400, FY2025, to a
-// woman-owned firm). Offices with no trustworthy baseline (MICC Fort Bragg, whose ad
-// buys are mostly by card; the VA's national office, which is one campaign; state and
-// local buyers) carry no spend analysis, and the page says so.
+// Totals in "what they buy" are real: FY2023–FY2025 obligations for NAICS 561720,
+// 561730 and 561790 with work in North Carolina, from USAspending transactions
+// (pulled 19 Oct 2026; office matched by award-id prefix, so close, not exact). The
+// pack has three-year totals only, not a split by year, so no office carries a spend
+// analysis, and the page says so.
 //
 // Sources:
-//   USAspending search API            https://api.usaspending.gov/api/v2/search/spending_over_time/
-//   Fort Bragg print and digital, 2019 https://www.usaspending.gov/award/CONT_AWD_W9124719P1860_9700_-NONE-_-NONE-
-//   Fort Bragg school-age ads, 2018    https://www.usaspending.gov/award/CONT_AWD_W9124718P0099_9700_-NONE-_-NONE-
-//   Fort Bragg ACS cable TV ads, WOSB set-aside, 2018  https://sam.gov/opp/12c34720dcc541dd7aeff59b642be4fc/view
-//   More Powerful NC, $2.5M of TV, radio and billboards  https://www.wfdd.org/2019-04-04/north-carolina-launches-campaign-to-combat-opioid-crisis
-//   Governor's Highway Safety Program grants, Oct 2025   https://governor.nc.gov/news/press-releases/2025/10/23/governor-stein-announces-more-25-million-grants-promote-safer-roads
-//   VA Veterans First (veteran-owned firms first)        https://www.law.cornell.edu/uscode/text/38/8127
+//   USAspending search API       https://api.usaspending.gov/api/v2/search/spending_by_award/
+//   NCDOT rest-area custodial    https://connect.ncdot.gov/letting/Roadside/54-SH-04-PR33540/Nash%20Janitorial%20Proposal%2026.pdf
+//   Robeson County Housing Auth. https://constructionbidsource.com/state/north-carolina/county/robeson/743452
 
 import { contactFor } from "../../../grant/facts";
 import { getOpportunity } from "../../../story/opportunities";
 import { PLACES } from "../../../story/places";
-import { allAwardRecords } from "../../../explore/awardsData";
-import type { BuyerAnalysis, BuyerOfficer, GovBuyer, OfficerRole, PursueVerdict } from "@/lib/mock/governmentBuyers";
+import type { BuyerOfficer, GovBuyer, OfficerRole } from "@/lib/mock/governmentBuyers";
 import { HERO_IDS } from "../opportunities";
-import { MEMBER_FIRM } from "./firms";
 
 function person(role: OfficerRole, first: boolean) {
   return (id: string, name: string, email: string, phone: string, notes?: string): BuyerOfficer => ({
@@ -45,7 +38,6 @@ function person(role: OfficerRole, first: boolean) {
 }
 const sblo = person("Small-Business Liaison", true);
 const co = person("Contracting Officer", false);
-const spec = person("Contract Specialist", false);
 const pm = person("Program Manager", false);
 
 /**
@@ -57,308 +49,184 @@ function staffOf(id: string, oppId: string, secondary: boolean, notes?: string):
   return { id, name: c.name, role: c.title as OfficerRole, email: c.email, phone: c.phone, notes };
 }
 
-/** Three fiscal years of spend, one category per row (shares of each year). */
-function spend(byYear: [number, number][], cats: [string, number][]) {
-  return {
-    annualSpendByYear: byYear.map(([year, trade]) => ({ year, trade })),
-    spendBreakdown: cats.map(([category, share]) => ({
-      category,
-      byYear: byYear.map(([year, total]) => ({ year, amount: Math.round((total * share) / 1000) * 1000 })),
-    })),
-  };
-}
-
-/** The firms that won most from these buyers, counted from the award record. */
-function awardeesFrom(abbrevs: readonly string[]): BuyerAnalysis["topAwardees"] {
-  const by = new Map<string, { count: number; total: number }>();
-  for (const a of allAwardRecords()) {
-    if (!abbrevs.includes(a.agency.abbrev ?? "")) continue;
-    if (a.winner.awardeeKey === MEMBER_FIRM.key) continue; // Dana herself
-    const row = by.get(a.winner.name) ?? { count: 0, total: 0 };
-    row.count += 1;
-    row.total += a.obligated ?? 0;
-    by.set(a.winner.name, row);
-  }
-  return [...by.entries()]
-    .sort((a, b) => b[1].total - a[1].total)
-    .slice(0, 4)
-    .map(([company, v]) => ({ company, awardsCount: v.count, totalDollars: v.total }));
-}
-
-function analysis(
-  verdict: PursueVerdict,
-  why: string,
-  s: ReturnType<typeof spend>,
-  smallBizPct: number,
-  wosbPct: number,
-  seasonalityNote: string,
-  topAwardees: BuyerAnalysis["topAwardees"],
-): BuyerAnalysis {
-  return { verdict, why, ...s, smallBizPct, wosbPct, seasonalityNote, topAwardees };
-}
-
-// USPFO NC: $384,144 / $286,662 / $173,192 in FY2023–FY2025, all to small businesses,
-// none to woman-owned firms; plus Dana's $86,400 in FY2025. Woman-owned share:
-// 86,400 / 930,398 = 9%.
-const NCNG_SPEND: [number, number][] = [[2023, 384_144], [2024, 286_662], [2025, 259_592]];
-// VA NCO 6: $103,049 / $5,998 / $79,271; small businesses $168,318 of $188,318 (89%); woman-owned 0%.
-const NCO6_SPEND: [number, number][] = [[2023, 103_049], [2024, 5_998], [2025, 79_271]];
-// MARSOC: $580,475 / $398,876 / $534,364; small businesses $437,091 of $1,513,715 (29%);
-// woman-owned $41,844 (3%).
-const MARSOC_SPEND: [number, number][] = [[2023, 580_475], [2024, 398_876], [2025, 534_364]];
+const first = (o: BuyerOfficer): BuyerOfficer => ({ ...o, recommendedFirstContact: true });
 
 export const BUYERS: GovBuyer[] = [
   {
-    id: "bragg-micc",
-    agencyKey: 5101,
+    id: "micc-bragg",
+    agencyKey: 5301,
     name: "Fort Bragg Contracting Command (MICC)",
     abbreviation: "MICC Fort Bragg",
     type: "federal",
     location: "Fort Bragg, NC",
     distanceMiles: PLACES.fortBragg.milesFromBase,
     whatTheyBuy:
-      "Advertising for Army Community Service and other family programs at Fort Bragg: print and digital ads, cable and streaming spots, and short videos. Its last large ad contracts were print and digital ads in 2019 (about $357K) and school-age program ads in 2018 (about $130K). It has set ad work aside for woman-owned firms before.",
+      "Cleaning, grounds and building services for the post: $71.8M in FY2023–FY2025, 93% of it to two AbilityOne nonprofits. What a commercial firm can win is the exterior work, such as Public Works' pressure washing (HUBZone), and one-off floor jobs.",
     buysFood: true,
     agencyMatchers: ["Mission and Installation Contracting Command"],
     awardAgencies: ["MICC Fort Bragg"],
     officers: [
-      sblo("bragg-1", "Rochelle Banerjee", "r.banerjee@army.mil.example", "910-555-0311", "Sends small businesses to the right contracting officer."),
-      staffOf("bragg-2", HERO_IDS.hero, false, "Named on the Family Advocacy print and digital quote."),
-      staffOf("bragg-3", HERO_IDS.hero, true),
-      pm("bragg-4", "Yvette Calloway", "y.calloway@army.mil.example", "910-555-0314", "Runs the Family Advocacy Program and tells the office what the campaign must do."),
+      sblo("micc-1", "Vernell Strickland", "v.strickland@army.mil.example", "910-555-0612", "Small business specialist. Ask her which Public Works services are coming up."),
+      staffOf("micc-2", HERO_IDS.hero, false, "Named on the pressure-washing quote."),
+      staffOf("micc-3", HERO_IDS.hero, true),
+      pm("micc-4", "Darnell Oxendine", "d.oxendine@army.mil.example", "910-555-0614", "Public Works contracting officer's representative for exterior cleaning."),
     ],
   },
   {
-    id: "uspfo-nc",
-    agencyKey: 5102,
-    name: "NC Army National Guard (USPFO for North Carolina)",
-    abbreviation: "USPFO NC",
+    id: "usace-wilmington",
+    agencyKey: 5302,
+    name: "U.S. Army Corps of Engineers, Wilmington District",
+    abbreviation: "USACE Wilmington",
     type: "federal",
-    location: "Raleigh, NC",
-    distanceMiles: PLACES.raleigh.milesFromBase,
+    location: "Wilmington, NC (lakes and locks across the state)",
+    distanceMiles: PLACES.wilmington.milesFromBase,
     whatTheyBuy:
-      "Recruiting ads for the NC Army National Guard: video ads on screens in DMV offices, sports sponsorships, digital and social campaigns, plus its recruiting website and design support. Most buys are small quotes set aside for small businesses.",
+      "Custodial and mowing at its lakes and locks, bought as small quotes where the lowest price wins: $1.27M across 24 firms in FY2023–FY2025, with 17 to 30 quotes each. You lost Jordan Lake here on price.",
     buysFood: true,
-    agencyMatchers: ["USPFO for North Carolina"],
-    awardAgencies: ["USPFO NC"],
+    agencyMatchers: ["Wilmington District"],
+    awardAgencies: ["USACE Wilmington"],
     officers: [
-      sblo("ncng-1", "Darnell Whitcomb", "d.whitcomb@army.mil.example", "919-555-0321", "Small business liaison for the Guard's contracting office."),
-      co("ncng-2", "Maj. Lucinda Farrow", "l.farrow@army.mil.example", "919-555-0322", "Handles the Guard's recruiting and advertising buys."),
-      pm("ncng-3", "SFC Raymond Tolliver", "r.tolliver@army.mil.example", "919-555-0323", "Runs marketing for the Recruiting and Retention Battalion."),
+      sblo("usacew-1", "Odessa McLamb", "o.mclamb@usace.army.mil.example", "910-555-0621", "Deputy for Small Business. Ask her which lake and lock quotes are coming."),
+      co("usacew-2", "Truett Bordeaux", "t.bordeaux@usace.army.mil.example", "910-555-0622", "Signs the lake custodial and mowing quotes."),
     ],
-    analysis: analysis(
-      "worth-it",
-      "You already delivered for them, they buy ads every year, and every dollar of the last three years went to small businesses. Ask for your interim rating first.",
-      spend(NCNG_SPEND, [["Recruiting ads, websites and design", 1]]),
-      100,
-      9,
-      "Most awards land in August and September, at the end of the federal fiscal year.",
-      awardeesFrom(["USPFO NC"]),
-    ),
   },
   {
-    id: "va-pcac",
-    agencyKey: 5103,
-    name: "VA Program Contracting Activity Central (PCAC)",
-    abbreviation: "VA PCAC",
+    id: "seymour-4cons",
+    agencyKey: 5303,
+    name: "4th Contracting Squadron (Seymour Johnson AFB)",
+    abbreviation: "4th CONS",
     type: "federal",
-    location: "Independence, OH (buys for the VA nationwide)",
-    distanceMiles: 560,
+    location: "Goldsboro, NC",
+    distanceMiles: PLACES.goldsboro.milesFromBase,
     whatTheyBuy:
-      "The VA's national marketing, above all the campaign that recruits doctors, nurses and staff for VA hospitals: about $25M over the last three fiscal years. The current campaign is set aside for service-disabled veteran-owned firms.",
+      "Base custodial (8(a)), grounds (HUBZone to 2024, veteran-owned since) and exterior washing through BPAs: $4.19M in FY2023–FY2025. Your dorm washing job was a call under your BPA here.",
     buysFood: true,
-    agencyMatchers: ["Program Contracting Activity Central"],
-    awardAgencies: ["VA PCAC"],
+    agencyMatchers: ["4th Contracting Squadron"],
+    awardAgencies: ["4th CONS"],
     officers: [
-      sblo("pcac-1", "Bernard Esterline", "b.esterline@va.gov.example", "216-555-0331", "Small business specialist for national VA contracts."),
-      staffOf("pcac-2", HERO_IDS.teamUp, false, "Named on the hiring campaign's sources sought."),
-      staffOf("pcac-3", HERO_IDS.teamUp, true),
+      first(co("sj-1", "Capt. Lorena Batchelor", "l.batchelor@us.af.mil.example", "919-555-0631", "Contracting officer for your BPA. Sends the calls.")),
+      pm("sj-2", "MSgt. Andre Hinnant", "a.hinnant@us.af.mil.example", "919-555-0632", "The COR on your dorm job. Ask him for the reference letter."),
+    ],
+  },
+  {
+    id: "pope-763ess",
+    agencyKey: 5304,
+    name: "763rd Enterprise Sourcing Squadron (Pope Army Airfield)",
+    abbreviation: "763 ESS",
+    type: "federal",
+    location: "Pope Army Airfield, NC",
+    distanceMiles: PLACES.popeAaf.milesFromBase,
+    whatTheyBuy:
+      "Services for the Air Force units at Pope: grounds (AbilityOne) and small facility jobs such as floor care, $1.02M in FY2023–FY2025.",
+    buysFood: true,
+    agencyMatchers: ["763rd Enterprise Sourcing Squadron"],
+    awardAgencies: [],
+    officers: [
+      first(staffOf("pope-1", "FA445227Q0031", false, "Named on the quarterly floor care quote.")),
+      staffOf("pope-2", "FA445227Q0031", true),
     ],
   },
   {
     id: "va-nco6",
-    agencyKey: 5104,
+    agencyKey: 5305,
     name: "VA Network Contracting Office 6",
     abbreviation: "VA NCO 6",
     type: "federal",
-    location: "Durham, NC (serves the Fayetteville VA Medical Center)",
+    location: "Durham, NC (buys for the VA hospitals and clinics in NC)",
     distanceMiles: PLACES.durham.milesFromBase,
     whatTheyBuy:
-      "Small marketing buys for VA hospitals in North Carolina and Virginia, including Durham and Fayetteville: printed and digital pieces for public-affairs campaigns, patient-education video and podcasts. VA rules give veteran-owned firms first claim when two of them can bid.",
+      "Janitorial for VA hospitals and clinics: $10.0M across 16 firms in FY2023–FY2025. VA rules set it aside for veteran-owned firms (21 to 44 quotes each); small one-off jobs, like deep cleans, go to small businesses.",
     buysFood: true,
     agencyMatchers: ["Network Contracting Office 6"],
     awardAgencies: ["VA NCO 6"],
     officers: [
-      sblo("nco6-1", "Gwendolyn Pacheco", "g.pacheco@va.gov.example", "919-555-0341", "Small business specialist for the network."),
-      co("nco6-2", "Arturo Lindell", "a.lindell@va.gov.example", "919-555-0342", "Public affairs and patient-education buys."),
-      pm("nco6-3", "Nia Holloway", "n.holloway@va.gov.example", "910-555-0343", "Public affairs officer, Fayetteville VA Coastal Health Care System."),
+      sblo("nco6-1", "Celestine Vann", "c.vann@va.gov.example", "919-555-0651", "Small business specialist for the network."),
+      staffOf("nco6-2", "36C24627Q0083", false, "Named on the Durham janitorial quote."),
     ],
-    analysis: analysis(
-      "maybe",
-      "The VA is one of your target buyers, but this office buys little marketing, and veteran-owned firms come first. Its newest video work went to one firm without a competition. Get known here before the next buy.",
-      spend(NCO6_SPEND, [["Promotion, printing and video", 1]]),
-      89,
-      0,
-      "Most of its awards land in August and September.",
-      awardeesFrom(["VA NCO 6"]),
-    ),
   },
   {
-    id: "marsoc",
-    agencyKey: 5105,
-    name: "Marine Forces Special Operations Command (MARSOC)",
-    abbreviation: "MARSOC",
+    id: "dha",
+    agencyKey: 5306,
+    name: "Defense Health Agency",
+    abbreviation: "DHA",
     type: "federal",
-    location: "Camp Lejeune, NC",
-    distanceMiles: PLACES.jacksonville.milesFromBase,
+    location: "Falls Church, VA (buys cleaning for Fort Bragg's Army hospital and the 4th Medical Group)",
+    distanceMiles: 300,
     whatTheyBuy:
-      "The busiest federal ad buyer in North Carolina's award record: airport, billboard and magazine ads bought from the media owners, plus geofenced recruiting campaigns, feature articles and video shoots.",
+      "Hospital and clinic cleaning through a small-business IDIQ, for its holders only: $13.6M in FY2023–FY2025, plus $20.6M bought by Army Medical before that.",
     buysFood: true,
-    agencyMatchers: ["MARSOC", "Marine Forces Special Operations"],
-    awardAgencies: ["MARSOC"],
+    agencyMatchers: ["Defense Health Agency"],
+    awardAgencies: ["DHA"],
     officers: [
-      sblo("marsoc-1", "Celeste Varga", "c.varga@socom.mil.example", "910-555-0351"),
-      co("marsoc-2", "Capt. Owen Brandauer", "o.brandauer@socom.mil.example", "910-555-0352", "Signs the recruiting and advertising awards."),
-      pm("marsoc-3", "MSgt Dale Kinnear", "d.kinnear@socom.mil.example", "910-555-0353", "Runs recruiting marketing for the command."),
+      sblo("dha-1", "Rochelle Batts", "r.batts@health.mil.example", "703-555-0661", "Small business office. Ask when the cleaning IDIQ opens to new holders."),
     ],
-    analysis: analysis(
-      "maybe",
-      "It buys the most advertising of any federal office in the state, but most of the money buys ad space straight from airports and billboard owners. The campaign and video work is small-business sized. Camp Lejeune is about 100 miles from your office.",
-      spend(MARSOC_SPEND, [["Recruiting and advertising", 1]]),
-      29,
-      3,
-      "Awards come all year. Airport and billboard space often renews in the summer.",
-      awardeesFrom(["MARSOC"]),
-    ),
   },
   {
-    id: "bragg-mwr",
-    agencyKey: 5106,
-    name: "Fort Bragg Family and MWR",
-    abbreviation: "Fort Bragg MWR",
+    id: "usace-charleston",
+    agencyKey: 5307,
+    name: "U.S. Army Corps of Engineers, Charleston District",
+    abbreviation: "USACE Charleston",
     type: "federal",
-    location: "Fort Bragg, NC",
-    distanceMiles: PLACES.fortBragg.milesFromBase,
+    location: "Charleston, SC (buys for the 81st Readiness Division's Army Reserve centers)",
+    distanceMiles: PLACES.charleston.milesFromBase,
     whatTheyBuy:
-      "Posters, social graphics, event promotion and short videos for Fort Bragg's recreation and family programs. It buys with non-appropriated funds, so its contracts do not appear in the federal award record.",
+      "Janitorial and grounds at Army Reserve centers in North and South Carolina, set aside for 8(a) firms: $1.14M in FY2023–FY2025.",
     buysFood: true,
-    agencyMatchers: ["Family and MWR"],
-    awardAgencies: [],
+    agencyMatchers: ["Charleston District"],
+    awardAgencies: ["USACE Charleston"],
     officers: [
-      sblo("mwr-1", "Tobias Maddox", "t.maddox@army.mil.example", "910-555-0361", "Points vendors to the non-appropriated fund contracting office."),
-      co("mwr-2", "Lorna Feeney", "l.feeney@army.mil.example", "910-555-0362", "NAF contracting officer."),
-      pm("mwr-3", "Holly Strickland", "h.strickland@army.mil.example", "910-555-0363", "Marketing director for Family and MWR."),
+      sblo("usacec-1", "Marisa Legare", "m.legare@usace.army.mil.example", "843-555-0671", "Deputy for Small Business. Keeps the list of 8(a) primes."),
+      staffOf("usacec-2", HERO_IDS.teamUp, false, "Named on the Army Reserve sources sought."),
     ],
   },
   {
-    id: "ncdhhs",
-    agencyKey: 5107,
-    name: "NC Department of Health and Human Services",
-    abbreviation: "NCDHHS",
+    id: "ncdot-div6",
+    agencyKey: 5308,
+    name: "NCDOT Division 6",
+    abbreviation: "NCDOT",
     type: "sled",
-    location: "Raleigh, NC",
-    distanceMiles: PLACES.raleigh.milesFromBase,
+    location: "Fayetteville, NC",
+    distanceMiles: PLACES.fayetteville.milesFromBase,
     whatTheyBuy:
-      "Statewide public-health and social-services campaigns, such as More Powerful NC, the opioid campaign that launched in 2019 with $2.5 million of TV, radio and billboard ads, and foster-parent recruitment.",
+      "Custodial for the I-95 rest areas, staffed 16 hours a day, every day. The lowest responsible bid wins, with the state's own wage floor ($14.48 for an attendant).",
     buysFood: true,
-    agencyMatchers: ["Department of Health and Human Services"],
+    agencyMatchers: ["North Carolina Department of Transportation"],
     awardAgencies: [],
     officers: [
-      co("dhhs-1", "Imelda Castro", "i.castro@dhhs.nc.gov.example", "919-555-0371", "Purchasing and contracts for the Division of Social Services."),
-      pm("dhhs-2", "Quentin Abara", "q.abara@dhhs.nc.gov.example", "919-555-0372", "Communications lead for foster-parent recruitment."),
-      sblo("dhhs-3", "Felicia Dorsett", "f.dorsett@dhhs.nc.gov.example", "919-555-0373", "Runs small business outreach for the department."),
+      first(staffOf("ncdot-1", "54-SH-06-PR34172", false, "Roadside Environmental. Named on the rest-area bid.")),
+      staffOf("ncdot-2", "54-SH-06-PR34172", true),
     ],
   },
   {
-    id: "ncdot-ghsp",
-    agencyKey: 5108,
-    name: "NCDOT Governor's Highway Safety Program",
-    abbreviation: "NCDOT GHSP",
-    type: "sled",
-    location: "Raleigh, NC",
-    distanceMiles: PLACES.raleigh.milesFromBase,
-    whatTheyBuy:
-      "Paid media for highway-safety enforcement campaigns such as \"Booze It & Lose It\", and a statewide roadside-safety campaign on the Move Over Law in this year's grants.",
-    buysFood: true,
-    agencyMatchers: ["Department of Transportation"],
-    awardAgencies: [],
-    officers: [
-      sblo("ghsp-1", "Wendell Ibarra", "w.ibarra@ncdot.gov.example", "919-555-0381", "Small business outreach for NCDOT purchasing."),
-      co("ghsp-2", "Carmen Holbrook", "c.holbrook@ncdot.gov.example", "919-555-0382", "Signs the paid-media contracts."),
-    ],
-  },
-  {
-    id: "fayetteville-city",
-    agencyKey: 5109,
-    name: "City of Fayetteville",
+    id: "rcha",
+    agencyKey: 5309,
+    name: "Robeson County Housing Authority",
     abbreviation: null,
     type: "sled",
-    location: "Fayetteville, NC",
-    distanceMiles: PLACES.fayetteville.milesFromBase,
+    location: "Lumberton, NC",
+    distanceMiles: PLACES.lumberton.milesFromBase,
     whatTheyBuy:
-      "Public-education and outreach campaigns for city departments, such as the stormwater campaign you made in 2023 and marketing for FAST, the city's bus system.",
+      "Office cleaning in four towns, bid on its own under HUD rules. Section 3 hiring of local low-income residents can score.",
     buysFood: true,
-    agencyMatchers: ["City of Fayetteville"],
+    agencyMatchers: ["Robeson County Housing Authority"],
     awardAgencies: [],
-    officers: [
-      sblo("fay-1", "Shonda Pettiford", "s.pettiford@fayettevillenc.gov.example", "910-555-0391", "Small and local business outreach. Ask her about the city's vendor list."),
-      staffOf("fay-2", "FAY-TR-2027-04", false, "Purchasing. Signs the FAST ridership contract."),
-      staffOf("fay-3", "FAY-TR-2027-04", true),
-      pm("fay-4", "Victor Almanza", "v.almanza@fayettevillenc.gov.example", "910-555-0394", "Marketing for FAST, the city's bus system."),
-    ],
+    officers: [first(staffOf("rcha-1", "RCHA-110626", false, "Procurement. Named on the office cleaning bid."))],
   },
   {
-    id: "cumberland-county",
-    agencyKey: 5110,
-    name: "Cumberland County Government",
-    abbreviation: null,
+    id: "fayetteville-pwc",
+    agencyKey: 5310,
+    name: "Fayetteville Public Works Commission",
+    abbreviation: "PWC",
     type: "sled",
     location: "Fayetteville, NC",
     distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy:
-      "Public-information campaigns for county departments: public health, emergency services and hurricane preparedness. Proposals are scored, and price counts.",
+    whatTheyBuy: "Custodial and floor care at its water treatment plants and offices. Crews need the plant's safety training first.",
     buysFood: true,
-    agencyMatchers: ["Cumberland County, NC"],
+    agencyMatchers: ["Fayetteville Public Works Commission"],
     awardAgencies: [],
     officers: [
-      staffOf("cc-1", "CUMCO-PH-2027-03", false, "Purchasing manager. Sent you the hurricane campaign debrief."),
-      staffOf("cc-2", "CUMCO-PH-2027-03", true),
-      { ...pm("cc-3", "Renata Kowal", "r.kowal@co.cumberland.nc.us.example", "910-555-0403", "Public information director."), recommendedFirstContact: true },
-    ],
-  },
-  {
-    id: "cumberland-schools",
-    agencyKey: 5111,
-    name: "Cumberland County Schools",
-    abbreviation: null,
-    type: "sled",
-    location: "Fayetteville, NC",
-    distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy: "Recruiting ads for teachers and bus drivers, and outreach to families about enrollment.",
-    buysFood: true,
-    agencyMatchers: ["Cumberland County Schools"],
-    awardAgencies: [],
-    officers: [
-      { ...staffOf("ccs-1", "CCS-HR-2027-05", true), recommendedFirstContact: true },
-      staffOf("ccs-2", "CCS-HR-2027-05", false),
-      pm("ccs-3", "Doreen Applewhite", "d.applewhite@ccs.k12.nc.us.example", "910-555-0413", "Runs teacher recruiting in Human Resources."),
-    ],
-  },
-  {
-    id: "ftcc",
-    agencyKey: 5112,
-    name: "Fayetteville Technical Community College",
-    abbreviation: "FTCC",
-    type: "sled",
-    location: "Fayetteville, NC",
-    distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy: "Enrollment marketing: paid social, search and streaming ads, student-story videos and landing pages.",
-    buysFood: true,
-    agencyMatchers: ["Fayetteville Technical Community College"],
-    awardAgencies: [],
-    officers: [
-      { ...co("ftcc-1", "Marisa Quintero", "m.quintero@faytechcc.edu.example", "910-555-0421", "Purchasing. Runs the enrollment campaign request."), recommendedFirstContact: true },
-      pm("ftcc-2", "Lionel Haskett", "l.haskett@faytechcc.edu.example", "910-555-0422", "Marketing director."),
+      first(staffOf("pwc-1", "PWC-2627-22", false, "Purchasing. Named on the water plants bid.")),
+      pm("pwc-2", "Lucinda Faison", "l.faison@faypwc.com.example", "910-555-0682", "Plant operations. Runs the safety training."),
     ],
   },
 ];

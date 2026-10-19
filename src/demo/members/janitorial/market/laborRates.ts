@@ -1,37 +1,45 @@
-// THE AGENCY's labor pricing (read through src/lib/mock/laborRates.ts, which picks the
-// active member). Every rate is real:
+// THE JANITORIAL FIRM's labor pricing (read through src/lib/mock/laborRates.ts, which
+// picks the active member). Source: demo-storyboard/janitorial-pack.md, "Wage rules".
+// Every rate is real:
 //
 // 1. The wage floor: the Service Contract Act wage determination for Cumberland and
-//    Hoke counties, NC, WD 2015-4377, Revision 33 (20 Aug 2026), for the creative
-//    titles it lists. Health and welfare is $5.92 an hour ($5.42 where Executive Order
-//    13706 paid sick leave applies). https://sam.gov/wage-determination/2015-4377/33
+//    Hoke counties, NC, WD 2015-4377, Revision 33 (20 Aug 2026). Health and welfare
+//    is $5.92 an hour ($5.42 where Executive Order 13706 paid sick leave applies).
+//    The WD has no floor-care title, so floor techs are priced as janitors.
+//    https://sam.gov/wage-determination/2015-4377/33
 //    (raw text: https://sam.gov/api/prod/wdol/v1/wd/2015-4377/33)
 // 2. Comparable awards: the award record in awards.ts (each modeled on a real award).
-// 3. Labor categories: GSA CALC+ ceiling rates, current year, pulled 19 Oct 2026,
-//    for rows on the Marketing and Public Relations SINs (541810, 541430, 541613,
-//    512110, 541910, 541820). Low = 25th percentile, median, high = 75th percentile.
-//    Education is the most common stated minimum; experience is the median minimum.
-//    https://api.gsa.gov/acquisition/calc/v3/api/ceilingrates/?keyword=graphic%20designer&page=1&page_size=500
-// 4. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
-//    NC metro area (22180): graphic designers' median wage $23.63 an hour (series
-//    OEUM002218000000027102408). https://data.bls.gov/oes/
+// 3. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
+//    NC metro area (22180), hourly: low = 25th percentile, median, high = 75th
+//    percentile (series OEUM0022180000000<SOC><07|08|09>, pulled 19 Oct 2026).
+//    https://api.bls.gov/publicAPI/v2/timeseries/data/
+//    Education and experience are the usual entry for each job, not from BLS.
+//
+// The WD's janitor rate ($16.46) equals the local median janitor pay, and its General
+// Maintenance Worker rate ($21.41) the local median maintenance worker pay: the
+// determination is built from these medians. Health and welfare comes on top.
 
 import type { ComparableAward, LcatRate, PrevailingWage } from "@/lib/mock/laborRates";
 
 const HEALTH_AND_WELFARE = 5.92;
 
 export const PREVAILING_WAGES: PrevailingWage[] = [
-  { trade: "Graphic Artist", baseHourly: 23.63, fringeHourly: HEALTH_AND_WELFARE, notes: "Layouts, production art and social graphics" },
-  { trade: "Illustrator II", baseHourly: 25.81, fringeHourly: HEALTH_AND_WELFARE, notes: "Designs ads and infographics from a brief" },
-  { trade: "Illustrator III", baseHourly: 31.57, fringeHourly: HEALTH_AND_WELFARE, notes: "Leads the design work on a campaign" },
-  { trade: "Photographer II", baseHourly: 19.35, fringeHourly: HEALTH_AND_WELFARE, notes: "Event and portrait shoots" },
-  { trade: "Photographer III", baseHourly: 23.97, fringeHourly: HEALTH_AND_WELFARE, notes: "Planned shoots, lighting and editing" },
-  { trade: "Photographer IV", baseHourly: 29.33, fringeHourly: HEALTH_AND_WELFARE, notes: "Senior photographer or videographer" },
-  { trade: "Media Specialist II", baseHourly: 20.83, fringeHourly: HEALTH_AND_WELFARE, notes: "Runs audiovisual and media equipment" },
+  { trade: "Janitor (11150)", baseHourly: 16.46, fringeHourly: HEALTH_AND_WELFARE, notes: "Night custodians, and floor techs too: this determination has no floor-care title" },
+  { trade: "Housekeeping Aide (11122)", baseHourly: 16.46, fringeHourly: HEALTH_AND_WELFARE },
+  { trade: "Window Cleaner (11360)", baseHourly: 17.89, fringeHourly: HEALTH_AND_WELFARE },
+  { trade: "Laborer, Grounds Maintenance (11210)", baseHourly: 17.21, fringeHourly: HEALTH_AND_WELFARE, notes: "Mowing and trimming" },
+  { trade: "Laborer (23470)", baseHourly: 18.03, fringeHourly: HEALTH_AND_WELFARE },
+  { trade: "Gardener (11090)", baseHourly: 21.75, fringeHourly: HEALTH_AND_WELFARE },
+  {
+    trade: "General Maintenance Worker (23370)",
+    baseHourly: 21.41,
+    fringeHourly: HEALTH_AND_WELFARE,
+    notes: "The class the Army listed for exterior washing in 2021. Ask which one it expects now",
+  },
 ];
 
 export const PREVAILING_WAGE_META = {
-  county: "Cumberland County, NC",
+  county: "Cumberland and Hoke counties, NC",
   determination: "WD 2015-4377, Rev. 33",
   effectiveDate: "2026-08-20",
   source: "U.S. Dept. of Labor — Service Contract Act wage determination (SAM.gov)",
@@ -39,55 +47,55 @@ export const PREVAILING_WAGE_META = {
 
 export const COMPARABLE_AWARDS: ComparableAward[] = [
   {
-    awardId: "W91247-19-P-1874",
-    title: "Print and digital advertisements, Army Community Service, Fort Bragg",
+    awardId: "W9124721P0093",
+    title: "Pressure washing and sandblasting, Fort Bragg, 2021–2026",
     agency: "Army / MICC Fort Bragg",
-    awardValue: 356_624,
-    unitNote: "Two years of weekly print and digital ads, about $178K a year",
+    awardValue: 782_100,
+    unitNote: "Five years at about 41¢ a square foot; a HUBZone quote, one of 6",
     location: "Fort Bragg, NC",
   },
   {
-    awardId: "W91242-25-P-A118",
-    title: "Digital recruiting campaign: NC Army National Guard (yours)",
-    agency: "Army / NC Army National Guard",
-    awardValue: 86_400,
-    unitNote: "12 months of videos, geofenced ads and lead routing, $7,200 a month",
-    location: "Raleigh, NC",
+    awardId: "FA480925F0123",
+    title: "Dormitory pressure washing, Seymour Johnson AFB (yours)",
+    agency: "Air Force / 4th Contracting Squadron",
+    awardValue: 84_600,
+    unitNote: "One call under your BPA: 14 dorms, stairwells and pads",
+    location: "Seymour Johnson AFB, NC",
   },
   {
-    awardId: "H92257-25-P-0041",
-    title: "Geofencing and lead-generation recruiting campaign, MARSOC",
-    agency: "Special Operations / MARSOC",
-    awardValue: 129_712,
-    unitNote: "The first year; up to $688K with the option years",
-    location: "Camp Lejeune, NC",
+    awardId: "W912PM26PA068",
+    title: "Custodial and refuse service, Jordan Lake",
+    agency: "Army / USACE Wilmington District",
+    awardValue: 38_900,
+    unitNote: "A 9-month base; the lowest of 30 quotes won",
+    location: "Moncure, NC",
   },
   {
-    awardId: "36C24626P2971",
-    title: "Patient-education and outreach video production, Durham VA",
+    awardId: "H9242126PE044",
+    title: "Floor stripping and restroom cleaning, SOF building",
+    agency: "Defense / USSOCOM, Fort Bragg",
+    awardValue: 9_871,
+    unitNote: "A one-time job, one of 3 quotes",
+    location: "Fort Bragg, NC",
+  },
+  {
+    awardId: "36C24626P2588",
+    title: "Janitorial, Durham VA Medical Center",
     agency: "VA / Network Contracting Office 6",
-    awardValue: 200_000,
-    unitNote: "The first year; up to $800K with the option years",
+    awardValue: 2_646_000,
+    unitNote: "Veteran-owned only; 44 quotes",
     location: "Durham, NC",
   },
 ];
 
-// GSA CALC+ ceiling rates on the marketing SINs: 25th percentile, median, 75th percentile.
+// BLS local pay, Fayetteville metro, May 2025: 25th percentile, median, 75th percentile.
 export const LCAT_RATES: LcatRate[] = [
-  { id: "lcat-account-director", category: "Account Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 179.73, median: 205.8, high: 230.57 },
-  { id: "lcat-creative-director", category: "Creative Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 154.25, median: 185.53, high: 217.88 },
-  { id: "lcat-art-director", category: "Art Director", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 122.59, median: 145.95, high: 167.86 },
-  { id: "lcat-project-manager", category: "Project Manager (marketing)", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 119.72, median: 144.63, high: 177.22 },
-  { id: "lcat-account-executive", category: "Account Executive", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 107.06, median: 129.81, high: 157.88 },
-  { id: "lcat-copywriter", category: "Copywriter", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 105.58, median: 133.53, high: 153.05 },
-  { id: "lcat-video-producer", category: "Video Producer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 100.78, median: 123.56, high: 138.62 },
-  { id: "lcat-video-editor", category: "Video Editor", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 85.12, median: 93.13, high: 108.61 },
-  { id: "lcat-graphic-designer", category: "Graphic Designer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 87.58, median: 108.61, high: 132.93 },
-  { id: "lcat-media-buyer", category: "Media Buyer / Media Planner", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 98.72, median: 121.23, high: 146.6 },
-  { id: "lcat-social-media", category: "Social Media Manager / Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 102.87, median: 125.5, high: 142.02 },
-  { id: "lcat-digital-marketing", category: "Digital Marketing Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 131.52, median: 151.49, high: 167.12 },
-  { id: "lcat-web-developer", category: "Web Developer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 113.01, median: 138.08, high: 164.55 },
+  { id: "lcat-janitorial-supervisor", category: "Custodial supervisor", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 18.27, median: 22.59, high: 28.43 },
+  { id: "lcat-maintenance-worker", category: "General maintenance worker", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 17.43, median: 21.41, high: 26.98 },
+  { id: "lcat-grounds-worker", category: "Grounds maintenance worker", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 15.47, median: 17.21, high: 19.75 },
+  { id: "lcat-janitor", category: "Janitor and floor tech", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 14.04, median: 16.46, high: 17.73 },
+  { id: "lcat-housekeeper", category: "Housekeeping cleaner", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 13.32, median: 14.48, high: 15.93 },
 ];
 
-/** BLS, May 2025: a Fayetteville graphic designer's median pay, an hour. */
-export const LOCAL_DESIGNER_MEDIAN = 23.63;
+/** BLS, May 2025: a Fayetteville janitor's median pay, an hour. (The name is the agency's export.) */
+export const LOCAL_DESIGNER_MEDIAN = 16.46;

@@ -1,19 +1,18 @@
-// THE AGENCY's partner record for Find partners, the company panel and the market
-// strip (read through src/demo/explore/partnersData.ts, which picks the active member).
+// THE JANITORIAL FIRM's partner record for Find partners, the company panel and the
+// market strip (read through src/demo/explore/partnersData.ts, which picks the active
+// member).
 //
-// Every company is made up (firms.ts). Every reason is true of Dana Okafor
-// (persona.ts, workspace.ts): woman-owned, nine staff, Fayetteville NC, serves NC,
-// VA and SC, and Bluestone's capture director wrote to her about the VA campaign
-// (the "Reply to Bluestone" task). Money, places and counts come from the award
-// record in awards.ts, so a company file and an award never disagree.
+// Every company is made up (firms.ts). Every reason is true of Reggie Tyndall
+// (persona.ts, workspace.ts): HUBZone, 38 staff on night crews, Fayetteville NC, two
+// hot-water rigs, Redtail's floor-care sub at two VA clinics in 2023–2024, and
+// Ashepoo's capture manager wrote to him about the Army Reserve centers (the "Reply to
+// Ashepoo" task). Money, places and counts come from the award record in awards.ts,
+// so a company file and an award never disagree.
 //
-// Sources for the market strip (USAspending, pulled 19 Oct 2026): federal
-// obligations in fiscal year 2026 for NAICS 541810, 541613, 541430, 512110 and
-// 541820 with the work in North Carolina or South Carolina, by transaction:
-// 8 contracts received new money, $2,870,761 in all, median $240,509.
-// https://api.usaspending.gov/api/v2/search/spending_by_transaction/
-// Virginia is left out: its total ($269M) is national campaigns run from
-// Northern Virginia, not work near Fayetteville.
+// The market strip: a yearly average of federal cleaning, grounds and building-service
+// awards (NAICS 561720, 561730, 561790) with work in Cumberland, Hoke and Wayne
+// counties, FY2023–FY2025: 112 awards, $204.0M, median $731K (USAspending
+// spending_by_award, pulled 19 Oct 2026).
 
 import { isoDaysFromNow } from "../../../story/clock";
 import { getOpportunity } from "../../../story/opportunities";
@@ -26,53 +25,53 @@ import { KEY_PARTNER_FIRM, OTHER_FIRMS } from "./firms";
 
 const firm = (key: number) => OTHER_FIRMS.find((f) => f.key === key)!;
 
-const TRADE_DIRECT: PrimeCandidate["trade"] = { proximity: "direct", naicsCodes: ["541810", "541613"] };
+const TRADE_DIRECT: PrimeCandidate["trade"] = { proximity: "direct", naicsCodes: ["561720", "561790", "561730"] };
 
-/** Days left to reply to the VA's sources sought (the story's team-up notice). */
-function vaReplyDays(): number {
-  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 21;
+/** Days left to answer the Army Reserve sources sought (the story's team-up notice). */
+function reserveReplyDays(): number {
+  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 12;
 }
 
 export const PARTNERS: MemberPartners = {
   tradeDirect: TRADE_DIRECT,
-  workEvidence: "their work: Advertising Agencies, Marketing Consulting",
+  workEvidence: "their work: Janitorial Services, Landscaping and Other Services to Buildings",
   specs: [
     {
       firm: KEY_PARTNER_FIRM,
       tier: "strong",
       verdict: "partner_play",
-      trade: TRADE_DIRECT,
-      bench: { distinctSubs: 9, repeatSubs: 3, trend: "growing" },
-      momentum: 0.21,
-      breakdown: { S1: 12, S2: 20, S3: 8, S5: 12, S7: 9, W2: 25, W8: 22 },
+      trade: { proximity: "direct", naicsCodes: ["561720", "561730"] },
+      bench: { distinctSubs: 3, repeatSubs: 1, trend: "growing" },
+      momentum: 0.16,
+      breakdown: { S1: 10, S2: 20, S3: 14, S5: 12, S7: 8, W2: 14, W8: 22 },
       storyReasons: [
         {
-          signal: "W2",
-          text: "They hold the VA's national hiring campaign, and the VA is asking firms about the next one now.",
-          evidence: `award record: VHA recruitment marketing and advertising, 2023, ends September 2027; open sources sought ${HERO_IDS.teamUp}`,
+          signal: "W8",
+          text: `They wrote to you about the Army Reserve centers: they want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}.`,
+          evidence: "their message to you about the Army Reserve centers",
         },
         {
-          signal: "W8",
-          text: `They wrote to you about that campaign: they want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}.`,
-          evidence: "their message to you about the VA hiring campaign",
+          signal: "W2",
+          text: "They hold the Army Reserve cleaning and mowing contract the Corps is asking about again.",
+          evidence: "award record: janitorial and grounds, 81st Readiness Division sites in NC and SC",
         },
       ],
       flags: [
         {
           id: "your_contact",
-          text: `You know someone here: ${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}. He wrote to you about the VA campaign.`,
+          text: `You know someone here: ${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}. He wrote to you about the Army Reserve centers.`,
         },
         {
           id: "set_aside",
-          text: "The next campaign is expected to be set aside for service-disabled veteran-owned firms. They are one and you are not, so their team is your way in.",
+          text: "The follow-on is expected to be for 8(a) firms. They are one and you are not, so their team is your way in.",
         },
         {
-          id: "size_gap",
-          text: "A year of the VA campaign is about $8M, about six times your revenue.",
+          id: "sub_limit",
+          text: "As their sub, your share is capped at half the work (13 CFR 125.6).",
         },
         {
           id: "recompete_due",
-          text: `Replies to the VA's sources sought are due in ${vaReplyDays()} days.`,
+          text: `Answers to the Corps' sources sought are due in ${reserveReplyDays()} days.`,
         },
       ],
     },
@@ -80,43 +79,21 @@ export const PARTNERS: MemberPartners = {
       firm: firm(4002),
       tier: "strong",
       verdict: "partner_play",
-      trade: { proximity: "direct", naicsCodes: ["541613", "541430", "541810"] },
-      bench: { distinctSubs: 6, repeatSubs: 2, trend: "steady" },
-      momentum: 0.08,
-      breakdown: { S1: 9, S2: 20, S3: 14, S5: 9, S7: 8, W4: 12 },
+      trade: { proximity: "direct", naicsCodes: ["561720"] },
+      bench: { distinctSubs: 3, repeatSubs: 1, trend: "steady" },
+      momentum: 0.1,
+      breakdown: { S1: 9, S2: 20, S3: 16, S5: 9, S7: 8, W1: 25 },
       storyReasons: [
         {
-          signal: "W4",
-          text: "They build the NC Guard's recruiting website and do its design work. The Guard is the buyer you ran a campaign for.",
-          evidence: "award record: recruiting website and visual design, NC Army National Guard",
+          signal: "W1",
+          text: "They hired you for floor care at two VA clinics in 2023–2024.",
+          evidence: "your past job: floor care at two VA clinics, $61K",
         },
       ],
       flags: [
         {
-          id: "schedule",
-          text: "They hold a GSA schedule. The Guard ordered its website through it, so only schedule holders could quote.",
-        },
-      ],
-    },
-    {
-      firm: firm(4003),
-      tier: "strong",
-      verdict: "partner_play",
-      trade: { proximity: "direct", naicsCodes: ["512110", "541613"] },
-      bench: { distinctSubs: 5, repeatSubs: 2, trend: "growing" },
-      momentum: 0.14,
-      breakdown: { S1: 8, S2: 20, S3: 10, S5: 8, S7: 7, W5: 10 },
-      storyReasons: [
-        {
-          signal: "W5",
-          text: "They make the Durham VA's patient videos. The VA is one of your target buyers.",
-          evidence: "award record: patient-education video production, Durham VA Health Care System",
-        },
-      ],
-      flags: [
-        {
-          id: "worked_with_partner",
-          text: `They have worked for ${KEY_PARTNER.name} twice as a subcontractor.`,
+          id: "set_aside",
+          text: "They are service-disabled veteran-owned, so they can prime the VA's janitorial. Ask them for the floor care on the Durham job.",
         },
       ],
     },
@@ -124,117 +101,99 @@ export const PARTNERS: MemberPartners = {
       firm: firm(4004),
       tier: "good",
       verdict: "partner_play",
-      trade: { proximity: "adjacent", naicsCodes: ["541810", "541890"] },
+      trade: { proximity: "direct", naicsCodes: ["561720"] },
       bench: { distinctSubs: 2, repeatSubs: 1, trend: "steady" },
-      momentum: 0.04,
-      breakdown: { S1: 5, S2: 14, S3: 14, S5: 5, S7: 6, W3: 12 },
+      momentum: 0.06,
+      breakdown: { S1: 8, S2: 20, S3: 8, S5: 8, S7: 6, W5: 10 },
+      storyReasons: [
+        {
+          signal: "W5",
+          text: "They clean the EPA campus in Research Triangle Park and subcontract part of it.",
+          evidence: "award record: custodial support, EPA campus, RTP (21 bids)",
+        },
+      ],
+      flags: [{ id: "far", text: `They are based in Charlotte, about ${PLACES.charlotte.milesFromBase} miles from your office. A local night crew is what they lack.` }],
+    },
+    {
+      firm: firm(4003),
+      tier: "good",
+      verdict: "competitor",
+      trade: { proximity: "direct", naicsCodes: ["561790"] },
+      bench: { distinctSubs: 0, repeatSubs: 0, trend: "steady" },
+      momentum: 0.08,
+      breakdown: { S1: 8, S2: 20, S3: 18, S5: 8, S7: 9, W3: 12 },
       storyReasons: [
         {
           signal: "W3",
-          text: "They held the Family Advocacy print and digital contract at Fort Bragg in 2019, the same work as your quote.",
-          evidence: "award record: print and digital advertisements, Army Community Service, Fort Bragg, 2019",
+          text: "They hold Fort Bragg's pressure-washing contract, the job you are bidding now.",
+          evidence: "award record: pressure washing and sandblasting, Fort Bragg, 2021–2026 (6 quotes)",
         },
       ],
       flags: [
         {
-          id: "app",
-          text: "They publish a local news app. If the Army says a news partner's app meets the app line, ask them first.",
-        },
-        {
-          id: "not_wosb",
-          text: "Your quote is set aside for woman-owned firms, and they are not one, so they cannot bid it themselves.",
+          id: "same_set_aside",
+          text: "They are HUBZone too. Expect them to quote the Fort Bragg job, with five years of its workload behind them.",
         },
       ],
     },
     {
       firm: firm(4005),
-      tier: "good",
+      tier: "stretch",
       verdict: "competitor",
-      trade: { proximity: "direct", naicsCodes: ["541810", "541820"] },
-      bench: { distinctSubs: 1, repeatSubs: 0, trend: "steady" },
-      momentum: 0.06,
-      breakdown: { S1: 4, S2: 20, S3: 12, S5: 5, S7: 9, W6: 6 },
+      trade: { proximity: "direct", naicsCodes: ["561720"] },
+      bench: { distinctSubs: 0, repeatSubs: 0, trend: "steady" },
+      momentum: 0.04,
+      breakdown: { S1: 6, S2: 20, S3: 6, S5: 6, S7: 4, W4: 8 },
       storyReasons: [
         {
-          signal: "W6",
-          text: "They won the Cumberland County hurricane campaign that you bid on.",
-          evidence: "Cumberland County's award notice: hurricane preparedness campaign",
+          signal: "W4",
+          text: "They won the Jordan Lake custodial job you quoted, on price.",
+          evidence: "award record: custodial and refuse service, Jordan Lake (30 quotes)",
         },
       ],
-      flags: [
-        {
-          id: "beat_you",
-          text: "Their price was about 6% below yours on the hurricane campaign, and your creative scored higher. Price the media buy apart from the creative next time.",
-        },
-        {
-          id: "same_set_aside",
-          text: "They have won small-business set-aside jobs, the same kind you can bid. Expect them on the same bids.",
-        },
-      ],
-    },
-    {
-      firm: firm(4006),
-      tier: "good",
-      verdict: "partner_play",
-      trade: TRADE_DIRECT,
-      bench: { distinctSubs: 3, repeatSubs: 1, trend: "steady" },
-      momentum: 0.1,
-      breakdown: { S1: 7, S2: 20, S3: 8, S5: 7, S7: 5 },
-      storyReasons: [],
-      flags: [],
-    },
-    {
-      firm: firm(4007),
-      tier: "stretch",
-      verdict: "partner_play",
-      trade: { proximity: "direct", naicsCodes: ["512110"] },
-      bench: { distinctSubs: 4, repeatSubs: 1, trend: "steady" },
-      momentum: 0.03,
-      breakdown: { S1: 6, S2: 20, S3: 2, S5: 6, S7: 3 },
-      storyReasons: [],
-      flags: [{ id: "far", text: `Their crew is in Norfolk, about ${PLACES.norfolk.milesFromBase} miles from your office.` }],
+      flags: [{ id: "far", text: "They are based in Austell, Georgia, and quote Corps lake jobs across the Southeast." }],
     },
   ],
   nonCandidates: [
     {
       key: 4101,
-      reasons: ["We have no record of them hiring outside firms."],
-      trade: { proximity: "adjacent", naicsCodes: ["541613", "541611"] },
+      reasons: ["An AbilityOne nonprofit: it must do the work with its own workforce, so it does not hire subcontractors for it."],
+      trade: { proximity: "direct", naicsCodes: ["561720", "561730"] },
       bench: { distinctSubs: 0, repeatSubs: 0, trend: "unknown" },
     },
     {
       key: 4102,
-      reasons: ["They have not won work in the last two years."],
-      trade: { proximity: "adjacent", naicsCodes: ["541820"] },
+      reasons: ["Its work comes through a hospital-cleaning IDIQ you do not hold, and we have no record of it hiring local firms."],
+      trade: { proximity: "direct", naicsCodes: ["561720"] },
       bench: { distinctSubs: 0, repeatSubs: 0, trend: "unknown" },
     },
   ],
   signalLabels: {
+    W1: "they have hired you before",
     W2: "they hold work the buyer is asking about again",
-    W3: "they held the same work as your quote",
-    W4: "they work for a buyer you have delivered for",
-    W5: "they work with a buyer you target",
-    W6: "they beat you on a job you bid",
+    W3: "they hold the job you are bidding",
+    W4: "they beat you on a job",
+    W5: "they work at a place you target",
     W8: "they have already reached out to you",
   },
-  market: { totalAwardedUsd12mo: 2_870_000, awardCount12mo: 8, medianAwardUsd: 240_000 },
-  /** Where My partners starts: two companies Dana has already looked at. */
+  market: { totalAwardedUsd12mo: 68_000_000, awardCount12mo: 37, medianAwardUsd: 731_000 },
+  /** Where My partners starts: two companies Reggie has already looked at. */
   initialPipeline: () => [
     {
-      awardeeKey: 4003,
-      companyName: firm(4003).name,
+      awardeeKey: KEY_PARTNER_FIRM.key,
+      companyName: KEY_PARTNER_FIRM.name,
       stage: "researching",
       sourceTag: "from Find partners",
-      savedAt: isoDaysFromNow(-6, 10),
-      updatedAt: isoDaysFromNow(-2, 15),
+      savedAt: isoDaysFromNow(-5, 10),
+      updatedAt: isoDaysFromNow(-1, 15),
     },
     {
       awardeeKey: 4002,
       companyName: firm(4002).name,
       stage: "saved",
       sourceTag: "from Find partners",
-      savedAt: isoDaysFromNow(-4, 9),
-      updatedAt: isoDaysFromNow(-4, 9),
+      savedAt: isoDaysFromNow(-9, 9),
+      updatedAt: isoDaysFromNow(-9, 9),
     },
   ],
 };

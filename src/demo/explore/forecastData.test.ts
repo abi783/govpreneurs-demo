@@ -69,7 +69,9 @@ describe("the demo forecasts", () => {
     const row = SCORED_ROWS.find((r) => r.record.oppKey === FORT_BRAGG_FORECAST_KEY);
     expect(row?.match?.tier).toBe("priority");
     expect(row?.scored.partnerRoute).toBe(true);
-    expect(row?.scored.reasons.some((x) => /bigger than your biggest past job/i.test(x.text))).toBe(true);
+    // A team bid because it is too big for her, or (the janitorial firm) because of a set-aside she lacks.
+    const tooBig = (row?.record.valHigh ?? 0) > 5 * BIGGEST;
+    expect(row?.scored.reasons.some((x) => /bigger than your biggest past job/i.test(x.text))).toBe(tooBig);
   });
 
   it("never rates work above five times her largest job as a good fit", () => {
