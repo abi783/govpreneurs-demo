@@ -15,14 +15,15 @@ import { fmtRate, type LcatLocation } from "@/lib/mock/laborRates";
 import type { MicroState } from "@/lib/state/microPurchases";
 import type { TrackedItem } from "@/lib/stayReady";
 import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
+import { LOCAL_DESIGNER_MEDIAN } from "./market/laborRates";
 import { PAST_PERFORMANCE, PERSONA } from "./persona";
 
 function k(n: number): string {
   return n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M` : `${Math.round(n / 1000)}K`;
 }
 
-/** Fayetteville metro median hourly pay for heavy and tractor-trailer drivers, BLS May 2025 (trucking-pack.md, Wage rules). */
-const LOCAL_TRUCK_DRIVER_MEDIAN = 24.03;
+/** Fayetteville metro median hourly pay for heavy and tractor-trailer drivers, BLS May 2025 (market/laborRates.ts). */
+const LOCAL_TRUCK_DRIVER_MEDIAN = LOCAL_DESIGNER_MEDIAN;
 
 /** Days before the demo opens (sc/timeline.ts). */
 export const HISTORY = {

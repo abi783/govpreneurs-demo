@@ -1,14 +1,18 @@
-// THE AGENCY'S SMALL ORDERS BOARD: honestly, not for her.
+// THE TRUCKING COMPANY'S SMALL ORDERS BOARD: honestly, not for her.
 // Read through src/demo/explore/orders/data.ts, which picks the active member.
-// Source: demo-storyboard/marketing-agency-pack.md, section 6 (approved 19 Oct 2026).
+// Source: demo-storyboard/trucking-pack.md, section 6.
 //
-// DLA's small orders are stock-numbered parts and supplies. None is ad, video or
-// design work, so "Orders for you" is empty and Hunter says why. "All orders"
-// still lists the public board: 10 orders any seller may bid. None needs an
-// approval, so no "Ones not open to you" row stands beside Hunter's one message.
-// The engine scores none of them for her (fit 0), and nothing is saved or quoted.
+// DLA's small orders are stock-numbered parts and supplies. None is a freight
+// move: DoD freight is tendered, not posted (inside the US through Crowley under
+// DFTS II; secure cargo to SDDC-approved carriers), and civilian agencies tender
+// loads through GSA's Freight Management Program. So "Orders for you" is empty
+// and Hunter says why. Fort Bragg's small hauling jobs go out as quotes, on
+// Opportunities. "All orders" still lists the public board: 10 orders any seller
+// may bid. None needs an approval, so no "Ones not open to you" row stands beside
+// Hunter's one message. The engine scores none of them for her (fit 0), and
+// nothing is saved or quoted.
 //
-// The ids match the caterer's board, so every deep link works for both members.
+// The ids match the caterer's board, so every deep link works for every member.
 // The suppliers are made up (explore/orders/suppliers.ts). Stock numbers and
 // solicitation numbers are made up but have the real shape.
 
@@ -22,18 +26,18 @@ const CONTACTS = {
   lindqvist: ["P. Lindqvist", "215-555-0154"],
 } as const satisfies Record<string, [string, string]>;
 
-/** The industry codes her "Orders for you" covers: her own five. No order has one. */
-export const FOR_YOU_NAICS = ["541810", "541613", "541430", "512110", "541820"];
+/** The industry codes her "Orders for you" covers: her own six. No order has one. */
+export const FOR_YOU_NAICS = ["484110", "484121", "484220", "484210", "492110", "488490"];
 
 /**
  * DEMO: what the board says on her empty "Orders for you" (pack section 6). Hunter's
- * sentence, and one way on to the small video and design jobs she can bid.
+ * sentence, and one way on to the small hauling jobs she can bid.
  */
 export const FOR_YOU_NOTE = {
-  hunter: "DLA's small orders are parts and supplies. None fit an ad agency, so I'm not showing you any.",
+  hunter: "DLA's small orders are parts and supplies. None fit a trucking company, so I'm not showing you any.",
   emptyHead: "Nothing on this board fits your business.",
-  emptyBody: "DLA buys parts and supplies here. Small video and design jobs are on Opportunities.",
-  link: { label: "See video and design jobs", to: "/opportunities" },
+  emptyBody: "DLA buys parts and supplies here, not freight moves. Small hauling jobs, like Fort Bragg's trailer moves, are on Opportunities.",
+  link: { label: "See small hauling jobs", to: "/opportunities" },
 } as const;
 
 export const SPECS: Spec[] = [

@@ -1,111 +1,151 @@
-// THE AGENCY's contract vehicles (read through src/lib/mock/vehicles.ts, which picks
-// the active member). Every vehicle here is real. Dana is not on a GSA schedule:
-// getting on one is Grant's "next time" step (marketing-agency-pack.md, gap 1).
+// THE TRUCKING COMPANY's contract vehicles (read through src/lib/mock/vehicles.ts,
+// which picks the active member). Source: demo-storyboard/trucking-pack.md, section
+// 13. Every vehicle and rule here is real. Tanya qualifies for SDDC's Freight
+// Carrier Registration Program and is not in it yet: that is Grant's "next time"
+// step (gap 1).
 //
 // Sources (checked 19 Oct 2026):
-//   GSA MAS, Marketing and Public Relations SINs and contractor counts
-//     https://www.gsaelibrary.gsa.gov/ElibMain/scheduleSummary.do?scheduleNumber=MAS
-//     https://www.gsaelibrary.gsa.gov/ElibMain/sinDetails.do?scheduleNumber=MAS&specialItemNumber=541810&executeQuery=YES
-//   Two years in business, or Startup Springboard
-//     https://www.gsa.gov/sell-to-government/step-1-learn-about-government-contracting/how-to-access-contract-opportunities
-//   ChooseVA posted to GSA eBuy for MAS 541810 holders  https://sam.gov/opp/edd02746c0fa40558ceb4e5ef7935f2d/view
-//   NC Guard recruiting website ordered through a GSA schedule
-//     https://www.usaspending.gov/award/CONT_AWD_W9124225FA076_9700_GS07F0382X_4732
-//   SBA mentor-protégé joint ventures: the set-asides the protégé qualifies for
-//     https://www.ecfr.gov/current/title-13/chapter-I/part-125/section-125.9
-//     https://www.ecfr.gov/current/title-13/chapter-I/part-128/section-128.402
-//   SBA Women-Owned Small Business Federal Contract Program  https://www.sba.gov/federal-contracting/contracting-assistance-programs/women-owned-small-business-federal-contract-program
-//   NC statewide term contracts (77 listed, none for advertising, marketing or PR)
-//     https://www.doa.nc.gov/divisions/purchase-contract/statewide-term-contracts
-//   GSA VETS 2: service-disabled veteran-owned only, IT services, $6.1B ceiling
-//     https://gsablogs.gsa.gov/technology/?p=4490
+//   SDDC carrier registration   https://public-inspection.federalregister.gov/2019-12733.pdf
+//                               https://www.overdriveonline.com/business/article/14885647/how-to-get-access-to-military-freight
+//   DFTS II award HTC71124DR035 https://sam.gov/opp/61d327eafc4e4b13a15e4b73eebe32e3/view
+//   TPS HTC711-13-R-R005        https://sam.gov/opp/ca41549209ab1ce43ba73def827cfcf2/view
+//   EAGLE II BOA synopsis       https://sam.gov/opp/9cbb5a628f3e4db3bb76485315542662/view
+//   GSA FMP rate offer (FY23)   https://origin-www.gsa.gov/system/files/FY23%20RFO%20-%20GSA%20General%20Rates%20-%20AX.pdf
+//   GSA MAS categories          https://www.gsaelibrary.gsa.gov/ElibMain/scheduleSummary.do?scheduleNumber=MAS
+//   USPS (39 U.S.C. 410)        https://www.law.cornell.edu/uscode/text/39/410
+//   VA Veterans First           https://www.law.cornell.edu/uscode/text/38/8127
 
 import type { Vehicle } from "@/lib/mock/vehicles";
 import { HERO_IDS } from "../opportunities";
 
 export const VEHICLES: Vehicle[] = [
-  // ── Fits an ad agency ──────────────────────────────────────────────
+  // ── Fits a trucking company ──────────────────────────────────────────
   {
-    id: "veh-gsa-mas-marketing",
-    name: "GSA MAS: Marketing and Public Relations",
-    type: "GSA MAS",
-    sponsor: "GSA",
-    ceilingValue: 0, // GSA MAS has no fixed ceiling
-    setAside: "Unrestricted",
-    scope:
-      "The government-wide schedule's marketing category: SIN 541810 Advertising Services, 541613 Marketing Consulting, 541430 Graphic Design, 512110 Video/Film Production, 541820 Public Relations, 541511 Web Based Marketing and 541910 Marketing Research. SIN 541810ODC lets you pass through media costs, such as TV, radio or social ad spots, alongside those services.",
-    openToNewEntrants: "Open now",
-    recompeteWindow: "Continuous (rolling)",
-    fitsFood: true,
-    fitReason:
-      "You are not on it yet, and some buyers only buy here: the VA posted its ChooseVA campaign to schedule holders under SIN 541810, and the NC Guard ordered its recruiting website through a schedule. With 7 years in business you meet the two-year rule. Expect months of work before the first order. This is Grant's \"next time\" step.",
-    pursueLink: { label: "Plan your next steps", href: "/roadmap" },
-  },
-  {
-    id: "veh-sba-wosb",
-    name: "SBA Women-Owned Small Business Federal Contract Program",
+    id: "veh-sddc-fcrp",
+    name: "SDDC Freight Carrier Registration Program",
     type: "Program",
-    sponsor: "SBA",
-    ceilingValue: 0,
-    setAside: "WOSB",
-    scope:
-      "Lets agencies set work aside for certified woman-owned small businesses in industries where women are underrepresented. Only certified firms can bid those jobs.",
-    openToNewEntrants: "Open now",
-    recompeteWindow: "Continuous (rolling)",
-    fitsFood: true,
-    fitReason:
-      "You hold this certification. The Fort Bragg Family Advocacy quote is set aside under it, so only woman-owned firms can bid. Keep your certification current.",
-    pursueLink: { label: "See the Family Advocacy quote", href: `/opportunities/${HERO_IDS.hero}` },
-  },
-  {
-    id: "veh-sba-mentor-protege",
-    name: "SBA Mentor-Protégé Program (teaming with a larger firm)",
-    type: "Program",
-    sponsor: "SBA",
+    sponsor: "Military Surface Deployment and Distribution Command (SDDC)",
     ceilingValue: 0,
     setAside: "Unrestricted",
     scope:
-      "A small business partners with a larger firm that coaches it. The two can bid together as a joint venture on set-aside work that the smaller firm, the protégé, qualifies for.",
+      "The door to DoD freight booked through SDDC. A carrier needs three straight years of DOT authority, a SCAC for each mode, a U.S. Bank Syncada account, a DoD performance bond and cargo insurance. Registration opens in seasons.",
+    openToNewEntrants: "On-ramp expected",
+    recompeteWindow: "Opens in seasons; watch SDDC's site",
+    fitsFood: true,
+    fitReason:
+      "You qualify (nine years of authority, a SCAC) and aren't in yet, so DoD freight can't be booked with you. This is Grant's \"next time\" step, and the first rung toward secure cargo.",
+  },
+  {
+    id: "veh-va-veterans-first",
+    name: "VA Veterans First (a rule, not a contract)",
+    type: "Program",
+    sponsor: "Department of Veterans Affairs",
+    ceilingValue: 0,
+    setAside: "SDVOSB",
+    scope:
+      "When two or more veteran-owned firms can do the work at a fair price, the VA must set it aside for them (38 U.S.C. 8127). Its trucking and courier work in North Carolina is set aside for service-disabled veteran-owned firms first.",
     openToNewEntrants: "Open now",
     recompeteWindow: "Continuous (rolling)",
     fitsFood: true,
     fitReason:
-      "A joint venture could bid small-business and woman-owned set-asides above your size. It cannot bid work set aside for service-disabled veteran-owned firms, because you are not one. For the VA hiring campaign, a subcontract with Bluestone is the way in.",
-    pursueLink: { label: "See Bluestone Veteran Media Group", href: "/partners?view=find&company=4001" },
+      "You hold SBA's service-disabled veteran-owned certificate, so these set-asides are yours to bid. The Fayetteville VA supply and linen runs are one. Your recertification window is open now; don't let it lapse.",
+    pursueLink: { label: "See the VA supply runs", href: `/opportunities/${HERO_IDS.hero}` },
+  },
+  {
+    id: "veh-eagle-boa",
+    name: "Army EAGLE Basic Ordering Agreement (base logistics)",
+    type: "Program",
+    sponsor: "Army Contracting Command – Rock Island",
+    ceilingValue: 0,
+    setAside: "Unrestricted",
+    scope:
+      "The Army's pool of companies that may bid its base logistics task orders: motor pools, supply and transportation at one base each. New holders join through one proposal window a year.",
+    openToNewEntrants: "On-ramp expected",
+    recompeteWindow: "One proposal window a year",
+    fitsFood: true,
+    fitReason:
+      "Primes only, and each base's order is far past your size. Fort Bragg's next one is coming, so team with a holder: Brightwater wants a local carrier for its transportation division.",
+    pursueLink: { label: "See Brightwater Sustainment Group", href: "/partners?view=find&company=4001" },
+  },
+  {
+    id: "veh-dfts-ii",
+    name: "Defense Freight Transportation Services (DFTS II)",
+    type: "IDIQ",
+    sponsor: "U.S. Transportation Command",
+    ceilingValue: 2_300_000_000,
+    setAside: "Unrestricted",
+    scope:
+      "One company, Crowley Government Services, manages DoD freight moved inside the US and books it with its network of carriers. Base period August 2024 to July 2026, plus five one-year options.",
+    openToNewEntrants: "Open now",
+    recompeteWindow: "Options run from 1 August each year",
+    fitsFood: true,
+    fitReason:
+      "You can't bid it, but you can haul under it: carriers join Crowley's network as subcontractors. Ask Crowley how, once you're in SDDC's carrier program.",
   },
 
   // ── Worth knowing, not for you yet ─────────────────────────────────
   {
-    id: "veh-nc-term-contracts",
-    name: "NC Statewide Term Contracts (Division of Purchase and Contract)",
-    type: "BPA",
-    sponsor: "NC Department of Administration",
+    id: "veh-gsa-fmp",
+    name: "GSA Freight Management Program (TMSS 2.0)",
+    type: "Program",
+    sponsor: "GSA",
     ceilingValue: 0,
     setAside: "Unrestricted",
     scope:
-      "Price lists that NC agencies can buy from without running their own bid. The state lists 77 of them; none covers advertising, marketing, media buying or public relations. The closest, 8014B Promotional Items, buys goods.",
+      "Civilian agencies tender loads to approved carriers in GSA's TMSS 2.0: over 1,000 carriers, 48 bureaus and 174 shipping sites. Carriers file rate offers in a yearly cycle.",
+    openToNewEntrants: "On-ramp expected",
+    recompeteWindow: "Next rate cycle in about 10 months",
+    fitsFood: false,
+    fitReason:
+      "Civilian freight is booked here, not posted on SAM.gov. File a rate offer in the next cycle if you want those loads.",
+  },
+  {
+    id: "veh-tps",
+    name: "Transportation Protective Services (TPS)",
+    type: "IDIQ",
+    sponsor: "U.S. Transportation Command",
+    ceilingValue: 655_000_000,
+    setAside: "Unrestricted",
+    scope:
+      "DoD's contract for secure cargo: classified and sensitive freight across the lower 48. 24 carriers held it in 2014. Only carriers SDDC has approved for protective service can join.",
     openToNewEntrants: "Closed",
     fitsFood: false,
     fitReason:
-      "There is no state contract to join for your work. NC agencies such as NCDHHS and NCDOT bid each campaign on its own, so watch for their requests on the Opportunities feed.",
+      "It needs a security clearance for your company and cleared drivers. Join SDDC's carrier program, haul DoD freight for a few years, then look again.",
+    pursueLink: { label: "See why Grant said no to the secure runs", href: `/opportunities/${HERO_IDS.twin}` },
   },
   {
-    id: "veh-vets-2",
-    name: "GSA VETS 2",
-    type: "GWAC",
-    sponsor: "GSA",
-    ceilingValue: 6_100_000_000,
-    setAside: "SDVOSB",
-    scope: "Government-wide IT services, open only to service-disabled veteran-owned small businesses.",
-    openToNewEntrants: "Closed",
+    id: "veh-usps-hcr",
+    name: "USPS highway contract routes",
+    type: "Program",
+    sponsor: "U.S. Postal Service",
+    ceilingValue: 0,
+    setAside: "Unrestricted",
+    scope:
+      "Mail routes paid a fixed rate per trip, solicited and awarded in USPS's own CLEAR system; carriers work through its Logistics Gateway. USPS buys under its own rules (39 U.S.C. 410), so there are no set-asides.",
+    openToNewEntrants: "Open now",
+    recompeteWindow: "Route by route",
     fitsFood: false,
-    fitReason: "IT services, and only for service-disabled veteran-owned firms. Not a path for an ad agency.",
+    fitReason: "Open to you, but your certificate doesn't help here. Register as a USPS supplier to see the routes.",
+    pursueLink: { label: "See the Fayetteville mail route", href: "/opportunities/HCR-28370" },
+  },
+  {
+    id: "veh-gsa-mas",
+    name: "GSA Multiple Award Schedule (MAS)",
+    type: "GSA MAS",
+    sponsor: "GSA",
+    ceilingValue: 0,
+    setAside: "Unrestricted",
+    scope:
+      "GSA's catalog of pre-priced services. It has no motor-freight category; only Package Delivery (NAICS 492110, 492210) fits a carrier, for courier work.",
+    openToNewEntrants: "Open now",
+    recompeteWindow: "Continuous (rolling)",
+    fitsFood: false,
+    fitReason: "Only your courier work would fit, and the VA and Army buy that by quote anyway. Not worth the offer for you yet.",
   },
 ];
 
 /** The type glosses that name the member's trade. */
 export const TYPE_GLOSS = {
-  "GSA MAS":
-    "GSA Multiple Award Schedule — a long-term contract any agency can order from. It has a category for marketing and public relations.",
-  BPA: "Blanket Purchase Agreement — a quick-ordering account for recurring needs, such as printing or ad space.",
+  IDIQ: "Indefinite Delivery / Indefinite Quantity — a pre-approved contract an agency orders freight moves or hauling from as needed, up to a ceiling.",
 };
