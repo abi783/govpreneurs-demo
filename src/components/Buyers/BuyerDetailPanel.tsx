@@ -25,6 +25,8 @@ import { JargonGloss } from "@/components/Layout/JargonGloss";
 import { awardedAgo, usd } from "@/lib/awardsApi";
 import { DraftIntroModal } from "./DraftIntroModal";
 import { showDemoNotice } from "@/demo/ui/notice";
+import { PERSONA } from "@/demo/story/persona";
+import { OWN, SET_ASIDES } from "@/demo/story/setAsides";
 
 // DEMO: a mail or phone link would open a program on the visitor's computer. These contacts
 // are sample data, so a click copies the address and says so.
@@ -141,7 +143,10 @@ export function BuyerDetailPanel({
           <li>
             <strong>What to send:</strong> one short paragraph (who you are, where you're based,
             what you do, your set-asides) plus your capability statement. Lead with{" "}
-            <strong>woman-owned (WOSB) + Fayetteville-local</strong> — both are concrete reasons to
+            {/* DEMO: the member's own set-aside and town. */}
+            <strong>
+              {SET_ASIDES[OWN].program} + {PERSONA.hqCity}-local
+            </strong> — both are concrete reasons to
             keep reading.
           </li>
         </ul>
