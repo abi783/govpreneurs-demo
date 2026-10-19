@@ -5,7 +5,8 @@
 import { describe, expect, it } from "vitest";
 import { MEMBERS } from "../member";
 
-const FILES = import.meta.glob("/src/demo/members/*/**/*.{ts,tsx}", { eager: true }) as Record<string, Record<string, unknown>>;
+// Not the packs' own tests: importing one here would run it a second time.
+const FILES = import.meta.glob(["/src/demo/members/*/**/*.{ts,tsx}", "!**/*.test.{ts,tsx}"], { eager: true }) as Record<string, Record<string, unknown>>;
 
 /** member → file in its folder → its export names */
 const PACKS = new Map<string, Map<string, string[]>>();
