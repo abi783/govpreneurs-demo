@@ -22,7 +22,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
         env:
-          BASE_PATH: /${{ github.event.repository.name }}/
+          BASE_PATH: /
       # SPA fallback so deep links work on Pages
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
