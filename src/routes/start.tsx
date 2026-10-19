@@ -74,7 +74,7 @@ function StartScreen() {
       <div className="brand-stripe" />
       <main className="start-card">
         <img src="/brand/govpreneurs-logo.svg" alt="GovPreneurs" className="start-logo" />
-        <h1 className="t-display-lg start-title">See GovPreneurs with a business like yours</h1>
+        <h1 className="t-display-lg start-title">See a business like yours</h1>
         <p className="t-body-lg start-lead">
           Pick your trade. You will explore a sample business that does the same work.
         </p>
@@ -112,7 +112,7 @@ function StartScreen() {
           </fieldset>
 
           <Button type="submit" variant="primary" className="start-go">
-            Show me my demo
+            Open my demo
           </Button>
           <p className="t-caption start-note">
             We use these details only to follow up about GovPreneurs. Everything in the demo is sample data.

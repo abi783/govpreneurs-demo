@@ -52,7 +52,7 @@ function AdminScreen() {
             {wrong && <p className="start-error">That password is not right.</p>}
           </div>
           <Button type="submit" variant="primary" className="start-go">
-            Turn on presenter mode
+            Open presenter mode
           </Button>
         </form>
       </main>
