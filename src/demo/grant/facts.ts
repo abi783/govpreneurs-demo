@@ -123,13 +123,13 @@ export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = Object.fro
 
 // ── Term of the contract ─────────────────────────────────────────────────
 
-const WORD_TO_N: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+const WORD_TO_N: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5 };
 
 /** Years in the contract, base plus options, read from the buyer's own summary. */
 export function parseTermYears(opp: StoryOpportunity): number {
   if (opp.noticeType === "Sources Sought") return 0;
   const m =
-    /(?:base year|one(?:-| )(?:school )?year(?: contract)?)[^.]*?\b(one|two|three|four|five)\b (?:option|renewal)/i.exec(
+    /(?:base year|one(?:-| )(?:school )?year(?: contract)?)[^.]*?\b(one|two|three|four|five|[1-5])\b (?:option|renewal)/i.exec(
       opp.summary,
     );
   if (m) return 1 + WORD_TO_N[m[1].toLowerCase()];
