@@ -22,8 +22,11 @@ import { rt, pinComputed, pinPublic } from "./rich";
 import { clausePin, naicsLabel, type Solicitation } from "./solicitation";
 import { solicitationFor } from "./detail";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { HERO_EXTRAS as AGENCY_EXTRAS } from "@/demo/members/agency/grant/analyses";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const { HERO_EXTRAS: PACK_EXTRAS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/analyses")>("/src/demo/members/*/grant/analyses.ts", { eager: true }),
+);
 
 export type Maker = (f: OppFacts, sol: Solicitation) => Extras;
 
@@ -721,7 +724,7 @@ const CATERER_EXTRAS: Record<string, Maker> = {
 };
 
 /** DEMO: the agency's are in src/demo/members/agency/grant/analyses.ts. */
-export const HERO_EXTRAS: Record<string, Maker> = byMember({ agency: AGENCY_EXTRAS, caterer: CATERER_EXTRAS });
+export const HERO_EXTRAS: Record<string, Maker> = byMember({ pack: PACK_EXTRAS, caterer: CATERER_EXTRAS });
 
 /** Grant's hand-written review of an opportunity, or null when it has none. */
 export function heroAnalysis(f: OppFacts) {

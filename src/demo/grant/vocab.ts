@@ -5,13 +5,16 @@
 // cooks or a team, food cost or media rates), it reads the word from here. The
 // values live with each member (src/demo/members/<member>/grant/vocab.ts).
 
-import { byMember } from "../member";
+import { byMember, own } from "../member";
 import type { StoryOpportunity } from "../story/opportunities";
-import * as agency from "../members/agency/grant/vocab";
 import * as caterer from "../members/caterer/grant/vocab";
 import type { Domain } from "./domains";
 import type { OppFacts } from "./facts";
 import type { ClausePatch } from "./solicitation";
+
+const pack = own(
+  import.meta.glob<typeof import("../members/agency/grant/vocab")>("/src/demo/members/*/grant/vocab.ts", { eager: true }),
+);
 
 export interface GrantVocab {
   /** Where distances are measured from: "your kitchen", "your office". */
@@ -102,4 +105,4 @@ export interface GrantVocab {
   wageRows: string[][];
 }
 
-export const V: GrantVocab = byMember<GrantVocab>({ agency: agency.VOCAB, caterer: caterer.VOCAB });
+export const V: GrantVocab = byMember<GrantVocab>({ pack: pack.VOCAB, caterer: caterer.VOCAB });

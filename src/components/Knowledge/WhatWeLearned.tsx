@@ -34,7 +34,7 @@ const FACTS: LearnedFact[] = [
       { text: "Allergen labels and halal handling are standard on every tray.", fromFile: "allergen" },
       { text: `${PERSONA.kitchen}.`, fromFile: "kitchen" },
     ],
-    agency: [
+    pack: [
       { text: "Certified woman-owned (WOSB). The certification renews in 41 days.", fromFile: "wosb certification letter" },
       { text: "Rates for video, paid social and search, and print buying.", fromFile: "rate card" },
       { text: "Results from the NC Guard recruiting and stormwater campaigns.", fromFile: "campaign results" },

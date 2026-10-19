@@ -3,11 +3,12 @@
 // (opportunities.ts `pursuit`), so the Pipeline is the union of those and the
 // closed ones. DEMO: the data is per member (src/demo/members/<member>/workspace.ts).
 
-import { byMember } from "../member";
-import * as agency from "../members/agency/workspace";
-import * as caterer from "../members/caterer/workspace";
+import { own } from "../member";
 import type { PursuitStage } from "./opportunities";
 import { MENTOR } from "./persona";
+
+const MEMBER_FILES = import.meta.glob<typeof import("../members/agency/workspace")>("/src/demo/members/*/workspace.ts", { eager: true });
+const member = own(MEMBER_FILES);
 
 /** Pursuits whose opportunity is no longer open, so it is not in the feed. */
 export interface ClosedPursuit {
@@ -88,10 +89,10 @@ export interface WalletStory {
 
 export const MENTOR_NAME = MENTOR.name;
 
-export const CLOSED_PURSUITS: ClosedPursuit[] = byMember({ agency: agency.CLOSED_PURSUITS, caterer: caterer.CLOSED_PURSUITS });
-export const MENTOR_REVIEWS: MentorReviewStory[] = byMember({ agency: agency.MENTOR_REVIEWS, caterer: caterer.MENTOR_REVIEWS });
-export const WALLET: WalletStory = byMember({ agency: agency.WALLET, caterer: caterer.WALLET });
-export const TASKS: StoryTask[] = byMember({ agency: agency.TASKS, caterer: caterer.TASKS });
-export const MENTOR_THREADS = byMember({ agency: agency.MENTOR_THREADS, caterer: caterer.MENTOR_THREADS });
-export const MENTOR_RECOMMENDATIONS = byMember({ agency: agency.MENTOR_RECOMMENDATIONS, caterer: caterer.MENTOR_RECOMMENDATIONS });
-export const closedPursuitDetail = byMember({ agency: agency.closedPursuitDetail, caterer: caterer.closedPursuitDetail });
+export const CLOSED_PURSUITS: ClosedPursuit[] = member.CLOSED_PURSUITS;
+export const MENTOR_REVIEWS: MentorReviewStory[] = member.MENTOR_REVIEWS;
+export const WALLET: WalletStory = member.WALLET;
+export const TASKS: StoryTask[] = member.TASKS;
+export const MENTOR_THREADS = member.MENTOR_THREADS;
+export const MENTOR_RECOMMENDATIONS = member.MENTOR_RECOMMENDATIONS;
+export const closedPursuitDetail = member.closedPursuitDetail;

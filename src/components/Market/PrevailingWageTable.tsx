@@ -13,7 +13,7 @@ import { byMember } from "../../demo/member";
 
 // DEMO: each member's words. The agency's determination is real; the caterer's is sample.
 const COPY = byMember({
-  agency: {
+  pack: {
     floor: "you can pay staff in these titles on a federal service contract here. You can pay more — you can't pay less. From the current Department of Labor determination.",
     compare: "Wage floors are the bottom; here's where comparable NC advertising jobs landed on total price.",
   },

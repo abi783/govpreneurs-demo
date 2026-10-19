@@ -8,13 +8,12 @@
 // DEMO: two members. The caterer's partners are below; the agency's are in
 // src/demo/members/agency/market/partners.ts. The functions are shared.
 
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { calendarDay, daysToDay } from "./dates";
 import { getOpportunity } from "@/demo/story/opportunities";
 import { PAST_PERFORMANCE, findPastPerformance, PERSONA, KEY_PARTNER } from "@/demo/story/persona";
 import { allAwardRecords, awardsWonBy, AWARD_SEEDS, buyerLabelOf } from "./awardsData";
-import { PARTNERS as AGENCY_PARTNERS } from "@/demo/members/agency/market/partners";
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING, type Firm } from "./firms";
 import type { AwardRecord } from "@/lib/awardsApi";
 import type {
@@ -28,6 +27,10 @@ import type {
   RankReason,
 } from "@/lib/partnersApi";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
+
+const { PARTNERS: PACK_PARTNERS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/partners")>("/src/demo/members/*/market/partners.ts", { eager: true }),
+);
 
 /** The states Amira serves (persona.ts). */
 const MY_STATES = PERSONA.serviceStates as readonly string[];
@@ -310,7 +313,7 @@ const CATERER: MemberPartners & { otherWorkEvidence: string } = {
 };
 
 const ACTIVE: MemberPartners & { otherWorkEvidence?: string } = byMember<MemberPartners & { otherWorkEvidence?: string }>({
-  agency: AGENCY_PARTNERS,
+  pack: PACK_PARTNERS,
   caterer: CATERER,
 });
 const SPECS = ACTIVE.specs;

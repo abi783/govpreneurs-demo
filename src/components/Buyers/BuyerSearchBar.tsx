@@ -4,7 +4,7 @@ import { byMember } from "@/demo/member";
 import { TRADE } from "@/lib/mock/governmentBuyers";
 
 // DEMO: the "buys my trade" pill names the member's trade.
-const TradeIcon = byMember({ agency: Megaphone, caterer: UtensilsCrossed });
+const TradeIcon = byMember({ pack: Megaphone, caterer: UtensilsCrossed });
 
 export function BuyerSearchBar({
   q,

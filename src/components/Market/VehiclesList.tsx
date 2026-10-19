@@ -68,7 +68,7 @@ function VehicleRow({ v }: { v: Vehicle }) {
           {v.fitsFood ? (
             <span className="veh-fit-badge veh-fit-badge--yes">
               {/* DEMO: the member's trade. */}
-              <Check size={11} aria-hidden /> {byMember({ agency: "Fits your work", caterer: "Fits food service" })}
+              <Check size={11} aria-hidden /> {byMember({ pack: "Fits your work", caterer: "Fits food service" })}
             </span>
           ) : (
             <span className="veh-fit-badge veh-fit-badge--no">

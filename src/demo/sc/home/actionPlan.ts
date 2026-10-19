@@ -8,13 +8,16 @@
 // src/demo/members/agency/sc/home.ts.
 
 import type { ActivePlaybook } from "@sc/types/portal";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 import { getOpportunity } from "@/demo/story/opportunities";
 import { KEY_PARTNER, MENTOR, PERSONA } from "@/demo/story/persona";
 import { TASKS } from "@/demo/story/workspace";
 import { getPlaybookState } from "./store";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { agencyPlan } from "@/demo/members/agency/sc/home";
+
+const { agencyPlan } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/sc/home")>("/src/demo/members/*/sc/home.ts", { eager: true }),
+);
 
 export const PLAN_ASSIGNMENT_ID = "plan-fort-bragg-and-va";
 
@@ -133,7 +136,7 @@ function catererPlan(): PlanContent {
 }
 
 function plan(): PlanContent {
-  return byMember({ caterer: catererPlan, agency: agencyPlan })();
+  return byMember({ caterer: catererPlan, pack: agencyPlan })();
 }
 
 function seedStatuses(): Record<string, string> {

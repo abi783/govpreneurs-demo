@@ -11,11 +11,15 @@
 // request for quote, a "proposal" for a request for proposal, a "bid" for an
 // invitation for bid, and a "reply" for sources sought.
 
-import { byMember } from "@/demo/member";
-import * as agency from "@/demo/members/agency/grant/domains";
+import { byMember, own } from "@/demo/member";
 import type { StoryOpportunity } from "@/demo/story/opportunities";
+import type { AgencyDomainKey as PackDomainKey } from "@/demo/members/agency/grant/domains";
 import type { PastPerformanceId } from "@/demo/story/persona";
 import { customerShort, EVENT_RANGE, MEALS_PER_DAY, PP } from "./facts";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/domains")>("/src/demo/members/*/grant/domains.ts", { eager: true }),
+);
 
 const MEALS = MEALS_PER_DAY.toLocaleString("en-US");
 
@@ -32,7 +36,7 @@ export type CatererDomainKey =
   | "staffing"
   | "construction";
 
-export type DomainKey = CatererDomainKey | agency.AgencyDomainKey;
+export type DomainKey = CatererDomainKey | PackDomainKey;
 
 /** The caterer's kinds of work, by opportunity. */
 const CATERER_DOMAIN_OF: Record<string, CatererDomainKey> = {
@@ -83,12 +87,12 @@ const CATERER_DOMAIN_OF: Record<string, CatererDomainKey> = {
 
 /** Which kind of work each story opportunity is. A new story entry needs a line here. */
 export const DOMAIN_OF: Record<string, DomainKey> = byMember<Record<string, DomainKey>>({
-  agency: agency.DOMAIN_OF,
+  pack: pack.DOMAIN_OF,
   caterer: CATERER_DOMAIN_OF,
 });
 
 export function domainOf(opp: StoryOpportunity): DomainKey {
-  return DOMAIN_OF[opp.id] ?? byMember<DomainKey>({ agency: "campaign", caterer: "dining" });
+  return DOMAIN_OF[opp.id] ?? byMember<DomainKey>({ pack: "campaign", caterer: "dining" });
 }
 
 /** The word a notice type uses for what the cook sends. */
@@ -675,7 +679,7 @@ const CATERER_DOMAINS: Record<CatererDomainKey, Domain> = {
   },
 };
 
-const DOMAINS: Record<DomainKey, Domain> = { ...CATERER_DOMAINS, ...agency.DOMAINS };
+const DOMAINS: Record<DomainKey, Domain> = { ...CATERER_DOMAINS, ...pack.DOMAINS };
 
 export function domainFor(opp: StoryOpportunity): Domain {
   return DOMAINS[domainOf(opp)];

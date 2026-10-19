@@ -17,8 +17,11 @@ import {
   type AwardSort,
   type SavedAward,
 } from "@/lib/awardsApi";
-import { byMember } from "../member";
-import { STORY_SAVED_AWARD_IDS as AGENCY_SAVED_AWARD_IDS } from "../members/agency/market/awards";
+import { byMember, own } from "../member";
+
+const { STORY_SAVED_AWARD_IDS: PACK_SAVED_AWARD_IDS } = own(
+  import.meta.glob<typeof import("../members/agency/market/awards")>("/src/demo/members/*/market/awards.ts", { eager: true }),
+);
 
 const SAVED_KEY = "explore.awards.saved";
 const PAGE_SIZE = 10;
@@ -35,7 +38,7 @@ function initialSaved(): SavedAward[] {
   // DEMO: each member starts with two awards saved (D85).
   const ids = byMember<readonly string[]>({
     caterer: ["W91247-19-C-0021", "W81K04-24-P-0187"],
-    agency: AGENCY_SAVED_AWARD_IDS,
+    pack: PACK_SAVED_AWARD_IDS,
   });
   return ids.map((awardId, i) => ({ awardId, sourceTag: "from Awards", savedAt: isoDaysFromNow(i === 0 ? -3 : -6, i === 0 ? 14 : 11) }));
 }

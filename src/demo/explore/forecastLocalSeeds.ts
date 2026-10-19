@@ -9,8 +9,11 @@
 import type { ForecastSeed } from "./forecastSeeds";
 import { OPPORTUNITIES } from "@/demo/story/opportunities";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { byMember } from "@/demo/member";
-import { FORECAST_KEYS as AGENCY_KEYS } from "@/demo/members/agency/market/forecasts";
+import { byMember, own } from "@/demo/member";
+
+const { FORECAST_KEYS: PACK_KEYS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
 
 /** The sources sought notice for the next Fort Bragg dining program, from the story. */
 const SOURCES_SOUGHT_ID = OPPORTUNITIES.find((o) => o.noticeType === "Sources Sought")!.id;
@@ -25,13 +28,13 @@ const CATERER_KEYS = {
 // DEMO: two members. The names are the caterer's; each key is the active member's
 // forecast in that story role (the agency's are in src/demo/members/agency/market/forecasts.ts).
 /** The forecast the story points at: Fort Bragg dining, or the VA hiring campaign. Hunter says team up. */
-export const FORT_BRAGG_FORECAST_KEY = byMember({ agency: AGENCY_KEYS.teamUp, caterer: CATERER_KEYS.fortBragg });
+export const FORT_BRAGG_FORECAST_KEY = byMember({ pack: PACK_KEYS.teamUp, caterer: CATERER_KEYS.fortBragg });
 /** Set aside for woman-owned firms: Pope ceremony catering, or Fort Bragg's family-program videos. */
-export const POPE_FORECAST_KEY = byMember({ agency: AGENCY_KEYS.wosb, caterer: CATERER_KEYS.pope });
+export const POPE_FORECAST_KEY = byMember({ pack: PACK_KEYS.wosb, caterer: CATERER_KEYS.pope });
 /** The next round of a job she lost on price: Seymour Johnson breakfast, or the county hurricane campaign. */
-export const SEYMOUR_FORECAST_KEY = byMember({ agency: AGENCY_KEYS.lost, caterer: CATERER_KEYS.seymour });
+export const SEYMOUR_FORECAST_KEY = byMember({ pack: PACK_KEYS.lost, caterer: CATERER_KEYS.seymour });
 /** The next round of her own local job: summer meals, or the city's stormwater campaign. */
-export const CUMBERLAND_SUMMER_KEY = byMember({ agency: AGENCY_KEYS.pastJob, caterer: CATERER_KEYS.cumberlandSummer });
+export const CUMBERLAND_SUMMER_KEY = byMember({ pack: PACK_KEYS.pastJob, caterer: CATERER_KEYS.cumberlandSummer });
 
 export const LOCAL_SEEDS: ForecastSeed[] = [
   {

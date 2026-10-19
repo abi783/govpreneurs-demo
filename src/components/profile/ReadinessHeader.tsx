@@ -68,7 +68,7 @@ export function ReadinessHeader() {
     couldHelp.push({ key: "dsbs", label: "a DSBS profile (so federal buyers can find you)", tab: "certifications" });
   }
   if (pp.some((e) => e.cpars === "Awaiting rating")) {
-    const job = byMember({ caterer: "your Womack job", agency: "your NC Guard campaign" });
+    const job = byMember({ caterer: "your Womack job", pack: "your NC Guard campaign" });
     couldHelp.push({ key: "cpars", label: `a performance rating (CPARS) for ${job}`, tab: "past-performance" });
   }
   if (MEMBER === "agency" && state("key-personnel") === "missing") {

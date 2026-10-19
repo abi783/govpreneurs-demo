@@ -4,16 +4,19 @@
 // DEMO: two members. The agency's story lines are in src/demo/members/agency/market/forecasts.ts.
 
 import { daysToDay } from "./dates";
-import { byMember, MEMBER } from "@/demo/member";
-import * as agency from "@/demo/members/agency/market/forecasts";
+import { byMember, MEMBER, own } from "@/demo/member";
 import { KEY_PARTNER, PAST_PERFORMANCE, findPastPerformance, PERSONA } from "@/demo/story/persona";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
 import { forecastRecord, FORECAST_MEMBER, scoredRow } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY, POPE_FORECAST_KEY, SEYMOUR_FORECAST_KEY, CUMBERLAND_SUMMER_KEY } from "./forecastLocalSeeds";
 
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
+
 const BIGGEST = FORECAST_MEMBER.biggestPastJob ?? 0;
 /** Where the member works from. */
-const BASE = byMember({ agency: agency.CHAT.base, caterer: "kitchen" });
+const BASE = byMember({ pack: pack.CHAT.base, caterer: "kitchen" });
 
 function money(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -42,7 +45,7 @@ export function cardTakeLine(oppKey: string): string | null {
   const r = forecastRecord(oppKey);
   if (!r) return null;
   const when_ = expectedDays(r) == null ? "" : ` Expected ${weeksOrMonths(Math.max(expectedDays(r) as number, 0))}.`;
-  if (MEMBER === "agency") return agency.cardLine(oppKey, r, when_, BIGGEST);
+  if (MEMBER === "agency") return pack.cardLine(oppKey, r, when_, BIGGEST);
   switch (oppKey) {
     case FORT_BRAGG_FORECAST_KEY:
       return `The Army's next dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
@@ -122,7 +125,7 @@ function samSentence(r: ForecastRecordDto): string {
 
 function teamSentence(r: ForecastRecordDto): string {
   if (r.oppKey === FORT_BRAGG_FORECAST_KEY) {
-    if (MEMBER === "agency") return agency.CHAT.teamUp;
+    if (MEMBER === "agency") return pack.CHAT.teamUp;
     return `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) has held Fort Bragg dining since 2019 and is looking for woman-owned catering subcontractors. You worked for them as a subcontractor in 2024. Open Partners to see their card.`;
   }
   const high = r.valHigh ?? 0;
@@ -130,7 +133,7 @@ function teamSentence(r: ForecastRecordDto): string {
     return "Yes, this is bigger than a job you can prime alone. Look in Partners for a prime that wins work like this and wants a woman-owned subcontractor.";
   }
   return byMember({
-    agency: agency.CHAT.smallTeam,
+    pack: pack.CHAT.smallTeam,
     caterer: "You do not need a partner for the size of this one. A partner can still help if the buyer asks for more staff than five people.",
   });
 }
@@ -170,11 +173,11 @@ export function forecastGrantReply(oppKey: string, message: string): string {
     return `${firstStep(r)} ${when(r)}.`;
   }
   if (has(/\b(mentor|sarah|review)\b/)) {
-    if (MEMBER === "agency") return agency.CHAT.mentor;
+    if (MEMBER === "agency") return pack.CHAT.mentor;
     return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
-    if (MEMBER === "agency") return agency.CHAT.past;
+    if (MEMBER === "agency") return pack.CHAT.past;
     const best = findPastPerformance("pp-cdg-sub") ?? PAST_PERFORMANCE[0];
     return `Your closest past work is ${best.projectTitle} (${money(best.totalValue)}, ${best.periodStart.slice(0, 4)}). Your Womack contract ($126K) shows federal prime work, and Cumberland County Schools ($198K) shows daily volume.`;
   }

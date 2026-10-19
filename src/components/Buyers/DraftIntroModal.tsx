@@ -7,7 +7,7 @@ import { PERSONA, PAST_PERFORMANCE } from "@/demo/story/persona";
 import { byMember } from "@/demo/member";
 
 // DEMO: each member's intro speaks for her own business.
-const defaultIntro = byMember({ agency: agencyIntro, caterer: catererIntro });
+const defaultIntro = byMember({ pack: agencyIntro, caterer: catererIntro });
 
 function k(n: number): string {
   return `$${Math.round(n / 1000)}K`;

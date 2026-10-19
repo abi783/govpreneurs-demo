@@ -12,13 +12,16 @@
 // here, and each states a fact that is true of the member in persona.ts.
 
 import { dayFromNow } from "../../lib/ava/dates";
-import { byMember } from "../member";
-import { HERO_IDS } from "../members/agency/opportunities";
+import { byMember, own } from "../member";
 import { getGrantBrief } from "../story/grantBriefs";
 import { getOpportunity } from "../story/opportunities";
 import { PERSONA } from "../story/persona";
 import { findOpportunity, type AvaOpportunity } from "./opportunity";
 import { KNOCKOUT_FACT, PROOF_FACT, type GrantFacts } from "./grantFacts";
+
+const { HERO_IDS } = own(
+  import.meta.glob<typeof import("../members/agency/opportunities")>("/src/demo/members/*/opportunities.ts", { eager: true }),
+);
 
 export type GrantRowStatus = "have" | "missing" | "confirm" | "unknown";
 
@@ -381,7 +384,7 @@ function genericRows(opp: AvaOpportunity): GrantRow[] {
       // DEMO: the agency's bids span several codes, so its row names the notice's own.
       byMember({
         caterer: "Food service",
-        agency: getOpportunity(opp.noticeId)?.naics ?? "Notice",
+        pack: getOpportunity(opp.noticeId)?.naics ?? "Notice",
       }),
       `${PERSONA.primaryNaics} is your main code`,
       "have",

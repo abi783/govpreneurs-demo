@@ -8,8 +8,7 @@
 // a charge or a ticked step shows at once.
 
 import { walletAmountsFrom, type WalletAmounts } from "@sc/lib/billing/walletDisplay";
-import { byMember } from "@/demo/member";
-import { agencyActivity } from "@/demo/members/agency/sc/home";
+import { byMember, own } from "@/demo/member";
 import type { EnrolledService } from "@sc/components/portal/RoadmapEnrollmentList";
 import type { ActivePlaybook } from "@sc/types/portal";
 import { getWalletBalance, getWalletEntries } from "@/demo/state/wallet";
@@ -32,6 +31,10 @@ import {
 } from "./store";
 import { CONTACT_TIMEZONE } from "./time";
 import type { GHLAppointment, MainStepProgress, WalletUsageItem } from "./types";
+
+const { agencyActivity } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/sc/home")>("/src/demo/members/*/sc/home.ts", { eager: true }),
+);
 
 export interface ActivityItem {
   id: string;
@@ -173,7 +176,7 @@ function activityFeed(): ActivityItem[] {
 
   // DEMO: lines only one member's story has (the agency: Sarah's Pass on Visit NC
   // and her answer on the NC Guard rating).
-  items.push(...byMember({ caterer: () => [], agency: agencyActivity })());
+  items.push(...byMember({ caterer: () => [], pack: agencyActivity })());
 
   for (const a of getActivity()) {
     items.push({

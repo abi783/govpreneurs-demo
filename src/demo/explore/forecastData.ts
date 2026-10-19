@@ -8,8 +8,7 @@
 // DEMO: for the agency, the 14 forecasts of src/demo/members/agency/market/forecasts.ts.
 
 import { calendarDay } from "./dates";
-import { byMember, MEMBER } from "@/demo/member";
-import * as agency from "@/demo/members/agency/market/forecasts";
+import { byMember, MEMBER, own } from "@/demo/member";
 import { PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
 import type {
   ForecastListRowDto,
@@ -21,6 +20,10 @@ import type { ScoredForecast } from "@/lib/forecasts/engine";
 import { firmFromMember, scoreLive } from "@/lib/forecasts/live";
 import { FORT_BRAGG_FORECAST_KEY, LOCAL_SEEDS } from "./forecastLocalSeeds";
 import { RECORDED_SEEDS, type ForecastSeed } from "./forecastSeeds";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
 
 /** Amira's facts, as the forecast rules read them. */
 export const FORECAST_MEMBER: ForecastMemberDto = {
@@ -48,7 +51,7 @@ function plainDate(days: number): string {
 
 /** How close the industry code is to the member's own, 0 to 1. Null: no code. */
 function categoryFitOf(code: string | null): number | null {
-  if (MEMBER === "agency") return agency.categoryFit(code, FORECAST_MEMBER.naics);
+  if (MEMBER === "agency") return pack.categoryFit(code, FORECAST_MEMBER.naics);
   if (!code) return null;
   if (FORECAST_MEMBER.naics.includes(code)) return 1;
   if (/^(7223|7225|311)/.test(code)) return 0.8;
@@ -95,7 +98,7 @@ function toRecord(seed: ForecastSeed): ForecastRecordDto {
 // DEMO: two members. The caterer has 48 forecasts; the agency's 14 are in
 // src/demo/members/agency/market/forecasts.ts.
 const ALL_SEEDS: ForecastSeed[] = byMember({
-  agency: agency.FORECAST_SEEDS,
+  pack: pack.FORECAST_SEEDS,
   caterer: [...LOCAL_SEEDS, ...RECORDED_SEEDS],
 });
 

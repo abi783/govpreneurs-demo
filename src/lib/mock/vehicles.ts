@@ -6,8 +6,11 @@
 // DEMO: two members. The agency's vehicles (all real) are in
 // src/demo/members/agency/market/vehicles.ts.
 
-import { byMember } from "@/demo/member";
-import * as agency from "@/demo/members/agency/market/vehicles";
+import { byMember, own } from "@/demo/member";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/vehicles")>("/src/demo/members/*/market/vehicles.ts", { eager: true }),
+);
 
 export type VehicleType = "IDIQ" | "GWAC" | "GSA MAS" | "BPA" | "MATOC" | "Program";
 
@@ -182,7 +185,7 @@ const CATERER_VEHICLES: Vehicle[] = [
   },
 ];
 
-export const VEHICLES: Vehicle[] = byMember({ agency: agency.VEHICLES, caterer: CATERER_VEHICLES });
+export const VEHICLES: Vehicle[] = byMember({ pack: pack.VEHICLES, caterer: CATERER_VEHICLES });
 
 export function vehiclesByFit(vehicles: Vehicle[], fitsOnly: boolean): Vehicle[] {
   return fitsOnly ? vehicles.filter((v) => v.fitsFood) : vehicles;
@@ -213,6 +216,6 @@ const CATERER_TYPE_GLOSS: Record<VehicleType, string> = {
 
 /** DEMO: the agency's glosses name its own trade. */
 export const VEHICLE_TYPE_GLOSS: Record<VehicleType, string> = byMember({
-  agency: { ...CATERER_TYPE_GLOSS, ...agency.TYPE_GLOSS },
+  pack: { ...CATERER_TYPE_GLOSS, ...pack.TYPE_GLOSS },
   caterer: CATERER_TYPE_GLOSS,
 });

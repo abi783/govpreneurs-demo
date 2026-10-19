@@ -16,7 +16,7 @@ const HERO = HERO_IDS.hero;
 /** An opportunity with Sarah's written reply, and a word from it, per member. */
 const LIVE_REVIEW = byMember({
   caterer: { oppKey: "VA247-26-R-0112", word: "Womack" },
-  agency: { oppKey: "MWR-FB-27-0006", word: "posters" },
+  pack: { oppKey: "MWR-FB-27-0006", word: "posters" },
 });
 
 beforeEach(() => wipeDemoStorage());

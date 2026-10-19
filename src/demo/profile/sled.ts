@@ -30,7 +30,7 @@ const KEY = "profile.sled";
  */
 const REGISTERED = byMember<Record<string, { vendorId: string; registeredDaysAgo: number } | undefined>>({
   caterer: {},
-  agency: { NC: { vendorId: "0001048772", registeredDaysAgo: 262 } },
+  pack: { NC: { vendorId: "0001048772", registeredDaysAgo: 262 } },
 });
 
 function seed(): SledRegistration[] {

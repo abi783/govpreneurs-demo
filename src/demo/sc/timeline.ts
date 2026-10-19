@@ -12,7 +12,7 @@ const HISTORY = byMember({
   // Amira: the Womack contract ended in 2024; her first mentor question was the Womack rating.
   caterer: { MEMBER_SINCE_DAYS: 220, ONBOARDING_CALL_DAYS_AGO: 218, COMPLIANCE_CALL_DAYS_AGO: 205, POSITIONING_CALL_DAYS_AGO: 150, SAM_CHECKED_DAYS_AGO: 183, FIRST_MENTOR_QUESTION_DAYS_AGO: 38 },
   // Dana: joined after the NC Guard campaign started; her first mentor question was the Guard rating.
-  agency: { MEMBER_SINCE_DAYS: 300, ONBOARDING_CALL_DAYS_AGO: 298, COMPLIANCE_CALL_DAYS_AGO: 286, POSITIONING_CALL_DAYS_AGO: 196, SAM_CHECKED_DAYS_AGO: 183, FIRST_MENTOR_QUESTION_DAYS_AGO: 41 },
+  pack: { MEMBER_SINCE_DAYS: 300, ONBOARDING_CALL_DAYS_AGO: 298, COMPLIANCE_CALL_DAYS_AGO: 286, POSITIONING_CALL_DAYS_AGO: 196, SAM_CHECKED_DAYS_AGO: 183, FIRST_MENTOR_QUESTION_DAYS_AGO: 41 },
 });
 
 /** She joined GovPreneurs this long ago. The Roadmap's first step started 2 days later. */

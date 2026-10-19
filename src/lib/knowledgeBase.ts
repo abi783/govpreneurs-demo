@@ -154,7 +154,7 @@ const CATERER_FILES: ConnectorFiles = {
   ],
 };
 
-const CONNECTOR_FILES: ConnectorFiles = byMember({ caterer: CATERER_FILES, agency: AGENCY_FILES });
+const CONNECTOR_FILES: ConnectorFiles = byMember({ caterer: CATERER_FILES, pack: AGENCY_FILES });
 
 function seed(): KnowledgeState {
   // Drive synced a couple of hours before the demo opened.

@@ -24,7 +24,7 @@ describe(`My Business seed (${MEMBER})`, () => {
   const score = readyScore(payload.fields, undefined, payload.media);
 
   it("starts at the story's score, with gaps and three suggestions", () => {
-    expect(`${score.settled} of ${score.total}`).toBe(byMember({ caterer: "47 of 55", agency: "44 of 51" }));
+    expect(`${score.settled} of ${score.total}`).toBe(byMember({ caterer: "47 of 55", pack: "44 of 51" }));
     expect(payload.counter).toEqual({ answered: 14, total: 14 });
     expect(payload.proposals).toHaveLength(3);
   });
@@ -54,7 +54,7 @@ describe(`My Business seed (${MEMBER})`, () => {
     expect(plan.proposals.map((p) => p.fieldKey)).toEqual(
       byMember({
         caterer: ["facilities", "equipment", "ninety_day_goal"],
-        agency: ["search_keywords", "key_personnel", "ninety_day_goal"],
+        pack: ["search_keywords", "key_personnel", "ninety_day_goal"],
       }),
     );
     expect(plan.dropped.map((d) => d.fieldKey)).toEqual(["payment_terms_tolerance"]);

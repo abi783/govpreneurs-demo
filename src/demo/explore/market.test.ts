@@ -23,7 +23,7 @@ import { COMPARABLE_FOOD_AWARDS, LCAT_RATES, PREVAILING_WAGES_CUMBERLAND_NC } fr
 // member). The agency bans the caterer's trade words (demo-storyboard/tools/scan-member.mjs).
 const BANNED = byMember({
   caterer: /sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|\bmarcus\b|williams construction|238160|amira's kitchen|diana potts|DEMO-[A-Z]+-\d+/i,
-  agency: /sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|williams construction|238160|DEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|ServSafe|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+  pack: /sodexo|aramark|compass group|eurest|highergov|\broof(ing|er|s)?\b|williams construction|238160|DEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|ServSafe|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
 });
 const caterer = MEMBER === "caterer";
 const agency = MEMBER === "agency";

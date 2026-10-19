@@ -11,7 +11,7 @@ import { byMember } from "../demo/member";
 
 // DEMO: each member's words for the page.
 const COPY = byMember({
-  agency: {
+  pack: {
     meta: "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for an ad agency.",
     lead: "an ad agency like yours.",
     fitsLabel: "Fits my work (marketing)",
@@ -39,7 +39,7 @@ const COPY = byMember({
     ),
   },
 });
-const NOT_FOR = byMember({ agency: "not for ad work", caterer: "not for food service" });
+const NOT_FOR = byMember({ pack: "not for ad work", caterer: "not for food service" });
 
 export const Route = createFileRoute("/vehicles")({
   head: () => ({

@@ -8,10 +8,13 @@
 
 import type { ActPayload } from "../../lib/hunterChat";
 import type { PastPerformanceId } from "../story/persona";
-import { byMember } from "../member";
-import { AGENCY_VOCAB } from "../members/agency/hunter/vocab";
+import { byMember, own } from "../member";
 import { CATERER_VOCAB } from "../members/caterer/hunter/vocab";
 import type { FeedRow } from "./data";
+
+const { AGENCY_VOCAB: PACK_VOCAB } = own(
+  import.meta.glob<typeof import("../members/agency/hunter/vocab")>("/src/demo/members/*/hunter/vocab.ts", { eager: true }),
+);
 
 /** A work word the chat turns into a code filter or a search. */
 export interface WorkType {
@@ -96,4 +99,4 @@ export interface HunterVocab {
   };
 }
 
-export const VOCAB: HunterVocab = byMember({ agency: AGENCY_VOCAB, caterer: CATERER_VOCAB });
+export const VOCAB: HunterVocab = byMember({ pack: PACK_VOCAB, caterer: CATERER_VOCAB });

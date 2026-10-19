@@ -106,15 +106,15 @@ const CORE_CAPABILITIES = byMember({
     "Halal and allergen-labeled menus",
     "Event and ceremony catering",
   ],
-  agency: [
+  pack: [
     "Short captioned videos, shot and edited in-house",
     "Paid social, search and display ads",
     "Print buying for local papers",
     "Landing pages and lead routing to a recruiter or caseworker",
   ],
 });
-const NAICS_EXAMPLE = byMember({ caterer: "722310 Food Service Contractors", agency: "541810 Advertising Agencies" });
-const PSC_EXAMPLE = byMember({ caterer: "S203, S206", agency: "R701, T006" });
+const NAICS_EXAMPLE = byMember({ caterer: "722310 Food Service Contractors", pack: "541810 Advertising Agencies" });
+const PSC_EXAMPLE = byMember({ caterer: "S203, S206", pack: "R701, T006" });
 
 // ── validation ───────────────────────────────────────────────────────────────
 
@@ -723,7 +723,7 @@ const DEFS: FieldDef[] = [
         ).getUTCFullYear()}`,
         source: "From your past performance",
       },
-      agency: { state: "missing" },
+      pack: { state: "missing" },
     }),
     edit: { type: "textarea" },
   },

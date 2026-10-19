@@ -18,12 +18,15 @@
 // order record. So the title says it ("ships to Fort Bragg") and the sample
 // order paper (a PDF) lists the full address.
 
-import { byMember } from "@/demo/member";
-import * as agency from "@/demo/members/agency/orders/data";
+import { byMember, own } from "@/demo/member";
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroAward, MicroOrder } from "@/lib/microPurchases/order";
 import { calendarDay } from "../dates";
 import { SUPPLIERS, type SupplierKey } from "./suppliers";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/orders/data")>("/src/demo/members/*/orders/data.ts", { eager: true }),
+);
 
 export type ShipTo = "fortBragg" | "campLejeune" | "popeAaf";
 
@@ -34,7 +37,7 @@ export const SHIP_TO: Record<ShipTo, { name: string; address: string }> = byMemb
     campLejeune: { name: "Camp Lejeune", address: "Food Service Warehouse, Camp Lejeune, NC 28547" },
     popeAaf: { name: "Pope Army Airfield", address: "Base Supply Receiving, Pope Army Airfield, NC 28308" },
   },
-  agency: {
+  pack: {
     fortBragg: { name: "Fort Bragg", address: "Supply Support Activity, Fort Bragg, NC 28310" },
     campLejeune: { name: "Camp Lejeune", address: "Base Supply Warehouse, Camp Lejeune, NC 28547" },
     popeAaf: { name: "Pope Army Airfield", address: "Base Supply Receiving, Pope Army Airfield, NC 28308" },
@@ -691,7 +694,7 @@ const CATERER_SPECS: Spec[] = [
   },
 ];
 
-const SPECS: Spec[] = byMember({ caterer: CATERER_SPECS, agency: agency.SPECS });
+const SPECS: Spec[] = byMember({ caterer: CATERER_SPECS, pack: pack.SPECS });
 
 export const ORDER_META: ReadonlyMap<string, OrderMeta> = new Map();
 export const ORDERS: MicroOrder[] = [];

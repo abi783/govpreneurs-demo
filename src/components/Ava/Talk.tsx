@@ -449,7 +449,7 @@ export function Talk({
       if (f.unit === "text")
         return byMember({
           caterer: "We cook every meal fresh in our own kitchen.",
-          agency: "We shoot, edit and caption every video in our own studio.",
+          pack: "We shoot, edit and caption every video in our own studio.",
         });
       if (f.unit === "phone") return "(910) 555-0100";
       if (f.unit === "email") return "name@example.com";

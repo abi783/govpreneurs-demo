@@ -11,8 +11,11 @@
 
 import { extract, amountIn, daysIn, saidNumbers, sentences, type Extraction } from "@sc/lib/businessProfile/tellExtract";
 import { readTellReply } from "@sc/lib/businessProfile/tellModel";
-import { byMember } from "../../member";
-import { TELL_SAMPLE as AGENCY_SAMPLE } from "../../members/agency/sc/business";
+import { byMember, own } from "../../member";
+
+const { TELL_SAMPLE: PACK_SAMPLE } = own(
+  import.meta.glob<typeof import("../../members/agency/sc/business")>("/src/demo/members/*/sc/business.ts", { eager: true }),
+);
 
 /**
  * The sentence "Say it out loud" types into the box (D56: no microphone). Each
@@ -21,7 +24,7 @@ import { TELL_SAMPLE as AGENCY_SAMPLE } from "../../members/agency/sc/business";
 export const TELL_SAMPLE = byMember({
   caterer:
     "We cook and deliver up to 1,100 meals a day from our kitchen in Fayetteville. We have two refrigerated vans for same-day delivery. We can wait 30 days to be paid. We want to win our first prime contract in the next 90 days.",
-  agency: AGENCY_SAMPLE,
+  pack: PACK_SAMPLE,
 });
 
 interface Fact {
@@ -65,7 +68,7 @@ type FactRule = { field: string; read: (s: string) => unknown | undefined };
 /** Things one member names when she says how many jobs she can run at once. */
 const JOB_WORDS = byMember({
   caterer: /\b(jobs|contracts|events|orders)\b/i,
-  agency: /\b(jobs|contracts|campaigns|clients|shoots)\b/i,
+  pack: /\b(jobs|contracts|campaigns|clients|shoots)\b/i,
 });
 
 /** The ad agency's services, as a buyer would search for them. */
@@ -183,7 +186,7 @@ const SHARED_LAST: FactRule[] = [
 /** Rules that turn one sentence into one fact. The first rule that fits wins. */
 const FACT_RULES: FactRule[] = [
   ...SHARED_FIRST,
-  ...byMember({ caterer: CATERER_RULES, agency: AGENCY_RULES }),
+  ...byMember({ caterer: CATERER_RULES, pack: AGENCY_RULES }),
   ...SHARED_LAST,
 ];
 
@@ -208,7 +211,7 @@ const UPLOAD_RULES: { field: string; test: RegExp }[] = byMember({
     ...SHARED_UPLOADS.slice(3),
     { field: "max_daily_output", test: /\d[\d,]*\s*(meals|plates|trays|lunches|breakfasts)\b.*\b(a day|per day|daily|each day)\b/i },
   ],
-  agency: [
+  pack: [
     ...SHARED_UPLOADS,
     { field: "doc_past_performance", test: /\b(CPARS|performance rating)\b/i },
     { field: "state_diversity_certifications", test: /\b(small business enterprise|NCSBE|state certification)\b/i },

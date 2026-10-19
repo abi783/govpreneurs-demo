@@ -119,7 +119,7 @@ function seedOrders(): DfyOrder[] {
   // registered in North Carolina (sled.ts), so hers is Virginia, where the VA work is.
   const { id, state } = byMember({
     caterer: { id: "dfy_seed_sled_nc", state: PERSONA.hqState },
-    agency: { id: "dfy_seed_sled_va", state: "VA" },
+    pack: { id: "dfy_seed_sled_va", state: "VA" },
   });
   const s = DFY_SERVICES[state === "VA" ? "sled-va" : "sled-nc"];
   return [

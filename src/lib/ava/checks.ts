@@ -491,7 +491,7 @@ export function exactChecks(bid: AvaBid, s: BidState): CheckResult {
     passed.push(
       byMember({
         caterer: "The price pays for the crew, the food and every cost Ava knows about.",
-        agency: "The price pays for your team, the ads you buy and every cost Ava knows about.",
+        pack: "The price pays for your team, the ads you buy and every cost Ava knows about.",
       }),
     );
   }

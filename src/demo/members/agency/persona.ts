@@ -5,7 +5,7 @@
 // buyers are real.
 
 import { dateDaysFromNow } from "../../story/clock";
-import type { MentorProfile, PastPerformance, Persona, Partner } from "../../story/persona";
+import type { MentorProfile, PastPerformance, Persona, Partner, PastPerformanceRoles } from "../../story/persona";
 
 export const PERSONA: Persona = {
   ownerFirstName: "Dana",
@@ -126,6 +126,14 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     referenceTitle: "Owner, Two Rivers Family Dental",
   },
 ];
+
+/** Her past jobs by the role they play in the story (PastPerformanceRoles). */
+export const PAST_PERFORMANCE_ROLES: PastPerformanceRoles = {
+  county: "pp-fayetteville-stormwater",
+  cdg: "pp-ncng-recruiting",
+  church: "pp-two-rivers-dental",
+  womack: "pp-ncng-recruiting",
+};
 
 /** The one mentor in the story. Every screen uses this name. */
 export const MENTOR: MentorProfile = {

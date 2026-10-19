@@ -15,8 +15,11 @@ import { PLACES } from "@/demo/story/places";
 import type { AuthoredBrief } from "./encode";
 import { CERTIFIED, COOKS, customerShort, PARTNER, PP, shareWords, usd } from "./facts";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { AUTHORED_BRIEFS as AGENCY_BRIEFS } from "@/demo/members/agency/grant/briefs";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const { AUTHORED_BRIEFS: PACK_BRIEFS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/briefs")>("/src/demo/members/*/grant/briefs.ts", { eager: true }),
+);
 
 const dining = getOpportunity(CATERER_HERO.teamUp)!;
 const mackall = getOpportunity(CATERER_HERO.twin)!;
@@ -326,4 +329,4 @@ const CATERER_BRIEFS: Record<string, AuthoredBrief> = {
 };
 
 /** DEMO: the agency's are in src/demo/members/agency/grant/briefs.ts. */
-export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = byMember({ agency: AGENCY_BRIEFS, caterer: CATERER_BRIEFS });
+export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = byMember({ pack: PACK_BRIEFS, caterer: CATERER_BRIEFS });

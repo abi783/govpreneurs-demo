@@ -12,7 +12,7 @@ import {
 } from "../../lib/partnersApi";
 // DEMO: what the member already shares with the partner she knows (D85).
 import { byMember } from "@/demo/member";
-const KNOWN_CONTACT_HOOK = byMember({ caterer: "the work you did together in 2024", agency: "his note to you about the VA campaign" });
+const KNOWN_CONTACT_HOOK = byMember({ caterer: "the work you did together in 2024", pack: "his note to you about the VA campaign" });
 
 /**
  * One company, in full — the detail behind a ranked card.

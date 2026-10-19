@@ -19,7 +19,7 @@ import { buildOldTake } from "./takeOld";
 const FORBIDDEN = byMember({
   caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i,
   // The same list as demo-storyboard/tools/scan-member.mjs uses for the agency's pages.
-  agency:
+  pack:
     /\broof(ing|er|s)?\b|Williams Construction|\b238160\b|Diana|DEMO-[A-Z]+-\d+|HigherGov|\b(cater\w*|meals?|kitchen|food[- ]?(service|handler)?|cooks?|dining|menus?|ServSafe|HACCP|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
 });
 
@@ -183,7 +183,7 @@ describe("documents download as real PDFs", () => {
   it("renders every document of a hero and of a generated opportunity", async () => {
     const ids = byMember({
       caterer: ["SP4701-26-Q-0021", "W912EE-27-S-0004", "FAYNC-2026-R-08", "N62470-26-R-0153"],
-      agency: [HERO_IDS.hero, HERO_IDS.twin, HERO_IDS.teamUp, "MWR-FB-27-0006", "FAY-TR-2027-04"],
+      pack: [HERO_IDS.hero, HERO_IDS.twin, HERO_IDS.teamUp, "MWR-FB-27-0006", "FAY-TR-2027-04"],
     });
     for (const id of ids) {
       const f = factsFor(getOpportunity(id)!);
@@ -203,8 +203,8 @@ describe("documents download as real PDFs", () => {
 
 describe("the rail", () => {
   /** A generated review, and one with no brief, for the member on stage. */
-  const GENERATED = byMember({ caterer: "NCNG-2026-21", agency: "MWR-FB-27-0006" });
-  const NO_BRIEF = byMember({ caterer: "DUR-CO-2026-12", agency: "NCDOT-GHSP-2027-08" });
+  const GENERATED = byMember({ caterer: "NCNG-2026-21", pack: "MWR-FB-27-0006" });
+  const NO_BRIEF = byMember({ caterer: "DUR-CO-2026-12", pack: "NCDOT-GHSP-2027-08" });
 
   it("answers an unknown question with the nearest questions, never an error", () => {
     const r = railReply(GENERATED, "blorp zzz quux");
@@ -233,7 +233,7 @@ describe("the rail", () => {
   it("an answer to an open question moves it to 'You told me' and lifts the confidence", () => {
     const id = HERO_IDS.teamUp;
     const before = buildAnalysis(id) as GrantAnalysis;
-    const asked = byMember({ caterer: 2, agency: 1 });
+    const asked = byMember({ caterer: 2, pack: 1 });
     expect(before.rail.openQuestions.length).toBe(asked);
     const dots = before.verdict.confidence.dots!;
     const q = before.rail.openQuestions[0];

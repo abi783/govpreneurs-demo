@@ -166,7 +166,7 @@ const ARMY_TEAM: Person[] = [
   { name: "Beatrice Calhoun", title: "Contracting Officer" },
   { name: "Terrence Boyle", title: "Contract Specialist" },
   // The agency's owner is Dana Okafor, so its Army buyer must not share her name.
-  { name: byMember({ agency: "Janelle Ostrander", caterer: "Janelle Okafor" }), title: "Contracting Officer" },
+  { name: byMember({ pack: "Janelle Ostrander", caterer: "Janelle Okafor" }), title: "Contracting Officer" },
   { name: "Gregory Lindqvist", title: "Contract Specialist" },
 ];
 

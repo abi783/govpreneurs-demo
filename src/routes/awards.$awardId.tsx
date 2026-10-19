@@ -22,7 +22,7 @@ import {
 import { byMember } from "@/demo/member";
 const KNOWN_PARTNER_NOTE = byMember({
   caterer: "from your 2024 subcontract. Ask him about the recompete.",
-  agency: "who wrote to you about the VA campaign. Ask him which shoots he needs a crew for.",
+  pack: "who wrote to you about the VA campaign. Ask him which shoots he needs a crew for.",
 });
 
 interface DetailSearch {

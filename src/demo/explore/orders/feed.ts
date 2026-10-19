@@ -2,13 +2,16 @@
 // feed, the code census, the category counts and the fit scores. The same rules
 // as the production service, over 20 orders instead of 16,000.
 
-import { byMember } from "@/demo/member";
-import * as agency from "@/demo/members/agency/orders/data";
+import { byMember, own } from "@/demo/member";
 import type { SmallOrdersFeed } from "@/lib/microPurchases/api";
 import type { MicroCategory } from "@/lib/microPurchases/categories";
 import type { MicroOrder } from "@/lib/microPurchases/order";
 import { calendarDay } from "../dates";
 import { ORDERS, ORDER_META } from "./data";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/orders/data")>("/src/demo/members/*/orders/data.ts", { eager: true }),
+);
 
 /** Production serves 50 orders a page. */
 export const PAGE_SIZE = 50;
@@ -42,7 +45,7 @@ function writtenOut(day: string): string {
  */
 const FOR_YOU_NAICS_PREFIXES: readonly string[] = byMember({
   caterer: ["311", "312", "322", "326", "332", "333", "424", "722"],
-  agency: agency.FOR_YOU_NAICS,
+  pack: pack.FOR_YOU_NAICS,
 });
 
 /**
@@ -51,9 +54,9 @@ const FOR_YOU_NAICS_PREFIXES: readonly string[] = byMember({
  * empty state. For the board route: Hunter's line on that tab, and the empty
  * state's one button.
  */
-export const FOR_YOU_NOTE: typeof agency.FOR_YOU_NOTE | null = byMember({
+export const FOR_YOU_NOTE: typeof pack.FOR_YOU_NOTE | null = byMember({
   caterer: null,
-  agency: agency.FOR_YOU_NOTE,
+  pack: pack.FOR_YOU_NOTE,
 });
 
 function inForYouLane(o: MicroOrder): boolean {

@@ -140,7 +140,7 @@ const TRADE = byMember({
       `One commercial kitchen and ${m.employees} staff mean a buyer deals with one team from the first menu to the last tray.`,
     ],
   },
-  agency: {
+  pack: {
     tagline: "Woman-owned ad agency 12 miles from Fort Bragg",
     place: (m: CapFacts) => `${m.employees} staff, three freelancers, and a studio with a two-person video crew.`,
     work: (list: string) =>

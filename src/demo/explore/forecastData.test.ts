@@ -11,10 +11,10 @@ import { captureStatus } from "@/lib/forecasts/engine";
 // DEMO: the agency's words must not show the caterer's trade (demo-storyboard/tools/scan-member.mjs).
 const BAD_WORDS = byMember({
   caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|HigherGov|\bDEMO-[A-Z]+-\d+/i,
-  agency: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
+  pack: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+|\b(cater\w*|meals?|kitchen|food|cooks?|dining|menus?|Haddad|Amira|722310|Camp Mackall|Womack|Carolina Dining)\b/i,
 });
 const REAL_FIRMS = /sodexo|aramark|compass group|eurest/i;
-const COUNT = byMember({ caterer: 48, agency: 14 });
+const COUNT = byMember({ caterer: 48, pack: 14 });
 const BIGGEST = FORECAST_MEMBER.biggestPastJob ?? 0;
 const statusOnTheDay = (dueOn: string | null) => captureStatus(dueOn ? daysToDay(dueOn) : null);
 

@@ -157,7 +157,7 @@ const FOOD_GROUPS: GroupDef[] = [
   },
 ];
 
-const GROUPS: GroupDef[] = byMember({ caterer: FOOD_GROUPS, agency: [...AGENCY_GROUPS, ...FOOD_GROUPS] });
+const GROUPS: GroupDef[] = byMember({ caterer: FOOD_GROUPS, pack: [...AGENCY_GROUPS, ...FOOD_GROUPS] });
 
 export const PSC_CODES: PscCode[] = GROUPS.flatMap((g) =>
   g.codes.map(([code, description]) => ({

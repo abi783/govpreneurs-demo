@@ -7,8 +7,11 @@
 // are in src/demo/members/agency/market/laborRates.ts. The exports below pick one.
 
 import { dateDaysFromNow } from "@/demo/story/clock";
-import { byMember } from "@/demo/member";
-import * as agency from "@/demo/members/agency/market/laborRates";
+import { byMember, own } from "@/demo/member";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/laborRates")>("/src/demo/members/*/market/laborRates.ts", { eager: true }),
+);
 
 export interface PrevailingWage {
   trade: string;
@@ -120,16 +123,16 @@ const CATERER_LCAT_RATES: LcatRate[] = [
 
 /** The wage floor table: the caterer's sample determination, or the agency's real one. */
 export const PREVAILING_WAGES_CUMBERLAND_NC: PrevailingWage[] = byMember({
-  agency: agency.PREVAILING_WAGES,
+  pack: pack.PREVAILING_WAGES,
   caterer: CATERER_WAGES,
 });
-export const PREVAILING_WAGE_META = byMember({ agency: agency.PREVAILING_WAGE_META, caterer: CATERER_WAGE_META });
+export const PREVAILING_WAGE_META = byMember({ pack: pack.PREVAILING_WAGE_META, caterer: CATERER_WAGE_META });
 /** Comparable awarded jobs in the member's trade. Each links to an award on the Awards page. */
 export const COMPARABLE_FOOD_AWARDS: ComparableAward[] = byMember({
-  agency: agency.COMPARABLE_AWARDS,
+  pack: pack.COMPARABLE_AWARDS,
   caterer: CATERER_COMPARABLE_AWARDS,
 });
-export const LCAT_RATES: LcatRate[] = byMember({ agency: agency.LCAT_RATES, caterer: CATERER_LCAT_RATES });
+export const LCAT_RATES: LcatRate[] = byMember({ pack: pack.LCAT_RATES, caterer: CATERER_LCAT_RATES });
 
 export function fmtRate(n: number): string {
   return `$${n.toFixed(2)}`;

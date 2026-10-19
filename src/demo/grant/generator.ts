@@ -8,8 +8,7 @@
 // The call itself is the story's. The generator never changes it: it builds the
 // reads, limits and next move so they explain that call.
 
-import { byMember } from "@/demo/member";
-import { CAVEATS as AGENCY_CAVEATS } from "@/demo/members/agency/grant/vocab";
+import { byMember, own } from "@/demo/member";
 import { dueTimeOf } from "@/demo/story/opportunities";
 import type { GrantCall } from "@/demo/story/opportunities";
 import { findPastPerformance, PERSONA, type PastPerformanceId } from "@/demo/story/persona";
@@ -48,6 +47,10 @@ import {
 import { boldIn, firstSentence, pinComputed, rt, sentences } from "./rich";
 import { clauseOf, clausePinMaybe, type Solicitation } from "./solicitation";
 import { V } from "./vocab";
+
+const { CAVEATS: PACK_CAVEATS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/vocab")>("/src/demo/members/*/grant/vocab.ts", { eager: true }),
+);
 
 type Rating = "strong" | "good" | "watch" | "weak";
 const ORDER: Record<Rating, number> = { strong: 0, good: 1, watch: 2, weak: 3 };
@@ -152,7 +155,7 @@ const CATERER_CAVEATS: Record<string, Caveat> = {
   },
 };
 
-const CAVEATS: Record<string, Caveat> = byMember({ agency: AGENCY_CAVEATS, caterer: CATERER_CAVEATS });
+const CAVEATS: Record<string, Caveat> = byMember({ pack: PACK_CAVEATS, caterer: CATERER_CAVEATS });
 
 // ── The generator ────────────────────────────────────────────────────────
 

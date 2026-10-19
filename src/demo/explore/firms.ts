@@ -7,9 +7,12 @@
 // agency's is in src/demo/members/agency/market/firms.ts. The export names are the
 // caterer's: AMIRA_FIRM is the member, CAROLINA_DINING the team-up partner.
 
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 import { KEY_PARTNER, PERSONA } from "@/demo/story/persona";
-import * as agency from "@/demo/members/agency/market/firms";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/firms")>("/src/demo/members/*/market/firms.ts", { eager: true }),
+);
 
 export interface Firm {
   /** The number that Partners and Awards use to join a company (awardeeKey). */
@@ -59,10 +62,10 @@ const CATERER_OTHERS: Firm[] = [
 ];
 
 /** The member's own company. It wins one award in the record. */
-export const AMIRA_FIRM: Firm = byMember({ agency: agency.MEMBER_FIRM, caterer: CATERER_SELF });
+export const AMIRA_FIRM: Firm = byMember({ pack: pack.MEMBER_FIRM, caterer: CATERER_SELF });
 /** The team-up partner: Carolina Dining Group, or Bluestone Veteran Media Group. */
-export const CAROLINA_DINING: Firm = byMember({ agency: agency.KEY_PARTNER_FIRM, caterer: CATERER_PARTNER });
-export const OTHER_FIRMS: Firm[] = byMember({ agency: agency.OTHER_FIRMS, caterer: CATERER_OTHERS });
+export const CAROLINA_DINING: Firm = byMember({ pack: pack.KEY_PARTNER_FIRM, caterer: CATERER_PARTNER });
+export const OTHER_FIRMS: Firm[] = byMember({ pack: pack.OTHER_FIRMS, caterer: CATERER_OTHERS });
 
 export const ALL_FIRMS: Firm[] = [CAROLINA_DINING, ...OTHER_FIRMS];
 
@@ -82,7 +85,7 @@ const CATERER_OTHER_WINNERS: Firm[] = [
   { key: 4104, name: "Magnolia School Foods", city: "Charleston", state: "SC", uei: "MS8P5J2XH9Q4", cage: "8MSF6" },
 ];
 
-export const OTHER_WINNERS: Firm[] = byMember({ agency: agency.OTHER_WINNERS, caterer: CATERER_OTHER_WINNERS });
+export const OTHER_WINNERS: Firm[] = byMember({ pack: pack.OTHER_WINNERS, caterer: CATERER_OTHER_WINNERS });
 
 /** Every fictional company, Amira included, for a lookup by key. */
 export const EVERY_FIRM: Firm[] = [AMIRA_FIRM, ...ALL_FIRMS, ...OTHER_WINNERS];

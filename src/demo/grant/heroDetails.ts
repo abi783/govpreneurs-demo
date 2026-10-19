@@ -11,8 +11,11 @@ import { calendarDay } from "./calendar";
 import type { HeroDetail } from "./detail";
 import { longDate, type OppFacts, termText, usd } from "./facts";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { HERO_DETAILS as AGENCY_DETAILS } from "@/demo/members/agency/grant/details";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
+
+const { HERO_DETAILS: PACK_DETAILS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/grant/details")>("/src/demo/members/*/grant/details.ts", { eager: true }),
+);
 
 export type Builder = (f: OppFacts) => HeroDetail;
 
@@ -337,4 +340,4 @@ const CATERER_DETAILS: Record<string, Builder> = {
 };
 
 /** The hand-written detail, by opportunity id. DEMO: the agency's are in src/demo/members/agency/grant/details.ts. */
-export const HERO_DETAILS: Record<string, Builder> = byMember({ agency: AGENCY_DETAILS, caterer: CATERER_DETAILS });
+export const HERO_DETAILS: Record<string, Builder> = byMember({ pack: PACK_DETAILS, caterer: CATERER_DETAILS });

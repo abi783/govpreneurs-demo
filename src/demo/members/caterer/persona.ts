@@ -8,7 +8,7 @@
 // "Why these?" panel needs one.
 
 import { dateDaysFromNow } from "../../story/clock";
-import type { MentorProfile, PastPerformance, Persona, Partner } from "../../story/persona";
+import type { MentorProfile, PastPerformance, Persona, Partner, PastPerformanceRoles } from "../../story/persona";
 
 export const PERSONA: Persona = {
   ownerFirstName: "Amira",
@@ -135,6 +135,9 @@ export const PAST_PERFORMANCE: PastPerformance[] = [
     awaitingReview: true,
   },
 ];
+
+/** Her past jobs by the role they play in the story (PastPerformanceRoles). */
+export const PAST_PERFORMANCE_ROLES: PastPerformanceRoles = { county: "pp-county-schools", cdg: "pp-cdg-sub", church: "pp-church", womack: "pp-womack" };
 
 /** The one mentor in the story. Every screen uses this name. */
 export const MENTOR: MentorProfile = {

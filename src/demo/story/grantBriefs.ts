@@ -6,9 +6,10 @@
 //
 // Voice: Grant talks to the member as "you". Plain words. No promise of a win.
 
-import { byMember } from "../member";
-import * as agency from "../members/agency/grantBriefs";
-import * as caterer from "../members/caterer/grantBriefs";
+import { others, own } from "../member";
+
+const MEMBER_FILES = import.meta.glob<typeof import("../members/agency/grantBriefs")>("/src/demo/members/*/grantBriefs.ts", { eager: true });
+const member = own(MEMBER_FILES);
 
 export type ReadName =
   | "Can you win it?"
@@ -41,12 +42,14 @@ export interface GrantBrief {
   railAnswers: Record<string, string>;
 }
 
-export const GRANT_BRIEFS: GrantBrief[] = byMember({ agency: agency.GRANT_BRIEFS, caterer: caterer.GRANT_BRIEFS });
+export const GRANT_BRIEFS: GrantBrief[] = member.GRANT_BRIEFS;
 
 /** DEMO: also finds the other member's briefs, so an Ava bid written for one member still loads (see opportunities.ts). */
 export function getGrantBrief(oppId: string): GrantBrief | undefined {
   return (
     GRANT_BRIEFS.find((b) => b.oppId === oppId) ??
-    byMember({ agency: caterer.GRANT_BRIEFS, caterer: agency.GRANT_BRIEFS }).find((b) => b.oppId === oppId)
+    others(MEMBER_FILES)
+      .flatMap((m) => m.GRANT_BRIEFS)
+      .find((b) => b.oppId === oppId)
   );
 }

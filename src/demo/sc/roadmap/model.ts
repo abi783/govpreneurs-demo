@@ -285,7 +285,7 @@ export const DONE_DATES: Record<string, { started?: number; done: number }> = by
   // DEMO: Dana joined while the NC Guard campaign ran, already registered in SAM.gov
   // (she renewed it later, SAM_CHECKED_DAYS_AGO). Her capability statement was
   // finished two days before the positioning call, as My Business shows.
-  agency: {
+  pack: {
     "p1-business-setup": { started: 298, done: 294 },
     "p1-digital-compliance": { started: 294, done: COMPLIANCE_CALL_DAYS_AGO },
     "p1-federal-registration": { started: 286, done: 280 },

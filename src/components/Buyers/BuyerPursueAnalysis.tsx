@@ -153,7 +153,7 @@ export function BuyerPursueAnalysis({
           {/* DEMO: the agency's spend is real (USAspending); the caterer's is sample. */}
           <p className="cs-pursue-foot">
             {byMember({
-              agency: "Same buyer, last 3 fiscal years. From public federal award records.",
+              pack: "Same buyer, last 3 fiscal years. From public federal award records.",
               caterer: "Same buyer, last 3 fiscal years. Sample analysis.",
             })}
           </p>

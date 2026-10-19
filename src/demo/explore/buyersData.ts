@@ -6,8 +6,7 @@
 // DEMO: two members. The caterer's buyers are below; the agency's (advertising and
 // marketing buyers, with real spend) are in src/demo/members/agency/market/buyers.ts.
 
-import { MEMBER } from "@/demo/member";
-import { BUYERS as AGENCY_BUYERS } from "@/demo/members/agency/market/buyers";
+import { MEMBER, own } from "@/demo/member";
 import { AGENCIES, allAwardRecords } from "./awardsData";
 import { anyFirmByKey } from "./firms";
 import { PLACES } from "@/demo/story/places";
@@ -18,6 +17,10 @@ import type {
   OfficerRole,
   PursueVerdict,
 } from "@/lib/mock/governmentBuyers";
+
+const { BUYERS: PACK_BUYERS } = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/buyers")>("/src/demo/members/*/market/buyers.ts", { eager: true }),
+);
 
 const CURRENT_YEAR = new Date().getFullYear();
 const y = (offset: number) => CURRENT_YEAR - offset;
@@ -604,4 +607,4 @@ const catererBuyers = (): GovBuyer[] => [
 ];
 
 /** The active member's buyer directory. */
-export const BUYER_SEED: GovBuyer[] = MEMBER === "agency" ? AGENCY_BUYERS : catererBuyers();
+export const BUYER_SEED: GovBuyer[] = MEMBER === "agency" ? PACK_BUYERS : catererBuyers();

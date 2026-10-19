@@ -54,7 +54,7 @@ export const STAY_READY_CHANGED_EVENT = "stay-ready-changed";
 const KEY = "profile.stayReady";
 
 function seed(): TrackedItem[] {
-  return byMember({ caterer: catererItems, agency: agencyItems })();
+  return byMember({ caterer: catererItems, pack: agencyItems })();
 }
 
 function samItem(): TrackedItem {

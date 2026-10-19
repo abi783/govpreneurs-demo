@@ -12,8 +12,11 @@ import { PAST_PERFORMANCE, findPastPerformance } from "@/demo/story/persona";
 import { getOpportunity } from "@/demo/story/opportunities";
 import type { AwardBench, AwardRecord } from "@/lib/awardsApi";
 import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
-import { byMember } from "@/demo/member";
-import * as agencyMarket from "@/demo/members/agency/market/awards";
+import { byMember, own } from "@/demo/member";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/awards")>("/src/demo/members/*/market/awards.ts", { eager: true }),
+);
 
 interface Agency {
   name: string;
@@ -759,10 +762,10 @@ const CATERER_SEEDS: AwardSeed[] = [
 type AnySeed = AwardSeed<string>;
 
 // DEMO: two members. The agency's awards and buyers are in src/demo/members/agency/market/awards.ts.
-const SEEDS: readonly AnySeed[] = byMember<readonly AnySeed[]>({ agency: agencyMarket.AWARD_SEEDS, caterer: CATERER_SEEDS });
-const BUYERS: Record<string, Agency> = byMember<Record<string, Agency>>({ agency: agencyMarket.AWARD_AGENCIES, caterer: AGENCIES });
+const SEEDS: readonly AnySeed[] = byMember<readonly AnySeed[]>({ pack: pack.AWARD_SEEDS, caterer: CATERER_SEEDS });
+const BUYERS: Record<string, Agency> = byMember<Record<string, Agency>>({ pack: pack.AWARD_AGENCIES, caterer: AGENCIES });
 const BUYER_LABELS: Record<string, string> = byMember<Record<string, string>>({
-  agency: agencyMarket.AWARD_AGENCY_LABEL,
+  pack: pack.AWARD_AGENCY_LABEL,
   caterer: AGENCY_LABEL,
 });
 
@@ -803,7 +806,7 @@ function catererOpenNowNote(): string {
 }
 
 const openNowNote: (awardId: string) => string | undefined = byMember({
-  agency: agencyMarket.openNowNote,
+  pack: pack.openNowNote,
   caterer: () => catererOpenNowNote(),
 });
 

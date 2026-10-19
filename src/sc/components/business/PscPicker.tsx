@@ -50,7 +50,7 @@ import {
 import { byMember } from "@/demo/member";
 const PSC_SEARCH_HINT = byMember({
   caterer: "Search a group or a code — housekeeping, catering, guard…",
-  agency: "Search a group or a code — advertising, video, printing…",
+  pack: "Search a group or a code — advertising, video, printing…",
 });
 
 /** Long enough that typing a word does not fire a request per keystroke. */

@@ -6,15 +6,16 @@
 // Written replies are keyed by opportunity id. Any other review gets a short
 // reply built from the opportunity, so the control never does nothing.
 
-import { byMember } from "../member";
-import * as agency from "../members/agency/mentorReplies";
-import * as caterer from "../members/caterer/mentorReplies";
+import { own } from "../member";
 import { getOpportunity } from "./opportunities";
 import { PERSONA } from "./persona";
 
+const MEMBER_FILES = import.meta.glob<typeof import("../members/agency/mentorReplies")>("/src/demo/members/*/mentorReplies.ts", { eager: true });
+const member = own(MEMBER_FILES);
+
 export type MentorVerdict = "pursue" | "discuss" | "pass";
 
-const WRITTEN = byMember({ agency: agency.MENTOR_REPLIES, caterer: caterer.MENTOR_REPLIES });
+const WRITTEN = member.MENTOR_REPLIES;
 
 /** Sarah's reply for this opportunity and verdict, as HTML. */
 export function mentorReplyFor(oppId: string | null, verdict: MentorVerdict): string {

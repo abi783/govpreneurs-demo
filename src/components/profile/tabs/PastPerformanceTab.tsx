@@ -47,7 +47,7 @@ const TEMPLATE = [
   byMember({
     caterer:
       '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
-    agency:
+    pack:
       '"Example: recruiting video campaign","Example County",45000,2024-03-01,2024-09-30,541810,Prime,"Made four 30-second videos and ran paid social for six months. 1,200 people filled in the lead form."',
   }),
 ].join("\n");

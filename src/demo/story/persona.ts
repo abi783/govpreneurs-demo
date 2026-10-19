@@ -4,9 +4,10 @@
 // DEMO: the demo can tell two stories (src/demo/member.ts). This file holds the
 // shapes and picks the active member's data from src/demo/members/<member>/.
 
-import { byMember } from "../member";
-import * as agency from "../members/agency/persona";
-import * as caterer from "../members/caterer/persona";
+import { others, own } from "../member";
+
+const MEMBER_FILES = import.meta.glob<typeof import("../members/agency/persona")>("/src/demo/members/*/persona.ts", { eager: true });
+const member = own(MEMBER_FILES);
 
 export interface Persona {
   ownerFirstName: string;
@@ -95,13 +96,10 @@ export interface Partner {
   seeking: string;
 }
 
-export const PERSONA: Persona = byMember({ agency: agency.PERSONA, caterer: caterer.PERSONA });
+export const PERSONA: Persona = member.PERSONA;
 
 // Past jobs are history, so their dates are fixed, not relative.
-export const PAST_PERFORMANCE: PastPerformance[] = byMember({
-  agency: agency.PAST_PERFORMANCE,
-  caterer: caterer.PAST_PERFORMANCE,
-});
+export const PAST_PERFORMANCE: PastPerformance[] = member.PAST_PERFORMANCE;
 
 /**
  * Find a past job by id. DEMO: it also finds the other member's jobs, so content
@@ -111,7 +109,9 @@ export const PAST_PERFORMANCE: PastPerformance[] = byMember({
 export function findPastPerformance(id: PastPerformanceId): PastPerformance | undefined {
   return (
     PAST_PERFORMANCE.find((p) => p.id === id) ??
-    byMember({ agency: caterer.PAST_PERFORMANCE, caterer: agency.PAST_PERFORMANCE }).find((p) => p.id === id)
+    others(MEMBER_FILES)
+      .flatMap((m) => m.PAST_PERFORMANCE)
+      .find((p) => p.id === id)
   );
 }
 
@@ -131,13 +131,10 @@ export interface PastPerformanceRoles {
   womack: PastPerformanceId;
 }
 
-export const PAST_PERFORMANCE_ROLES: PastPerformanceRoles = byMember({
-  agency: { county: "pp-fayetteville-stormwater", cdg: "pp-ncng-recruiting", church: "pp-two-rivers-dental", womack: "pp-ncng-recruiting" },
-  caterer: { county: "pp-county-schools", cdg: "pp-cdg-sub", church: "pp-church", womack: "pp-womack" },
-});
+export const PAST_PERFORMANCE_ROLES: PastPerformanceRoles = member.PAST_PERFORMANCE_ROLES;
 
 /** The one mentor in the story. Every screen uses this name. */
-export const MENTOR: MentorProfile = byMember({ agency: agency.MENTOR, caterer: caterer.MENTOR });
+export const MENTOR: MentorProfile = member.MENTOR;
 
 /** The partner at the center of the team-up story. */
-export const KEY_PARTNER: Partner = byMember({ agency: agency.KEY_PARTNER, caterer: caterer.KEY_PARTNER });
+export const KEY_PARTNER: Partner = member.KEY_PARTNER;

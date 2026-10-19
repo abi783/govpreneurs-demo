@@ -18,9 +18,17 @@
 
 import type { PastPerformanceId } from "./persona";
 import type { PlaceKey } from "./places";
-import { byMember } from "../member";
+import { MEMBER, type MemberId } from "../member";
 import * as agency from "../members/agency/opportunities";
 import * as caterer from "../members/caterer/opportunities";
+
+// Every member's opportunities. Static imports, not a glob: the QA specs load
+// this file outside Vite. A new member adds one line here.
+const MEMBER_FILES: Record<
+  MemberId,
+  { HERO_IDS: { readonly hero: string; readonly twin: string; readonly teamUp: string }; OPPORTUNITIES: StoryOpportunity[] }
+> = { agency, caterer };
+const member = MEMBER_FILES[MEMBER];
 
 export type NoticeType =
   | "Solicitation"
@@ -148,10 +156,7 @@ export interface StoryOpportunity {
 }
 
 
-const HEROES = byMember<{ readonly hero: string; readonly twin: string; readonly teamUp: string }>({
-  agency: agency.HERO_IDS,
-  caterer: caterer.HERO_IDS,
-});
+const HEROES = member.HERO_IDS;
 
 /**
  * The three opportunities the story turns on: the hero Grant says to bid, its
@@ -161,13 +166,10 @@ const HEROES = byMember<{ readonly hero: string; readonly twin: string; readonly
  */
 export const HERO_IDS = HEROES;
 
-export const OPPORTUNITIES: StoryOpportunity[] = byMember({
-  agency: agency.OPPORTUNITIES,
-  caterer: caterer.OPPORTUNITIES,
-});
+export const OPPORTUNITIES: StoryOpportunity[] = member.OPPORTUNITIES;
 
-/** The other member's records. Never in a feed or a list (see OPPORTUNITIES). */
-const OTHER_MEMBER: StoryOpportunity[] = byMember({ agency: caterer.OPPORTUNITIES, caterer: agency.OPPORTUNITIES });
+/** Every other member's records. Never in a feed or a list (see OPPORTUNITIES). */
+const OTHER_MEMBER: StoryOpportunity[] = Object.entries(MEMBER_FILES).flatMap(([id, m]) => (id === MEMBER ? [] : m.OPPORTUNITIES));
 
 /**
  * Lookup by id. DEMO: it also finds the other member's records, so content

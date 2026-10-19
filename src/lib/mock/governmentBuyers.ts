@@ -21,7 +21,7 @@ import { BUYER_SEED } from "@/demo/explore/buyersData";
 
 /** DEMO: the member's trade, in the words the buyer pages use. */
 export const TRADE = byMember({
-  agency: { label: "Marketing and advertising", phrase: "marketing and advertising" },
+  pack: { label: "Marketing and advertising", phrase: "marketing and advertising" },
   caterer: { label: "Food service", phrase: "food service" },
 });
 

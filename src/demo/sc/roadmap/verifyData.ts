@@ -98,7 +98,7 @@ function dataFor(key: VerifyKey, checkedAt: string, inputs?: Record<string, unkn
           day: "numeric",
           year: "numeric",
         }),
-        scope: byMember({ caterer: "Kitchen and office systems", agency: "Studio, edit suite and office systems" }),
+        scope: byMember({ caterer: "Kitchen and office systems", pack: "Studio, edit suite and office systems" }),
         affirmingOfficial: PERSONA.ownerName,
       };
   }

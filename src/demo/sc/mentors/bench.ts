@@ -44,7 +44,7 @@ export const BENCH: BenchMentor[] = [
       // DEMO: the line names the member's kind of work.
       byMember({
         caterer: "Pick the right bids, check your price, and read your proposal before you send it. Best for food-service and facilities bids.",
-        agency: "Pick the right bids, check your price, and read your proposal before you send it. Best for Army and VA services bids.",
+        pack: "Pick the right bids, check your price, and read your proposal before you send it. Best for Army and VA services bids.",
       }),
     price: MENTOR_REVIEW_PRICE,
     hours: { start: 9, end: 16, lunch: 12 },
@@ -62,7 +62,7 @@ export const BENCH: BenchMentor[] = [
         consultationDescription:
           "Write an approach section that scores. Bring a draft or a solicitation and Renee will mark what the evaluators will look for.",
       },
-      agency: {
+      pack: {
         title: "Proposal writing and GSA schedules · former proposal director",
         bio: "Renee led proposal teams at a federal communications contractor for 11 years, including two GSA schedule offers. She has written or reviewed more than 200 federal proposals.",
         consultationDescription:
@@ -111,7 +111,7 @@ export const BENCH: BenchMentor[] = [
         consultationDescription:
           "Build a price that covers your costs and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
       },
-      agency: {
+      pack: {
         bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, media buys and overhead without under-bidding.",
         consultationDescription:
           "Build a price that covers your costs and still pays you, option years included. Calvin checks your labor rates, media costs and margin line by line.",
@@ -133,7 +133,7 @@ export const BENCH: BenchMentor[] = [
         consultationDescription:
           "Sell to VA medical centers. Learn the VA's forms, its veteran set-aside rules, and how a hospital kitchen contract is scored.",
       },
-      agency: {
+      pack: {
         bio: "Angela bought outreach, hiring and facility services for VA medical centers for 12 years. She explains how the VA buys and what its evaluators score.",
         consultationDescription:
           "Sell to the VA. Learn the VA's forms, its veteran set-aside rules, and how to work under a veteran-owned prime.",
