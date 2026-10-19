@@ -145,7 +145,7 @@ describe.runIf(MEMBER === "it")("the IT firm's Army Reserve help desk quote", ()
     const { bid, s } = look(ID, ready(ID, atStart()));
     const years = periodTotals(bid, s).map((p) => p.total!);
     expect(years).toHaveLength(5);
-    // Six seats at the wage floor run above Grant's "about $620K a year".
+    // Six seats at the wage floor come to about $710K, Grant's "about $710K a year".
     expect(years[0]).toBeGreaterThan(620_000);
     expect(years[0]).toBeLessThan(740_000);
     expect(years[1]).toBeGreaterThan(years[0]);
