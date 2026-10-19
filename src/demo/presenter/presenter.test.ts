@@ -10,14 +10,20 @@ import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
 import { avaDemo } from "@/lib/ava/store";
 import { ready, reading } from "@/lib/ava/play";
 import { SEGMENTS } from "./segments";
+import { byMember } from "@/demo/member";
 
 const HERO = HERO_IDS.hero;
+/** An opportunity with Sarah's written reply, and a word from it, per member. */
+const LIVE_REVIEW = byMember({
+  caterer: { oppKey: "VA247-26-R-0112", word: "Womack" },
+  agency: { oppKey: "MWR-FB-27-0006", word: "posters" },
+});
 
 beforeEach(() => wipeDemoStorage());
 
 describe("C1: Sarah answers", () => {
   it("turns a pending review into her reply, with the verdict", () => {
-    const sent = createReview({ oppKey: "VA247-26-R-0112", title: "Patient meals", message: "Should I bid?" });
+    const sent = createReview({ oppKey: LIVE_REVIEW.oppKey, title: "A live review", message: "Should I bid?" });
     expect(pendingReviews().map((r) => r.id)).toContain(sent.id);
 
     const answered = answerReview(sent.id, "pursue");
@@ -29,7 +35,7 @@ describe("C1: Sarah answers", () => {
     const thread = getMentorReviewThread(sent.id)!;
     const last = thread.messages[thread.messages.length - 1];
     expect(last.author).toBe("mentor");
-    expect(last.bodyHtml).toContain("Womack");
+    expect(last.bodyHtml).toContain(LIVE_REVIEW.word);
   });
 
   it("writes a sensible reply for an opportunity with no written one", () => {
