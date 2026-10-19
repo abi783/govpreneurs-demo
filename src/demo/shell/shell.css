@@ -632,3 +632,19 @@
     animation: none;
   }
 }
+
+/* DEMO: presenter mode off (visitor.ts). */
+.demo-presenter__leave {
+  margin-top: var(--s-2);
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--n-6);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.demo-presenter__leave:hover { color: var(--n-3); }

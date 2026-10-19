@@ -51,6 +51,9 @@ function resolveMember(): MemberId {
       }
       const kept = window.sessionStorage.getItem(MEMBER_KEY);
       if (isMember(kept)) return kept;
+      // A visitor's pick on the start screen (visitor.ts), remembered across tabs.
+      const picked = (JSON.parse(window.localStorage.getItem("gp-demo:visitor") ?? "null") as { member?: string } | null)?.member;
+      if (isMember(picked)) return picked;
     } catch {
       /* storage blocked: fall through */
     }

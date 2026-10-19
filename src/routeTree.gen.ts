@@ -13,6 +13,7 @@ import { Route as WhosWinningRouteImport } from './routes/whos-winning'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as VehiclesRouteImport } from './routes/vehicles'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as StartRouteImport } from './routes/start'
 import { Route as SmallOrdersRouteImport } from './routes/small-orders'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PipelineRouteImport } from './routes/pipeline'
@@ -30,6 +31,7 @@ import { Route as BusinessProfileRouteImport } from './routes/business-profile'
 import { Route as AwardsRouteImport } from './routes/awards'
 import { Route as AvaRouteImport } from './routes/ava'
 import { Route as AgenciesRouteImport } from './routes/agencies'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StayReadyIndexRouteImport } from './routes/stay-ready.index'
 import { Route as SmallOrdersIndexRouteImport } from './routes/small-orders.index'
@@ -69,6 +71,11 @@ const VehiclesRoute = VehiclesRouteImport.update({
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartRoute = StartRouteImport.update({
+  id: '/start',
+  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SmallOrdersRoute = SmallOrdersRouteImport.update({
@@ -154,6 +161,11 @@ const AvaRoute = AvaRouteImport.update({
 const AgenciesRoute = AgenciesRouteImport.update({
   id: '/agencies',
   path: '/agencies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -260,6 +272,7 @@ const OpportunitiesAwardedContractIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
   '/ava': typeof AvaRouteWithChildren
   '/awards': typeof AwardsRouteWithChildren
@@ -277,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
+  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -303,6 +317,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
   '/business-profile': typeof BusinessProfileRoute
   '/find-a-mentor': typeof FindAMentorRoute
@@ -313,6 +328,7 @@ export interface FileRoutesByTo {
   '/partners': typeof PartnersRoute
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
+  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -340,6 +356,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/agencies': typeof AgenciesRoute
   '/ava': typeof AvaRouteWithChildren
   '/awards': typeof AwardsRouteWithChildren
@@ -357,6 +374,7 @@ export interface FileRoutesById {
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
+  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -385,6 +403,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/agencies'
     | '/ava'
     | '/awards'
@@ -402,6 +421,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/roadmap'
     | '/small-orders'
+    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -428,6 +448,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/agencies'
     | '/business-profile'
     | '/find-a-mentor'
@@ -438,6 +459,7 @@ export interface FileRouteTypes {
     | '/partners'
     | '/pipeline'
     | '/roadmap'
+    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -464,6 +486,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/agencies'
     | '/ava'
     | '/awards'
@@ -481,6 +504,7 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/roadmap'
     | '/small-orders'
+    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -508,6 +532,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AgenciesRoute: typeof AgenciesRoute
   AvaRoute: typeof AvaRouteWithChildren
   AwardsRoute: typeof AwardsRouteWithChildren
@@ -525,6 +550,7 @@ export interface RootRouteChildren {
   PipelineRoute: typeof PipelineRoute
   RoadmapRoute: typeof RoadmapRoute
   SmallOrdersRoute: typeof SmallOrdersRouteWithChildren
+  StartRoute: typeof StartRoute
   TasksRoute: typeof TasksRoute
   VehiclesRoute: typeof VehiclesRoute
   WalletRoute: typeof WalletRoute
@@ -562,6 +588,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start': {
+      id: '/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/small-orders': {
@@ -681,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/agencies'
       fullPath: '/agencies'
       preLoaderRoute: typeof AgenciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -926,6 +966,7 @@ const SmallOrdersRouteWithChildren = SmallOrdersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AgenciesRoute: AgenciesRoute,
   AvaRoute: AvaRouteWithChildren,
   AwardsRoute: AwardsRouteWithChildren,
@@ -943,6 +984,7 @@ const rootRouteChildren: RootRouteChildren = {
   PipelineRoute: PipelineRoute,
   RoadmapRoute: RoadmapRoute,
   SmallOrdersRoute: SmallOrdersRouteWithChildren,
+  StartRoute: StartRoute,
   TasksRoute: TasksRoute,
   VehiclesRoute: VehiclesRoute,
   WalletRoute: WalletRoute,

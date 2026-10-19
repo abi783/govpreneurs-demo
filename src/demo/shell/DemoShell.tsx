@@ -13,6 +13,7 @@ import { CommandPalette } from "./CommandPalette";
 import { ResetDemoDialog } from "./ResetDemo";
 import { DemoNoticeHost } from "./DemoNoticeHost";
 import { PresenterPanel } from "../presenter/PresenterPanel";
+import { getVisitor, isPresenter } from "../visitor";
 import { TimeJumpHost } from "../presenter/TimeJump";
 import { ScChatHost } from "../sc/ScChatHost";
 import "./shell.css";
@@ -114,6 +115,14 @@ function useNoClickThroughOnDoubleClick() {
 
 const IS_MAC = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
 
+/** The strip above every page. A visitor hears whose business she is looking at (D98). */
+function stripText(): string {
+  const v = isPresenter() ? null : getVisitor();
+  if (v?.niche === "other") return `We don't have your trade yet, so this is ${PERSONA.businessShortName}, a sample marketing agency.`;
+  if (v) return `You're exploring ${PERSONA.businessShortName}, a sample business like yours.`;
+  return `Sample data — ${PERSONA.businessShortName} is a fictional business.`;
+}
+
 export function DemoShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -176,7 +185,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
       <div className="demo-content">
         <div className="demo-strip">
           <span className="demo-strip__text">
-            Sample data — {PERSONA.businessShortName} is a fictional business.
+            {stripText()}
           </span>
           <button type="button" className="demo-strip__reset" onClick={() => setResetOpen(true)}>
             <RotateCcw size={12} aria-hidden />
@@ -192,7 +201,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
       <ResetDemoDialog open={resetOpen} onOpenChange={setResetOpen} />
       <DemoNoticeHost />
       <ScChatHost />
-      <PresenterPanel />
+      {isPresenter() && <PresenterPanel />}
       <TimeJumpHost />
     </div>
   );
