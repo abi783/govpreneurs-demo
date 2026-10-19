@@ -191,6 +191,7 @@ const NAICS: CodeRow[] = [
   { code: "493110", description: "General Warehousing and Storage" },
   { code: "532120", description: "Truck, Utility Trailer, and RV (Recreational Vehicle) Rental and Leasing" },
   { code: "621111", description: "Offices of Physicians (except Mental Health Specialists)" },
+  { code: "621330", description: "Offices of Mental Health Practitioners (except Physicians)" },
   { code: "621610", description: "Home Health Care Services" },
   { code: "622110", description: "General Medical and Surgical Hospitals" },
   { code: "623110", description: "Nursing Care Facilities (Skilled Nursing Facilities)" },
