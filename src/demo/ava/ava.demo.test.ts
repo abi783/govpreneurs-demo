@@ -61,7 +61,7 @@ describe("the story, as Ava reads it", () => {
     expect(findOpportunity("NOT-A-BID-123")).toBeUndefined();
   });
 
-  test.runIf(!CATERER)("the agency's one bid is its hero, with 3 questions waiting", () => {
+  test.runIf(MEMBER === "agency")("the agency's one bid is its hero, with 3 questions waiting", () => {
     expect(STORY_BID_IDS).toEqual([AGENCY_HERO]);
     expect(STORY_BIDS[0].statusLine).toBe(
       "Ava has 3 questions for you about your team, the videos and the app line.",

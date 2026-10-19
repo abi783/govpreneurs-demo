@@ -25,11 +25,15 @@ const pack = own(
   import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
 );
 
+/** A set-aside code a member holds, as the forecast engine's certificate name. */
+const CERT_OF: Partial<Record<string, string>> = { WOSB: "wosb", HZC: "hubzone", SDVOSBC: "sdvosb", "8A": "8a" };
+
 /** Amira's facts, as the forecast rules read them. */
 export const FORECAST_MEMBER: ForecastMemberDto = {
   naics: [PERSONA.primaryNaics, ...PERSONA.secondaryNaics.map((n) => n.code)],
   states: [...PERSONA.serviceStates],
-  certs: ["wosb"],
+  // DEMO: the member's own program certificates, in the engine's names (WOSB → "wosb").
+  certs: PERSONA.setAsideEligibility.flatMap((c) => (CERT_OF[c] ? [CERT_OF[c]] : [])),
   certsKnown: true,
   isSmall: true,
   registration: { status: "active", endsOn: PERSONA.samActiveUntil },

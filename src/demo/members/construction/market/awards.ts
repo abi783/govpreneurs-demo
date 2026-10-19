@@ -1,36 +1,31 @@
-// THE AGENCY's award record: the Awards page, the Partners "Who's winning" strip,
+// THE CONTRACTOR's award record: the Awards page, the Partners "Who's winning" strip,
 // the Government Buyers panel and the company files (read through
 // src/demo/explore/awardsData.ts, which picks the active member).
 //
-// Each award is modeled on a real federal award for advertising, marketing, design
-// or video work in NC, SC or VA (sources below): the buyer, the work, the value,
-// the set-aside and the number of offers come from the real record. Changed: the
-// winner is a made-up company (D13), the award id is invented in the buyer's format
-// (each id checked unused on USAspending, 19 Oct 2026), and most dates are counted
-// from today so "Just awarded" stays true. Two awards keep their real dates because
-// the story is built on them: the VA hiring campaign (ends 24 September 2027) and
-// Dana's own NC Guard campaign (persona.ts).
+// Source: demo-storyboard/construction-pack.md, section 13. Each award is modeled on
+// a real federal construction award with work at or near Fort Bragg (the model is
+// named on each one): the buyer, the work, the value, the set-aside and the number
+// of offers come from the real record. Changed: the winner is a made-up company
+// (D13), the award id is invented in the buyer's format (the pack's ids were checked
+// unused on USAspending, 19 Oct 2026; the two VA service orders' ids were not), and
+// most dates are counted from today so "Just awarded" stays true. Two awards keep
+// their real dates: the VA's 3rd-floor fan coils (the team-up's predecessor) and
+// Derrick's own Pope job (persona.ts).
 //
-// Sources (USAspending, pulled 19 Oct 2026):
-//   VHA recruitment marketing   https://www.usaspending.gov/award/CONT_AWD_36C77623C0104_3600_-NONE-_-NONE-
-//   VA "Same Day" promotion     https://www.usaspending.gov/award/CONT_AWD_36C24625P0814_3600_-NONE-_-NONE-
-//   NC Guard recruiting website https://www.usaspending.gov/award/CONT_AWD_W9124225FA076_9700_GS07F0382X_4732
-//   NC Guard visual design      https://www.usaspending.gov/award/CONT_AWD_W9124223P0066_9700_-NONE-_-NONE-
-//   Durham VA video (2026)      https://www.usaspending.gov/award/CONT_AWD_36C24626P0898_3600_-NONE-_-NONE-
-//   Durham VA video (2023)      https://www.usaspending.gov/award/CONT_AWD_36C24623P1780_3600_-NONE-_-NONE-
-//   Norfolk Naval Shipyard      https://www.usaspending.gov/award/CONT_AWD_N4215820PS265_9700_-NONE-_-NONE-
-//   Fort Bragg print and digital https://www.usaspending.gov/award/CONT_AWD_W9124719P1860_9700_-NONE-_-NONE-
-//   NC DMV screen ads           https://www.usaspending.gov/award/CONT_AWD_W9124225PA042_9700_-NONE-_-NONE-
-//   MARSOC geofencing           https://www.usaspending.gov/award/CONT_AWD_H9225720P0024_9700_-NONE-_-NONE-
-//   MARSOC article series       https://www.usaspending.gov/award/CONT_AWD_H9225723P0036_9700_-NONE-_-NONE-
-//   SC ANG recruiting           https://www.usaspending.gov/award/CONT_AWD_W50S9525PA007_9700_-NONE-_-NONE-
-//   Fort Jackson graphics       https://www.usaspending.gov/award/CONT_AWD_W9124C21P0030_9700_-NONE-_-NONE-
-//   USASOC short film           https://www.usaspending.gov/award/CONT_AWD_H9223922P0011_9700_-NONE-_-NONE-
-//   MARSOC video and photo shoot https://www.usaspending.gov/award/CONT_AWD_H9225722F0107_9700_H9225720D0002_9700
-//   MARSOC staff and advertising https://www.usaspending.gov/award/CONT_AWD_H9225726FE074_9700_H9240020D0039_9700
-//   Camp Lejeune media monitoring https://www.usaspending.gov/award/CONT_AWD_M6700121P1196_9700_-NONE-_-NONE-
-//   NC Guard digital recruiting (Dana's, modeled on) https://www.usaspending.gov/award/CONT_AWD_W9124221P0013_9700_-NONE-_-NONE-
-//     and https://www.usaspending.gov/award/CONT_AWD_W912K625PA019_9700_-NONE-_-NONE-
+// Models (USAspending):
+//   Barracks HVAC task order      https://www.usaspending.gov/award/CONT_AWD_W9124724F0488_9700_W9124723D9010_9700
+//   HUBZone SOF HVAC, 9 offers    https://www.usaspending.gov/award/CONT_AWD_W912PM21C0014_9700_-NONE-_-NONE-
+//   8(a) barracks HVAC            https://www.usaspending.gov/award/CONT_AWD_W9124725CA074_9700_-NONE-_-NONE-
+//   USACE Savannah barracks       https://www.usaspending.gov/award/CONT_AWD_W912HN22C4007_9700_-NONE-_-NONE-
+//   VA auxiliary chiller          https://www.usaspending.gov/award/CONT_AWD_36C24626C0024_3600_-NONE-_-NONE-
+//   VA fan coils, 3rd floor       https://www.usaspending.gov/award/CONT_AWD_36C24623C0027_3600_-NONE-_-NONE-
+//   VA health-record wiring       https://www.usaspending.gov/award/CONT_AWD_36C77626C0042_3600_-NONE-_-NONE-
+//   VA breaker testing            https://www.usaspending.gov/award/CONT_AWD_36C24626P0998_3600_-NONE-_-NONE-
+//   VA boiler plant services      https://www.usaspending.gov/award/CONT_AWD_36C24624P1848_3600_-NONE-_-NONE-
+//   Pope electrical repair        https://www.usaspending.gov/award/CONT_AWD_FA445225P0042_9700_-NONE-_-NONE-
+//   Pope B771 renovation (his)    https://www.usaspending.gov/award/CONT_AWD_FA445224C0007_9700_-NONE-_-NONE-
+//   FAA HVAC                      https://www.usaspending.gov/award/CONT_AWD_6973GH21C00079_6920_-NONE-_-NONE-
+//   Minor MATOC order             https://www.usaspending.gov/award/CONT_AWD_W9124725FA086_9700_W9124723D9007_9700
 
 import { findPastPerformance } from "../../../story/persona";
 import { getOpportunity } from "../../../story/opportunities";
@@ -40,425 +35,319 @@ import { KEY_PARTNER_FIRM, MEMBER_FIRM } from "./firms";
 
 /** The buyers. Government offices are real, so these names are real. */
 export const AWARD_AGENCIES = {
+  usaceWilmington: { name: "Department of the Army, U.S. Army Corps of Engineers, Wilmington District", abbrev: "USACE Wilmington", isDefense: true },
+  usaceSavannah: { name: "Department of the Army, U.S. Army Corps of Engineers, Savannah District", abbrev: "USACE Savannah", isDefense: true },
   braggMicc: { name: "Department of the Army, Mission and Installation Contracting Command (Fort Bragg)", abbrev: "MICC Fort Bragg", isDefense: true },
-  uspfoNc: { name: "Department of the Army, USPFO for North Carolina (NC Army National Guard)", abbrev: "USPFO NC", isDefense: true },
-  vaPcac: { name: "Department of Veterans Affairs, Program Contracting Activity Central", abbrev: "VA PCAC", isDefense: false },
+  pope: { name: "Department of the Air Force, 763rd Enterprise Sourcing Squadron (Pope Army Airfield)", abbrev: "763 ESS Pope", isDefense: true },
   vaNco6: { name: "Department of Veterans Affairs, Network Contracting Office 6", abbrev: "VA NCO 6", isDefense: false },
-  marsoc: { name: "U.S. Special Operations Command, Marine Forces Special Operations Command (Camp Lejeune)", abbrev: "MARSOC", isDefense: true },
-  usasoc: { name: "U.S. Special Operations Command, U.S. Army Special Operations Command (Fort Bragg)", abbrev: "USASOC", isDefense: true },
-  lejeune: { name: "Department of the Navy, Marine Corps Base Camp Lejeune", abbrev: "MCB Camp Lejeune", isDefense: true },
-  uspfoSc: { name: "Department of the Air Force, USPFO for South Carolina (169th Fighter Wing)", abbrev: "USPFO SC", isDefense: true },
-  fortJackson: { name: "Department of the Army, MICC Fort Jackson", abbrev: "MICC Fort Jackson", isDefense: true },
-  norfolkShipyard: { name: "Department of the Navy, Norfolk Naval Shipyard", abbrev: "Norfolk Naval Shipyard", isDefense: true },
+  vaPcac: { name: "Department of Veterans Affairs, Program Contracting Activity Central", abbrev: "VA PCAC", isDefense: false },
+  faa: { name: "Department of Transportation, Federal Aviation Administration", abbrev: "FAA", isDefense: false },
 } as const;
 
 export type AgencyAwardAgency = keyof typeof AWARD_AGENCIES;
 
 /** The buyer in a sentence, for "Won (job) for (buyer)". */
 export const AWARD_AGENCY_LABEL: Record<AgencyAwardAgency, string> = {
+  usaceWilmington: "the Corps of Engineers' Wilmington District",
+  usaceSavannah: "the Corps of Engineers' Savannah District",
   braggMicc: "the Army contracting office at Fort Bragg",
-  uspfoNc: "the NC National Guard",
-  vaPcac: "the VA's national contracting office",
+  pope: "Air Force contracting at Pope Army Airfield",
   vaNco6: "the VA contracting office for North Carolina and Virginia",
-  marsoc: "Marine special operations at Camp Lejeune",
-  usasoc: "Army special operations at Fort Bragg",
-  lejeune: "Marine Corps Base Camp Lejeune",
-  uspfoSc: "the South Carolina Air National Guard",
-  fortJackson: "the Army at Fort Jackson",
-  norfolkShipyard: "the Navy at Norfolk Naval Shipyard",
+  vaPcac: "the VA's national contracting office",
+  faa: "the Federal Aviation Administration",
 };
 
 const FULL_OPEN = "Full and Open Competition";
 const AFTER_EXCL = "Full and Open Competition after exclusion of sources";
 const SIMPLIFIED = "Competed under simplified acquisition procedures";
+const FAIR_OPPORTUNITY = "Subject to Multiple Award Fair Opportunity";
 const NOT_COMPETED = "Not Competed";
 const SB_SETASIDE = "Small Business Set-Aside, total";
+const HUBZONE_SETASIDE = "HUBZone Set-Aside";
 const SDVOSB_SETASIDE = "Service-Disabled Veteran-Owned Small Business Set-Aside";
 const EIGHT_A_SOLE = "8(a) Sole Source";
 const SB_PRIME = "Not required (small business prime)";
 
-const BLUESTONE = KEY_PARTNER_FIRM.key;
-const DANA = MEMBER_FIRM.key;
-const ncng = findPastPerformance("pp-ncng-recruiting")!;
+const BLACKJACK = KEY_PARTNER_FIRM.key;
+const NINEBARK = MEMBER_FIRM.key;
+const pope = findPastPerformance("pp-pope-office-hvac")!;
+
+/** The VA's 3rd-floor fan coils: the job the VA is asking about again for floors 2 and 4. */
+const FAN_COILS_3RD_FLOOR = "36C24623C0189";
 
 export const AWARD_SEEDS: AwardSeed<AgencyAwardAgency>[] = [
-  // ── Bluestone Veteran Media Group (4001): the VA's national hiring campaign ──
+  // ── Blackjack Oak Federal Builders (4001): the Fayetteville VA's wiring job ──
   {
-    id: "36C77623C0298",
-    title: "VHA recruitment marketing and advertising campaign (national)",
-    winner: BLUESTONE,
+    id: "36C77626C0311",
+    title: "Health-record infrastructure upgrades, Fayetteville VA Medical Center",
+    winner: BLACKJACK,
     agency: "vaPcac",
-    obligated: 34_307_425,
-    ceiling: 41_650_983,
-    startedOn: "2023-09-25",
-    endsOn: "2027-09-24",
-    rebidIsOpen: true,
-    city: "Alexandria",
-    state: "VA",
-    naics: "541613",
-    workType: "Hiring campaigns for VA doctors, nurses and staff",
-    psc: "R701",
-    offers: 11,
+    obligated: 21_588_052,
+    startedDaysAgo: 150,
+    endsInDays: 420,
+    city: "Fayetteville",
+    state: "NC",
+    naics: "236220",
+    workType: "New wiring, telecom rooms and power for the VA's new health-record system",
+    psc: "Z2DA",
+    offers: 6,
     extent: AFTER_EXCL,
     setAside: SDVOSB_SETASIDE,
     subPlan: SB_PRIME,
-    bench: { distinct: 9, repeat: 3, subs: [[4003, 2], [4007, 1], [4006, 1]] },
+    bench: { distinct: 7, repeat: 2, subs: [[4003, 1], [4004, 1]] },
+  },
+
+  // ── Ninebark Builders (4000): Derrick's own Pope job ─────────────────────
+  {
+    id: "FA445225C0019",
+    title: "HVAC and electrical repair, office building, Pope Army Airfield",
+    winner: NINEBARK,
+    agency: "pope",
+    obligated: pope.totalValue,
+    currentValue: pope.totalValue,
+    ceiling: pope.totalValue,
+    startedOn: pope.periodStart,
+    endsOn: pope.periodEnd,
+    city: "Pope Army Airfield",
+    state: "NC",
+    naics: "238220",
+    workType: "Six heat pumps, a new 400A panel and controls in an office building",
+    psc: "Z2AA",
+    offers: 5,
+    extent: AFTER_EXCL,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Turnrow Federal (4002): Vertical Construction MATOC task orders ──────
+  {
+    id: "W9124726F0412",
+    title: "Barracks HVAC repair, Fort Bragg (task order under the Vertical Construction MATOC)",
+    winner: 4002,
+    agency: "braggMicc",
+    obligated: 2_273_756,
+    startedDaysAgo: 70,
+    endsInDays: 260,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "236220",
+    workType: "New air handlers, piping and controls in an occupied barracks",
+    psc: "Z2JZ",
+    offers: 5,
+    extent: FAIR_OPPORTUNITY,
+    setAside: HUBZONE_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 6, repeat: 2, subs: [[4000, 1], [4003, 1]] },
+  },
+
+  // ── Pocosin Mechanical (4003): HUBZone HVAC work ─────────────────────────
+  {
+    id: "W912PM26C0017",
+    title: "HVAC replacement, Special Operations building, Fort Bragg",
+    winner: 4003,
+    agency: "usaceWilmington",
+    obligated: 1_098_843,
+    startedDaysAgo: 230,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "238220",
+    workType: "A sealed bid: air handlers, a chiller and controls in an occupied building",
+    psc: "Z2AA",
+    offers: 9,
+    extent: AFTER_EXCL,
+    setAside: HUBZONE_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 3, repeat: 1, subs: [[4004, 1]] },
   },
   {
-    id: "36C24625P2968",
-    title: "Promotional materials for the \"Same Day\" access campaign, Durham VA Health Care System",
-    winner: BLUESTONE,
-    agency: "vaNco6",
-    obligated: 22_045,
-    ceiling: 49_655,
-    startedDaysAgo: 584,
-    endsInDays: 145,
-    city: "Durham",
+    id: "6973GH24C00187",
+    title: "HVAC upgrade, FAA radar site, Raeford",
+    winner: 4003,
+    agency: "faa",
+    obligated: 215_808,
+    startedDaysAgo: 760,
+    city: "Raeford",
     state: "NC",
-    naics: "541810",
-    workType: "Printed and digital pieces for a public-affairs campaign",
-    psc: "R701",
+    naics: "238220",
+    workType: "New HVAC for a radar equipment building, kept cool during the switch",
+    psc: "Z2AZ",
+    offers: 16,
+    extent: AFTER_EXCL,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 3, repeat: 1, subs: [[4004, 1]] },
+  },
+  {
+    id: "W9124726FA233",
+    title: "Exit signs and emergency lights, Fort Bragg (order under the Minor Construction MATOC)",
+    winner: 4003,
+    agency: "braggMicc",
+    obligated: 23_000,
+    startedDaysAgo: 30,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "238210",
+    workType: "A small electrical order for MATOC holders only",
+    psc: "Z2JZ",
+    offers: 3,
+    extent: FAIR_OPPORTUNITY,
+    setAside: HUBZONE_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Wirefield Constructors (4004): 8(a) work at Fort Bragg and Pope ──────
+  {
+    id: "W9124726CA019",
+    title: "Barracks and HVAC repair, Fort Bragg",
+    winner: 4004,
+    agency: "braggMicc",
+    obligated: 3_951_352,
+    startedDaysAgo: 160,
+    endsInDays: 200,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "236220",
+    workType: "Barracks repairs and new HVAC, given to one 8(a) firm without a competition",
+    psc: "Z2JZ",
     offers: 1,
+    extent: NOT_COMPETED,
+    setAside: EIGHT_A_SOLE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
+  },
+  {
+    id: "FA445225P0057",
+    title: "Electrical and bathroom repair, Pope Army Airfield",
+    winner: 4004,
+    agency: "pope",
+    obligated: 63_863,
+    startedDaysAgo: 480,
+    city: "Pope Army Airfield",
+    state: "NC",
+    naics: "236220",
+    workType: "A small repair job: new circuits and a restroom",
+    psc: "Z2AA",
+    offers: 6,
+    extent: SIMPLIFIED,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
+  },
+
+  // ── Galeway Veteran Builders (4005): Fayetteville VA mechanical work ─────
+  {
+    id: FAN_COILS_3RD_FLOOR,
+    title: "Replace fan coil units, Building 1, 3rd floor, Fayetteville VA Medical Center",
+    winner: 4005,
+    agency: "vaNco6",
+    obligated: 3_002_879,
+    startedOn: "2023-06-26",
+    endsOn: "2025-07-31",
+    rebidIsOpen: true,
+    city: "Fayetteville",
+    state: "NC",
+    naics: "236220",
+    workType: "Fan coils, piping and power on one floor of an open hospital",
+    psc: "Z2DA",
+    offers: 2,
+    extent: AFTER_EXCL,
+    setAside: SDVOSB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 5, repeat: 2, subs: [[4003, 2]] },
+  },
+  {
+    id: "36C24626C0093",
+    title: "Replace auxiliary chiller, Fayetteville VA Medical Center",
+    winner: 4005,
+    agency: "vaNco6",
+    obligated: 682_942,
+    startedDaysAgo: 120,
+    city: "Fayetteville",
+    state: "NC",
+    naics: "238220",
+    workType: "A sealed bid for one chiller and its pumps",
+    psc: "Z2DA",
+    offers: 4,
+    extent: AFTER_EXCL,
+    setAside: SDVOSB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 5, repeat: 2, subs: [[4003, 2]] },
+  },
+  {
+    id: "36C24626P1043",
+    title: "Electrical breaker testing, stage 2, Fayetteville VA Medical Center",
+    winner: 4005,
+    agency: "vaNco6",
+    obligated: 318_400,
+    startedDaysAgo: 330,
+    endsInDays: 315,
+    city: "Fayetteville",
+    state: "NC",
+    naics: "238210",
+    workType: "Testing and servicing the hospital's breakers, one building at a time",
+    psc: "J059",
+    offers: 3,
     extent: SIMPLIFIED,
     setAside: SDVOSB_SETASIDE,
     subPlan: SB_PRIME,
-    bench: { distinct: 9, repeat: 3, subs: [[4003, 2], [4007, 1], [4006, 1]] },
-  },
-
-  // ── Lantern Row Creative (4000): Dana's own NC Guard campaign ─────────────
-  {
-    id: "W91242-25-P-A118",
-    title: "Digital recruiting campaign: NC Army National Guard",
-    winner: DANA,
-    agency: "uspfoNc",
-    obligated: ncng.totalValue,
-    currentValue: ncng.totalValue,
-    ceiling: ncng.totalValue,
-    startedOn: ncng.periodStart,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541810",
-    workType: "Recruiting videos, geofenced ads and leads routed to recruiters",
-    psc: "R701",
-    offers: 4,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: null,
-  },
-
-  // ── Hollowell Pike Communications (4002): NC Guard web and design ─────────
-  {
-    id: "W91242-25-F-A914",
-    title: "Recruiting website design and upkeep, NC Army National Guard (GSA schedule order)",
-    winner: 4002,
-    agency: "uspfoNc",
-    obligated: 103_010,
-    ceiling: 319_974,
-    startedDaysAgo: 417,
-    endsInDays: 312,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541613",
-    workType: "The Guard's recruiting website",
-    psc: "R701",
-    offers: 1,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 6, repeat: 2, subs: [[4005, 1], [4004, 1]] },
+    bench: { distinct: 5, repeat: 2, subs: [[4003, 2]] },
   },
   {
-    id: "W91242-23-P-0071",
-    title: "Visual design support for NC National Guard public affairs",
-    winner: 4002,
-    agency: "uspfoNc",
-    obligated: 235_231,
-    ceiling: 629_321,
-    startedDaysAgo: 1115,
-    endsInDays: 345,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541430",
-    workType: "An on-site designer for the Guard's public affairs office",
-    psc: "T001",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 6, repeat: 2, subs: [[4005, 1], [4004, 1]] },
-  },
-
-  // ── Kestrel Point Federal Marketing (4003): VA video and Navy recruiting ──
-  {
-    id: "36C24626P2971",
-    title: "Patient-education and outreach video production, Durham VA Health Care System",
-    winner: 4003,
-    agency: "vaNco6",
-    obligated: 200_000,
-    ceiling: 800_000,
-    startedDaysAgo: 54,
-    endsInDays: 310,
-    city: "Durham",
-    state: "NC",
-    naics: "512110",
-    workType: "Short videos for patients and veterans",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
-  },
-  {
-    id: "36C24623P1792",
-    title: "Educational video production, Durham VA Health Care System",
-    winner: 4003,
-    agency: "vaNco6",
-    obligated: 250_050,
-    ceiling: 390_050,
-    startedDaysAgo: 1130,
-    city: "Durham",
-    state: "NC",
-    naics: "512110",
-    workType: "Educational videos for veterans",
-    psc: "R701",
-    offers: 1,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
-  },
-  {
-    id: "N42158-20-P-S281",
-    title: "Recruitment and marketing campaign, Norfolk Naval Shipyard",
-    winner: 4003,
-    agency: "norfolkShipyard",
-    obligated: 638_300,
-    startedDaysAgo: 2224,
-    city: "Portsmouth",
-    state: "VA",
-    naics: "541613",
-    workType: "Hiring campaign for shipyard trades",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
-  },
-
-  // ── Sandhill Signal Media (4004): a local publisher with screens and an app ──
-  {
-    id: "W91247-19-P-1874",
-    title: "Print and digital advertisements, Army Community Service, Fort Bragg",
-    winner: 4004,
-    agency: "braggMicc",
-    obligated: 356_624,
-    startedOn: "2019-09-30",
-    city: "Fort Bragg",
-    state: "NC",
-    naics: "541810",
-    workType: "Weekly print ads and digital ads for family programs",
-    psc: "R701",
-    offers: 5,
-    extent: SIMPLIFIED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 2, repeat: 1, subs: [[4005, 1]] },
-  },
-  {
-    id: "W91242-25-P-A931",
-    title: "Recruiting ads on screens in NC DMV offices, NC Army National Guard",
-    winner: 4004,
-    agency: "uspfoNc",
-    obligated: 143_169,
-    ceiling: 367_974,
-    startedDaysAgo: 409,
-    endsInDays: 320,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541890",
-    workType: "Video ads on the screens they own in DMV offices",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 2, repeat: 1, subs: [[4005, 1]] },
-  },
-
-  // ── Quillmark Creative (4005): the Fayetteville agency that beat Dana on price ──
-  {
-    id: "H92257-25-P-0041",
-    title: "Geofencing and lead-generation recruiting campaign, MARSOC",
+    id: "36C24624P1907",
+    title: "Boiler plant services, Fayetteville VA Medical Center",
     winner: 4005,
-    agency: "marsoc",
-    obligated: 129_712,
-    ceiling: 687_904,
-    startedDaysAgo: 300,
-    endsInDays: 65,
-    city: "Camp Lejeune",
-    state: "NC",
-    naics: "541810",
-    workType: "Location-based recruiting ads with lead forms",
-    psc: "R701",
-    offers: 7,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 1, repeat: 0, subs: [[4004, 1]] },
-  },
-  {
-    id: "H92257-23-P-0391",
-    title: "Article series and public relations support, MARSOC",
-    winner: 4005,
-    agency: "marsoc",
-    obligated: 48_000,
-    ceiling: 120_000,
-    startedDaysAgo: 1319,
-    endsInDays: 528,
-    city: "Camp Lejeune",
-    state: "NC",
-    naics: "541820",
-    workType: "Feature articles about the command",
-    psc: "R708",
-    offers: 7,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 1, repeat: 0, subs: [[4004, 1]] },
-  },
-
-  // ── Ironline Recruiting Media (4006): South Carolina Guard recruiting ──────
-  {
-    id: "W50S95-25-P-A917",
-    title: "Recruiting marketing campaign, 169th Fighter Wing (SC Air National Guard)",
-    winner: 4006,
-    agency: "uspfoSc",
-    obligated: 249_999,
-    startedDaysAgo: 395,
-    city: "Eastover",
-    state: "SC",
-    naics: "541810",
-    workType: "A year of recruiting ads around Columbia",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 3, repeat: 1, subs: [[4007, 1]] },
-  },
-  {
-    id: "W9124C-21-P-0917",
-    title: "Graphics upgrade, U.S. Army Chaplain Center and School, Fort Jackson",
-    winner: 4006,
-    agency: "fortJackson",
-    obligated: 247_463,
-    startedDaysAgo: 1872,
-    city: "Columbia",
-    state: "SC",
-    naics: "541430",
-    workType: "Wall graphics and displays",
-    psc: "T001",
-    offers: 1,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 3, repeat: 1, subs: [[4007, 1]] },
-  },
-
-  // ── Harbor Nine Productions (4007): video crews for special operations ────
-  {
-    id: "H92257-26-F-0021",
-    title: "Video and photo shoot, MARSOC (order under an existing contract)",
-    winner: 4007,
-    agency: "marsoc",
-    obligated: 95_750,
-    startedDaysAgo: 62,
-    city: "Jacksonville",
-    state: "NC",
-    naics: "512110",
-    workType: "A shoot for recruiting video and photos",
-    psc: "R701",
-    offers: null,
-    extent: null,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
-  },
-  {
-    id: "H92239-22-P-0391",
-    title: "Short film for USASOC, Fort Bragg",
-    winner: 4007,
-    agency: "usasoc",
-    obligated: 223_132,
-    startedOn: "2022-08-10",
+    agency: "vaNco6",
+    obligated: 176_500,
+    startedDaysAgo: 760,
+    endsInDays: 335,
     city: "Fayetteville",
     state: "NC",
-    naics: "512110",
-    workType: "A short film about the command",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
+    naics: "238220",
+    workType: "Service and repair of the hospital's boiler plant",
+    psc: "J045",
+    offers: 2,
+    extent: SIMPLIFIED,
+    setAside: SDVOSB_SETASIDE,
     subPlan: SB_PRIME,
-    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
+    bench: { distinct: 5, repeat: 2, subs: [[4003, 2]] },
   },
 
-  // ── Companies that are not partners for Dana ─────────────────────────────
+  // ── Ironsprings Federal Constructors (4006): USACE Savannah's barracks ───
   {
-    id: "H92257-25-F-E917",
-    title: "Staff and advertising support, MARSOC (order under a multiple-award contract)",
-    winner: 4101,
-    agency: "marsoc",
-    obligated: 2_359_322,
-    ceiling: 4_757_830,
-    startedDaysAgo: 440,
-    endsInDays: 285,
-    city: "Jacksonville",
+    id: "W912HN25C3011",
+    title: "Barracks repair, Fort Bragg",
+    winner: 4006,
+    agency: "usaceSavannah",
+    obligated: 24_149_862,
+    startedDaysAgo: 400,
+    endsInDays: 240,
+    city: "Fort Bragg",
     state: "NC",
-    naics: "541613",
-    workType: "Full-time marketing staff on site, plus ad buys",
-    psc: "R701",
-    offers: 4,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: "Plan on file",
-    bench: null,
-  },
-  {
-    id: "M67001-21-P-1997",
-    title: "News and media monitoring, Marine Corps Base Camp Lejeune",
-    winner: 4102,
-    agency: "lejeune",
-    obligated: 333_600,
-    startedDaysAgo: 1853,
-    city: "Camp Lejeune",
-    state: "NC",
-    naics: "541820",
-    workType: "Daily news clips and media reports",
-    psc: "R708",
+    naics: "236220",
+    workType: "A whole-barracks repair, with the electrical and HVAC work subcontracted",
+    psc: "Z2JZ",
     offers: 5,
     extent: FULL_OPEN,
-    setAside: null,
+    setAside: SB_SETASIDE,
     subPlan: SB_PRIME,
-    bench: null,
+    bench: { distinct: 8, repeat: 2, subs: [[4003, 1], [4002, 1]] },
   },
 ];
 
 /** Replies to the VA's sources sought, from the story's notice. */
 function vaRepliesDays(): number {
-  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 21;
+  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 14;
 }
 
-/** The line on an award whose next contract is already being asked about. */
+/** The line on an award whose next job is already being asked about. */
 export function openNowNote(awardId: string): string | undefined {
-  if (awardId === "36C77623C0298") {
-    return `The VA is asking which firms could run the next campaign. Replies are due in ${vaRepliesDays()} days, and it is expected to be set aside for service-disabled veteran-owned firms. Grant says to team up.`;
+  if (awardId === FAN_COILS_3RD_FLOOR) {
+    return `The VA is asking which firms could do floors 2 and 4 next. Replies are due in ${vaRepliesDays()} days, and it is expected to be set aside for service-disabled veteran-owned firms. Grant says to team up.`;
   }
   return undefined;
 }
 
-/** Awards the story saves on the Awards page: the VA hiring campaign and Dana's own. */
-export const STORY_SAVED_AWARD_IDS = ["36C77623C0298", "W91242-25-P-A118"] as const;
+/** Awards the story saves on the Awards page: the VA's 3rd-floor fan coils and his Pope job. */
+export const STORY_SAVED_AWARD_IDS = [FAN_COILS_3RD_FLOOR, "FA445225C0019"] as const;

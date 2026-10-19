@@ -3,6 +3,7 @@
 // Run: DEMO_MEMBER=<id> bun scripts/make-capability-statement.ts (a new member adds its lines to COPY)
 //      DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
 //      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
+//      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -32,6 +33,20 @@ const COPY = {
     extraRows: [
       ["PSC", "PSC R701 · T006"],
       ["Contract vehicles", "None yet (no GSA schedule)"],
+    ] as [string, string][],
+  },
+  // The pack's line (construction-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/construction/sc/business.ts).
+  construction: {
+    who: `HUBZone general contractor 12 miles from Fort Bragg. We self-perform electrical and HVAC work with two crews of each, and run building repairs from bid to closeout. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, within ${PERSONA.serviceRadiusMiles} miles of our shop.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Shop and yard on Grove Street. Two bucket trucks, a scissor lift and refrigerant recovery machines",
+      "Phased work in occupied buildings, with outages booked ahead",
+    ],
+    extraRows: [
+      ["PSC", "PSC Z2AA · Z2JZ"],
+      ["Bonding", `$${(PERSONA.bondLine?.single ?? 0) / 1_000_000}M a job · $${(PERSONA.bondLine?.aggregate ?? 0) / 1_000_000}M in total`],
     ] as [string, string][],
   },
 }[MEMBER];

@@ -10,6 +10,7 @@
 import { demoResponse, type DemoRouteDef } from "../runtime/router";
 import { readDemoState, updateDemoState } from "../runtime/store";
 import { isoDaysFromNow } from "../story/clock";
+import { OWN } from "../story/setAsides";
 import { calendarDay, dayToIso } from "../explore/dates";
 import { getSavedOpps, registerSavedResolver } from "../state/workspace";
 import { numParam } from "./util";
@@ -216,7 +217,7 @@ function eventsFor(oppKey: string, seen: boolean): ForecastWatchEvent[] {
   }
   if (oppKey === POPE_FORECAST_KEY) {
     return [
-      event("pope-1", "set_aside_changed", 5, { field: "setAsideCode", before: "TBD", after: "WOSB", decided: true }, seen),
+      event("pope-1", "set_aside_changed", 5, { field: "setAsideCode", before: "TBD", after: OWN, decided: true }, seen),
     ];
   }
   if (oppKey === "ce493b6f89e41ddc4ff5b2b7923301d9") {
