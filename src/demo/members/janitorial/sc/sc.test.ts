@@ -1,9 +1,8 @@
-// The Success Center sample data reads right for the member on stage.
-//   bunx vitest run src/demo/members                    (the caterer)
+// The Success Center sample data reads right for the janitorial firm.
 //   DEMO_MEMBER=janitorial bunx vitest run src/demo/members
 
 import { describe, expect, it } from "vitest";
-import { MEMBER, byMember } from "../../../member";
+import { MEMBER } from "../../../member";
 import { buildSeed } from "../../../sc/business/seed";
 import { buildPayload } from "../../../sc/business/payload";
 import { TELL_SAMPLE, demoExtract } from "../../../sc/business/demoTell";
@@ -15,19 +14,20 @@ import { getActionPlans } from "../../../sc/home/actionPlan";
 import { BENCH } from "../../../sc/mentors/bench";
 import { buildTasksPayload } from "../../../sc/tasks/payload";
 import { TASKS } from "../../../story/workspace";
+import { listTrackedItems } from "@/lib/stayReady";
+import { daysUntil } from "../../../story/clock";
 
 const FOOD_KEYS = ["health_permits", "food_manager_certifications", "food_handler_cards", "doc_haccp_plan", "health_inspection_score", "facilities", "max_daily_output"];
+/** Other members' facts that must not leak into his record. */
+const OTHER_WORDS = /ServSafe|meals|catering|\bHUB\b|WOSB|woman-owned|Lantern|Dana|video|paid social|Ninebark|Derrick|bond line/i;
 
-// A pack folder's tests run in every member's mode: these hold for the janitorial firm only.
-const ONSTAGE = MEMBER === "janitorial";
-
-describe.runIf(ONSTAGE)(`My Business seed (${MEMBER})`, () => {
+describe.runIf(MEMBER === "janitorial")("My Business seed (janitorial)", () => {
   const seed = buildSeed();
   const payload = buildPayload(seed);
   const score = readyScore(payload.fields, undefined, payload.media);
 
   it("starts at the story's score, with gaps and three suggestions", () => {
-    expect(`${score.settled} of ${score.total}`).toBe(byMember({ caterer: "47 of 55", pack: "44 of 51" }));
+    expect(`${score.settled} of ${score.total}`).toBe("44 of 51");
     expect(payload.counter).toEqual({ answered: 14, total: 14 });
     expect(payload.proposals).toHaveLength(3);
   });
@@ -37,10 +37,13 @@ describe.runIf(ONSTAGE)(`My Business seed (${MEMBER})`, () => {
     for (const p of seed.proposals) expect(acceptStoredValue(p.fieldKey, p.value).ok, p.fieldKey).toBe(true);
   });
 
-  it("the agency's record has no kitchen, permit or food-handler rows", () => {
-    if (MEMBER !== "agency") return;
+  it("holds his story: HUBZone at 41%, no CPARS, no sandblaster, no other member's facts", () => {
     expect(seed.rows.map((r) => r.fieldKey).filter((k) => FOOD_KEYS.includes(k))).toEqual([]);
-    expect(JSON.stringify(seed)).not.toMatch(/kitchen|ServSafe|meals|catering|\bHUB\b/i);
+    const json = JSON.stringify(seed);
+    expect(json).not.toMatch(OTHER_WORDS);
+    expect(json).toContain("41% of staff live in a HUBZone");
+    expect(json).toContain("Too small for a performance rating (CPARS)");
+    expect(JSON.stringify(seed.proposals)).not.toMatch(/blaster/i);
     expect(score.open.map((f) => f.key)).toContain("key_personnel");
   });
 
@@ -54,18 +57,13 @@ describe.runIf(ONSTAGE)(`My Business seed (${MEMBER})`, () => {
       },
       openProposal: () => null,
     });
-    expect(plan.proposals.map((p) => p.fieldKey)).toEqual(
-      byMember({
-        caterer: ["facilities", "equipment", "ninety_day_goal"],
-        pack: ["search_keywords", "key_personnel", "ninety_day_goal"],
-      }),
-    );
+    expect(plan.proposals.map((p) => p.fieldKey)).toEqual(["search_keywords", "key_personnel", "ninety_day_goal"]);
     expect(plan.dropped.map((d) => d.fieldKey)).toEqual(["payment_terms_tolerance"]);
     expect(plan.leftover).toEqual([]);
   });
 });
 
-describe.runIf(ONSTAGE)(`Success Center (${MEMBER})`, () => {
+describe.runIf(MEMBER === "janitorial")("Success Center (janitorial)", () => {
   it("the first open task is Ava's three questions on the hero bid", () => {
     const tasks = buildTasksPayload();
     expect(tasks.sections.all.tasks[0]?.title).toMatch(/^Answer Ava's 3 questions/);
@@ -78,7 +76,14 @@ describe.runIf(ONSTAGE)(`Success Center (${MEMBER})`, () => {
       (w) => w ?? "",
     );
     for (const w of words) expect(copyProblem(w), w).toBeNull();
-    if (MEMBER === "agency") expect(words.join(" ")).not.toMatch(/kitchen|food|cook|meal|catering|ServSafe/i);
+    expect(words.join(" ")).not.toMatch(/kitchen|food|cook|meal|catering|ServSafe|video|campaign|bond/i);
+    expect(plan.steps).toHaveLength(7);
     expect(plan.steps.find((s) => s.resourceUrl?.startsWith("/ava/"))?.resourceUrl).toBe(TASKS.find((t) => t.source === "ava")!.to);
+  });
+
+  it("Stay Ready tracks the HUBZone recertification and his insurance", () => {
+    const items = listTrackedItems();
+    expect(items.map((i) => i.id)).toEqual(["sam", "hubzone-cert", "insurance", "insurance-auto"]);
+    expect(daysUntil(items.find((i) => i.id === "hubzone-cert")!.dueDate)).toBe(38);
   });
 });

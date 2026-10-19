@@ -6,6 +6,7 @@
 //      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
 //      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
 //      DEMO_MEMBER=trucking bun scripts/make-capability-statement.ts     (Rockfish Run Freight)
+//      DEMO_MEMBER=janitorial bun scripts/make-capability-statement.ts   (Gray Owl Facility Services)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -79,6 +80,20 @@ const COPY = {
       ["PSC", "PSC V111 · V119"],
       ["Authority", "USDOT and MC operating authority since 2017 · SCAC"],
       ["Contract vehicles", "None yet (not in SDDC's carrier program)"],
+    ] as [string, string][],
+  },
+  // The pack's line (janitorial-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/janitorial/sc/business.ts).
+  janitorial: {
+    who: `HUBZone janitorial and facilities firm 12 miles from Fort Bragg: night custodial crews, floor care, and hot-water pressure washing with wash-water recovery. Crews badged for Fort Bragg and Seymour Johnson. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, within ${PERSONA.serviceRadiusMiles} miles of our yard.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office and equipment yard on Gillespie St. Two hot-water pressure-washing trailers (3,500 psi), a wash-water recovery kit, burnishers and carpet extractors",
+      "Wash water kept out of storm drains; child-safe chemicals where buildings need them",
+    ],
+    extraRows: [
+      ["PSC", "PSC S201 · S299"],
+      ["Contract vehicles", "Pressure-washing BPA, Seymour Johnson AFB (FA480924A0007)"],
     ] as [string, string][],
   },
 }[MEMBER];
