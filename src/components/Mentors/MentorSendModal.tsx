@@ -57,7 +57,8 @@ export function composeMentorMessage(parts: {
   const q = parts.question.trim();
   const lines: string[] = [];
   if (parts.confirmed) lines.push(`Confirmed: ${parts.confirmed}.`);
-  if (parts.topics.length) lines.push(`Help with: ${parts.topics.join("; ")}.`);
+  // DEMO: no full stop after a topic that already ends a sentence ("Should I bid on this?").
+  if (parts.topics.length) lines.push(`Help with: ${parts.topics.join("; ")}`.replace(/([^.?!])$/, "$1."));
   if (lines.length === 0) return q;
   lines.push(`Question: ${q}`);
   return lines.join("\n");

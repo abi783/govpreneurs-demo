@@ -131,7 +131,7 @@ function closedBid(c: ClosedPursuit): DemoBid {
     expired: false,
     valueMidUsd: c.value,
     value: money(c.value),
-    scope: "fed",
+    scope: c.scope ?? "fed",
     demo: { next: c.next, closedId: c.id },
   };
 }

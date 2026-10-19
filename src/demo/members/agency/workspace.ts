@@ -48,6 +48,7 @@ export const CLOSED_PURSUITS: ClosedPursuit[] = [
     note: "Not awarded. Lost on price by about 6%; the debrief is in your notes.",
     daysAgo: 50,
     next: { label: "Read the debrief notes", to: "/pipeline" },
+    scope: "sled",
   },
 ];
 

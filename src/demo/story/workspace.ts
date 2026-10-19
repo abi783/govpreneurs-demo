@@ -20,6 +20,8 @@ export interface ClosedPursuit {
   /** Days since the last event (submission, award, or loss). */
   daysAgo: number;
   next: { label: string; to: string };
+  /** Federal unless set: a county or city job is "sled". */
+  scope?: "fed" | "sled";
 }
 
 export type MentorReviewStatus = "awaiting_mentor" | "mentor_replied" | "closed";
