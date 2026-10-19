@@ -1,14 +1,19 @@
-// THE AGENCY'S SMALL ORDERS BOARD: honestly, not for her.
+// THE CONTRACTOR'S SMALL ORDERS BOARD: honestly, not for him.
 // Read through src/demo/explore/orders/data.ts, which picks the active member.
-// Source: demo-storyboard/marketing-agency-pack.md, section 6 (approved 19 Oct 2026).
+// Source: demo-storyboard/construction-pack.md, section 6.
 //
-// DLA's small orders are stock-numbered parts and supplies. None is ad, video or
-// design work, so "Orders for you" is empty and Hunter says why. "All orders"
-// still lists the public board: 10 orders any seller may bid. None needs an
-// approval, so no "Ones not open to you" row stands beside Hunter's one message.
-// The engine scores none of them for her (fit 0), and nothing is saved or quoted.
+// DLA's small orders are stock-numbered parts. The ones nearest his trade are air
+// filter elements and circuit breakers, which DLA bought in $3K–$16K orders in
+// 2025–26 from an NC parts distributor: a distribution business with approved part
+// numbers, not installation. So "Orders for you" is empty and Hunter says why.
+// Fort Bragg's small repair orders go through the HUBZone Minor Construction MATOC
+// (holders only); the small jobs he can bid are Pope's repair quotes, on
+// Opportunities. "All orders" still lists the public board: 10 orders any seller
+// may bid. None needs an approval, so no "Ones not open to you" row stands beside
+// Hunter's one message. The engine scores none of them for him (fit 0), and nothing
+// is saved or quoted.
 //
-// The ids match the caterer's board, so every deep link works for both members.
+// The ids match the caterer's board, so every deep link works for every member.
 // The suppliers are made up (explore/orders/suppliers.ts). Stock numbers and
 // solicitation numbers are made up but have the real shape.
 
@@ -22,18 +27,18 @@ const CONTACTS = {
   lindqvist: ["P. Lindqvist", "215-555-0154"],
 } as const satisfies Record<string, [string, string]>;
 
-/** The industry codes her "Orders for you" covers: her own five. No order has one. */
-export const FOR_YOU_NAICS = ["541810", "541613", "541430", "512110", "541820"];
+/** The industry codes his "Orders for you" covers: his own three. No order has one. */
+export const FOR_YOU_NAICS = ["236220", "238210", "238220"];
 
 /**
- * DEMO: what the board says on her empty "Orders for you" (pack section 6). Hunter's
- * sentence, and one way on to the small video and design jobs she can bid.
+ * DEMO: what the board says on his empty "Orders for you" (pack section 6). Hunter's
+ * sentence, and one way on to the small repair jobs he can bid.
  */
 export const FOR_YOU_NOTE = {
-  hunter: "DLA's small orders are parts and supplies. None fit an ad agency, so I'm not showing you any.",
+  hunter: "DLA's small orders are parts, like air filters and breakers. You install equipment, so I'm not showing you any.",
   emptyHead: "Nothing on this board fits your business.",
-  emptyBody: "DLA buys parts and supplies here. Small video and design jobs are on Opportunities.",
-  link: { label: "See video and design jobs", to: "/opportunities" },
+  emptyBody: "DLA buys parts here, not installation. Small repair jobs, like Pope's, are on Opportunities.",
+  link: { label: "See small repair jobs", to: "/opportunities" },
 } as const;
 
 export const SPECS: Spec[] = [
@@ -70,11 +75,11 @@ export const SPECS: Spec[] = [
   {
     n: 103,
     sol: "SPE7M126T4436",
-    plain: "Air filter elements for field generators, ships to Fort Bragg",
-    official: "FILTER ELEMENT,INTAKE AIR CLEANER",
-    nsn: "2940015586614",
+    plain: "Air filter elements for HVAC units, ships to Fort Bragg",
+    official: "FILTER ELEMENT,AIR CONDITIONING",
+    nsn: "4130015586614",
     category: "filters",
-    naics: "336390",
+    naics: "333413",
     quantity: 40,
     ui: "EA",
     amc: "1",
@@ -86,9 +91,9 @@ export const SPECS: Spec[] = [
     postedDaysAgo: 5,
     closesInDays: 14,
     contact: CONTACTS.abernathy,
-    approved: [["piedmont", "PF-AE-2210"]],
+    approved: [["piedmont", "PF-HV-2010"]],
     awards: [
-      ["piedmont", 45, 40, 55.75, "SPE7M126F3390", "PF-AE-2210"],
+      ["piedmont", 45, 40, 55.75, "SPE7M126F3390", "PF-HV-2010"],
       ["ironbridge", 170, 30, 54.2, "SPE7M126F0127"],
     ],
     shipTo: "fortBragg",
@@ -255,9 +260,9 @@ export const SPECS: Spec[] = [
   {
     n: 125,
     sol: "SPE7M126T4493",
-    plain: "Sealed toggle switches, ships to Camp Lejeune",
-    official: "SWITCH,TOGGLE",
-    nsn: "5930014986625",
+    plain: "Circuit breakers, 20-amp, ships to Camp Lejeune",
+    official: "CIRCUIT BREAKER",
+    nsn: "5925014986625",
     category: "electrical",
     naics: "335313",
     quantity: 50,
@@ -269,8 +274,8 @@ export const SPECS: Spec[] = [
     postedDaysAgo: 6,
     closesInDays: 14,
     contact: CONTACTS.abernathy,
-    approved: [["quarry", "QP-TS-MS24"]],
-    awards: [["quarry", 78, 60, 25.1, "SPE7M126F1792", "QP-TS-MS24"]],
+    approved: [["quarry", "QP-CB-20A"]],
+    awards: [["quarry", 78, 60, 25.1, "SPE7M126F1792", "QP-CB-20A"]],
     shipTo: "campLejeune",
     fit: 0,
     buyer: LAND_AND_MARITIME,

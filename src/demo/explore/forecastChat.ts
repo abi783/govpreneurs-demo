@@ -70,7 +70,7 @@ export function cardTakeLine(oppKey: string): string | null {
 // ── The chat on a forecast page ───────────────────────────────────────────────
 
 const SUGGESTIONS =
-  "Try one of these: “When will the bid request come?”, “Can I bid as a woman-owned business?”, “Is it the right size for me?”, “Should I team up?” or “What should I do first?”";
+  `Try one of these: “When will the bid request come?”, “Can I bid as a ${SET_ASIDES[OWN].short} business?”, “Is it the right size for me?”, “Should I team up?” or “What should I do first?”`;
 
 function placeSentence(r: ForecastRecordDto): string {
   const city = r.popCity?.trim();
@@ -145,7 +145,7 @@ function teamSentence(r: ForecastRecordDto): string {
   }
   const high = r.valHigh ?? 0;
   if (high > BIGGEST * 5) {
-    return "Yes, this is bigger than a job you can prime alone. Look in Partners for a prime that wins work like this and wants a woman-owned subcontractor.";
+    return `Yes, this is bigger than a job you can prime alone. Look in Partners for a prime that wins work like this and wants a ${SET_ASIDES[OWN].short} subcontractor.`;
   }
   return byMember({
     pack: pack.CHAT.smallTeam,

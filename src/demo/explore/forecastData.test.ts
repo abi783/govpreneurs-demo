@@ -100,7 +100,8 @@ describe("the demo forecasts", () => {
       winners?.state === "counted" ? (winners.source.provenance.tally?.firms ?? []).map((f) => f.name) : [];
     if (MEMBER === "caterer") expect(names[0]).toBe("Carolina Dining Group");
     // The agency's take ranks by number of awards; Bluestone, the VA campaign's holder, is among the top three.
-    else expect(names).toContain("Bluestone Veteran Media Group");
+    else if (MEMBER === "agency") expect(names).toContain("Bluestone Veteran Media Group");
+    else expect(names.length).toBeGreaterThan(0);
     for (const n of names) {
       expect(n).not.toMatch(REAL_FIRMS);
     }
