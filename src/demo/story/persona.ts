@@ -62,7 +62,7 @@ export const PERSONA = {
     "Halal and allergen-labeled menus as standard",
     "Two refrigerated vans for same-day delivery inside 60 miles",
   ],
-  capabilityStatementFile: "/demo-files/haddad-catering-capability-statement.pdf",
+  capabilityStatementFile: import.meta.env.BASE_URL + "demo-files/haddad-catering-capability-statement.pdf",
   plan: "Elite",
   locationId: "demo-haddad-catering",
   userId: "demo-user-amira",

@@ -7,7 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   // DEMO: static site served from the root.
-  base: "/",
+  base: process.env.BASE_PATH ?? "/",
   server: {
     host: "::",
     port: 8080,

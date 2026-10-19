@@ -68,7 +68,7 @@ export function AgentAvatar({
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`/ds-assets/agents/${agent}.png`}
+          src={`${import.meta.env.BASE_URL}ds-assets/agents/${agent}.png`}
           alt=""
           loading="lazy"
           decoding="async"

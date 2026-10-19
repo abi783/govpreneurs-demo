@@ -9,7 +9,7 @@
 // router module, which imports the route tree, which imports them — a cycle
 // that surfaces as "Cannot access 'basepath' before initialization".
 // DEMO: the demo is a static site served from the root, so the basepath is always "/".
-export const basepath: string = "/";
+export const basepath: string = import.meta.env.BASE_URL.replace(/\/$/, "") || "/";
 
 /**
  * Build an in-app href. ALWAYS use this instead of `${basepath}${path}`.

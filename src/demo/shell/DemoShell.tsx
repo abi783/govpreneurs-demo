@@ -124,7 +124,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
       <aside className="demo-menu" aria-label="Main menu">
         <Link to="/" className="demo-logo" aria-label="GovPreneurs, go to the Success Center">
           <span className="demo-logo__shield">
-            <img src="/brand/govpreneurs-logo.svg" alt="" />
+            <img src={`${import.meta.env.BASE_URL}brand/govpreneurs-logo.svg`} alt="" />
           </span>
           <span className="demo-logo__word">GovPreneurs</span>
         </Link>
