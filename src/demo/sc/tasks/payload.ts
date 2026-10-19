@@ -111,6 +111,15 @@ const DUE_REASON: Record<string, string> = {
   "task-seymour-cpars": "so it goes in with your quote",
   "task-pope-sources-sought": "before the sources sought closes",
   "task-cmmc-items": "before a job asks for your score",
+  // DEMO: the consulting firm's tasks (members/consulting/workspace.ts).
+  "task-ava-va-program": "so Ava can finish the quote",
+  "task-count-hours": "so your own staff carry half the work",
+  "task-halyard-point": "so a team bid is still possible",
+  "task-coach-question": "before Q&A closes",
+  "task-interim-cpars": "while the contracting officer remembers the job",
+  "task-sub-certificate": "so it goes in with your quote",
+  "task-vetcert-renewal": "so VA sees it active at award",
+  "task-gsa-offer": "because an offer takes months",
 };
 
 /** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */

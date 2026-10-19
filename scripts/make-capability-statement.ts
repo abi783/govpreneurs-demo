@@ -6,6 +6,7 @@
 //      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
 //      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
 //      DEMO_MEMBER=trucking bun scripts/make-capability-statement.ts     (Rockfish Run Freight)
+//      DEMO_MEMBER=consulting bun scripts/make-capability-statement.ts   (Coppervale Advisory Group)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -79,6 +80,20 @@ const COPY = {
       ["PSC", "PSC V111 · V119"],
       ["Authority", "USDOT and MC operating authority since 2017 · SCAC"],
       ["Contract vehicles", "None yet (not in SDDC's carrier program)"],
+    ] as [string, string][],
+  },
+  // The pack's line (consulting-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/consulting/sc/business.ts).
+  consulting: {
+    who: `Service-disabled veteran-owned consulting firm in ${PERSONA.hqCity}: leadership programs, Lean process reviews, strategic plans and HR studies for Army, VA and NC public offices, led by a retired Army HR officer. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff and seven contract facilitators. We work across North Carolina, South Carolina and Virginia.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office on Green St. A 30-seat training room, projectors and a 360 survey platform",
+      "PMP, Lean Six Sigma Black Belt and SHRM-SCP; ICF-credentialed coaches",
+    ],
+    extraRows: [
+      ["PSC", "PSC R408 · U008"],
+      ["Contract vehicles", "None yet (no GSA schedule)"],
     ] as [string, string][],
   },
 }[MEMBER];
