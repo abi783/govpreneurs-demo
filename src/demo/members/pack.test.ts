@@ -33,3 +33,27 @@ describe("member packs", () => {
     for (const { id } of MEMBERS) expect(PACKS.get(id)?.has("words.ts"), `${id} has no words.ts`).toBe(true);
   });
 });
+
+describe("ids across members", () => {
+  // Any member can open another member's opportunity or past job by its number
+  // (member.ts, others), so no number may belong to two members.
+  const ids = (pick: (mod: Record<string, unknown>) => { id: string }[] | undefined, file: string) =>
+    [...PACKS.keys()].flatMap((m) => (pick(FILES[`/src/demo/members/${m}/${file}`] ?? {}) ?? []).map((x) => `${x.id} (${m})`));
+  const dupes = (list: string[]) => {
+    const seen = new Map<string, string>();
+    return list.filter((entry) => {
+      const id = entry.replace(/ \(.*\)$/, "");
+      const before = seen.get(id);
+      seen.set(id, entry);
+      return before !== undefined;
+    });
+  };
+
+  it("no opportunity number belongs to two members", () => {
+    expect(dupes(ids((m) => m.OPPORTUNITIES as { id: string }[], "opportunities.ts"))).toEqual([]);
+  });
+
+  it("no past-job id belongs to two members", () => {
+    expect(dupes(ids((m) => m.PAST_PERFORMANCE as { id: string }[], "persona.ts"))).toEqual([]);
+  });
+});

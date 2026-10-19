@@ -5,6 +5,7 @@
 // shapes and picks the active member's data from src/demo/members/<member>/.
 
 import { others, own } from "../member";
+import type { SetAside } from "./opportunities";
 
 const MEMBER_FILES = import.meta.glob<typeof import("../members/agency/persona")>("/src/demo/members/*/persona.ts", { eager: true });
 const member = own(MEMBER_FILES);
@@ -33,8 +34,8 @@ export interface Persona {
   primaryNaics: string;
   primaryNaicsLabel: string;
   secondaryNaics: readonly { code: string; label: string }[];
-  /** SAM set-aside codes the member is eligible for. */
-  setAsideEligibility: readonly ("SBA" | "WOSB")[];
+  /** SAM set-aside codes the member is eligible for (story/setAsides.ts). */
+  setAsideEligibility: readonly NonNullable<SetAside>[];
   certifications: readonly string[];
   /** Security clearances held by the staff. */
   clearances: readonly string[];
@@ -49,6 +50,8 @@ export interface Persona {
   targetValueMax: number;
   /** Largest bond ever carried. */
   largestBond: number;
+  /** A contractor's surety bond line: the most per job, in total, and in use now. */
+  bondLine?: { single: number; aggregate: number; inUse: number };
   serviceStates: readonly string[];
   serviceRadiusMiles: number;
   targetAgencies: readonly string[];
