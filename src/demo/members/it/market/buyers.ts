@@ -1,36 +1,31 @@
-// THE AGENCY's buyer directory for Government Buyers: offices that buy advertising
-// and marketing near Lantern Row Creative's studio in Fayetteville, NC (read through
+// THE IT SERVICES FIRM's buyer directory for Government Buyers: offices that buy IT
+// support near Gallberry Technology Group's office in Fayetteville, NC (read through
 // src/demo/explore/buyersData.ts, which picks the active member).
 //
-// The offices are real, and so is what they buy (sources below). The people are
-// made up, and their addresses end in ".example". Where an opportunity page already
-// names a buyer's contracting staff (Grant's contacts, src/demo/grant/facts.ts), the
-// same people are read from there, so both pages name the same person.
+// Source: demo-storyboard/it-services-pack.md, section 13. The offices are real, and
+// so is what they buy. The people are made up, and their addresses end in ".example".
+// Where an opportunity page already names a buyer's contracting staff (Grant's
+// contacts, src/demo/grant/facts.ts), the same people are read from there, so both
+// pages name the same person. The Army hospital at Fort Bragg is never named:
+// "Womack" is one of the caterer's own words.
 //
-// Spend figures are real: federal obligations for NAICS 541810, 541613, 541430,
-// 512110, 541820 and 541890, fiscal years 2023 to 2025, from USAspending (pulled
-// 19 Oct 2026; office matched by its award-id prefix, so treat them as close, not
-// exact). One story fact is added: Dana's own NC Guard award ($86,400, FY2025, to a
-// woman-owned firm). Offices with no trustworthy baseline (MICC Fort Bragg, whose ad
-// buys are mostly by card; the VA's national office, which is one campaign; state and
-// local buyers) carry no spend analysis, and the page says so.
+// Totals in "what they buy" are real: obligations FY2023–FY2025 for IT codes (NAICS
+// 541512, 541519, 541513, 518210, 541511) with the work in North Carolina, from
+// USAspending transactions (pulled 19 Oct 2026; office matched by award-id prefix,
+// so close, not exact). The pack has three-year totals only, not award counts or a
+// split by year, so no office carries a spend analysis. State and local buyers have
+// no spend baseline.
 //
 // Sources:
-//   USAspending search API            https://api.usaspending.gov/api/v2/search/spending_over_time/
-//   Fort Bragg print and digital, 2019 https://www.usaspending.gov/award/CONT_AWD_W9124719P1860_9700_-NONE-_-NONE-
-//   Fort Bragg school-age ads, 2018    https://www.usaspending.gov/award/CONT_AWD_W9124718P0099_9700_-NONE-_-NONE-
-//   Fort Bragg ACS cable TV ads, WOSB set-aside, 2018  https://sam.gov/opp/12c34720dcc541dd7aeff59b642be4fc/view
-//   More Powerful NC, $2.5M of TV, radio and billboards  https://www.wfdd.org/2019-04-04/north-carolina-launches-campaign-to-combat-opioid-crisis
-//   Governor's Highway Safety Program grants, Oct 2025   https://governor.nc.gov/news/press-releases/2025/10/23/governor-stein-announces-more-25-million-grants-promote-safer-roads
-//   VA Veterans First (veteran-owned firms first)        https://www.law.cornell.edu/uscode/text/38/8127
+//   USAspending search API   https://api.usaspending.gov/api/v2/search/spending_by_transaction/
+//   NCDIT 920S IT services   https://it.nc.gov/services/statewide-it-contracts/920s-it-services
+//   Town managed-IT RFP model https://www.butnernc.org/media/9071
 
 import { contactFor } from "../../../grant/facts";
 import { getOpportunity } from "../../../story/opportunities";
 import { PLACES } from "../../../story/places";
-import { allAwardRecords } from "../../../explore/awardsData";
-import type { BuyerAnalysis, BuyerOfficer, GovBuyer, OfficerRole, PursueVerdict } from "@/lib/mock/governmentBuyers";
+import type { BuyerOfficer, GovBuyer, OfficerRole } from "@/lib/mock/governmentBuyers";
 import { HERO_IDS } from "../opportunities";
-import { MEMBER_FIRM } from "./firms";
 
 function person(role: OfficerRole, first: boolean) {
   return (id: string, name: string, email: string, phone: string, notes?: string): BuyerOfficer => ({
@@ -44,8 +39,6 @@ function person(role: OfficerRole, first: boolean) {
   });
 }
 const sblo = person("Small-Business Liaison", true);
-const co = person("Contracting Officer", false);
-const spec = person("Contract Specialist", false);
 const pm = person("Program Manager", false);
 
 /**
@@ -57,308 +50,193 @@ function staffOf(id: string, oppId: string, secondary: boolean, notes?: string):
   return { id, name: c.name, role: c.title as OfficerRole, email: c.email, phone: c.phone, notes };
 }
 
-/** Three fiscal years of spend, one category per row (shares of each year). */
-function spend(byYear: [number, number][], cats: [string, number][]) {
-  return {
-    annualSpendByYear: byYear.map(([year, trade]) => ({ year, trade })),
-    spendBreakdown: cats.map(([category, share]) => ({
-      category,
-      byYear: byYear.map(([year, total]) => ({ year, amount: Math.round((total * share) / 1000) * 1000 })),
-    })),
-  };
-}
-
-/** The firms that won most from these buyers, counted from the award record. */
-function awardeesFrom(abbrevs: readonly string[]): BuyerAnalysis["topAwardees"] {
-  const by = new Map<string, { count: number; total: number }>();
-  for (const a of allAwardRecords()) {
-    if (!abbrevs.includes(a.agency.abbrev ?? "")) continue;
-    if (a.winner.awardeeKey === MEMBER_FIRM.key) continue; // Dana herself
-    const row = by.get(a.winner.name) ?? { count: 0, total: 0 };
-    row.count += 1;
-    row.total += a.obligated ?? 0;
-    by.set(a.winner.name, row);
-  }
-  return [...by.entries()]
-    .sort((a, b) => b[1].total - a[1].total)
-    .slice(0, 4)
-    .map(([company, v]) => ({ company, awardsCount: v.count, totalDollars: v.total }));
-}
-
-function analysis(
-  verdict: PursueVerdict,
-  why: string,
-  s: ReturnType<typeof spend>,
-  smallBizPct: number,
-  wosbPct: number,
-  seasonalityNote: string,
-  topAwardees: BuyerAnalysis["topAwardees"],
-): BuyerAnalysis {
-  return { verdict, why, ...s, smallBizPct, wosbPct, seasonalityNote, topAwardees };
-}
-
-// USPFO NC: $384,144 / $286,662 / $173,192 in FY2023–FY2025, all to small businesses,
-// none to woman-owned firms; plus Dana's $86,400 in FY2025. Woman-owned share:
-// 86,400 / 930,398 = 9%.
-const NCNG_SPEND: [number, number][] = [[2023, 384_144], [2024, 286_662], [2025, 259_592]];
-// VA NCO 6: $103,049 / $5,998 / $79,271; small businesses $168,318 of $188,318 (89%); woman-owned 0%.
-const NCO6_SPEND: [number, number][] = [[2023, 103_049], [2024, 5_998], [2025, 79_271]];
-// MARSOC: $580,475 / $398,876 / $534,364; small businesses $437,091 of $1,513,715 (29%);
-// woman-owned $41,844 (3%).
-const MARSOC_SPEND: [number, number][] = [[2023, 580_475], [2024, 398_876], [2025, 534_364]];
+const first = (o: BuyerOfficer): BuyerOfficer => ({ ...o, recommendedFirstContact: true });
 
 export const BUYERS: GovBuyer[] = [
   {
-    id: "bragg-micc",
-    agencyKey: 5101,
+    id: "micc-bragg",
+    agencyKey: 5301,
     name: "Fort Bragg Contracting Command (MICC)",
     abbreviation: "MICC Fort Bragg",
     type: "federal",
     location: "Fort Bragg, NC",
     distanceMiles: PLACES.fortBragg.milesFromBase,
     whatTheyBuy:
-      "Advertising for Army Community Service and other family programs at Fort Bragg: print and digital ads, cable and streaming spots, and short videos. Its last large ad contracts were print and digital ads in 2019 (about $357K) and school-age program ads in 2018 (about $130K). It has set ad work aside for woman-owned firms before.",
+      "IT support for the Army Reserve, XVIII Airborne Corps and other units on post: $63.9M in FY2023–FY2025. Some is competed in the open as 8(a) set-asides; much is ordered only through ITES-3S, for its holders.",
     buysFood: true,
     agencyMatchers: ["Mission and Installation Contracting Command"],
     awardAgencies: ["MICC Fort Bragg"],
     officers: [
-      sblo("bragg-1", "Rochelle Banerjee", "r.banerjee@army.mil.example", "910-555-0311", "Sends small businesses to the right contracting officer."),
-      staffOf("bragg-2", HERO_IDS.hero, false, "Named on the Family Advocacy print and digital quote."),
-      staffOf("bragg-3", HERO_IDS.hero, true),
-      pm("bragg-4", "Yvette Calloway", "y.calloway@army.mil.example", "910-555-0314", "Runs the Family Advocacy Program and tells the office what the campaign must do."),
+      sblo("micc-1", "Lorraine Bellamy", "l.bellamy@army.mil.example", "910-555-0611", "Small business specialist. Ask her which IT buys will be open-market rather than ITES-3S."),
+      staffOf("micc-2", HERO_IDS.hero, false, "Named on the Army Reserve help desk quote."),
+      staffOf("micc-3", HERO_IDS.hero, true),
+      pm("micc-4", "Maj. Desmond Rouse", "d.rouse@army.mil.example", "910-555-0614", "Army Reserve G-6. Owns the help desk work statement."),
+    ],
+  },
+  {
+    id: "dha-bragg",
+    agencyKey: 5302,
+    name: "Defense Health Agency (the Army medical center at Fort Bragg)",
+    abbreviation: "DHA",
+    type: "federal",
+    location: "Buys for the Army hospital at Fort Bragg and its clinics",
+    distanceMiles: PLACES.fortBragg.milesFromBase,
+    whatTheyBuy:
+      "The hospital's IT services, ordered through 8(a) STARS III: $12.2M in FY2023–FY2025. Only STARS III holders can quote, so a firm like yours comes in as a subcontractor.",
+    buysFood: true,
+    agencyMatchers: ["Defense Health Agency"],
+    awardAgencies: ["DHA"],
+    officers: [
+      sblo("dha-1", "Patrice Odum", "p.odum@health.mil.example", "703-555-0621", "Small business office. Keeps the list of STARS III primes looking for local subs."),
+      staffOf("dha-2", HERO_IDS.teamUp, false, "Named on the hospital IT request for information."),
+      staffOf("dha-3", HERO_IDS.teamUp, true),
+    ],
+  },
+  {
+    id: "pope-763ess",
+    agencyKey: 5303,
+    name: "763rd Enterprise Sourcing Squadron (Pope Army Airfield)",
+    abbreviation: "763 ESS",
+    type: "federal",
+    location: "Pope Army Airfield, NC",
+    distanceMiles: PLACES.popeAaf.milesFromBase,
+    whatTheyBuy:
+      "IT support for the 43rd Communications Squadron and the airfield's clinic: $3.3M in FY2023–FY2025. The last two support contracts went to one 8(a) firm without a competition.",
+    buysFood: true,
+    agencyMatchers: ["763rd Enterprise Sourcing Squadron"],
+    awardAgencies: ["763 ESS Pope"],
+    officers: [
+      first(staffOf("pope-1", "FA445227R0004", false, "Named on the 43 CS sources sought.")),
+      pm("pope-3", "Capt. Renata Voss", "r.voss@us.af.mil.example", "910-555-0633", "43rd Communications Squadron. Writes the support requirements."),
+    ],
+  },
+  {
+    id: "seymour-4cons",
+    agencyKey: 5304,
+    name: "4th Contracting Squadron (Seymour Johnson AFB)",
+    abbreviation: "4th CONS",
+    type: "federal",
+    location: "Goldsboro, NC",
+    distanceMiles: PLACES.goldsboro.milesFromBase,
+    whatTheyBuy:
+      "Desktop support and base telecom work, competed as small-business set-asides: $2.5M in FY2023–FY2025. Your desktop support contract is one, and its follow-on is open now.",
+    buysFood: true,
+    agencyMatchers: ["4th Contracting Squadron"],
+    awardAgencies: ["4th CONS"],
+    officers: [
+      first(staffOf("sj-1", "FA480927Q0006", false, "Named on the desktop support follow-on. Rated your work Very Good.")),
+      staffOf("sj-2", "FA480927Q0006", true),
     ],
   },
   {
     id: "uspfo-nc",
-    agencyKey: 5102,
-    name: "NC Army National Guard (USPFO for North Carolina)",
+    agencyKey: 5305,
+    name: "USPFO for North Carolina (NC National Guard)",
     abbreviation: "USPFO NC",
     type: "federal",
     location: "Raleigh, NC",
     distanceMiles: PLACES.raleigh.milesFromBase,
     whatTheyBuy:
-      "Recruiting ads for the NC Army National Guard: video ads on screens in DMV offices, sports sponsorships, digital and social campaigns, plus its recruiting website and design support. Most buys are small quotes set aside for small businesses.",
+      "Laptops, imaging, security and phone lines for Guard offices across the state: $1.6M in FY2023–FY2025. Your laptop imaging quote is waiting on their award.",
     buysFood: true,
     agencyMatchers: ["USPFO for North Carolina"],
     awardAgencies: ["USPFO NC"],
     officers: [
-      sblo("ncng-1", "Darnell Whitcomb", "d.whitcomb@army.mil.example", "919-555-0321", "Small business liaison for the Guard's contracting office."),
-      co("ncng-2", "Maj. Lucinda Farrow", "l.farrow@army.mil.example", "919-555-0322", "Handles the Guard's recruiting and advertising buys."),
-      pm("ncng-3", "SFC Raymond Tolliver", "r.tolliver@army.mil.example", "919-555-0323", "Runs marketing for the Recruiting and Retention Battalion."),
-    ],
-    analysis: analysis(
-      "worth-it",
-      "You already delivered for them, they buy ads every year, and every dollar of the last three years went to small businesses. Ask for your interim rating first.",
-      spend(NCNG_SPEND, [["Recruiting ads, websites and design", 1]]),
-      100,
-      9,
-      "Most awards land in August and September, at the end of the federal fiscal year.",
-      awardeesFrom(["USPFO NC"]),
-    ),
-  },
-  {
-    id: "va-pcac",
-    agencyKey: 5103,
-    name: "VA Program Contracting Activity Central (PCAC)",
-    abbreviation: "VA PCAC",
-    type: "federal",
-    location: "Independence, OH (buys for the VA nationwide)",
-    distanceMiles: 560,
-    whatTheyBuy:
-      "The VA's national marketing, above all the campaign that recruits doctors, nurses and staff for VA hospitals: about $25M over the last three fiscal years. The current campaign is set aside for service-disabled veteran-owned firms.",
-    buysFood: true,
-    agencyMatchers: ["Program Contracting Activity Central"],
-    awardAgencies: ["VA PCAC"],
-    officers: [
-      sblo("pcac-1", "Bernard Esterline", "b.esterline@va.gov.example", "216-555-0331", "Small business specialist for national VA contracts."),
-      staffOf("pcac-2", HERO_IDS.teamUp, false, "Named on the hiring campaign's sources sought."),
-      staffOf("pcac-3", HERO_IDS.teamUp, true),
+      first(staffOf("ncng-1", "W91242-27-Q-0021", false, "Named on the recruiting office phone and internet quote.")),
+      staffOf("ncng-2", "W91242-27-Q-0021", true),
     ],
   },
   {
     id: "va-nco6",
-    agencyKey: 5104,
+    agencyKey: 5306,
     name: "VA Network Contracting Office 6",
     abbreviation: "VA NCO 6",
     type: "federal",
-    location: "Durham, NC (serves the Fayetteville VA Medical Center)",
+    location: "Durham, NC (buys for the Fayetteville VA Medical Center)",
     distanceMiles: PLACES.durham.milesFromBase,
     whatTheyBuy:
-      "Small marketing buys for VA hospitals in North Carolina and Virginia, including Durham and Fayetteville: printed and digital pieces for public-affairs campaigns, patient-education video and podcasts. VA rules give veteran-owned firms first claim when two of them can bid.",
+      "IT for the Fayetteville and Durham VA medical centers: $11.2M in FY2023–FY2025, mostly software for medical devices. VA rules give veteran-owned firms first claim, so its IT jobs near you are rarely open to you.",
     buysFood: true,
     agencyMatchers: ["Network Contracting Office 6"],
-    awardAgencies: ["VA NCO 6"],
+    awardAgencies: [],
     officers: [
-      sblo("nco6-1", "Gwendolyn Pacheco", "g.pacheco@va.gov.example", "919-555-0341", "Small business specialist for the network."),
-      co("nco6-2", "Arturo Lindell", "a.lindell@va.gov.example", "919-555-0342", "Public affairs and patient-education buys."),
-      pm("nco6-3", "Nia Holloway", "n.holloway@va.gov.example", "910-555-0343", "Public affairs officer, Fayetteville VA Coastal Health Care System."),
+      sblo("nco6-1", "Gilbert Faison", "g.faison@va.gov.example", "919-555-0661", "Small business specialist for the network."),
+      staffOf("nco6-2", "36C24627Q0187", false, "Named on the clinic cabling quote."),
     ],
-    analysis: analysis(
-      "maybe",
-      "The VA is one of your target buyers, but this office buys little marketing, and veteran-owned firms come first. Its newest video work went to one firm without a competition. Get known here before the next buy.",
-      spend(NCO6_SPEND, [["Promotion, printing and video", 1]]),
-      89,
-      0,
-      "Most of its awards land in August and September.",
-      awardeesFrom(["VA NCO 6"]),
-    ),
   },
   {
     id: "marsoc",
-    agencyKey: 5105,
-    name: "Marine Forces Special Operations Command (MARSOC)",
+    agencyKey: 5307,
+    name: "Marine Forces Special Operations Command (MARSOC), Camp Lejeune",
     abbreviation: "MARSOC",
     type: "federal",
     location: "Camp Lejeune, NC",
     distanceMiles: PLACES.jacksonville.milesFromBase,
     whatTheyBuy:
-      "The busiest federal ad buyer in North Carolina's award record: airport, billboard and magazine ads bought from the media owners, plus geofenced recruiting campaigns, feature articles and video shoots.",
+      "Small IT jobs posted as ordinary quotes, such as office rewires and switch installs. Offices at Camp Lejeune spent $17.2M on IT in FY2023–FY2025.",
     buysFood: true,
-    agencyMatchers: ["MARSOC", "Marine Forces Special Operations"],
+    agencyMatchers: ["Marine Forces Special Operations Command"],
     awardAgencies: ["MARSOC"],
-    officers: [
-      sblo("marsoc-1", "Celeste Varga", "c.varga@socom.mil.example", "910-555-0351"),
-      co("marsoc-2", "Capt. Owen Brandauer", "o.brandauer@socom.mil.example", "910-555-0352", "Signs the recruiting and advertising awards."),
-      pm("marsoc-3", "MSgt Dale Kinnear", "d.kinnear@socom.mil.example", "910-555-0353", "Runs recruiting marketing for the command."),
-    ],
-    analysis: analysis(
-      "maybe",
-      "It buys the most advertising of any federal office in the state, but most of the money buys ad space straight from airports and billboard owners. The campaign and video work is small-business sized. Camp Lejeune is about 100 miles from your office.",
-      spend(MARSOC_SPEND, [["Recruiting and advertising", 1]]),
-      29,
-      3,
-      "Awards come all year. Airport and billboard space often renews in the summer.",
-      awardeesFrom(["MARSOC"]),
-    ),
+    officers: [first(staffOf("marsoc-1", "H9225727Q0012", false, "Named on the office rewire quote.")), staffOf("marsoc-2", "H9225727Q0012", true)],
   },
   {
-    id: "bragg-mwr",
-    agencyKey: 5106,
-    name: "Fort Bragg Family and MWR",
-    abbreviation: "Fort Bragg MWR",
-    type: "federal",
-    location: "Fort Bragg, NC",
-    distanceMiles: PLACES.fortBragg.milesFromBase,
-    whatTheyBuy:
-      "Posters, social graphics, event promotion and short videos for Fort Bragg's recreation and family programs. It buys with non-appropriated funds, so its contracts do not appear in the federal award record.",
-    buysFood: true,
-    agencyMatchers: ["Family and MWR"],
-    awardAgencies: [],
-    officers: [
-      sblo("mwr-1", "Tobias Maddox", "t.maddox@army.mil.example", "910-555-0361", "Points vendors to the non-appropriated fund contracting office."),
-      co("mwr-2", "Lorna Feeney", "l.feeney@army.mil.example", "910-555-0362", "NAF contracting officer."),
-      pm("mwr-3", "Holly Strickland", "h.strickland@army.mil.example", "910-555-0363", "Marketing director for Family and MWR."),
-    ],
-  },
-  {
-    id: "ncdhhs",
-    agencyKey: 5107,
-    name: "NC Department of Health and Human Services",
-    abbreviation: "NCDHHS",
+    id: "ncdit",
+    agencyKey: 5308,
+    name: "NC Department of Information Technology",
+    abbreviation: "NCDIT",
     type: "sled",
     location: "Raleigh, NC",
     distanceMiles: PLACES.raleigh.milesFromBase,
     whatTheyBuy:
-      "Statewide public-health and social-services campaigns, such as More Powerful NC, the opioid campaign that launched in 2019 with $2.5 million of TV, radio and billboard ads, and foster-parent recruitment.",
+      "Statewide IT term contracts that state agencies order from, such as 920S IT services. A new one is open now.",
     buysFood: true,
-    agencyMatchers: ["Department of Health and Human Services"],
+    agencyMatchers: ["NC Department of Information Technology"],
     awardAgencies: [],
-    officers: [
-      co("dhhs-1", "Imelda Castro", "i.castro@dhhs.nc.gov.example", "919-555-0371", "Purchasing and contracts for the Division of Social Services."),
-      pm("dhhs-2", "Quentin Abara", "q.abara@dhhs.nc.gov.example", "919-555-0372", "Communications lead for foster-parent recruitment."),
-      sblo("dhhs-3", "Felicia Dorsett", "f.dorsett@dhhs.nc.gov.example", "919-555-0373", "Runs small business outreach for the department."),
-    ],
-  },
-  {
-    id: "ncdot-ghsp",
-    agencyKey: 5108,
-    name: "NCDOT Governor's Highway Safety Program",
-    abbreviation: "NCDOT GHSP",
-    type: "sled",
-    location: "Raleigh, NC",
-    distanceMiles: PLACES.raleigh.milesFromBase,
-    whatTheyBuy:
-      "Paid media for highway-safety enforcement campaigns such as \"Booze It & Lose It\", and a statewide roadside-safety campaign on the Move Over Law in this year's grants.",
-    buysFood: true,
-    agencyMatchers: ["Department of Transportation"],
-    awardAgencies: [],
-    officers: [
-      sblo("ghsp-1", "Wendell Ibarra", "w.ibarra@ncdot.gov.example", "919-555-0381", "Small business outreach for NCDOT purchasing."),
-      co("ghsp-2", "Carmen Holbrook", "c.holbrook@ncdot.gov.example", "919-555-0382", "Signs the paid-media contracts."),
-    ],
+    officers: [first(staffOf("ncdit-1", "ITS-402276-001", false, "Named on the IT specialty services term contract.")), staffOf("ncdit-2", "ITS-402276-001", true)],
   },
   {
     id: "fayetteville-city",
-    agencyKey: 5109,
+    agencyKey: 5309,
     name: "City of Fayetteville",
     abbreviation: null,
     type: "sled",
     location: "Fayetteville, NC",
     distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy:
-      "Public-education and outreach campaigns for city departments, such as the stormwater campaign you made in 2023 and marketing for FAST, the city's bus system.",
+    whatTheyBuy: "Help-desk overflow, after-hours support and network work for city offices, bid one job at a time.",
     buysFood: true,
     agencyMatchers: ["City of Fayetteville"],
     awardAgencies: [],
     officers: [
-      sblo("fay-1", "Shonda Pettiford", "s.pettiford@fayettevillenc.gov.example", "910-555-0391", "Small and local business outreach. Ask her about the city's vendor list."),
-      staffOf("fay-2", "FAY-TR-2027-04", false, "Purchasing. Signs the FAST ridership contract."),
-      staffOf("fay-3", "FAY-TR-2027-04", true),
-      pm("fay-4", "Victor Almanza", "v.almanza@fayettevillenc.gov.example", "910-555-0394", "Marketing for FAST, the city's bus system."),
+      sblo("fay-1", "Vernice Spivey", "v.spivey@fayettevillenc.gov.example", "910-555-0691", "Small and local business outreach. Ask her about the city's bidders list."),
+      staffOf("fay-2", "FAY-IT-2027-03", false, "IT department. Named on the help desk overflow bid."),
     ],
   },
   {
     id: "cumberland-county",
-    agencyKey: 5110,
+    agencyKey: 5310,
     name: "Cumberland County Government",
     abbreviation: null,
     type: "sled",
     location: "Fayetteville, NC",
     distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy:
-      "Public-information campaigns for county departments: public health, emergency services and hurricane preparedness. Proposals are scored, and price counts.",
+    whatTheyBuy: "Network refreshes and IT support for the courthouse, social services and other county offices.",
     buysFood: true,
     agencyMatchers: ["Cumberland County, NC"],
     awardAgencies: [],
-    officers: [
-      staffOf("cc-1", "CUMCO-PH-2027-03", false, "Purchasing manager. Sent you the hurricane campaign debrief."),
-      staffOf("cc-2", "CUMCO-PH-2027-03", true),
-      { ...pm("cc-3", "Renata Kowal", "r.kowal@co.cumberland.nc.us.example", "910-555-0403", "Public information director."), recommendedFirstContact: true },
-    ],
-  },
-  {
-    id: "cumberland-schools",
-    agencyKey: 5111,
-    name: "Cumberland County Schools",
-    abbreviation: null,
-    type: "sled",
-    location: "Fayetteville, NC",
-    distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy: "Recruiting ads for teachers and bus drivers, and outreach to families about enrollment.",
-    buysFood: true,
-    agencyMatchers: ["Cumberland County Schools"],
-    awardAgencies: [],
-    officers: [
-      { ...staffOf("ccs-1", "CCS-HR-2027-05", true), recommendedFirstContact: true },
-      staffOf("ccs-2", "CCS-HR-2027-05", false),
-      pm("ccs-3", "Doreen Applewhite", "d.applewhite@ccs.k12.nc.us.example", "910-555-0413", "Runs teacher recruiting in Human Resources."),
-    ],
+    officers: [first(staffOf("cc-1", "CUMCO-IT-2027-02", false, "Information Services. Named on the switch refresh.")), staffOf("cc-2", "CUMCO-IT-2027-02", true)],
   },
   {
     id: "ftcc",
-    agencyKey: 5112,
+    agencyKey: 5311,
     name: "Fayetteville Technical Community College",
     abbreviation: "FTCC",
     type: "sled",
     location: "Fayetteville, NC",
     distanceMiles: PLACES.fayetteville.milesFromBase,
-    whatTheyBuy: "Enrollment marketing: paid social, search and streaming ads, student-story videos and landing pages.",
+    whatTheyBuy: "Evening and weekend help desk for students and staff, and classroom technology support. It pays in 30 days.",
     buysFood: true,
     agencyMatchers: ["Fayetteville Technical Community College"],
     awardAgencies: [],
-    officers: [
-      { ...co("ftcc-1", "Marisa Quintero", "m.quintero@faytechcc.edu.example", "910-555-0421", "Purchasing. Runs the enrollment campaign request."), recommendedFirstContact: true },
-      pm("ftcc-2", "Lionel Haskett", "l.haskett@faytechcc.edu.example", "910-555-0422", "Marketing director."),
-    ],
+    officers: [first(staffOf("ftcc-1", "FTCC-IT-2027-04", false, "Purchasing. Runs the student help desk bid.")), staffOf("ftcc-2", "FTCC-IT-2027-04", true)],
   },
 ];
