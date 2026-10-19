@@ -159,10 +159,10 @@ describe("the member's facts come from the story", () => {
   test("the mentor is Sarah Mitchell and nobody else", () => {
     expect(MENTOR.name).toBe("Sarah Mitchell");
   });
-  test("her four past jobs are the story's four", () => {
+  test("her past jobs are the story's, one customer each", () => {
     // Each past job a bid names appears with the story's title or customer.
     const named = new Set(PAST_PERFORMANCE.map((p) => p.customerName.split(",")[0]));
-    expect(named.size).toBe(4);
+    expect(named.size).toBe(PAST_PERFORMANCE.length);
   });
   test("the legal name and the registration numbers agree", () => {
     for (const id of ids) {
