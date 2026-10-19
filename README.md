@@ -12,8 +12,11 @@ commit `fddbf283`, 16 Oct 2026), plus:
 - a left menu that copies the GoHighLevel member menu.
 
 There is **no backend, no login and no network call**. Every API call is answered
-in the browser from sample data about one fictional member, Amira Haddad of
-Haddad Catering & Food Services LLC.
+in the browser from sample data about one fictional member. There are two
+(`src/demo/member.ts`, D85): **Dana Okafor of Lantern Row Creative LLC**, an ad
+agency (the Level Up story, and the default), and **Amira Haddad of Haddad
+Catering & Food Services LLC**. Add `?member=caterer` to any URL, or use the
+presenter panel (Shift+Alt+P), to switch.
 
 ## For Abhi: build and host
 
@@ -58,7 +61,8 @@ bun run qa:crawl       # opens every page in a headless browser and clicks every
 
 | Folder | What is in it |
 |---|---|
-| `src/demo/story/` | **The story.** Every fact about Amira, every opportunity, Grant's calls, the pipeline, tasks, mentor reviews and the wallet. Every page reads from here. `check.ts` proves each Hunter reason is true. |
+| `src/demo/members/<member>/` | Each member's own story data: persona, opportunities, workspace, Grant briefs, Sarah's replies, and per-area content. |
+| `src/demo/story/` | **The story.** The shapes and rules, and the active member's facts: every opportunity, Grant's calls, the pipeline, tasks, mentor reviews and the wallet. Every page reads from here. `check.ts` proves each Hunter reason is true. |
 | `src/demo/runtime/` | The fetch interceptor and router that answer every API call in the browser, and the store that keeps the visitor's changes in `sessionStorage`. |
 | `src/demo/api/` | One file per area with the API handlers. `ENDPOINTS.md` lists every call the app makes. |
 | `src/demo/state/` | Shared state: saved list, wallet, mentor reviews. |
