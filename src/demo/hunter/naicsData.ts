@@ -74,6 +74,8 @@ const NAICS: CodeRow[] = [
   { code: "561740", description: "Carpet and Upholstery Cleaning Services" },
   { code: "561790", description: "Other Services to Buildings and Dwellings" },
   { code: "561920", description: "Convention and Trade Show Organizers" },
+  { code: "561990", description: "All Other Support Services" },
+  { code: "325612", description: "Polish and Other Sanitation Good Manufacturing" },
   { code: "562111", description: "Solid Waste Collection" },
   { code: "562112", description: "Hazardous Waste Collection" },
   { code: "562119", description: "Other Waste Collection" },
