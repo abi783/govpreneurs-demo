@@ -12,7 +12,8 @@ import type { MemberId } from "./member";
 
 const VISITOR_KEY = "gp-demo:visitor";
 const PRESENTER_KEY = "gp-demo:presenter";
-const PRESENTER_PASSWORD = "karthik";
+// Any capitals, with or without the space: "Tim Sabir", "timsabir".
+const PRESENTER_PASSWORD = "timsabir";
 
 /** The trades a visitor can pick. "Other" opens the marketing agency. */
 export const NICHES: { id: string; label: string; member: MemberId }[] = [
@@ -88,7 +89,7 @@ export function setPresenter(on: boolean): void {
 }
 
 export function presenterPasswordMatches(typed: string): boolean {
-  return typed.trim().toLowerCase() === PRESENTER_PASSWORD;
+  return typed.replace(/\s+/g, "").toLowerCase() === PRESENTER_PASSWORD;
 }
 
 /** True when this visitor has not been through /start yet. */
