@@ -3,6 +3,7 @@
 // The board saves this document with PUT /small-orders/state and reads it back
 // with GET /small-orders/state, so it is still there after a reload.
 
+import { MEMBER } from "@/demo/member";
 import { readDemoState, writeDemoState } from "@/demo/runtime/store";
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { PERSONA } from "@/demo/story/persona";
@@ -15,8 +16,38 @@ function nsnOf(id: string): string {
   return findOrder(id)?.nsn ?? "";
 }
 
-/** Amira's starting answers. */
+/**
+ * DEMO: the agency has never used the board: no kinds of items picked, nothing
+ * said or sent. All four registrations read as done so the board does not ask an
+ * ad agency to open a DLA account for orders that are not for her. Nothing on
+ * the board shows them (the checklist hides once all four are done).
+ */
+function agencyState(): MicroState {
+  return {
+    categories: [],
+    onboarded: false,
+    cashCeiling: null,
+    cashUnsure: false,
+    attestedNsns: [],
+    declinedNsns: [],
+    unsureNsns: [],
+    suppliedNsns: [],
+    quotes: [],
+    wins: [],
+    registrations: { sam: true, cage: true, dibbs: true, piee: true },
+    firstRegistrationAt: null,
+    samExpiresOn: PERSONA.samActiveUntil,
+    seenOrderIds: [],
+  };
+}
+
+/** The member's starting answers. */
 export function initialMemberState(): MicroState {
+  return MEMBER === "agency" ? agencyState() : catererState();
+}
+
+/** Amira's starting answers. */
+function catererState(): MicroState {
   const pasta = findOrder("mp-109");
   return {
     categories: ["food-beverage", "food-service-supplies", "kitchen-equipment", "safety-gear"],
