@@ -23,6 +23,7 @@ import {
 } from "./derive";
 import { ALL_AVA_BIDS, AVA_BIDS } from "./fixtures";
 import { FAMILY_ADVOCACY_ID } from "./fixtures/familyAdvocacy";
+import { HERO_IDS as CONSTRUCTION_IDS } from "../../demo/members/construction/opportunities";
 import { MEMBER } from "../../demo/member";
 import { STAFFING_KEY } from "./flow";
 import { cumberlandBid } from "./fixtures/cumberland";
@@ -197,10 +198,16 @@ describe("fixtures", () => {
     const caterer = CATERER_IDS.map((id) => ALL_AVA_BIDS[id]);
     expect(caterer.every(Boolean)).toBe(true);
     expect(new Set(caterer.map((b) => b.kind)).size).toBe(4);
-    expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual([...CATERER_IDS, FAMILY_ADVOCACY_ID].sort());
+    expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual(
+      [...CATERER_IDS, FAMILY_ADVOCACY_ID, CONSTRUCTION_IDS.hero].sort(),
+    );
     for (const [id, bid] of Object.entries(ALL_AVA_BIDS)) expect(bid.noticeId).toBe(id);
     expect(BIDS.map((b) => b.noticeId)).toEqual(
-      MEMBER === "caterer" ? CATERER_IDS : [FAMILY_ADVOCACY_ID],
+      MEMBER === "caterer"
+        ? CATERER_IDS
+        : MEMBER === "agency"
+          ? [FAMILY_ADVOCACY_ID]
+          : [CONSTRUCTION_IDS.hero],
     );
   });
 

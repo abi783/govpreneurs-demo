@@ -181,10 +181,12 @@ describe("page 1: the scope", () => {
     test(`${bid.noticeId}: a fact the files do not state shows as Not stated, never hidden`, () => {
       const secs = scopeSections(bid, confirmed());
       const overview = secs.find((x) => x.id === "contract");
-      // No sample bid states an estimated value, so it must be listed as Not stated.
-      expect(overview?.facts.some((f) => f.label === "Estimated value" && f.value === null)).toBe(
-        true,
-      );
+      // A bid whose files state no estimated value lists it as Not stated. DEMO:
+      // the contractor's USACE bid states its magnitude.
+      if (!bid.overview?.estimatedValue)
+        expect(overview?.facts.some((f) => f.label === "Estimated value" && f.value === null)).toBe(
+          true,
+        );
       expect(secs.reduce((n, sec) => n + notStatedCount(sec), 0)).toBeGreaterThan(0);
     });
 
