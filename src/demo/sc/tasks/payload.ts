@@ -79,6 +79,15 @@ const DUE_REASON: Record<string, string> = {
   "task-bluestone": "so a team bid is still possible",
   "task-print-quotes": "so you can price five years of print",
   "task-rating": "before the Guard's next campaign",
+  // DEMO: the contractor's tasks (members/construction/workspace.ts).
+  "task-ava-training-building": "so Ava can finish the bid",
+  "task-surety": "so you can post the bid bond",
+  "task-blackjack-oak": "so a team bid is still possible",
+  "task-lead-times": "so you know the job fits 240 days",
+  "task-site-visit": "when the site visit is held",
+  "task-wage-class": "before questions close",
+  "task-va-sources-sought": "before the sources sought closes",
+  "task-hubzone-recert": "so your HUBZone status does not lapse",
 };
 
 /** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */

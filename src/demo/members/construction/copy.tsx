@@ -13,7 +13,7 @@ import type { BuyerOfficer, GovBuyer } from "@/lib/mock/governmentBuyers";
 import { fmtRate, type LcatLocation } from "@/lib/mock/laborRates";
 import type { MicroState } from "@/lib/state/microPurchases";
 import type { TrackedItem } from "@/lib/stayReady";
-import { isoDaysFromNow } from "../../story/clock";
+import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
 import { PAST_PERFORMANCE, PERSONA } from "./persona";
 
 function k(n: number): string {
@@ -54,9 +54,8 @@ export const ROADMAP_DONE_DATES: Record<string, { started?: number; done: number
 /** What his CMMC Level 1 self-assessment covers. */
 export const CMMC_SCOPE = "Office, estimating and project-management systems";
 
-/** The size of his capability statement in public/demo-files (scripts/make-capability-statement.ts writes it).
- *  Still the agency's size: set it when the statement is made (README, step 6). */
-export const CAPABILITY_STATEMENT_BYTES = 3305;
+/** The size of his capability statement in public/demo-files (scripts/make-capability-statement.ts writes it). */
+export const CAPABILITY_STATEMENT_BYTES = 3313;
 
 /** What he calls a job when he says how many he can run at once (My Business, "Tell us"). */
 export const JOB_WORDS = /\b(jobs|projects|contracts|crews|sites)\b/i;
@@ -235,6 +234,18 @@ export const stayReadyItems = (samItem: () => TrackedItem): TrackedItem[] => {
         "Every bid asks for active liability insurance, and the surety checks it before it writes a bond. An expired policy means you can't bid.",
     },
     {
+      // A bond line is renewed through the broker, like a policy, so it uses the insurance steps.
+      id: "bond-line",
+      kind: "insurance",
+      name: "Surety bond line renewal",
+      shortName: "bond line",
+      dueDate: isoDaysFromNow(150, 0),
+      dfyAvailable: false,
+      dfyPriceUSD: 0,
+      smsOptIn: true,
+      stakes: `Your surety reviews your books each year before it renews your $${k(PERSONA.bondLine?.single ?? 0)} single and $${k(PERSONA.bondLine?.aggregate ?? 0)} total limits. Without it, you can't post a bid bond.`,
+    },
+    {
       id: "insurance-auto",
       kind: "insurance",
       name: "Business auto insurance",
@@ -263,7 +274,7 @@ export const CAP_STATEMENT = {
   ],
 };
 
-/** His insurance and bonding, as Grant reads them. */
+/** His insurance and bonding, as Grant reads them. The dates match Stay Ready and My Business. */
 export const insurance = (): InsuranceBonding => {
   return {
     coverages: [
@@ -274,7 +285,7 @@ export const insurance = (): InsuranceBonding => {
         carrier: "Piedmont Mutual",
         amBest: "A (XV)",
         basis: "occurrence",
-        expiry: "2027-05-31",
+        expiry: dateDaysFromNow(120),
       },
       {
         type: "workers-comp",
@@ -283,7 +294,7 @@ export const insurance = (): InsuranceBonding => {
         carrier: "Piedmont Mutual",
         amBest: "A (XV)",
         basis: "occurrence",
-        expiry: "2027-05-31",
+        expiry: dateDaysFromNow(120),
       },
       {
         type: "auto",
@@ -292,7 +303,7 @@ export const insurance = (): InsuranceBonding => {
         carrier: "Piedmont Mutual",
         amBest: "A (XV)",
         basis: "occurrence",
-        expiry: "2027-05-31",
+        expiry: dateDaysFromNow(210),
       },
       {
         type: "umbrella",
@@ -301,7 +312,7 @@ export const insurance = (): InsuranceBonding => {
         carrier: "Atlantic Specialty Underwriters",
         amBest: "A (XIII)",
         basis: "occurrence",
-        expiry: "2027-05-31",
+        expiry: dateDaysFromNow(120),
       },
     ],
     bonding: PERSONA.bondLine
