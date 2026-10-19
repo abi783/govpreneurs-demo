@@ -194,6 +194,13 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
     ],
   },
   {
+    match: /Transportation|Aviation/i,
+    team: [
+      { name: "Rosalind Mercer", title: "Contracting Officer" },
+      { name: "Grady Whitlock", title: "Contract Specialist" },
+    ],
+  },
+  {
     match: /General Services/i,
     team: [
       { name: "Dale Harmon", title: "Contracting Officer" },

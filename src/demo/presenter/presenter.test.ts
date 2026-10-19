@@ -10,13 +10,21 @@ import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
 import { avaDemo } from "@/lib/ava/store";
 import { ready, reading } from "@/lib/ava/play";
 import { SEGMENTS } from "./segments";
-import { byMember } from "@/demo/member";
+import { byMember, own } from "@/demo/member";
 
 const HERO = HERO_IDS.hero;
 /** An opportunity with Sarah's written reply, and a word from it, per member. */
 const LIVE_REVIEW = byMember({
   caterer: { oppKey: "VA247-26-R-0112", word: "Womack" },
-  pack: { oppKey: "MWR-FB-27-0006", word: "posters" },
+  // A pack member: the first opportunity with Sarah's written "pursue" reply, and a long word from it.
+  pack: (() => {
+    const { MENTOR_REPLIES } = own(
+      import.meta.glob<typeof import("@/demo/members/agency/mentorReplies")>("/src/demo/members/*/mentorReplies.ts", { eager: true }),
+    );
+    const [oppKey, reply] = Object.entries(MENTOR_REPLIES).find(([, r]) => r.pursue)!;
+    const word = reply.pursue!.replace(/<[^>]+>/g, " ").split(/\s+/).find((w) => /^[A-Za-z]{8,}$/.test(w))!;
+    return { oppKey, word };
+  })(),
 });
 
 beforeEach(() => wipeDemoStorage());
