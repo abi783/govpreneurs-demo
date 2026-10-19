@@ -95,6 +95,13 @@ const DUE_REASON: Record<string, string> = {
   "task-sandblasting-question": "before questions close",
   "task-blasting-sub": "so sandblasting fits your price",
   "task-cor-letter": "while the COR remembers the job",
+  // DEMO: the trucking company's tasks (members/trucking/workspace.ts).
+  "task-ava-va-routes": "so Ava can finish the quote",
+  "task-license-question": "before questions close",
+  "task-fuel-price": "so you can price five years of diesel",
+  "task-courier-notes": "so you can use her notes in your quote",
+  "task-brightwater": "so a team bid is still possible",
+  "task-interim-rating": "while the contracting officer remembers the job",
 };
 
 /** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */

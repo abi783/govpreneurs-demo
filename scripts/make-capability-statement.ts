@@ -5,6 +5,7 @@
 //      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
 //      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
 //      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
+//      DEMO_MEMBER=trucking bun scripts/make-capability-statement.ts     (Rockfish Run Freight)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -61,6 +62,21 @@ const COPY = {
     extraRows: [
       ["PSC", "PSC DE01 · DG01"],
       ["Contract vehicles", "GSA MAS, SIN 54151S"],
+    ] as [string, string][],
+  },
+  // The pack's line (trucking-pack.md §1). The fleet and PSC lines are what
+  // My Business reads off this file (members/trucking/sc/business.ts).
+  trucking: {
+    who: `Service-disabled veteran-owned trucking company 12 miles from Fort Bragg: scheduled box-truck routes, dry-van and refrigerated truckload across NC, SC and VA, and on-call trailer and container moves, run by a former Army truck driver. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff, 12 of them drivers.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Truck yard and shop on Gillespie St. 7 tractors, 9 trailers, 4 box trucks with lift gates and a cargo van",
+      "Our own drivers in our own trucks; we don't broker loads",
+    ],
+    extraRows: [
+      ["PSC", "PSC V111 · V119"],
+      ["Authority", "USDOT and MC operating authority since 2017 · SCAC"],
+      ["Contract vehicles", "None yet (not in SDDC's carrier program)"],
     ] as [string, string][],
   },
 }[MEMBER];
