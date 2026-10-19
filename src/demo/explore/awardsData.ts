@@ -8,9 +8,10 @@
 
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING } from "./firms";
 import { calendarDay, daysToDay } from "./dates";
-import { PAST_PERFORMANCE } from "@/demo/story/persona";
-import { getOpportunity, HERO_IDS } from "@/demo/story/opportunities";
+import { PAST_PERFORMANCE, findPastPerformance } from "@/demo/story/persona";
+import { getOpportunity } from "@/demo/story/opportunities";
 import type { AwardBench, AwardRecord } from "@/lib/awardsApi";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 interface Agency {
   name: string;
@@ -107,8 +108,8 @@ const WOSB_SETASIDE = "Women-Owned Small Business Set-Aside";
 const CDG = CAROLINA_DINING.key;
 const AMIRA = AMIRA_FIRM.key;
 
-const womack = PAST_PERFORMANCE.find((p) => p.id === "pp-womack")!;
-const cdgSub = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub")!;
+const womack = findPastPerformance("pp-womack")!;
+const cdgSub = findPastPerformance("pp-cdg-sub")!;
 
 const SEEDS: Seed[] = [
   // ── Carolina Dining Group (4001) ───────────────────────────────────────
@@ -776,7 +777,7 @@ function benchOf(s: Seed): AwardBench | null {
 
 /** The Army is already taking bids for the next Fort Bragg dining contract. The days come from the story's notice. */
 function openNowNote(): string {
-  const notice = getOpportunity(HERO_IDS.fortBraggDining)!;
+  const notice = getOpportunity(CATERER_HERO.teamUp)!;
   return `The Army is taking bids for this job again now. Proposals are due in ${notice.closesInDays} days. Grant says to bid as a subcontractor.`;
 }
 

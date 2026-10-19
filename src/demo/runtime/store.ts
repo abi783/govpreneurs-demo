@@ -17,6 +17,7 @@
 //   - `resetDemo()` wipes everything and returns to the Success Center.
 
 import { useCallback, useSyncExternalStore } from "react";
+import { MEMBER_KEY } from "../member";
 
 export const DEMO_STATE_PREFIX = "gp-demo:v1:";
 
@@ -133,7 +134,10 @@ export function clearDemoState(name: string): void {
 export function wipeDemoStorage(): void {
   cache.clear();
   try {
+    // The member (agency or caterer) is the presenter's choice, not demo state: keep it.
+    const member = window.sessionStorage.getItem(MEMBER_KEY);
     window.sessionStorage.clear();
+    if (member) window.sessionStorage.setItem(MEMBER_KEY, member);
   } catch {
     /* ignore */
   }

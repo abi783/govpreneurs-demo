@@ -107,7 +107,7 @@ function build(o: StoryOpportunity): FeedRow {
     id: o.id,
     city: place.city,
     state: place.state,
-    miles: place.milesFromKitchen,
+    miles: place.milesFromBase,
     zip: ZIPS[place.city],
     postedAt: postedIso(o.postedDaysAgo),
     closesAt: deadlineIso(o.closesInDays),

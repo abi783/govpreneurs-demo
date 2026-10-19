@@ -2,6 +2,7 @@
 // fails the build if any list is not empty. This is what makes "every reason
 // Hunter gives is true" a fact rather than a hope.
 
+import { MEMBER } from "../member";
 import {
   AVA_BIDS,
   FOR_YOU,
@@ -47,7 +48,7 @@ function parseMoney(text: string): number | null {
 }
 
 export function factProblem(o: StoryOpportunity, f: FitFact): string | null {
-  const miles = PLACES[o.place].milesFromKitchen;
+  const miles = PLACES[o.place].milesFromBase;
   const mid = o.valueLow !== null && o.valueHigh !== null ? (o.valueLow + o.valueHigh) / 2 : null;
   switch (f.kind) {
     case "naics": {
@@ -99,6 +100,12 @@ export function factProblem(o: StoryOpportunity, f: FitFact): string | null {
       return `unchecked notice-type phrase "${f.says}"`;
     case "clearanceGap":
       return o.clearanceRequired && PERSONA.clearances.length === 0 ? null : "clearance-gap fact is not true";
+    case "providerLock":
+      return o.exclusiveProvider ? null : "provider-lock fact on work open to any provider";
+    case "setAsideGap":
+      return o.setAside && !(PERSONA.setAsideEligibility as readonly string[]).includes(o.setAside)
+        ? null
+        : "set-aside-gap fact, but the member can bid this set-aside";
   }
 }
 
@@ -114,6 +121,8 @@ export function checkStory(): string[] {
     if (o.postedDaysAgo < 0) p(o, "posted in the future");
     if (o.valueLow !== null && o.valueHigh !== null && o.valueLow > o.valueHigh) p(o, "value low > high");
     if (/\b(Amira's Kitchen|Marcus|Williams Construction|roof)/i.test(JSON.stringify(o))) p(o, "old persona text");
+    // The agency's story must never fall back to the caterer's words.
+    if (MEMBER === "agency" && /\b(cater\w*|meals?|kitchen|food|cooks?|dining)\b/i.test(JSON.stringify(o))) p(o, "catering word in the agency story");
 
     const { line, fit, forYouRank } = o.hunter;
     if (forYouRank !== undefined) {

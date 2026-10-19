@@ -7,7 +7,8 @@
 // 200-mile area) so a search in Virginia, one of her three states, finds something.
 
 import type { ForecastSeed } from "./forecastSeeds";
-import { HERO_IDS, OPPORTUNITIES } from "@/demo/story/opportunities";
+import { OPPORTUNITIES } from "@/demo/story/opportunities";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 /** The sources sought notice for the next Fort Bragg dining program, from the story. */
 const SOURCES_SOUGHT_ID = OPPORTUNITIES.find((o) => o.noticeType === "Sources Sought")!.id;
@@ -25,7 +26,7 @@ export const LOCAL_SEEDS: ForecastSeed[] = [
     oppKey: FORT_BRAGG_FORECAST_KEY,
     hgTitle: "Installation Dining Services, Fort Bragg: FY2027 Program",
     hgText:
-      `The Army's next dining program for Fort Bragg, planned after the two-facility contract that it is bidding now (notice ${HERO_IDS.fortBraggDining}). Full food service at the on-post dining facilities: three meals a day, seven days a week, with a base year and four option years. The Army is running a market study (sources sought notice ${SOURCES_SOUGHT_ID}) to decide how much of the work to set aside for small business.`,
+      `The Army's next dining program for Fort Bragg, planned after the two-facility contract that it is bidding now (notice ${CATERER_HERO.teamUp}). Full food service at the on-post dining facilities: three meals a day, seven days a week, with a base year and four option years. The Army is running a market study (sources sought notice ${SOURCES_SOUGHT_ID}) to decide how much of the work to set aside for small business.`,
     sourceId: "MICC-FB-FY27-0412",
     postedDaysAgo: 21,
     expectedInDays: 165,

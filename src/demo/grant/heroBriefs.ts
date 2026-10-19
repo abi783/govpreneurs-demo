@@ -9,15 +9,16 @@
 // older shape and a different set-aside, so these are rewritten to agree with the
 // story exactly.
 
-import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
+import { getOpportunity } from "@/demo/story/opportunities";
 import { PERSONA } from "@/demo/story/persona";
 import { PLACES } from "@/demo/story/places";
 import type { AuthoredBrief } from "./encode";
 import { CERTIFIED, COOKS, customerShort, PARTNER, PP, shareWords, usd } from "./facts";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
-const dining = getOpportunity(HERO_IDS.fortBraggDining)!;
-const mackall = getOpportunity(HERO_IDS.classifiedSite)!;
-const fieldMeals = getOpportunity(HERO_IDS.fieldMeals)!;
+const dining = getOpportunity(CATERER_HERO.teamUp)!;
+const mackall = getOpportunity(CATERER_HERO.twin)!;
+const fieldMeals = getOpportunity(CATERER_HERO.hero)!;
 const sought = getOpportunity("W912EE-27-S-0004")!;
 
 /** Yearly value of Fort Bragg dining: the buyer states it per year. */
@@ -33,8 +34,8 @@ const MACKALL_SHARE = MACKALL_ANNUAL / PERSONA.annualRevenue;
 
 export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
   // ── Fort Bragg dining: bid as a subcontractor ────────────────────────
-  [HERO_IDS.fortBraggDining]: {
-    oppId: HERO_IDS.fortBraggDining,
+  [CATERER_HERO.teamUp]: {
+    oppId: CATERER_HERO.teamUp,
     confidence: 3,
     gist: dining.grant.oneLine,
     thesis: `The work is yours, but the bond is not. Bid as a subcontractor under the firm that holds the contract.`,
@@ -49,7 +50,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       },
       "Can you perform there?": {
         rating: "strong",
-        text: `Fort Bragg is ${PLACES[dining.place].milesFromKitchen} miles from your kitchen, and you have already worked in two of its dining facilities.`,
+        text: `Fort Bragg is ${PLACES[dining.place].milesFromBase} miles from your kitchen, and you have already worked in two of its dining facilities.`,
       },
       "Can you do the work?": {
         rating: "watch",
@@ -146,8 +147,8 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
   },
 
   // ── Camp Mackall restricted site: no-bid ─────────────────────────────
-  [HERO_IDS.classifiedSite]: {
-    oppId: HERO_IDS.classifiedSite,
+  [CATERER_HERO.twin]: {
+    oppId: CATERER_HERO.twin,
     confidence: 5,
     gist: mackall.grant.oneLine,
     thesis: `This contract is closed to you today. Every worker needs a Secret clearance on day one, and the Army will not sponsor one. Put your time into Camp Mackall field meals instead.`,
@@ -162,7 +163,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       },
       "Can you perform there?": {
         rating: "good",
-        text: `Camp Mackall is ${PLACES[mackall.place].milesFromKitchen} miles from your kitchen. Entry to a restricted site adds time to every shift.`,
+        text: `Camp Mackall is ${PLACES[mackall.place].milesFromBase} miles from your kitchen. Entry to a restricted site adds time to every shift.`,
       },
       "Can you do the work?": {
         rating: "weak",
@@ -200,7 +201,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
     ],
     nextMove: {
       label: "Go to Camp Mackall field meals",
-      to: `/opportunities/${HERO_IDS.fieldMeals}`,
+      to: `/opportunities/${CATERER_HERO.hero}`,
       rationale: `It is the same base. It needs no clearance, and only woman-owned firms can bid. Spend this month on that quote.`,
     },
     secondaryMove: { label: "Add the clearance gap to my Roadmap", to: "/roadmap" },

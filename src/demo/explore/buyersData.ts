@@ -92,7 +92,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "MICC Fort Bragg",
     type: "federal",
     location: "Fort Bragg, NC",
-    distanceMiles: PLACES.fortBragg.milesFromKitchen,
+    distanceMiles: PLACES.fortBragg.milesFromBase,
     whatTheyBuy:
       "Dining facility operations, field feeding, event catering and mess attendant services for soldiers at Fort Bragg, Pope Army Airfield and Camp Mackall. Many of its awards are set aside for small and woman-owned businesses.",
     buysFood: true,
@@ -127,7 +127,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "Womack AMC",
     type: "federal",
     location: "Fort Bragg, NC",
-    distanceMiles: PLACES.fortBragg.milesFromKitchen,
+    distanceMiles: PLACES.fortBragg.milesFromBase,
     whatTheyBuy:
       "Patient meals, therapeutic diets and kitchen support for the hospital on Fort Bragg.",
     buysFood: true,
@@ -160,7 +160,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "Pope AAF",
     type: "federal",
     location: "Pope Army Airfield, NC",
-    distanceMiles: PLACES.popeAaf.milesFromKitchen,
+    distanceMiles: PLACES.popeAaf.milesFromBase,
     whatTheyBuy:
       "Ceremonies, official functions and unit events with catering for 50 to 600 guests. Often set aside for woman-owned firms.",
     buysFood: true,
@@ -191,7 +191,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "VA NCO 6",
     type: "federal",
     location: "Durham, NC (serves the Fayetteville VA Medical Center)",
-    distanceMiles: PLACES.durham.milesFromKitchen,
+    distanceMiles: PLACES.durham.milesFromBase,
     whatTheyBuy:
       "Patient meals, hospital kitchen support and retail dining at VA medical centers in North Carolina and Virginia.",
     buysFood: true,
@@ -572,7 +572,7 @@ export const BUYER_SEED: GovBuyer[] = [
     abbreviation: "NS Norfolk",
     type: "federal",
     location: "Norfolk, VA",
-    distanceMiles: PLACES.norfolk.milesFromKitchen,
+    distanceMiles: PLACES.norfolk.milesFromBase,
     whatTheyBuy: "Galley services and mess attendants for the Navy's largest base.",
     buysFood: true,
     agencyMatchers: ["Naval Station Norfolk"],

@@ -11,23 +11,30 @@ import {
   type SetAside,
   type StoryOpportunity,
 } from "@/demo/story/opportunities";
-import { KEY_PARTNER, MENTOR, PAST_PERFORMANCE, PERSONA, type PastPerformance } from "@/demo/story/persona";
+import {
+  KEY_PARTNER,
+  MENTOR,
+  PAST_PERFORMANCE, findPastPerformance,
+  PAST_PERFORMANCE_ROLES,
+  PERSONA,
+  type PastPerformance,
+} from "@/demo/story/persona";
 import { PLACES, type Place } from "@/demo/story/places";
 
 // ── The member's own record, read from the story ─────────────────────────
 
 const pp = (id: PastPerformance["id"]): PastPerformance => {
-  const found = PAST_PERFORMANCE.find((p) => p.id === id);
+  const found = findPastPerformance(id);
   if (!found) throw new Error(`No past performance ${id} in the story`);
   return found;
 };
 
 /** The four past jobs, by name. */
 export const PP = {
-  county: pp("pp-county-schools"),
-  cdg: pp("pp-cdg-sub"),
-  church: pp("pp-church"),
-  womack: pp("pp-womack"),
+  county: pp(PAST_PERFORMANCE_ROLES.county),
+  cdg: pp(PAST_PERFORMANCE_ROLES.cdg),
+  church: pp(PAST_PERFORMANCE_ROLES.church),
+  womack: pp(PAST_PERFORMANCE_ROLES.womack),
 };
 
 /** The customer's name without the agency tail: "Womack Army Medical Center". */
@@ -49,7 +56,7 @@ export const PARTNER = KEY_PARTNER;
 
 /** Holders of a food-handler certificate, and how many cooks she has. */
 export const COOKS = PERSONA.employeesW2;
-export const CERTIFIED = PERSONA.foodHandlerCertified;
+export const CERTIFIED = PERSONA.foodHandlerCertified ?? 0;
 export const UNCERTIFIED = COOKS - CERTIFIED;
 
 // ── Money, dates and words ───────────────────────────────────────────────
@@ -102,11 +109,13 @@ export function liveDaysTo(iso: string): number {
 export const SET_ASIDE_LABEL: Record<NonNullable<SetAside>, string> = {
   WOSB: "Women-Owned Small Business (WOSB) set-aside",
   SBA: "Total Small Business set-aside",
+  SDVOSBC: "Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside",
 };
 
 export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = {
   WOSB: "woman-owned",
   SBA: "small-business",
+  SDVOSBC: "service-disabled veteran-owned",
 };
 
 // ── Term of the contract ─────────────────────────────────────────────────
@@ -346,7 +355,7 @@ export function factsFor(opp: StoryOpportunity): OppFacts {
     opp,
     id: opp.id,
     place,
-    miles: place.milesFromKitchen,
+    miles: place.milesFromBase,
     placeText: `${place.city}, ${place.state}`,
     years,
     mid,

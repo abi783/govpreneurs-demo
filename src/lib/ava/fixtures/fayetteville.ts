@@ -22,7 +22,7 @@ import { getGrantBrief } from "../../../demo/story/grantBriefs";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import {
   KEY_PARTNER,
-  PAST_PERFORMANCE,
+  PAST_PERFORMANCE, findPastPerformance,
   PERSONA,
   type PastPerformanceId,
 } from "../../../demo/story/persona";
@@ -33,7 +33,7 @@ import { D, DM, ET_OFFSET, FORMED_ON, USWD } from "./when";
 
 // ─── Facts of the member, from the story ─────────────────────────────────────
 
-const job = (id: PastPerformanceId) => PAST_PERFORMANCE.find((p) => p.id === id)!;
+const job = (id: PastPerformanceId) => findPastPerformance(id)!;
 const COUNTY = job("pp-county-schools");
 const BRAGG = job("pp-cdg-sub");
 const CHURCH = job("pp-church");

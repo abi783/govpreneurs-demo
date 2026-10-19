@@ -7,8 +7,8 @@
 
 import { isoDaysFromNow } from "@/demo/story/clock";
 import { calendarDay, daysToDay } from "./dates";
-import { getOpportunity, HERO_IDS } from "@/demo/story/opportunities";
-import { PAST_PERFORMANCE, PERSONA, KEY_PARTNER } from "@/demo/story/persona";
+import { getOpportunity } from "@/demo/story/opportunities";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA, KEY_PARTNER } from "@/demo/story/persona";
 import {
   AGENCY_LABEL,
   agencyIdOf,
@@ -28,6 +28,7 @@ import type {
   PrimeCandidate,
   RankReason,
 } from "@/lib/partnersApi";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 /** The states Amira serves (persona.ts). */
 const MY_STATES = PERSONA.serviceStates as readonly string[];
@@ -51,10 +52,10 @@ const TRADE_DIRECT: PrimeCandidate["trade"] = { proximity: "direct", naicsCodes:
 
 /** The pursuit Amira sees on the Pipeline board, to name days left. */
 function fortBraggRfpDays(): number {
-  return getOpportunity(HERO_IDS.fortBraggDining)?.closesInDays ?? 18;
+  return getOpportunity(CATERER_HERO.teamUp)?.closesInDays ?? 18;
 }
 
-const pastCdg = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub")!;
+const pastCdg = findPastPerformance("pp-cdg-sub")!;
 
 const SPECS: Spec[] = [
   {
@@ -74,7 +75,7 @@ const SPECS: Spec[] = [
       {
         signal: "W2",
         text: `They hold Fort Bragg dining and the Army is bidding it again now. ${KEY_PARTNER.seeking}.`,
-        evidence: `award record: Fort Bragg dining, 2019, all four option years used; open request ${HERO_IDS.fortBraggDining}`,
+        evidence: `award record: Fort Bragg dining, 2019, all four option years used; open request ${CATERER_HERO.teamUp}`,
       },
     ],
     flags: [

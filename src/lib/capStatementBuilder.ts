@@ -105,7 +105,7 @@ function factsFrom(overrides: ReturnType<typeof getFieldOverrides>, pp: PpEntry[
     coreCapabilities: listOf("core-capabilities", overrides),
     differentiators: listOf("differentiators", overrides),
     employees,
-    foodHandlers: Number(textOf("food-handlers", overrides)) || PERSONA.foodHandlerCertified,
+    foodHandlers: Number(textOf("food-handlers", overrides)) || (PERSONA.foodHandlerCertified ?? 0),
     formedOn: PERSONA.formedOn,
     states: [...PERSONA.serviceStates],
     largestBond: PERSONA.largestBond,

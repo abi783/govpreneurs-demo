@@ -5,7 +5,7 @@
 // demo store (store.ts) and laid over these starting values.
 
 import type { ReactNode } from "react";
-import { PAST_PERFORMANCE, PERSONA } from "../story/persona";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../story/persona";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
 import { SAM_CHECKED_DAYS_AGO } from "../sc/timeline";
@@ -701,7 +701,7 @@ const DEFS: FieldDef[] = [
     initial: {
       state: "attested",
       value: `Subcontractor to Fort Bragg dining prime, ${new Date(
-        PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub")!.periodStart,
+        findPastPerformance("pp-cdg-sub")!.periodStart,
       ).getUTCFullYear()}`,
       source: "From your past performance",
     },

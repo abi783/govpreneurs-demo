@@ -12,6 +12,7 @@
 //     "One business day later" card, then the product's own screens.
 //   - Booth mode is off unless switched on. After 3 minutes with no input it warns for
 //     10 seconds ("touch anything to keep going"), then rests on Hunter's feed.
+//   - Member (C4): which sample business the story is about. Switching starts the story again.
 //   - `data-qa-skip`: the QA crawl clicks every button, but not these.
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -23,7 +24,8 @@ import { answerReview, pendingReviews } from "@/demo/state/mentorReviews";
 import { awardOutcome, setAwardOutcome, type AwardOutcome } from "@/demo/state/outcomes";
 import type { MentorVerdict } from "@/demo/story/mentorReplies";
 import { refreshMentorReviews } from "@/lib/mentorReviewsApi";
-import { IDLE_ROUTE, SEGMENTS, jumpTo } from "./segments";
+import { MEMBER, MEMBERS } from "@/demo/member";
+import { IDLE_ROUTE, SEGMENTS, jumpTo, switchMember } from "./segments";
 import { showTimeJump } from "./TimeJump";
 
 const IDLE_MS = 3 * 60_000;
@@ -230,6 +232,24 @@ export function PresenterPanel() {
                 <button key={s.n} type="button" className="demo-presenter__jump" onClick={() => jumpTo(s)}>
                   <kbd>{keyFor(s.n)}</kbd>
                   {s.label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="demo-presenter__sec">
+            <div className="demo-presenter__label">Member</div>
+            <div className="demo-presenter__row">
+              {MEMBERS.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  className={`demo-presenter__btn${m.id === MEMBER ? " is-on" : ""}`}
+                  aria-pressed={m.id === MEMBER}
+                  title={m.label}
+                  onClick={() => m.id !== MEMBER && switchMember(m.id)}
+                >
+                  {m.id === "agency" ? "Ad agency" : "Caterer"}
                 </button>
               ))}
             </div>

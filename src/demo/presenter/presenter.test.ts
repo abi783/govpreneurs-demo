@@ -11,7 +11,7 @@ import { avaDemo } from "@/lib/ava/store";
 import { ready, reading } from "@/lib/ava/play";
 import { SEGMENTS } from "./segments";
 
-const HERO = HERO_IDS.fieldMeals;
+const HERO = HERO_IDS.hero;
 
 beforeEach(() => wipeDemoStorage());
 

@@ -6,14 +6,15 @@
 // fact in the text comes from the story files; none is typed twice.
 
 import type { ActivePlaybook } from "@sc/types/portal";
-import { HERO_IDS, getOpportunity } from "@/demo/story/opportunities";
+import { getOpportunity } from "@/demo/story/opportunities";
 import { KEY_PARTNER, MENTOR, PERSONA } from "@/demo/story/persona";
 import { TASKS } from "@/demo/story/workspace";
 import { getPlaybookState } from "./store";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 export const PLAN_ASSIGNMENT_ID = "plan-fort-bragg-and-va";
 
-const fieldMeals = getOpportunity(HERO_IDS.fieldMeals)!;
+const fieldMeals = getOpportunity(CATERER_HERO.hero)!;
 
 /** Steps that are done when the demo opens. The rest she can tick. */
 const DONE_AT_START = ["step-cap-statement", "step-mackall-review"];
@@ -115,7 +116,7 @@ export function getActionPlans(): ActivePlaybook[] {
           content:
             `Ava has questions about your **delivery times** and your **staffing plan**. She cannot finish the quote without them. It takes about ten minutes. Due ${dueText("task-ava-mackall")}.`,
           videoUrl: null,
-          resourceUrl: `/ava/${HERO_IDS.fieldMeals}`,
+          resourceUrl: `/ava/${CATERER_HERO.hero}`,
           attachmentUrl: null,
           attachmentName: null,
           allowMemberUpload: false,

@@ -3,7 +3,7 @@
 // the forecast record and Amira's facts, so the numbers are true for her.
 
 import { daysToDay } from "./dates";
-import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
+import { KEY_PARTNER, PAST_PERFORMANCE, findPastPerformance, PERSONA } from "@/demo/story/persona";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
 import { forecastRecord, FORECAST_MEMBER, scoredRow } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY, POPE_FORECAST_KEY, SEYMOUR_FORECAST_KEY, CUMBERLAND_SUMMER_KEY } from "./forecastLocalSeeds";
@@ -160,7 +160,7 @@ export function forecastGrantReply(oppKey: string, message: string): string {
     return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
-    const best = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub") ?? PAST_PERFORMANCE[0];
+    const best = findPastPerformance("pp-cdg-sub") ?? PAST_PERFORMANCE[0];
     return `Your closest past work is ${best.projectTitle} (${money(best.totalValue)}, ${best.periodStart.slice(0, 4)}). Your Womack contract ($126K) shows federal prime work, and Cumberland County Schools ($198K) shows daily volume.`;
   }
   if (has(/\b(compet|who wins|winner|incumbent|who has)\b/)) {

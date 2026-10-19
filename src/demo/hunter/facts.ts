@@ -3,7 +3,7 @@
 // (`persona.ts`, `opportunities.ts`, `places.ts`). Nothing is typed twice.
 
 import { money } from "../../lib/money";
-import { PAST_PERFORMANCE, PERSONA, type PastPerformance } from "../story/persona";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA, type PastPerformance } from "../story/persona";
 import type { FitFact } from "../story/opportunities";
 import { longDate } from "./dates";
 import type { FeedRow } from "./data";
@@ -88,7 +88,7 @@ export function holdsSetAside(row: FeedRow): boolean {
 /** A past job that matches this notice, by what the notice is about. */
 export function pastJobFor(row: FeedRow): PastPerformance | undefined {
   const text = `${row.o.plainTitle} ${row.o.agency} ${row.o.office}`.toLowerCase();
-  const byId = (id: PastPerformance["id"]) => PAST_PERFORMANCE.find((p) => p.id === id);
+  const byId = (id: PastPerformance["id"]) => findPastPerformance(id);
   if (row.o.naics === "722320") return byId("pp-church");
   if (/patient|hospital|medical|nutrition|veterans/.test(text)) return byId("pp-womack");
   if (/school|cafeteria|child nutrition|senior|detention|meal program|meals for/.test(text)) {
@@ -144,6 +144,10 @@ export function fitSentence(row: FeedRow, f: FitFact): string {
       return f.code === "WOSB"
         ? "Only woman-owned small businesses can compete for it, and you are one."
         : "It is set aside for small businesses, and you are one.";
+    case "providerLock":
+      return "The work is written around one provider's own platform and crew, so other firms can't meet it as written.";
+    case "setAsideGap":
+      return "It is set aside for a group you are not in, so the way in is as a subcontractor.";
     case "valueInRange":
       return `The value is ${aboutValue(row)}. That is inside your ${RANGE_TEXT} range.`;
     case "valueAboveRange":
@@ -151,7 +155,7 @@ export function fitSentence(row: FeedRow, f: FitFact): string {
     case "distance":
       return `The site is ${row.miles} miles from your kitchen in ${PERSONA.hqCity}.`;
     case "pastPerformance": {
-      const p = PAST_PERFORMANCE.find((x) => x.id === f.id);
+      const p = findPastPerformance(f.id);
       return p
         ? `You did this kind of work before: ${pastJobText(p)}.`
         : "You did this kind of work before.";

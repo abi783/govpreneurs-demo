@@ -266,7 +266,7 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
 /** Food-handler gap: the one closable gap that the story names for the Camp Mackall job. */
 function actFor(row: FeedRow): ActPayload | undefined {
   if (row.id !== "SP4701-26-Q-0021") return undefined;
-  const missing = PERSONA.employeesW2 - PERSONA.foodHandlerCertified;
+  const missing = PERSONA.employeesW2 - (PERSONA.foodHandlerCertified ?? 0);
   return {
     gap: {
       kind: "set_aside",

@@ -183,7 +183,7 @@ function knowledgeBody(file: KnowledgeSource): PdfSection[] {
         heading: "Food-handler certificates",
         lines: [
           `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} staff hold a current food-handler certificate.`,
-          `${PERSONA.employeesW2 - PERSONA.foodHandlerCertified} staff still need one.`,
+          `${PERSONA.employeesW2 - (PERSONA.foodHandlerCertified ?? 0)} staff still need one.`,
         ],
       },
     ];
@@ -209,7 +209,7 @@ function knowledgeBody(file: KnowledgeSource): PdfSection[] {
     ];
   }
   if (name.includes("kitchen")) {
-    return [{ heading: "Kitchen and vehicles", lines: [PERSONA.kitchen] }];
+    return [{ heading: "Kitchen and vehicles", lines: [(PERSONA.kitchen ?? "")] }];
   }
   return [{ heading: "About this file", lines: [`${file.name} was added to your knowledge base.`] }];
 }

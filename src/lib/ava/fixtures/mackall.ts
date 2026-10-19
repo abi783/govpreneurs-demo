@@ -27,7 +27,7 @@
 import { buyerPeople, REFERENCE_CONTACTS } from "../../../demo/ava/contacts";
 import { getGrantBrief } from "../../../demo/story/grantBriefs";
 import { getOpportunity } from "../../../demo/story/opportunities";
-import { PAST_PERFORMANCE, PERSONA, type PastPerformance } from "../../../demo/story/persona";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA, type PastPerformance } from "../../../demo/story/persona";
 import { PLACES } from "../../../demo/story/places";
 import { doc, profile } from "../build";
 import type { AskAnswer, BidState } from "../store";
@@ -60,7 +60,7 @@ const POSTED = -STORY.postedDaysAgo;
 const POSTED_AMD1 = POSTED + 2;
 
 /** Driving miles from her kitchen to the drop points. */
-const MILES = PLACES[STORY.place].milesFromKitchen;
+const MILES = PLACES[STORY.place].milesFromBase;
 /** The Army expects about this many weekly rotations in a contract year. */
 const ROTATION_WEEKS = 18;
 /** Rotations run on weekdays. */
@@ -80,12 +80,12 @@ const FUEL_START = Math.round(RUNS * TRIP_MILES * 0.7);
 /** Weeks a year when two rotations overlap. */
 const OVERLAP_WEEKS = 2;
 /** The cooks who do not yet hold a food handler certificate. */
-const COOKS_WITHOUT = PERSONA.employeesW2 - PERSONA.foodHandlerCertified;
+const COOKS_WITHOUT = PERSONA.employeesW2 - (PERSONA.foodHandlerCertified ?? 0);
 
 // ─── Her past jobs, from the story ───
 
 function pastJob(id: PastPerformance["id"]): PastPerformance {
-  const job = PAST_PERFORMANCE.find((p) => p.id === id);
+  const job = findPastPerformance(id);
   if (!job) throw new Error(`The story has no past job ${id}`);
   return job;
 }
@@ -449,7 +449,7 @@ const P_FOOD_HANDLERS: Proof = profile(
   "Your food safety training",
   `Cooks with a current food handler certificate: ${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2}`,
 );
-const P_VANS: Proof = profile("Your kitchen", PERSONA.kitchen);
+const P_VANS: Proof = profile("Your kitchen", (PERSONA.kitchen ?? ""));
 
 // ─── The staffing plan ───
 // One plan: the price pays for these hours, and the writing describes these

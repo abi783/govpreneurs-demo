@@ -120,7 +120,7 @@ function relativeAt(daysAgo: number, hour = 15): string {
 function activityFeed(): ActivityItem[] {
   const items: ActivityItem[] = [];
 
-  const fieldMeals = getOpportunity(HERO_IDS.fieldMeals);
+  const fieldMeals = getOpportunity(HERO_IDS.hero);
   if (fieldMeals?.ava) {
     items.push({
       id: "act-ava",
@@ -145,7 +145,7 @@ function activityFeed(): ActivityItem[] {
     });
   }
 
-  const restricted = getOpportunity(HERO_IDS.classifiedSite);
+  const restricted = getOpportunity(HERO_IDS.twin);
   if (restricted?.pursuit) {
     items.push({
       id: "act-grant",

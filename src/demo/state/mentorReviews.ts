@@ -7,7 +7,12 @@ import { isoDaysFromNow } from "@/demo/story/clock";
 import { getOpportunity } from "@/demo/story/opportunities";
 import { describeSaved } from "@/demo/state/workspace";
 import { MENTOR, PERSONA } from "@/demo/story/persona";
-import { MENTOR_REVIEWS, type MentorReviewStory } from "@/demo/story/workspace";
+import {
+  MENTOR_RECOMMENDATIONS,
+  MENTOR_REVIEWS,
+  MENTOR_THREADS,
+  type MentorReviewStory,
+} from "@/demo/story/workspace";
 import { mentorReplyFor, type MentorVerdict } from "@/demo/story/mentorReplies";
 import type {
   MentorReviewSummary,
@@ -49,39 +54,16 @@ function msg(
   };
 }
 
-/** The written threads. Keyed by review id from the story. */
-const THREADS: Record<string, MentorThreadMessage[]> = {
-  "rev-fayetteville-proposal": [
-    msg("m1", "member", 2, 16,
-      "<p>Hi Sarah — Ava finished my proposal for the Fayetteville Public Works cafe and events contract. It's due in two weeks. Could you read it before I send it? I'm most worried about section 2, our experience, because we have never run a daily cafe.</p>",
-      [{ name: "Haddad-Catering-Fayetteville-proposal.docx", url: null }]),
-    msg("m2", "mentor", 0, 9,
-      "<p>Amira, this is a strong draft. Three changes before you send it:</p><ol><li><strong>Move your event work to the top of section 2.</strong> The city scores approach at 40%. Your church and county events are your best evidence; right now they are on page 6.</li><li><strong>Call the county summer program what it is: daily service.</strong> 1,100 meals a day for 11 weeks answers the \"never run a cafe\" worry better than any sentence about it.</li><li><strong>Name Janet Reyes as your first reference.</strong> Purchasing officers call the first name on the list.</li></ol><p>Your price is in the right place. Don't lower it. — Sarah</p>"),
-  ],
-  "rev-mackall-pursue": [
-    msg("m1", "member", 3, 11,
-      "<p>Sarah, Hunter put the Camp Mackall field meals quote at the top of my list and Grant says bid. Before Ava starts — should I pursue it? It would be my biggest federal job as prime.</p>"),
-    msg("m2", "mentor", 2, 15,
-      "<p><strong>Pursue it.</strong> It is woman-owned only, it has no incumbent, and it is sized for your kitchen. Two things this week:</p><ul><li>Get your last two cooks food-handler certified. The quote asks for proof for every cook.</li><li>Plan the 3:30 AM starts now, before you price it. Early starts cost overtime.</li></ul><p>Lead with your Carolina Dining Group work at Fort Bragg. Same base, same kind of work. — Sarah</p>"),
-    msg("m3", "member", 2, 17, "<p>Thank you! Booking the food-handler course for Thursday.</p>"),
-  ],
-  "rev-womack-closeout": [
-    msg("m1", "member", 38, 10,
-      "<p>My Womack Army Medical Center contract ended, but there is no performance rating for it. How do I get one? Grant says it would help my next VA bid.</p>"),
-    msg("m2", "mentor", 35, 14,
-      "<p>Email the contracting officer and ask for an interim CPARS rating — CPARS is the federal performance rating system. Keep it short: the contract number, the dates, and one line on what you delivered. I've attached a template you can copy.</p>",
-      [{ name: "CPARS-request-template.docx", url: null }]),
-  ],
-};
-
-const RECOMMENDATION: Record<string, MentorReviewSummary["recommendation"]> = {
-  "rev-mackall-pursue": "pursue",
-  "rev-fayetteville-proposal": "discuss",
-};
+/** The member's written threads (story/workspace.ts), as messages. */
+function threadOf(reviewId: string): MentorThreadMessage[] {
+  return (MENTOR_THREADS[reviewId] ?? []).map((m, i) =>
+    msg(`m${i + 1}`, m.author, m.daysAgo, m.hour, m.html, (m.attachments ?? []).map((name) => ({ name, url: null }))),
+  );
+}
 
 function initial(): StoredReview[] {
   return MENTOR_REVIEWS.map((r) => {
-    const messages = THREADS[r.id] ?? [];
+    const messages = threadOf(r.id);
     const last = messages[messages.length - 1];
     const opp = r.oppId ? getOpportunity(r.oppId) : undefined;
     return {
@@ -93,7 +75,7 @@ function initial(): StoredReview[] {
         solNumber: r.oppId,
         title: r.title,
         status: STATUS[r.status],
-        recommendation: RECOMMENDATION[r.id] ?? null,
+        recommendation: MENTOR_RECOMMENDATIONS[r.id] ?? null,
         mentorName: MENTOR.name,
         createdAt: isoDaysFromNow(-r.openedDaysAgo, 10),
         lastMessageAt: last?.at ?? isoDaysFromNow(-r.lastMessageDaysAgo, 10),

@@ -10,6 +10,7 @@ import { avaDemo } from "@/lib/ava/store";
 import { ready, reading } from "@/lib/ava/play";
 import { readDemoState, wipeDemoStorage, writeDemoState } from "@/demo/runtime/store";
 import { HERO_IDS } from "@/demo/story/opportunities";
+import { MEMBER_KEY, type MemberId } from "@/demo/member";
 
 export interface Segment {
   n: number;
@@ -19,7 +20,7 @@ export interface Segment {
   seed?: () => void;
 }
 
-const HERO = HERO_IDS.fieldMeals;
+const HERO = HERO_IDS.hero;
 
 /** Ava has built the hero bid and she is reading it. */
 function heroDrafted(): void {
@@ -30,7 +31,7 @@ export const SEGMENTS: Segment[] = [
   { n: 1, label: "Open", to: "/pipeline" },
   { n: 2, label: "My Business", to: "/my-business" },
   { n: 3, label: "Find", to: "/opportunities" },
-  { n: 4, label: "Say no", to: `/opportunities/${HERO_IDS.classifiedSite}` },
+  { n: 4, label: "Say no", to: `/opportunities/${HERO_IDS.twin}` },
   { n: 5, label: "Decide", to: `/opportunities/${HERO}` },
   { n: 6, label: "Mentor", to: `/opportunities/${HERO}` },
   { n: 7, label: "Ava asks", to: `/ava/${HERO}` },
@@ -56,6 +57,15 @@ export function boothModeOn(): boolean {
 
 export function setBoothMode(on: boolean): void {
   writeDemoState(BOOTH_KEY, on);
+}
+
+/** Switch the sample member: wipe the demo and start the story again on Success Center. */
+export function switchMember(id: MemberId): void {
+  const booth = boothModeOn();
+  wipeDemoStorage();
+  window.sessionStorage.setItem(MEMBER_KEY, id);
+  if (booth) setBoothMode(true);
+  window.location.assign("/");
 }
 
 /** Wipe the demo, seed this segment, and load its page. Booth mode survives the wipe. */

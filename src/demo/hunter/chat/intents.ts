@@ -6,7 +6,6 @@
 // matched before a filter, so "what is a sources sought" explains the term and
 // "show only sources sought" changes the feed.
 
-import { HERO_IDS } from "../../story/opportunities";
 import { KEY_PARTNER, PERSONA } from "../../story/persona";
 import { PLACES } from "../../story/places";
 import { allRows, forYouRows, rowById, savedRows, universe, type FeedRow } from "../data";
@@ -51,6 +50,7 @@ import { findOpp, titleIn } from "./resolve";
 import { proposeProfileChange } from "./profile";
 import { readSession, updateSession } from "./session";
 import type { ChatCtx, Rule, Turn } from "./types";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 const has = (ctx: ChatCtx, rx: RegExp) => rx.test(ctx.norm);
 
@@ -605,7 +605,7 @@ const incumbentRule: Rule = {
       )
     )
       return null;
-    const hero = rowById(HERO_IDS.fortBraggDining)!;
+    const hero = rowById(CATERER_HERO.teamUp)!;
     const opp = has(ctx, /\bfort bragg\b.*\b(dining|dfac)\b|\b(dining|dfac)\b.*\bfort bragg\b/)
       ? hero
       : (findOpp(ctx.norm, ctx.visible) ?? undefined);
@@ -662,7 +662,7 @@ const filterRule: Rule = {
         if (delta.cities?.length === 1) {
           const place = Object.values(PLACES).find((p) => p.city === delta.cities![0]);
           if (place)
-            notes.push(`${place.city} is ${place.milesFromKitchen} miles from your kitchen.`);
+            notes.push(`${place.city} is ${place.milesFromBase} miles from your kitchen.`);
         }
         if (delta.postedWithin) {
           const newest = [...rows].sort((a, b) => a.o.postedDaysAgo - b.o.postedDaysAgo)[0];

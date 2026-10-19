@@ -284,7 +284,7 @@ function jobFor(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
 
 /** Food-handler cards: 3 of 5 cooks hold one (the story's number). */
 function foodHandlerCards(): Paper[] {
-  return Array.from({ length: PERSONA.foodHandlerCertified }, (_, i): Paper => ({
+  return Array.from({ length: PERSONA.foodHandlerCertified ?? 0 }, (_, i): Paper => ({
     id: `fh-${i + 1}`,
     kind: "certification",
     name: `Food handler certificate, cook ${i + 1}`,

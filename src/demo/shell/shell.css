@@ -498,6 +498,11 @@
 .demo-presenter__btn {
   text-align: center;
 }
+.demo-presenter__btn.is-on {
+  border-color: var(--demo-muted);
+  background: var(--demo-navy-active);
+  cursor: default;
+}
 .demo-presenter__btn:hover,
 .demo-presenter__jump:hover {
   background: var(--demo-navy-active);

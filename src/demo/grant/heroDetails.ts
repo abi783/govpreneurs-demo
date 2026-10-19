@@ -7,10 +7,10 @@
 // clock), so a change in the story reaches the page, the sample PDFs and Grant.
 
 import { DEMO_TODAY } from "@/demo/story/clock";
-import { HERO_IDS } from "@/demo/story/opportunities";
 import { calendarDay } from "./calendar";
 import type { HeroDetail } from "./detail";
 import { longDate, type OppFacts, termText, usd } from "./facts";
+import { HERO_IDS as CATERER_HERO } from "@/demo/members/caterer/opportunities";
 
 type Builder = (f: OppFacts) => HeroDetail;
 
@@ -327,9 +327,9 @@ const sourcesSought: Builder = (f) => {
 
 /** The hand-written detail, by opportunity id. */
 export const HERO_DETAILS: Record<string, Builder> = {
-  [HERO_IDS.fieldMeals]: fieldMeals,
-  [HERO_IDS.fortBraggDining]: fortBraggDining,
-  [HERO_IDS.classifiedSite]: restrictedSite,
+  [CATERER_HERO.hero]: fieldMeals,
+  [CATERER_HERO.teamUp]: fortBraggDining,
+  [CATERER_HERO.twin]: restrictedSite,
   "FAYNC-2026-R-08": cafe,
   "CUMCO-2026-014": detention,
   "W912EE-27-S-0004": sourcesSought,

@@ -125,7 +125,7 @@ const INSTALLATIONS: { rx: RegExp; search: string }[] = [
 export function citiesWithin(miles: number): string[] {
   const out = new Set<string>();
   for (const p of Object.values(PLACES)) {
-    if (p.milesFromKitchen <= miles && !/Multiple/.test(p.city)) out.add(p.city);
+    if (p.milesFromBase <= miles && !/Multiple/.test(p.city)) out.add(p.city);
   }
   return [...out];
 }
