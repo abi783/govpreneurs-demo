@@ -14,7 +14,8 @@
     "qa:crawl": "playwright test qa/crawl.spec.ts",
     "check": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "qa:shots": "QA_SHOTS=1 playwright test qa/shots.spec.ts"
+    "qa:shots": "QA_SHOTS=1 playwright test qa/shots.spec.ts",
+    "qa:studio": "STUDIO=1 playwright test -c qa/studio/playwright.studio.config.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -86,6 +87,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "^9.32.0",
     "@playwright/test": "^1.62.0",
     "@testing-library/dom": "^10.4.1",

@@ -1,0 +1,12 @@
+{
+  "detector": {
+    "ignoreFiles": [
+      "src/sc/design-system/preview/**",
+      "src/sc/design-system/ui_kits/**"
+    ],
+    "ignoreValues": [
+      { "rule": "overused-font", "value": "inter", "reason": "Brand UI font, tokenised as --font-ui (DESIGN.md exception 1)", "createdAt": "2026-10-19" },
+      { "rule": "overused-font", "value": "instrument serif", "reason": "Brand editorial font, tokenised as --font-ed (DESIGN.md exception 2)", "createdAt": "2026-10-19" }
+    ]
+  }
+}
