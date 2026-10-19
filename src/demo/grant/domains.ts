@@ -18,6 +18,7 @@ import type { AgencyDomainKey as ConstructionDomainKey } from "@/demo/members/co
 import type { AgencyDomainKey as ItDomainKey } from "@/demo/members/it/grant/domains";
 import type { AgencyDomainKey as TruckingDomainKey } from "@/demo/members/trucking/grant/domains";
 import type { AgencyDomainKey as ConsultingDomainKey } from "@/demo/members/consulting/grant/domains";
+import type { AgencyDomainKey as JanitorialDomainKey } from "@/demo/members/janitorial/grant/domains";
 import type { PastPerformanceId } from "@/demo/story/persona";
 import { customerShort, EVENT_RANGE, MEALS_PER_DAY, PP } from "./facts";
 
@@ -40,7 +41,7 @@ export type CatererDomainKey =
   | "staffing"
   | "construction";
 
-type PackDomainKey = AgencyDomainKey | ConstructionDomainKey | ItDomainKey | TruckingDomainKey | ConsultingDomainKey;
+type PackDomainKey = AgencyDomainKey | ConstructionDomainKey | ItDomainKey | TruckingDomainKey | ConsultingDomainKey | JanitorialDomainKey;
 
 export type DomainKey = CatererDomainKey | PackDomainKey;
 

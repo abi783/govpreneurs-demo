@@ -1,10 +1,11 @@
-// THE AGENCY's words for Grant's generated reviews (read through src/demo/grant/vocab.ts),
-// and the risks the story's one-liners name for a few of its opportunities.
+// THE JANITORIAL FIRM's words for Grant's generated reviews (read through
+// src/demo/grant/vocab.ts), and the risks the story's one-liners name for a few
+// of its opportunities.
 //
-// Lantern Row Creative is a nine-person ad agency in downtown Fayetteville with a
-// two-person video crew (persona.ts). It buys media but owns no channel, carries no
-// bond, and runs most of its work from its office, so distance matters only for
-// shoots and meetings.
+// Gray Owl Facility Services is a 38-person HUBZone cleaning firm on Gillespie
+// Street in Fayetteville (persona.ts): night custodial crews, four floor techs,
+// two exterior techs and two hot-water washing rigs. No bond, no credit line.
+// Its work is on site, so distance is drive time for the crews every night.
 
 import { dueTimeOf } from "../../../story/opportunities";
 import { PARTNER, STAFF, type OppFacts } from "../../../grant/facts";
@@ -15,193 +16,315 @@ import { HERO_IDS, OPPORTUNITIES } from "../opportunities";
 
 const hero = OPPORTUNITIES.find((o) => o.id === HERO_IDS.hero)!;
 
-/** "all of North Carolina", "NC, VA, SC, GA and FL", for work that is not tied to one place. */
-function areaOf(f: OppFacts): string | null {
-  if (!/^Multiple/.test(f.place.city)) return null;
-  const states = /\(([^)]+)\)/.exec(f.place.city)?.[1].split(/,\s*/);
-  if (!states) return "all of North Carolina";
-  return `${states.slice(0, -1).join(", ")} and ${states[states.length - 1]}`;
-}
-
-/** Sample wage rates. They are for the demonstration and are not the Department of Labor's. */
+/** Rates from SCA wage determination 2015-4377, Rev. 33 (Cumberland and Hoke counties). */
 const WAGE_ROWS: string[][] = [
   ["Occupation", "Hourly rate", "Health and welfare"],
-  ["Illustrator II", "$24.10", "$5.36"],
-  ["Media Specialist II", "$21.85", "$5.36"],
-  ["Media Specialist III", "$24.37", "$5.36"],
-  ["Photographer II", "$21.40", "$5.36"],
-  ["Photographer III", "$26.52", "$5.36"],
-  ["General Clerk II", "$15.48", "$5.36"],
+  ["Janitor (11150)", "$16.46", "$5.92"],
+  ["Housekeeping Aide (11122)", "$16.46", "$5.92"],
+  ["Window Cleaner (11360)", "$17.89", "$5.92"],
+  ["Laborer, Grounds Maintenance (11210)", "$17.21", "$5.92"],
+  ["General Maintenance Worker (23370)", "$21.41", "$5.92"],
+  ["Laborer (23470)", "$18.03", "$5.92"],
 ];
+
+/** The set-asides the shared clause text does not word. */
+const SET_ASIDE_CLAUSE: Record<string, string> = {
+  HZC: "This requirement is a set-aside for HUBZone small businesses under 13 CFR 126. Only firms that SBA certifies as HUBZone at the time of the offer and at award can compete.",
+  SDVOSBC:
+    "This requirement is a set-aside for service-disabled veteran-owned small businesses. Only firms listed as SDVOSB in SBA's certification database at the time of the offer can compete.",
+  "8A": "This requirement is set aside for firms in the SBA's 8(a) Business Development Program. Only 8(a) firms can compete.",
+};
+
+/** The AbilityOne line, for notices on the Procurement List. */
+const ABILITYONE_READ = {
+  name: "Can you win it?" as const,
+  rating: "weak" as const,
+  text: "The work goes to AbilityOne nonprofits by law, so the Army can't accept a quote from a commercial firm at any price.",
+  bold: "at any price",
+};
 
 /** Risks the story's one-liners name that the facts alone do not show. */
 export const CAVEATS: Record<string, Caveat> = {
-  "W91242-27-Q-0014": {
-    limit: "Performance rating: your NC Guard campaign has no performance rating yet. Ask the Guard for an interim rating before you send the quote.",
-    kind: "proposal-weakness",
-    change: "If the Guard can't give an interim rating before the due date, I'd lead with your Longleaf hiring results instead.",
-    ref: "pp-ncng-recruiting",
-  },
-  "36C10X27Q0007": {
-    limit: "Schedule: the VA sends this request through GSA eBuy to GSA schedule holders only. You are not on a schedule yet.",
+  "45-RQ300517R": {
+    limit: "Site visit: the 14 October site visit was mandatory for every bidder, and you weren't there.",
     kind: "disqualifier",
     decides: true,
-    phrase: "the GSA schedule",
-    change: "If the VA posts this work outside eBuy, open to small businesses, I'd run the checks again.",
-    trail: "Who can quote: **GSA schedule holders only**, through GSA eBuy.",
+    phrase: "the missed site visit",
+    change: "If the department reopens the bid with a new site visit, I'd run the checks again.",
+    trail: "Who can quote: **only firms at the 14 October site visit**. You were not there.",
     read: {
       name: "Can you win it?",
       rating: "weak",
-      text: "Only GSA schedule holders can quote: the VA sends this request through GSA eBuy. You are not on a schedule yet, so you can't send a quote.",
-      bold: "You are not on a schedule yet",
+      text: "The site visit on 14 October was mandatory. You weren't there, so a quote from you won't be accepted.",
+      bold: "a quote from you won't be accepted",
     },
     roadmap: {
-      item: "A **GSA schedule** of your own",
-      why: "Some buyers, like this VA campaign, ask only schedule holders. With 7 years in business you meet GSA's two-year rule for an offer.",
-      takes: "An offer to GSA under the advertising services category, and a few months of review. Ask Sarah where to start.",
+      item: "A **calendar of site visits** for the state buyers near you",
+      why: "State cleaning bids often make the site visit mandatory, and it comes early. Missing it ends the bid before you price.",
+      takes: "Save a Hunter search for NC state cleaning bids, and put each site visit on your calendar the day the bid posts.",
     },
   },
-  "NCDOT-GHSP-2027-08": {
-    limit: "Margin: most of the price is the media buy, which you pass through at cost. Your fee is the small part.",
+  "54-SH-06-PR34172": {
+    limit: "Seven days: the rest areas are staffed 16 hours a day, every day of the year, holidays included, with a supervisor within 50 miles.",
     kind: "winning-hurts",
     decides: true,
-    phrase: "the media-buy margin",
-    change: "If NCDOT pays for the media apart from your fee, I'd move this to **Bid**.",
+    phrase: "the seven-day staffing",
+    change: "If you build a seven-day schedule and its payroll still leaves a margin at NCDOT's wage floor, I'd move this to **Bid**.",
     read: {
-      name: "Will you make money?",
+      name: "Can you do the work?",
       rating: "watch",
-      text: "Most of the money passes through to stations and platforms at cost. Your fee is the small part, so the margin is thin.",
-      bold: "the margin is thin",
+      text: "Two rest areas, 16 hours a day, every day of the year. That is a seven-day staffing business more than a night cleaning job.",
+      bold: "a seven-day staffing business",
     },
     question: {
-      id: "carry-media",
-      question: "Can you carry about a **month of media costs** before NCDOT pays?",
-      payoff: "A yes shows whether the **media buy** is a real limit.",
-      chip: "media",
-      yes: { gist: "You said you can carry a month of media costs, so the media buy is less of a limit.", ack: "Good. Carrying the media until NCDOT pays is the hard part of a buy this size. I raised my confidence." },
-      no: { gist: "You cannot carry a month of media costs, so the media buy stays a real limit.", ack: "Then the media buy stays a real limit. A credit line, or a partner who fronts the media, is the way around it. My confidence stays where it was." },
+      id: "seven-day-schedule",
+      question: "Have you built a **seven-day schedule** with its payroll cost?",
+      payoff: "A yes shows whether the **seven-day staffing** is a real limit.",
+      chip: "staffing",
+      yes: { gist: "You have a seven-day schedule and its payroll, so the staffing is less of a limit.", ack: "Good. Bring it to Sarah; if the payroll leaves a margin, this can work. I raised my confidence." },
+      no: { gist: "You haven't built a seven-day schedule yet, so the staffing stays a real limit.", ack: "Then build it before you price: 16 hours a day, 365 days, with holidays. My confidence stays where it was." },
     },
   },
-  "NCDHHS-FC-2027-11": {
-    limit: "Media buy: a statewide campaign means a statewide media buy, and radio is new for you. Price it with real rates before you commit.",
+  W9124727QA026: {
+    limit: "Certification: hood, duct and fan cleaning has to meet NFPA 96, and you don't hold that certification yet.",
+    kind: "responsibility",
+    decides: true,
+    phrase: "the NFPA 96 certification",
+    change: "If you get two techs certified for NFPA 96 hood cleaning, I'd tell you to answer this and get ready for the bid.",
+    question: {
+      id: "nfpa-96",
+      question: "Could you get two techs **certified for NFPA 96** hood cleaning before the bid?",
+      payoff: "A yes shows whether the **certification** is a real limit.",
+      chip: "certification",
+      yes: { gist: "You can get two techs certified for NFPA 96, so the certification is less of a limit.", ack: "Good. Say so in your reply; a strong small-business answer can open this up. I raised my confidence." },
+      no: { gist: "You can't get techs certified in time, so the certification stays a real limit.", ack: "Then answer anyway, and say when you'll be certified. My confidence stays where it was." },
+    },
+  },
+  "RCC-27-004": {
+    limit: "Rebid: the college bid this in 2025 and again in 2026 without a contract that lasted.",
+    kind: "proposal-weakness",
+    decides: true,
+    phrase: "the rebid",
+    change: "If the college says what changed since the last two bids, I'd look at the price again.",
+    question: {
+      id: "rcc-what-changed",
+      question: "Do you know **what changed** since the college's last two bids?",
+      payoff: "A yes shows whether the **rebid** is a real risk.",
+      chip: "rebid",
+      yes: { gist: "You know what changed since the last two bids, so the rebid is less of a risk.", ack: "Good. Price to that, not to the old bids. I raised my confidence." },
+      no: { gist: "You don't know what changed, so the rebid stays a real risk.", ack: "Then ask the business office before you price. My confidence stays where it was." },
+    },
+  },
+  "FTCC-RFP-27-05": {
+    limit: "Pilot: NC community colleges mostly clean in house, so this may be a trial, not a lasting contract.",
     kind: "winning-hurts",
     decides: true,
-    phrase: "the statewide media buy",
-    change: "If the state sets the media budget apart from your fee, I'd move this to **Bid**.",
-    read: {
-      name: "Will you make money?",
-      rating: "watch",
-      text: "A statewide buy, with radio, is most of the price. Price it from real station rates, or the margin goes.",
-      bold: "Price it from real station rates",
-    },
+    phrase: "the pilot",
+    change: "If the college confirms a full term with options, I'd move this to **Bid**.",
     question: {
-      id: "priced-radio",
-      question: "Have you priced a **statewide radio buy** before?",
-      payoff: "A yes shows whether the **media buy** is a real limit.",
-      chip: "media",
-      yes: { gist: "You have priced a statewide radio buy before, so the media buy is less of a limit.", ack: "Good. Start from those rates and confirm them with the stations. I raised my confidence." },
-      no: { gist: "You have not priced a statewide radio buy, so the media buy stays a real limit.", ack: "Then get rate cards from the main stations before you price, or team with a media buyer. My confidence stays where it was." },
+      id: "ftcc-pilot",
+      question: "Has the college said whether this is **a pilot** or a full term?",
+      payoff: "A yes shows whether you'd be **staffing for a trial**.",
+      chip: "pilot",
+      yes: { gist: "The college confirmed the term, so staffing up is less of a risk.", ack: "Good. Then staff it as steady work. I raised my confidence." },
+      no: { gist: "You don't know if it's a pilot, so staffing up stays a risk.", ack: "Then ask before you hire for it. My confidence stays where it was." },
+    },
+  },
+  "PWC-2627-22": {
+    limit: "Plant safety: every worker needs the utility's plant safety training before the first shift.",
+    kind: "responsibility",
+    change: "If the training takes longer than the start date allows, I'd look at this again.",
+  },
+  W912PM27QA004: {
+    limit: "Price: the lowest price gets it, and mowing draws a crowd of local firms. Price it lean.",
+    kind: "proposal-weakness",
+    change: "If the Corps adds sites or visits in an amendment, I'd check the price again.",
+  },
+  W912PM27QA013: {
+    limit: "Competition: 23 firms quoted the last version of this tiny job.",
+    kind: "proposal-weakness",
+    change: "If the Corps adds the other Wake County offices, I'd look at it again.",
+  },
+  W9124727RA002: {
+    limit: "AbilityOne: Fort Bragg's grounds work is on the AbilityOne Procurement List, so it goes to nonprofit agencies by law.",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the AbilityOne list",
+    change: "If the work comes off the Procurement List, I'd run the checks again.",
+    trail: "Who can quote: **AbilityOne nonprofit agencies only**. A commercial firm can't.",
+    read: ABILITYONE_READ,
+    roadmap: {
+      item: "The **exterior and specialty work** Fort Bragg buys from firms like yours",
+      why: "Custodial and grounds at Fort Bragg are AbilityOne work. DPW's pressure washing and the one-time floor jobs are open to you.",
+      takes: `Bid the ${hero.plainTitle.charAt(0).toLowerCase()}${hero.plainTitle.slice(1)}, and save a Hunter search for one-time floor jobs on post.`,
+    },
+  },
+  W9124727RA008: {
+    limit: "AbilityOne: the headquarters custodial work is on the AbilityOne Procurement List, so it goes to nonprofit agencies by law.",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the AbilityOne list",
+    change: "If the work comes off the Procurement List, I'd look at it again, but it would still be nearly your whole revenue.",
+    trail: "Who can quote: **AbilityOne nonprofit agencies only**. A commercial firm can't.",
+    read: ABILITYONE_READ,
+    roadmap: {
+      item: "The **exterior and specialty work** Fort Bragg buys from firms like yours",
+      why: "Custodial and grounds at Fort Bragg are AbilityOne work. DPW's pressure washing and the one-time floor jobs are open to you.",
+      takes: `Bid the ${hero.plainTitle.charAt(0).toLowerCase()}${hero.plainTitle.slice(1)}.`,
+    },
+  },
+  "36C24627Q0083": {
+    limit: "Set-aside: only service-disabled veteran-owned firms can quote. You are HUBZone and small, not veteran-owned.",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the veteran-owned set-aside",
+    change: "If the VA reposts this open to HUBZone or small businesses, I'd run the checks again.",
+    trail: "Set-aside: **service-disabled veteran-owned firms only**. You are not one.",
+    read: {
+      name: "Can you win it?",
+      rating: "weak",
+      text: "Only service-disabled veteran-owned firms can quote, and 44 did last time. You are not veteran-owned, so you can't hold this contract.",
+      bold: "you can't hold this contract",
+    },
+    roadmap: {
+      item: "Floor care as a **subcontractor** to a veteran-owned prime",
+      why: "VA janitorial near you is veteran-owned first. You did floor care at two VA clinics as a subcontractor before.",
+      takes: "Ask your past veteran-owned prime whether it is quoting this, and offer your floor crew.",
+    },
+  },
+  W912PM27QA009: {
+    limit: "Set-aside: only service-disabled veteran-owned firms can quote. You are not veteran-owned.",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the veteran-owned set-aside",
+    change: "If the Corps reposts this open to small businesses, I'd run the checks again.",
+    trail: "Set-aside: **service-disabled veteran-owned firms only**. You are not one.",
+    read: {
+      name: "Can you win it?",
+      rating: "weak",
+      text: "Only service-disabled veteran-owned firms can quote, and you are not one.",
+      bold: "you are not one",
+    },
+  },
+  HQC00827R0012: {
+    limit: "Set-aside: only service-disabled veteran-owned firms can bid, and most of the work is shelf stocking.",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the veteran-owned set-aside",
+    change: "If the agency splits the custodial work out, open to small businesses, I'd look at that part.",
+    trail: "Set-aside: **service-disabled veteran-owned firms only**. You are not one.",
+    read: {
+      name: "Can you win it?",
+      rating: "weak",
+      text: "Only service-disabled veteran-owned firms can bid, and you are not one. Most of the work is stocking shelves besides.",
+      bold: "you are not one",
+    },
+  },
+  "47PE0627Q0011": {
+    limit: "Set-aside: only 8(a) firms can quote. You are HUBZone, not 8(a).",
+    kind: "disqualifier",
+    decides: true,
+    phrase: "the 8(a) set-aside",
+    change: "If GSA reposts this open to HUBZone or small businesses, I'd run the checks again.",
+    trail: "Set-aside: **8(a) firms only**. You are not in the program.",
+    read: {
+      name: "Can you win it?",
+      rating: "weak",
+      text: "Only 8(a) firms can quote. You are HUBZone, not 8(a), so you can't hold this contract.",
+      bold: "you can't hold this contract",
     },
   },
 };
 
 export const VOCAB: GrantVocab = {
   base: "your office",
-  crew: "your team",
-  teamOf: `a ${STAFF}-person team`,
-  peers: "agencies",
-  bigWork: "federal ad work",
-  nearRun: "Your crew can shoot there and be back the same day.",
-  farTrip: "Each shoot or meeting there is a long day on the road for your crew.",
-  travelCost: "travel time",
-  frontCost: "you staff up and pay for ad space",
-  priceAdvice: "Price from your real hours and media rates. An office this close keeps travel cost low.",
-  fitsWin: "A win fits the team you have.",
-  canRun: `Your ${STAFF}-person team can run this work, with a freelancer in busy months.`,
-  fitsYou: "your team and your size",
-  edge: "a nearby office and a clean record",
-  cashLine: "A **credit line** and a second crew",
-  localPartner: "A local partner makes the on-site work possible.",
-  recordWhy: "A second federal prime near your office is the record that larger buyers look for.",
+  crew: "your crews",
+  teamOf: `a ${STAFF}-person firm`,
+  peers: "cleaning firms",
+  bigWork: "federal cleaning work",
+  nearRun: "Your crews can drive out each night and be home the same night.",
+  farTrip: "Each shift there is a long drive for your crews, or a motel bill.",
+  travelCost: "drive time and fuel for your crews",
+  frontCost: "you hire, train and carry payroll",
+  priceAdvice: "Price from your real crew hours, the wage determination's rates and your chemicals. A site this close keeps travel cost low.",
+  fitsWin: "A win fits the crews you have.",
+  canRun: `Your ${STAFF}-person firm can run this work with the crews you have.`,
+  fitsYou: "your crews and your size",
+  edge: "local night crews, already badged, close to the site",
+  cashLine: "A **credit line** for weekly payroll",
+  localPartner: "A local cleaning firm makes the nightly site work possible.",
+  recordWhy: "A federal prime near your office, with a rating, is the record larger buyers look for.",
   firstMatch: `The ${hero.plainTitle}`,
   isTarget: (f) =>
     Boolean(f.opp.targetAgency) ||
-    /Veterans/.test(f.opp.agency) ||
-    /National Guard/.test(f.opp.office) ||
-    (/Army/.test(f.opp.agency) && /Fort Bragg/.test(f.place.city)),
-  wide: (f) => {
-    const area = areaOf(f);
-    return area ? `The work covers ${area}. You run the ads from your office; only shoots and meetings need travel.` : null;
-  },
+    (/Army|Air Force/.test(f.opp.agency) && /Fort Bragg|Pope|Seymour/.test(f.place.city)) ||
+    /Transportation|Veterans/.test(f.opp.agency),
+  wide: (f) => (/Statewide|Multiple/.test(f.place.city) ? "The sites run across the region. Your crews would cover the ones near Fayetteville." : null),
 
-  cost: "your real hours and media rates",
+  cost: "your real crew hours and chemical costs",
   insuranceLine: "No bond is asked for. Your general liability insurance is on file, and it meets the notice.",
-  nearLine: "That is close enough for your crew to shoot and be back the same day.",
-  farLine: "Plan shoot days and meetings around the drive.",
-  sizeFix: "Only with a partner or more staff. A second crew takes time to hire, and a larger media buy needs cash up front. Open Partners to find a prime.",
-  partnerHint: (opp) => (/Veterans/.test(opp.agency) ? `${PARTNER.name} wants a woman-owned video crew for VA work in NC, VA and SC. ` : ""),
+  nearLine: "That is close enough for your crews to drive out each night.",
+  farLine: "Plan for drive time or a motel for the crews, and price it.",
+  sizeFix: "Only with more crews or a partner. Night crews take weeks to hire and train, and weekly payroll against 30-day pay needs cash. Open Partners to find a prime who needs local crews.",
+  partnerHint: (opp) =>
+    /Army Reserve|Readiness|Seymour/.test(`${opp.title} ${opp.office}`) ? `${PARTNER.name} wants a local subcontractor for the North Carolina sites. ` : "",
   localQuestion: {
-    question: (place) => `Could you plan the **shoot days and meetings** in ${place}, or work with a partner there?`,
+    question: (place) => `Could you run a crew out of **${place}**, or work with a local cleaning firm there?`,
     payoff: "A yes shows whether the **drive** is a real limit.",
-    yes: { gist: "You said you can plan the trips or work with a partner there, so the distance is less of a limit.", ack: "Good. Planned shoot days, or a partner on site, make the distance workable. I raised my confidence." },
-    no: { gist: "You cannot plan the trips or work with a partner there, so the distance stays a real limit.", ack: "Then the distance stays a real limit. A partner on Partners may be the way around it. My confidence stays where it was." },
+    yes: { gist: "You said you can run a crew there or work with a local firm, so the distance is less of a limit.", ack: "Good. A local crew, or a local partner, makes the distance workable. Price the drive. I raised my confidence." },
+    no: { gist: "You can't run a crew there, so the distance stays a real limit.", ack: "Then the distance stays a real limit. A local firm there may be the way around it. My confidence stays where it was." },
   },
   reactions: Object.fromEntries(
     Object.values(CAVEATS).flatMap((c) => (c.question ? [[c.question.id, { yes: c.question.yes, no: c.question.no }]] : [])),
   ),
 
   eligibility: () => [
-    "Samples of similar work: ads, videos or designs.",
     "General liability insurance of $1M for each occurrence, and workers' compensation.",
+    "A background check and a base pass or badge for each worker on a federal site.",
   ],
-  collect: "Collect work samples, insurance proof and references.",
-  attachments: "work samples and references",
-  travelRisk: "Travel for shoots and meetings adds cost.",
+  collect: "Collect your insurance proof, your crew roster and three similar jobs.",
+  attachments: "your insurance proof and three similar jobs",
+  travelRisk: "Drive time and fuel for the crews add cost.",
 
-  trade: "Advertising",
-  // The demo states no size-standard figure for the agency's codes.
+  trade: "Building cleaning",
+  // The demo states no size-standard figure for the firm's codes.
   sizeStandard: null,
   dueInClauses: dueTimeOf,
-  clauses: (f, offer) => {
-    const area = areaOf(f);
-    const out: Record<string, string | null> = {
-      permit: null,
-      certs: null,
-      haccp: null,
-      bond: null,
-      insurance: `The contractor shall carry commercial general liability insurance of $1,000,000 for each occurrence and $2,000,000 in total, and workers' compensation at the legal limit. Proof is due with the ${offer}.`,
-      access: f.isFederal
-        ? "Anyone who works on the buyer's site needs a background check and a base pass or site badge. The contractor starts these checks within five days of award."
-        : null,
-    };
-    if (offer === "quote") out.content = "The quote has three parts: the price schedule, a short technical plan (up to three pages), and work samples with two references.";
-    if (offer === "proposal") out.content = "The proposal has three parts: a technical volume (up to ten pages) with work samples, a past performance volume with three references, and the price schedule.";
-    if (area) out.place = `The ads run across ${area}. Shoots and meetings take place at sites the buyer names at award.`;
-    return out;
-  },
+  clauses: (f, offer) => ({
+    permit: null,
+    certs: null,
+    haccp: null,
+    hours: f.isFederal
+      ? "Recurring cleaning is done after the buyer's working hours, Monday to Friday. The contractor's supervisor is reachable from 7:00 AM to 3:30 PM on working days."
+      : null,
+    bond: null,
+    ...(f.setAside && SET_ASIDE_CLAUSE[f.setAside] ? { setAside: SET_ASIDE_CLAUSE[f.setAside] } : {}),
+    insurance: `The contractor shall carry commercial general liability insurance of $1,000,000 for each occurrence and $2,000,000 in total, automobile liability of $1,000,000, and workers' compensation at the legal limit. Proof is due with the ${offer}.`,
+    access: f.isFederal
+      ? "Each worker needs a background check and a base pass before the first shift. The contractor starts these checks within five days of award."
+      : null,
+  }),
   extraClauses: (f): ClausePatch[] => {
     const fed = f.isFederal;
     const work = fed ? "C" : "2";
     const terms = fed ? "H" : "5";
     return [
-      { kind: "approval", section: work, ref: `${work}.4`, heading: "Approval before release", text: "The contractor shall send every ad, video and design to the buyer's representative for written approval before it runs." },
+      { kind: "chemicals", section: work, ref: fed ? "C.7" : "2.9", heading: "Chemicals", text: "The contractor shall use cleaning products from the buyer's approved list and keep a safety data sheet on site for each one." },
+      { kind: "qualityControl", section: work, ref: fed ? "C.8" : "2.10", heading: "Quality control", text: "The contractor shall keep a quality control plan, inspect its own work each week, and fix any finding within one working day." },
       {
-        kind: "accessibility",
-        section: work,
-        ref: `${work}.5`,
-        heading: "Captions and accessibility",
-        text: `Every video shall carry captions. Web and digital content shall meet ${fed ? "Section 508 of the Rehabilitation Act" : "WCAG 2.1, level AA"}.`,
-      },
-      { kind: "reports", section: work, ref: `${work}.6`, heading: "Reports", text: "The contractor shall send a monthly report of what ran, what it reached and what people did, such as clicks, calls and sign-ups." },
-      {
-        kind: "rights",
+        kind: "keyPersonnel",
         section: terms,
-        ref: `${terms}.${fed ? 3 : 2}`,
-        heading: "Rights in the work",
-        text: `${fed ? "The Government owns" : "The buyer owns"} the ads, videos, designs and data made under this contract.${fed ? " FAR 52.227-17, Rights in Data—Special Works, applies." : ""} The contractor delivers the licenses for any music, photos or footage it uses.`,
+        ref: `${terms}.6`,
+        heading: "Key personnel",
+        text: "The contractor shall name a project manager and a quality control manager, and tell the contracting officer before replacing either one.",
       },
     ];
   },
   wageRows: WAGE_ROWS,
+  priceOnlyWin: "The lowest price from a qualified bidder wins. Local night crews and no travel keep yours down.",
+  priceOnlyMoney: "A price-only bid is won on price. Build it from real crew hours and the wage floor, or walk away.",
+  offTrade: {
+    item: "A contract in **building cleaning**",
+    why: "This notice is not cleaning work, so it does not build the record you want.",
+  },
 };
-
