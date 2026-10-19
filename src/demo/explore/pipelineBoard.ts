@@ -13,6 +13,7 @@ import { calendarIso } from "./dates";
 import { OPPORTUNITIES, getOpportunity, type StoryOpportunity } from "@/demo/story/opportunities";
 import { CLOSED_PURSUITS, type ClosedPursuit } from "@/demo/story/workspace";
 import { describeSaved } from "@/demo/state/workspace";
+import { awardOutcome, outcomeCard } from "@/demo/state/outcomes";
 import type { Bid } from "@/lib/mock/bids";
 import type { MentorReviewSummary } from "@/lib/mentorReviewsApi";
 import type { SavedOppDetail } from "@/lib/workspace";
@@ -66,7 +67,14 @@ function storyBid(o: StoryOpportunity, storyStage: Bid["stage"], withPursuit: bo
   let avaLabel = o.ava ? avaTagLabel(o.ava) : null;
   // What Tim did in Ava during the call wins over the story's starting point.
   const sentAt = o.ava ? avaSentAt(o.id) : null;
-  if (o.ava && sentAt && pursuit) {
+  // DEMO (presenter control C2): the award Tim played forward to.
+  const decided = o.ava && sentAt ? awardOutcome(o.id) : null;
+  if (decided && pursuit) {
+    stage = decided;
+    avaLabel = null;
+    const card = outcomeCard(o.id, decided);
+    pursuit = { ...pursuit, note: card.note, next: card.next };
+  } else if (o.ava && sentAt && pursuit) {
     stage = "submitted";
     avaLabel = "Sent";
     pursuit = {
@@ -102,6 +110,7 @@ function storyBid(o: StoryOpportunity, storyStage: Bid["stage"], withPursuit: bo
     demo: {
       ...(pursuit ? { next: pursuit.next } : {}),
       ...(o.ava && avaLabel ? { ava: { to: `/ava/${o.id}`, label: avaLabel } } : {}),
+      ...(decided ? { closedId: o.id } : {}),
     },
   };
 }

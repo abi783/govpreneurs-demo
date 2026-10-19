@@ -8,6 +8,7 @@ import { getOpportunity } from "@/demo/story/opportunities";
 import { describeSaved } from "@/demo/state/workspace";
 import { MENTOR, PERSONA } from "@/demo/story/persona";
 import { MENTOR_REVIEWS, type MentorReviewStory } from "@/demo/story/workspace";
+import { mentorReplyFor, type MentorVerdict } from "@/demo/story/mentorReplies";
 import type {
   MentorReviewSummary,
   MentorReviewThread,
@@ -192,6 +193,46 @@ export function createReview(input: { oppKey: string; title: string; message: st
   };
   update((prev) => [...prev, { summary, messages: [first] }]);
   return summary;
+}
+
+/** Reviews still waiting for Sarah, newest first. */
+export function pendingReviews(): MentorReviewSummary[] {
+  return listMentorReviews().filter((r) => r.status === "pending");
+}
+
+/**
+ * DEMO (presenter control C1): Sarah answers a pending review. The presenter
+ * shows a "One business day later" card first; this writes her reply into the
+ * thread, so Mentor Reviews, the opportunity page and the Pipeline all agree.
+ */
+export function answerReview(id: string, verdict: MentorVerdict): MentorReviewSummary | null {
+  let answered: MentorReviewSummary | null = null;
+  update((prev) =>
+    prev.map((r) => {
+      if (r.summary.id !== id) return r;
+      const at = new Date().toISOString();
+      const bodyHtml = mentorReplyFor(r.summary.oppKey, verdict);
+      const reply: MentorThreadMessage = {
+        id: `m-${Date.now()}-${++seq}`,
+        author: "mentor",
+        authorName: MENTOR.name,
+        bodyHtml,
+        at,
+        attachments: [],
+      };
+      answered = {
+        ...r.summary,
+        status: "responded",
+        recommendation: verdict,
+        lastMessageAt: at,
+        lastMessageAuthor: "mentor",
+        lastMessagePreview: bodyHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 140),
+        unread: true,
+      };
+      return { summary: answered, messages: [...r.messages, reply] };
+    }),
+  );
+  return answered;
 }
 
 function escapeHtml(s: string): string {

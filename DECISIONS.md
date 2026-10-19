@@ -50,7 +50,7 @@ name its number.
 
 - D26. **The pages are built by seven parallel agents**, each in its own git worktree with its own files. I merge their work. The story file and the shared state (saved list, wallet, mentor reviews) are mine, so no two pages can disagree.
 - D27. **Amira has a one-page capability statement PDF** (`public/demo-files/`), generated from the story. Hunter's "Why these?" panel and My Business link to it.
-- D28. **A new mentor review stays "Sarah is reviewing"** after Tim sends it. In the product, a reply takes about one business day. A fake instant reply would mislead a buyer.
+- D28. *(Retired by D80, 19 Oct 2026.)* **A new mentor review stays "Sarah is reviewing"** after Tim sends it. In the product, a reply takes about one business day. A fake instant reply would mislead a buyer.
 - D29. **Sending a review costs $97 from the wallet**, as in production. The balance goes down live on the call.
 - D30. **Hunter's chat is scripted.** Every starter question has a specific, true answer. About 30 typed questions are recognised. Any other question gets a helpful reply with the nearest questions as buttons.
 - D31. **Grant's hand-written reviews:** Camp Mackall field meals, Fayetteville cafe, Cumberland County, Fort Bragg dining, the restricted site and the Fort Bragg reply. Every other opportunity gets a review generated from the story facts. Production's own generator still talks about roofing.
@@ -102,3 +102,11 @@ name its number.
 - D77. **Due dates can fall on a weekend on some days.** Dates count from the day the demo opens; rolling them to weekdays would make "N days left" differ between pages. Accepted as a small realism gap.
 - D78. **Small Orders never lists a set-aside she can't bid on as "for you"** (for example a service-disabled-veteran set-aside).
 - D79. **A double-click sends once.** Mentor reviews, bookings and purchases charge the wallet once, even on a fast double-click.
+
+## Presenter controls (19 Oct 2026, Karthik)
+
+- D80. **Sarah can answer on the call (retires D28).** The presenter's "Sarah answers" control replies to a waiting review with Pursue, Discuss or Pass. A "One business day later" card shows first, so nobody takes it for the product's real turnaround. Her written replies live in `src/demo/story/mentorReplies.ts`; any other review gets a short reply built from the opportunity.
+- D81. **A sent bid can be decided on the call.** The "Award" control moves a bid she sent in Ava to Won or Not awarded, after a "Three weeks later" card. The Pipeline card and the award dialog are the ones the story's closed pursuits already use.
+- D82. **Jump to any of the 11 story segments.** It wipes the demo, writes what that segment needs (Ava's draft read, the hero bid sent), then loads its page. It is for recovering from a mis-click and for resetting the booth; on a call Tim clicks the real screens.
+- D83. **Booth mode is off unless switched on.** After 3 minutes with no input it warns for 10 seconds ("touch anything to keep going"), then rests on Hunter's feed. The timer only arms after someone touches the demo, so an empty booth is not reloaded every 3 minutes. "Reset demo" turns booth mode off.
+- D84. **The controls stay out of the audience's way.** A faint handle at the bottom of the dark menu, or Shift+Alt+P (like Ava's Shift+Alt+A). The panel sits over the menu, never over the page or the bottom-right chat boxes, shows only the controls that fit the screen, closes after each action, and answers to 1–9, 0 and − while open. The QA crawl skips it (`data-qa-skip`). Code: `src/demo/presenter/`.

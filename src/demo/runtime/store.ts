@@ -126,15 +126,11 @@ export function clearDemoState(name: string): void {
 }
 
 /**
- * Wipe the demo and start again.
- *
- * It clears all of `sessionStorage` and `localStorage`. The demo owns this
- * origin, so this removes the `gp-demo:` keys and also every key that the app
- * itself writes (the feed view memory, onboarding answers, the Hunter chat, and
- * so on). Then it loads `/`. The reload also drops the module-level caches.
+ * Empty every store without reloading: the starting story comes back on the next
+ * read. The presenter's "jump to segment" wipes, writes that segment's state,
+ * then loads its page.
  */
-export function resetDemo(): void {
-  resetting = true;
+export function wipeDemoStorage(): void {
   cache.clear();
   try {
     window.sessionStorage.clear();
@@ -146,6 +142,19 @@ export function resetDemo(): void {
   } catch {
     /* ignore */
   }
+}
+
+/**
+ * Wipe the demo and start again.
+ *
+ * It clears all of `sessionStorage` and `localStorage`. The demo owns this
+ * origin, so this removes the `gp-demo:` keys and also every key that the app
+ * itself writes (the feed view memory, onboarding answers, the Hunter chat, and
+ * so on). Then it loads `/`. The reload also drops the module-level caches.
+ */
+export function resetDemo(): void {
+  resetting = true;
+  wipeDemoStorage();
   const keepFast = new URLSearchParams(window.location.search).get("fast") === "1";
   const target = keepFast ? "/?fast=1" : "/";
   const already =

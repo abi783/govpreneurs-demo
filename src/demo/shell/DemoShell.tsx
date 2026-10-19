@@ -12,6 +12,8 @@ import { MENU_SECTIONS, isMenuItemActive } from "../nav/menu";
 import { CommandPalette } from "./CommandPalette";
 import { ResetDemoDialog } from "./ResetDemo";
 import { DemoNoticeHost } from "./DemoNoticeHost";
+import { PresenterPanel } from "../presenter/PresenterPanel";
+import { TimeJumpHost } from "../presenter/TimeJump";
 import { ScChatHost } from "../sc/ScChatHost";
 import "./shell.css";
 import "../nav/storySearch";
@@ -190,6 +192,8 @@ export function DemoShell({ children }: { children: ReactNode }) {
       <ResetDemoDialog open={resetOpen} onOpenChange={setResetOpen} />
       <DemoNoticeHost />
       <ScChatHost />
+      <PresenterPanel />
+      <TimeJumpHost />
     </div>
   );
 }

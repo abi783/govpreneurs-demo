@@ -63,6 +63,7 @@ bun run qa:crawl       # opens every page in a headless browser and clicks every
 | `src/demo/api/` | One file per area with the API handlers. `ENDPOINTS.md` lists every call the app makes. |
 | `src/demo/state/` | Shared state: saved list, wallet, mentor reviews. |
 | `src/demo/shell/` | The left menu, search palette, sample-data strip and "Reset demo". |
+| `src/demo/presenter/` | The presenter panel (Shift+Alt+P): Sarah answers, award, jump to a story segment, booth mode. Decisions D80–D84. |
 | `src/demo/<area>/` | Sample data and helpers for one area (hunter, grant, ava, explore, sc/…). |
 | `src/sc/` | Code lifted from the Success Center app, with `next/*` replaced by shims in `src/demo/shims/`. |
 | `src/routes/`, `src/components/`, `src/lib/` | Production frontend code. Demo changes are marked `// DEMO:`. |

@@ -8,6 +8,7 @@ import { Modal } from "@/components/ui/Modal";
 import { CLOSED_PURSUITS } from "@/demo/story/workspace";
 import { PERSONA } from "@/demo/story/persona";
 import { SEYMOUR_FORECAST_KEY } from "./forecastLocalSeeds";
+import { outcomeDetail, outcomePursuit } from "@/demo/state/outcomes";
 
 interface Detail {
   heading: string;
@@ -66,8 +67,9 @@ export function PursuitDetailDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const pursuit = CLOSED_PURSUITS.find((c) => c.id === closedId);
-  const detail = pursuit ? detailFor(closedId, pursuit.daysAgo) : null;
+  // DEMO: a bid Tim played forward to an award (presenter control C2) uses this dialog too.
+  const pursuit = CLOSED_PURSUITS.find((c) => c.id === closedId) ?? outcomePursuit(closedId);
+  const detail = pursuit ? (detailFor(closedId, pursuit.daysAgo) ?? outcomeDetail(closedId)) : null;
   if (!pursuit || !detail) return null;
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
