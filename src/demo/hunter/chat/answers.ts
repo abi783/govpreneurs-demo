@@ -16,6 +16,7 @@ import { money } from "../../../lib/money";
 import { HERO_IDS } from "../../story/opportunities";
 import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "../../story/persona";
 import { PLACES } from "../../story/places";
+import { HELD, HELD_TITLES, holds, orList, OWN, PROGRAMS, SET_ASIDES, SHOW_OWN, WHAT_IS_OWN, type SetAsideCode } from "../../story/setAsides";
 import { forYouRows, savedRows, universe, type FeedRow } from "../data";
 import { longDate, shortDate } from "../dates";
 import {
@@ -74,7 +75,7 @@ export const chip = {
   fresh: "What's new this week?",
   how: "How do you pick my matches?",
   readyList: "Which of these am I actually ready for?",
-  wosb: "Show only woman-owned set-asides",
+  own: SHOW_OWN,
   saved: "Show my saved ones",
   profile: "What do you know about my business?",
   closing: "What closes first?",
@@ -117,6 +118,8 @@ export function whyMatch(row: FeedRow): Turn {
     ? "That is why I rank it lower."
     : has("providerLock")
       ? "Read the point about the provider before you spend time on it."
+      : has("lockedOut")
+        ? "Read the point about who can bid before you spend time on it."
       : has("setAsideGap")
         ? "So it is a team-up, not a job to hold alone."
         : "I explain the fit.";
@@ -127,8 +130,8 @@ export function whyMatch(row: FeedRow): Turn {
     chips: [
       chip.ready(row),
       chip.top3,
-      row.setAside === "WOSB"
-        ? "What is a WOSB set-aside?"
+      row.setAside && row.setAside !== "SBA" && holdsSetAside(row)
+        ? SET_ASIDES[row.setAside as SetAsideCode].whatIs
         : has("setAsideGap")
           ? "What is a prime and a sub?"
           : chip.how,
@@ -251,6 +254,10 @@ export function readinessRows(row: FeedRow): EligibilityRow[] {
       value: `${o.clearanceRequired} Your team holds no clearances.`,
       status: "fail",
     });
+  }
+
+  if (o.lockedTo) {
+    rows.push({ field: "Who can bid", value: `Only ${o.lockedTo} can bid. You are not one of them.`, status: "fail" });
   }
 
   if (o.exclusiveProvider) {
@@ -417,13 +424,7 @@ export function compare(rows: FeedRow[], intro: string, chips: string[]): Turn {
       {
         field: "Who can compete",
         values: picked.map((r) =>
-          r.setAside === "WOSB"
-            ? "Woman-owned only"
-            : r.setAside === "SBA"
-              ? "Small business only"
-              : r.setAside === "SDVOSBC"
-                ? "Veteran-owned only"
-                : "Every business",
+          r.setAside ? SET_ASIDES[r.setAside as SetAsideCode].only : "Every business",
         ),
         winner: bestIdx(
           picked.map((r) => (r.setAside && holdsSetAside(r) ? 1 : 0)),
@@ -540,7 +541,7 @@ export function bestMatches(): Turn {
 type Readiness = "ready" | "stretch" | "early" | "blocked";
 
 export function readinessClass(row: FeedRow): Readiness {
-  if (row.o.clearanceRequired || row.o.exclusiveProvider) return "blocked";
+  if (row.o.clearanceRequired || row.o.exclusiveProvider || row.o.lockedTo) return "blocked";
   // A set-aside she does not hold is a team job, even on an early notice.
   if (!holdsSetAside(row)) return "stretch";
   if (row.o.noticeType === "Sources Sought") return "early";
@@ -581,7 +582,15 @@ export function readyList(rows: FeedRow[]): Turn {
           ? "It needs cleared staff."
           : groups.blocked.every((r) => r.o.exclusiveProvider)
             ? "The work names one provider's own platform and crew."
-            : "Each needs cleared staff or one named provider."
+            : groups.blocked.every((r) => r.o.lockedTo)
+              ? "Only some firms can bid on it, and you are not one of them."
+              : `Each needs ${orList(
+                  [
+                    groups.blocked.some((r) => r.o.clearanceRequired) && "cleared staff",
+                    groups.blocked.some((r) => r.o.exclusiveProvider) && "one named provider",
+                    groups.blocked.some((r) => r.o.lockedTo) && "a contract or approval only some firms hold",
+                  ].filter((s): s is string => Boolean(s)),
+                )}.`
       }`,
     );
   parts.push(GRANT_POINTER);
@@ -713,7 +722,7 @@ export function profileCard(): Turn {
   };
   return {
     reply:
-      `I know ${PERSONA.businessName}. You are a woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, with ${VOCAB.profile.intro}.\n` +
+      `I know ${PERSONA.businessName}. You are ${SET_ASIDES[OWN].aBusiness} in ${PERSONA.hqCity}, ${PERSONA.hqState}, with ${VOCAB.profile.intro}.\n` +
       "Each fact on the card shows where I read it. If one is wrong, tell me and I will propose a change for you to save.",
     kind: "profile",
     data,
@@ -727,7 +736,7 @@ export function howIPick(): Turn {
       "I score every new notice on four things.\n" +
       `• Scope fit: how close the work is to your codes (${PERSONA.primaryNaicsLabel}, ${PERSONA.secondaryNaics.map((n) => n.label).join(", ")}).\n` +
       `• Location: how far the ${VOCAB.place.replace(/^The /, "").toLowerCase()} is ${FROM_BASE} in ${PERSONA.hqCity}. Your area is ${PERSONA.serviceStates.join(", ")}, up to ${PERSONA.serviceRadiusMiles} miles.\n` +
-      "• Certification fit: the set-asides you hold, which are Small Business and Woman-Owned (WOSB).\n" +
+      `• Certification fit: the set-asides you hold, which are ${HELD_TITLES}.\n` +
       `• Past performance: your ${PAST_PERFORMANCE.length} finished jobs.\n` +
       "Then I sort each into Priority, Strong, Stretch or Low, and say why. I read your capability statement and SAM.gov registration. I do not decide whether to bid. Grant does.",
     chips: [chip.best, chip.profile, chip.top3],
@@ -735,18 +744,23 @@ export function howIPick(): Turn {
 }
 
 export function setAsideStatus(rows: FeedRow[]): Turn {
-  const wosb = rows.filter((r) => r.setAside === "WOSB").length;
-  const sba = rows.filter((r) => r.setAside === "SBA").length;
+  const n = (c: string) => rows.filter((r) => r.setAside === c).length;
   const open = rows.filter((r) => !r.setAside).length;
+  // Her own programs first, plain small business last.
+  const mine = [...HELD.filter((c) => c !== "SBA"), ...HELD.filter((c) => c === "SBA")];
   const notHers = rows.filter((r) => !holdsSetAside(r)).length;
+  const notHersKinds = PROGRAMS.filter((c) => !holds(c) && n(c) > 0);
+  const counts = [...mine, ...notHersKinds].map((c) => `${n(c)} ${SET_ASIDES[c].plain}`);
+  const youAre = HELD.map((c) => SET_ASIDES[c].youAre);
+  const kinds = ["no kinds", "one kind", "two kinds", "three kinds", "four kinds"][HELD.length];
   return {
     reply:
-      "You qualify for two kinds of set-aside. You are a small business, and you are woman-owned (WOSB).\n" +
+      `You qualify for ${kinds} of set-aside. ${cap(youAre.length <= 2 ? youAre.join(", and ") : `${youAre.slice(0, -1).join(", ")}, and ${youAre.at(-1)}`)}.\n` +
       (notHers
-        ? `On this list: ${wosb} woman-owned, ${sba} small business, ${notHers} veteran-owned, ${open} open to every business. You can compete for all but the ${notHers} veteran-owned.\n`
-        : `On this list: ${wosb} woman-owned, ${sba} small business, ${open} open to every business. You qualify for ${wosb + sba} of the ${rows.length}.\n`) +
-      "You do not qualify for veteran-owned (SDVOSB), 8(a), HUBZone or tribal set-asides.",
-    chips: [chip.wosb, "What is a WOSB set-aside?", chip.best],
+        ? `On this list: ${[...counts, `${open} open to every business`].join(", ")}. You can compete for all but the ${notHers} ${orList(notHersKinds.map((c) => SET_ASIDES[c].plain))}.\n`
+        : `On this list: ${[...counts, `${open} open to every business`].join(", ")}. You qualify for ${mine.reduce((s, c) => s + n(c), 0)} of the ${rows.length}.\n`) +
+      `You do not qualify for ${orList([...PROGRAMS.filter((c) => !holds(c)).map((c) => SET_ASIDES[c].program), "tribal"])} set-asides.`,
+    chips: [chip.own, WHAT_IS_OWN, chip.best],
   };
 }
 

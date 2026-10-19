@@ -4,6 +4,7 @@
 
 import { money } from "../../lib/money";
 import { findPastPerformance, PERSONA, type PastPerformance } from "../story/persona";
+import { aSetAside, holds, SET_ASIDES, type SetAsideCode } from "../story/setAsides";
 import type { FitFact } from "../story/opportunities";
 import { longDate } from "./dates";
 import type { FeedRow } from "./data";
@@ -67,14 +68,7 @@ export function distanceShort(row: FeedRow): string {
 }
 
 /** Who a set-aside is for, by SAM code. */
-const SET_ASIDE_FOR: Record<string, { name: string; firms: string }> = {
-  WOSB: { name: "Woman-owned (WOSB)", firms: "woman-owned small businesses" },
-  SBA: { name: "Small business", firms: "small businesses" },
-  SDVOSBC: {
-    name: "Service-disabled veteran-owned (SDVOSB)",
-    firms: "service-disabled veteran-owned firms",
-  },
-};
+const SET_ASIDE_FOR: Record<string, { name: string; firms: string }> = SET_ASIDES;
 
 /** "Woman-owned (WOSB)", for the readiness card. */
 export function setAsideName(row: FeedRow): string {
@@ -83,16 +77,12 @@ export function setAsideName(row: FeedRow): string {
 
 /** Plain name of the set-aside, and whether the member holds it. */
 export function setAsideText(row: FeedRow): string {
-  if (row.setAside === "WOSB") return "a woman-owned set-aside";
-  if (row.setAside === "SBA") return "a small-business set-aside";
-  if (row.setAside === "SDVOSBC") return "a service-disabled veteran-owned set-aside";
-  return "open to every business";
+  return row.setAside ? aSetAside(row.setAside as SetAsideCode) : "open to every business";
 }
 
 /** True when the member can compete for the set-aside (or there is none). */
 export function holdsSetAside(row: FeedRow): boolean {
-  if (!row.setAside) return true;
-  return (PERSONA.setAsideEligibility as readonly string[]).includes(row.setAside);
+  return holds(row.setAside);
 }
 
 /** A past job that matches this notice, by what the notice is about. */
@@ -141,11 +131,13 @@ export function fitSentence(row: FeedRow, f: FitFact): string {
       // The story's own words for the code ("your food-service code"), as the card's line says them.
       return `It uses ${f.says}, NAICS ${f.code} (${row.naicsLabel}).`;
     case "setAside":
-      return f.code === "WOSB"
-        ? "Only woman-owned small businesses can compete for it, and you are one."
-        : "It is set aside for small businesses, and you are one.";
+      return f.code === "SBA"
+        ? "It is set aside for small businesses, and you are one."
+        : `Only ${SET_ASIDES[f.code].firms} can compete for it, and you are one.`;
     case "providerLock":
       return "The work is written around one provider's own platform and crew, so other firms can't meet it as written.";
+    case "lockedOut":
+      return `Only ${row.o.lockedTo} can bid, and you are not one of them.`;
     case "setAsideGap":
       return `It is set aside for ${SET_ASIDE_FOR[row.setAside]?.firms ?? "a group you are not in"}, and you are not one, so the way in is as a subcontractor.`;
     case "valueInRange":
@@ -191,8 +183,8 @@ export function reasonList(row: FeedRow): string[] {
     const ordered = [...fit].sort(
       (a, b) => Number(a.kind === "clearanceGap") - Number(b.kind === "clearanceGap"),
     );
-    // A provider lock or a set-aside she does not hold always shows, in third place.
-    const gap = fit.find((f) => f.kind === "providerLock" || f.kind === "setAsideGap");
+    // A provider lock, a lockout or a set-aside she does not hold always shows, in third place.
+    const gap = fit.find((f) => f.kind === "providerLock" || f.kind === "lockedOut" || f.kind === "setAsideGap");
     if (gap) return [...ordered.filter((f) => f !== gap).slice(0, 2), gap].map(reasonOf);
     return ordered.slice(0, 3).map(reasonOf);
   }

@@ -6,6 +6,7 @@
 
 import { FOR_YOU, OPPORTUNITIES, type StoryOpportunity } from "../story/opportunities";
 import { PLACES } from "../story/places";
+import { SET_ASIDES } from "../story/setAsides";
 import { stateName } from "../../lib/vocab/usStates";
 import { getSavedOpps } from "../state/workspace";
 import { deadlineIso, postedIso } from "./dates";
@@ -26,7 +27,7 @@ export interface FeedRow {
   closesAt: string;
   low: number | null;
   high: number | null;
-  /** The SAM set-aside code the card shows: "WOSB", "SBA", "SDVOSBC" or "". */
+  /** The SAM set-aside code the card shows (story/setAsides.ts), or "". */
   setAside: string;
   /** The ids the drawer's set-aside filter uses. */
   setAsideIds: string[];
@@ -74,14 +75,10 @@ const NOTICE_IDS: Record<string, string[]> = {
   "Sources Sought": ["sources_sought"],
 };
 
-const SET_ASIDE_WORDS: Record<string, string> = {
-  WOSB: "wosb woman-owned women-owned woman owned set-aside",
-  SBA: "sba small business set-aside",
-  SDVOSBC: "sdvosb service-disabled veteran-owned set-aside",
-};
+const SET_ASIDE_WORDS: Record<string, string> = Object.fromEntries(Object.entries(SET_ASIDES).map(([c, s]) => [c, s.words]));
 
 /** The drawer's set-aside ids for a SAM code. */
-const SET_ASIDE_IDS: Record<string, string[]> = { WOSB: ["WOSB"], SBA: ["SB"], SDVOSBC: ["VOSB"] };
+const SET_ASIDE_IDS: Record<string, string[]> = Object.fromEntries(Object.entries(SET_ASIDES).map(([c, s]) => [c, s.filterIds]));
 
 const DOD = /army|navy|air force|marine/i;
 

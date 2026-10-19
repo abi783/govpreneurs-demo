@@ -12,6 +12,7 @@ import {
   type SetAside,
   type StoryOpportunity,
 } from "@/demo/story/opportunities";
+import { SET_ASIDES } from "@/demo/story/setAsides";
 import {
   KEY_PARTNER,
   MENTOR,
@@ -112,17 +113,13 @@ export function liveDaysTo(iso: string): number {
 
 // ── Set-asides ───────────────────────────────────────────────────────────
 
-export const SET_ASIDE_LABEL: Record<NonNullable<SetAside>, string> = {
-  WOSB: "Women-Owned Small Business (WOSB) set-aside",
-  SBA: "Total Small Business set-aside",
-  SDVOSBC: "Service-Disabled Veteran-Owned Small Business (SDVOSB) set-aside",
-};
+export const SET_ASIDE_LABEL: Record<NonNullable<SetAside>, string> = Object.fromEntries(
+  Object.entries(SET_ASIDES).map(([c, s]) => [c, s.label]),
+) as Record<NonNullable<SetAside>, string>;
 
-export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = {
-  WOSB: "woman-owned",
-  SBA: "small-business",
-  SDVOSBC: "service-disabled veteran-owned",
-};
+export const SET_ASIDE_SHORT: Record<NonNullable<SetAside>, string> = Object.fromEntries(
+  Object.entries(SET_ASIDES).map(([c, s]) => [c, s.short]),
+) as Record<NonNullable<SetAside>, string>;
 
 // ── Term of the contract ─────────────────────────────────────────────────
 

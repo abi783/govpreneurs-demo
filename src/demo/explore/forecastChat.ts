@@ -6,6 +6,7 @@
 import { daysToDay } from "./dates";
 import { byMember, MEMBER, own } from "@/demo/member";
 import { KEY_PARTNER, PAST_PERFORMANCE, findPastPerformance, PERSONA } from "@/demo/story/persona";
+import { holds, OWN, SET_ASIDES } from "@/demo/story/setAsides";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
 import { forecastRecord, FORECAST_MEMBER, scoredRow } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY, POPE_FORECAST_KEY, SEYMOUR_FORECAST_KEY, CUMBERLAND_SUMMER_KEY } from "./forecastLocalSeeds";
@@ -98,16 +99,30 @@ function sizeSentence(r: ForecastRecordDto): string {
 function whoSentence(r: ForecastRecordDto): string {
   const code = r.setAsideCode?.trim().toUpperCase() ?? "";
   if (code === "WOSB" || code === "WOSBSS") {
-    return "The Army plans this for women-owned small businesses. You are certified as woman-owned, so you qualify to bid. Keep your certificate current.";
+    return holds("WOSB")
+      ? "The Army plans this for women-owned small businesses. You are certified as woman-owned, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for women-owned small businesses. You are not certified as woman-owned, so you cannot bid it as the prime. You can join a woman-owned prime's team as a subcontractor.";
   }
   if (code === "SDVOSBC" || code === "SDVOSBS") {
-    return "The buyer plans this for service-disabled veteran-owned small businesses. You are not one, so you cannot bid it as the prime. You can join a veteran-owned prime's team as a subcontractor.";
+    return holds("SDVOSBC")
+      ? "The buyer plans this for service-disabled veteran-owned small businesses. You are one, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for service-disabled veteran-owned small businesses. You are not one, so you cannot bid it as the prime. You can join a veteran-owned prime's team as a subcontractor.";
+  }
+  if (code === "HZC" || code === "HZS") {
+    return holds("HZC")
+      ? "The buyer plans this for HUBZone small businesses. You are HUBZone-certified, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for HUBZone small businesses. You are not HUBZone-certified, so you cannot bid it as the prime. You can join a HUBZone prime's team as a subcontractor.";
+  }
+  if (code === "8A" || code === "8AN") {
+    return holds("8A")
+      ? "The buyer plans this for firms in the SBA's 8(a) program. You are in it, so you qualify to bid. Keep your 8(a) status current."
+      : "The buyer plans this for firms in the SBA's 8(a) program. You are not in it, so you cannot bid it as the prime. You can join an 8(a) prime's team as a subcontractor.";
   }
   if (code === "SBA" || code === "SBP") {
     return "The buyer plans this for small businesses. You are a small business, so you can bid.";
   }
   if (!code || code === "TBD") {
-    return "The buyer has not decided who may bid yet. A reply to the buyer's market study can help them choose a set-aside. Your woman-owned certificate would count if they pick that route.";
+    return `The buyer has not decided who may bid yet. A reply to the buyer's market study can help them choose a set-aside. ${OWN === "SBA" ? "Your small-business size" : `Your ${SET_ASIDES[OWN].short} certificate`} would count if they pick that route.`;
   }
   return "The record names a program set-aside that I cannot match to your certificates. Check the program rules before you plan a bid.";
 }

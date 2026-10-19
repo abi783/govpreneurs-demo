@@ -8,6 +8,7 @@
 
 import { MENTOR, PERSONA } from "../../story/persona";
 import { PLACES } from "../../story/places";
+import { HELD_TITLES, OWN, SET_ASIDES } from "../../story/setAsides";
 import { allRows, forYouRows, rowById, savedRows, universe, type FeedRow } from "../data";
 import { longDate } from "../dates";
 import {
@@ -106,7 +107,7 @@ export const help: Rule = {
     return {
       reply:
         "I am Hunter, your discovery agent. I find government contracts that match your business and explain why each one is on your list.\n" +
-        'You can ask me to filter the feed ("only woman-owned", "under $500K", "near Fayetteville"), explain a match, compare opportunities, check if you are ready, or save one.\n' +
+        `You can ask me to filter the feed ("only ${SET_ASIDES[OWN].short}", "under $500K", "near Fayetteville"), explain a match, compare opportunities, check if you are ready, or save one.\n` +
         "For a deep read on one opportunity, open it and ask Grant.",
       chips: [chip.best, chip.top3, chip.how],
     };
@@ -641,8 +642,8 @@ const filterRule: Rule = {
       return {
         reply:
           `You do not hold the ${parsed.notHers} status, so those set-asides are not open to you. I did not change your list.\n` +
-          "You qualify for Small Business and Woman-Owned (WOSB) set-asides.",
-        chips: [chip.wosb, "Do I qualify for these set-asides?", chip.best],
+          `You qualify for ${HELD_TITLES} set-asides.`,
+        chips: [chip.own, "Do I qualify for these set-asides?", chip.best],
       };
     }
     const { delta } = parsed;
@@ -665,7 +666,7 @@ const filterRule: Rule = {
             `The nearest is ${titleOf(nearest)}, ${nearest.miles} miles ${FROM_BASE}. Your service area reaches ${PERSONA.serviceRadiusMiles} miles.`,
           );
         }
-        if (delta.setAsides?.includes("WOSB")) notes.push("You qualify for all of them.");
+        if (OWN !== "SBA" && delta.setAsides?.some((id) => SET_ASIDES[OWN].filterIds.includes(id))) notes.push("You qualify for all of them.");
         if (delta.cities?.length === 1) {
           const place = Object.values(PLACES).find((p) => p.city === delta.cities![0]);
           if (place) notes.push(`${place.city} is ${place.milesFromBase} miles ${FROM_BASE}.`);
@@ -704,7 +705,7 @@ const searchFallback: Rule = {
     if (hits.length === 0) {
       return {
         reply: `I found nothing for "${phrase}". Try a place, a buyer, ${VOCAB.searchHint}, or a size.`,
-        chips: [chip.best, chip.near, chip.wosb],
+        chips: [chip.best, chip.near, chip.own],
       };
     }
     return applyChange(ctx, { search: phrase }, { said: `Searching for "${phrase}".` });
@@ -774,7 +775,7 @@ const countRule: Rule = {
             /\s+:/,
             ":",
           ),
-        chips: [chip.best, chip.wosb, chip.fresh],
+        chips: [chip.best, chip.own, chip.fresh],
       };
     }
     return {

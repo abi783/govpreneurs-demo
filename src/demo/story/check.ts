@@ -103,6 +103,8 @@ export function factProblem(o: StoryOpportunity, f: FitFact): string | null {
       return o.clearanceRequired && PERSONA.clearances.length === 0 ? null : "clearance-gap fact is not true";
     case "providerLock":
       return o.exclusiveProvider ? null : "provider-lock fact on work open to any provider";
+    case "lockedOut":
+      return o.lockedTo ? null : "locked-out fact on work any firm can bid";
     case "setAsideGap":
       return o.setAside && !(PERSONA.setAsideEligibility as readonly string[]).includes(o.setAside)
         ? null

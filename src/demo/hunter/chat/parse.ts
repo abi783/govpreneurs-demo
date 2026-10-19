@@ -7,6 +7,7 @@ import { money } from "../../../lib/money";
 import { PERSONA } from "../../story/persona";
 import { OPPORTUNITIES } from "../../story/opportunities";
 import { PLACES } from "../../story/places";
+import { holds, SET_ASIDES, type SetAsideCode } from "../../story/setAsides";
 import { stateName } from "../../../lib/vocab/usStates";
 import { VOCAB } from "../vocab";
 
@@ -205,19 +206,20 @@ export function parseFilters(raw: string, norm: string): ParsedFilters {
   const mods: string[] = [];
   let notHers: string | undefined;
 
-  // Set-asides
-  if (/\b(sdvosb|veteran|vosb)\b/.test(norm) && !/veterans affairs/.test(norm))
-    notHers = "veteran-owned (SDVOSB)";
-  else if (/\b8\s?\(?a\)?\b|hubzone|hub zone|tribal|native american/.test(norm)) {
-    notHers = /hubzone|hub zone/.test(norm)
-      ? "HUBZone"
-      : /tribal|native/.test(norm)
-        ? "tribal"
-        : "8(a)";
-  }
-  if (/\b(woman|women|wosb|edwosb)\b/.test(norm)) {
-    delta.setAsides = ["WOSB"];
-    nouns.push("woman-owned (WOSB) set-asides");
+  // Set-asides: a program she holds filters the list; one she does not hold is "not hers".
+  const asked: Record<string, boolean> = {
+    SDVOSBC: /\b(sdvosb|veteran|vosb)\b/.test(norm) && !/veterans affairs/.test(norm),
+    HZC: /hubzone|hub zone/.test(norm),
+    tribal: /tribal|native american/.test(norm),
+    "8A": /\b8\s?\(?a\)?\b/.test(norm),
+    WOSB: /\b(woman|women|wosb|edwosb)\b/.test(norm),
+  };
+  const notHeld = Object.keys(asked).find((c) => asked[c] && !(c in SET_ASIDES && holds(c)));
+  if (notHeld) notHers = notHeld === "tribal" ? "tribal" : SET_ASIDES[notHeld as SetAsideCode].program;
+  const held = (["SDVOSBC", "HZC", "8A", "WOSB"] as const).find((c) => asked[c] && holds(c));
+  if (held) {
+    delta.setAsides = SET_ASIDES[held].filterIds;
+    nouns.push(`${SET_ASIDES[held].program} set-asides`);
   } else if (/\bsmall business (set.?asides?|only|jobs)\b|\bsba set.?aside/.test(norm)) {
     delta.setAsides = ["SB"];
     nouns.push("small-business set-asides");

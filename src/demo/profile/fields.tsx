@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import { MEMBER, byMember, own } from "../member";
 import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../story/persona";
+import { OWN, SET_ASIDES } from "../story/setAsides";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
 import { SAM_CHECKED_DAYS_AGO } from "../sc/timeline";
@@ -449,11 +450,18 @@ const DEFS: FieldDef[] = [
     id: "wosb-doc",
     tab: "certifications",
     tier: "T2",
-    label: "WOSB/EDWOSB Certification",
-    helper: "Upload your SBA woman-owned small business certificate so buyers can check it.",
-    initial: { state: "attested", value: "WOSB certificate.pdf", source: `You uploaded WOSB certificate.pdf on ${ago(60)}`, at: iso(60) },
+    // DEMO: the member's own certificate (story/setAsides.ts). WOSB for the caterer and the agency.
+    label: OWN === "WOSB" || OWN === "SBA" ? "WOSB/EDWOSB Certification" : `${SET_ASIDES[OWN].title} Certification`,
+    helper: `Upload your ${SET_ASIDES[OWN === "SBA" ? "WOSB" : OWN].certificate} certificate so buyers can check it.`,
+    initial:
+      OWN === "SBA"
+        ? { state: "missing" }
+        : { state: "attested", value: `${SET_ASIDES[OWN].abbr} certificate.pdf`, source: `You uploaded ${SET_ASIDES[OWN].abbr} certificate.pdf on ${ago(60)}`, at: iso(60) },
     edit: { type: "file" },
-    whyItMatters: "Women-owned set-asides ask for proof of certification. Hunter flags these on matching bids.",
+    whyItMatters:
+      OWN === "WOSB" || OWN === "SBA"
+        ? "Women-owned set-asides ask for proof of certification. Hunter flags these on matching bids."
+        : `${SET_ASIDES[OWN].title} set-asides ask for proof of certification. Hunter flags these on matching bids.`,
   },
   {
     id: "8a",
@@ -600,7 +608,7 @@ const DEFS: FieldDef[] = [
     initial: { state: "attested", value: "Both, leaning set-aside", source: told(112), at: iso(112) },
     edit: { type: "select", options: ["Set-aside only", "Both, leaning set-aside", "Both, leaning open", "Full-and-open only"] },
     show: (v) =>
-      v === "Full-and-open only" ? String(v) : `${v} (you're a woman-owned small business)`,
+      v === "Full-and-open only" ? String(v) : `${v} (you're ${SET_ASIDES[OWN].aBusiness})`,
     chatEditable: true,
     whyItMatters:
       "Set-aside opportunities have less competition. Full-and-open are bigger but compete with everyone — this tells Hunter where to focus.",

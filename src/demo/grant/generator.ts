@@ -12,6 +12,7 @@ import { byMember, own } from "@/demo/member";
 import { dueTimeOf } from "@/demo/story/opportunities";
 import type { GrantCall } from "@/demo/story/opportunities";
 import { findPastPerformance, PERSONA, type PastPerformanceId } from "@/demo/story/persona";
+import { holds, SET_ASIDES } from "@/demo/story/setAsides";
 import type {
   CapturePath,
   ComplianceRow,
@@ -303,8 +304,8 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const winText =
     subGo && call.prime === "no_go"
       ? `As a prime you would compete with firms far bigger than yours. As a subcontractor you ride the winning prime and share in the work.`
-      : f.setAside === "WOSB"
-        ? `Only woman-owned small businesses can compete. That removes the large ${V.peers}.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
+      : f.setAside && f.setAside !== "SBA"
+        ? `Only ${SET_ASIDES[f.setAside].firms} can compete. That removes the large ${V.peers}.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
         : f.setAside === "SBA"
           ? `Only small businesses can compete. That removes the large national firms, but other small ${V.peers} will bid.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
           : priceOnly
@@ -313,7 +314,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const winBold =
     subGo && call.prime === "no_go"
       ? "As a subcontractor you ride the winning prime"
-      : f.setAside === "WOSB"
+      : f.setAside && f.setAside !== "SBA"
         ? `removes the large ${V.peers}`
         : f.setAside === "SBA"
           ? "removes the large national firms"
@@ -491,7 +492,10 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       closableInWindow: status === "missing" ? (closable ?? false) : undefined,
     });
   };
-  if (f.setAside === "WOSB") row("Woman-owned small business (WOSB) certification", "setAside", "eligibility", "WOSB certified", "Certified in SBA's MySBA Certifications", "have");
+  if (f.setAside && f.setAside !== "SBA") {
+    const sa = SET_ASIDES[f.setAside];
+    row(f.setAside === "WOSB" ? "Woman-owned small business (WOSB) certification" : `${sa.name} certification`, "setAside", "eligibility", `${sa.abbr} certified`, holds(f.setAside) ? "Certified in SBA's MySBA Certifications" : "Not certified", holds(f.setAside) ? "have" : "missing");
+  }
   else if (f.setAside === "SBA") row("Small business under the size standard", "setAside", "eligibility", "a small business", `You are small: ${usd(PERSONA.annualRevenue)} yearly revenue`, "have");
   if (f.isFederal) {
     row(`Registered under NAICS ${opp.naics}`, "naics", "eligibility", `NAICS ${opp.naics}`, opp.naics === PERSONA.primaryNaics ? "Your primary code" : "One of your codes", "have");
@@ -534,7 +538,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
     verdict === "bid"
       ? [
           rt(`**${cap(d.service)}** fits ${V.fitsYou}.`),
-          rt(f.setAside ? `Only ${f.setAside === "WOSB" ? "woman-owned" : "small"} firms can bid, so the field is smaller.` : "Anyone can bid, so your record and your price must carry it."),
+          rt(f.setAside ? `Only ${f.setAside === "SBA" ? "small" : SET_ASIDES[f.setAside].short} firms can bid, so the field is smaller.` : "Anyone can bid, so your record and your price must carry it."),
           rt(`Send the ${offer} before ${longDate(f.closes)}.`),
         ]
       : verdict === "review"
@@ -610,7 +614,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       checkCount: 5,
       items: [
         { glyph: "neutral", text: rt(d.competition), source: "Award records" },
-        { glyph: f.setAside ? "ok" : "warn", text: rt(f.setAside ? `The ${f.setAside === "WOSB" ? "woman-owned" : "small-business"} set-aside keeps the large firms out.` : "No set-aside, so large firms can bid."), source: "Notice" },
+        { glyph: f.setAside ? "ok" : "warn", text: rt(f.setAside ? `The ${SET_ASIDES[f.setAside].short} set-aside keeps the large firms out.` : "No set-aside, so large firms can bid."), source: "Notice" },
       ],
     },
     {
@@ -814,8 +818,8 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       headline: thesis,
       wouldChange,
       competitiveRisk: rt(
-        f.setAside === "WOSB"
-          ? `the **other woman-owned ${V.peers}** near you who list your code`
+        f.setAside && f.setAside !== "SBA"
+          ? `the **other ${SET_ASIDES[f.setAside].short} ${V.peers}** near you who list your code`
           : f.setAside === "SBA"
             ? `**other small ${V.peers}** with a federal record`
             : `**larger firms** with more ${V.bigWork}`,

@@ -4,8 +4,9 @@
 
 import { money } from "../../../lib/money";
 import { PAST_PERFORMANCE, PERSONA } from "../../story/persona";
+import { andList, HELD, HELD_TITLES, holds, PROGRAMS, SET_ASIDES, SHOW_OWN, WHAT_IS_OWN } from "../../story/setAsides";
+import { cap, RANGE_TEXT } from "../facts";
 import { allRows, forYouRows, type FeedRow } from "../data";
-import { RANGE_TEXT } from "../facts";
 import { VOCAB } from "../vocab";
 import type { Turn } from "./types";
 
@@ -50,31 +51,40 @@ export const DEFINITIONS: Definition[] = [
       return {
         reply:
           "A WOSB set-aside is a contract that only woman-owned small businesses can compete for. WOSB means Women-Owned Small Business.\n" +
-          `You are woman-owned and small, and your WOSB status is on file. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
-          "Fewer firms can compete for these, so the field is smaller.",
-        chips: ["Show only woman-owned set-asides", "Do I qualify for these set-asides?"],
+          (holds("WOSB")
+            ? `You are woman-owned and small, and your WOSB status is on file. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
+              "Fewer firms can compete for these, so the field is smaller."
+            : `You are not certified as woman-owned, so those set-asides are not for you. Your set-asides are ${HELD_TITLES}.`),
+        chips: [SHOW_OWN, "Do I qualify for these set-asides?"],
       };
     },
   },
   {
     id: "define-sdvosb",
     test: /sdvosb|service.disabled|veteran.owned|\bvosb\b/,
-    answer: () => ({
+    answer: (rows) => ({
       reply:
         "SDVOSB means Service-Disabled Veteran-Owned Small Business. Only firms owned by a veteran with a service-connected disability can compete for these set-asides.\n" +
-        "You are not an SDVOSB, so those set-asides are not for you. Your set-asides are Small Business and Woman-Owned (WOSB).",
-      chips: ["What is a WOSB set-aside?", "Do I qualify for these set-asides?"],
+        (holds("SDVOSBC")
+          ? `You are service-disabled veteran-owned, and your SDVOSB status is on file. So you can compete for all ${count(rows, (r) => r.setAside === "SDVOSBC")} of them on this list.`
+          : `You are not an SDVOSB, so those set-asides are not for you. Your set-asides are ${HELD_TITLES}.`),
+      chips: [holds("SDVOSBC") ? SHOW_OWN : WHAT_IS_OWN, "Do I qualify for these set-asides?"],
     }),
   },
   {
     id: "define-8a-hubzone",
     test: /\b8\s?\(?a\)?\b|hubzone|hub zone|edwosb|native american|tribal/,
-    answer: () => ({
-      reply:
-        "8(a), HUBZone and tribal set-asides are programs for other kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
-        "You do not hold those, so I do not rank them for you. You qualify for Small Business and Woman-Owned (WOSB).",
-      chips: ["Do I qualify for these set-asides?", "Show only woman-owned set-asides"],
-    }),
+    answer: (rows) => {
+      const mine = (["8A", "HZC"] as const).filter((c) => holds(c));
+      return {
+        reply: mine.length
+          ? "8(a), HUBZone and tribal set-asides are programs for certain kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
+            `${cap(andList(mine.map((c) => SET_ASIDES[c].youAre)))}, so you can compete for the ${count(rows, (r) => (mine as string[]).includes(r.setAside))} on this list. Your set-asides are ${HELD_TITLES}.`
+          : "8(a), HUBZone and tribal set-asides are programs for other kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
+            `You do not hold those, so I do not rank them for you. You qualify for ${HELD_TITLES}.`,
+        chips: ["Do I qualify for these set-asides?", SHOW_OWN],
+      };
+    },
   },
   {
     id: "define-small-business-set-aside",
@@ -85,7 +95,7 @@ export const DEFINITIONS: Definition[] = [
         reply:
           "A small business set-aside is a contract that only small businesses can compete for. The size limit depends on your NAICS code.\n" +
           `You are a small business. ${n} opportunit${n === 1 ? "y" : "ies"} on this list carry that label.`,
-        chips: ["Do I qualify for these set-asides?", "Show only woman-owned set-asides"],
+        chips: ["Do I qualify for these set-asides?", SHOW_OWN],
       };
     },
   },
@@ -93,17 +103,22 @@ export const DEFINITIONS: Definition[] = [
     id: "define-set-aside",
     test: /set.?aside/,
     answer: (rows) => {
-      const wosb = count(rows, (r) => r.setAside === "WOSB");
-      const sba = count(rows, (r) => r.setAside === "SBA");
+      const n = (c: string) => count(rows, (r) => r.setAside === c);
       const open = count(rows, (r) => !r.setAside);
-      const vet = count(rows, (r) => r.setAside === "SDVOSBC");
+      // Her own programs first, plain small business last; then the ones she does not hold.
+      const mine = [...HELD.filter((c) => c !== "SBA"), ...HELD.filter((c) => c === "SBA")];
+      const notHers = PROGRAMS.filter((c) => !holds(c) && n(c) > 0);
+      const parts = [...mine, ...notHers].map((c) => `${n(c)} ${SET_ASIDES[c].counted}`).join(", ");
+      const qualify = notHers.length
+        ? `You qualify for all but the ${andList(notHers.map((c) => SET_ASIDES[c].counted))}.`
+        : mine.length === 1
+          ? `You qualify for the ${SET_ASIDES[mine[0]!].counted} ones.`
+          : `You qualify for the first ${["", "one", "two", "three", "four"][mine.length]}.`;
       return {
         reply:
           "A set-aside is a contract that the buyer keeps for one kind of business, such as small businesses or woman-owned firms. Other firms cannot compete for it.\n" +
-          (vet
-            ? `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, ${vet} veteran-owned, and ${open} open to every business. You qualify for all but the veteran-owned.`
-            : `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, and ${open} open to every business. You qualify for the first two.`),
-        chips: ["What is a WOSB set-aside?", "Show only woman-owned set-asides"],
+          `On this list: ${parts}, and ${open} open to every business. ${qualify}`,
+        chips: [WHAT_IS_OWN, SHOW_OWN],
       };
     },
   },

@@ -38,14 +38,14 @@ export type NoticeType =
   | "Invitation for Bid"
   | "Request for Proposal";
 
-/** SAM set-aside codes used in the story. null = open to all. SDVOSBC = service-disabled veteran-owned. */
-export type SetAside = "WOSB" | "SBA" | "SDVOSBC" | null;
+/** SAM set-aside codes used in the story (setAsides.ts says what each means). null = open to all. */
+export type SetAside = "WOSB" | "SBA" | "SDVOSBC" | "HZC" | "8A" | null;
 
 export type HunterTier = "priority" | "strong" | "stretch" | "low";
 
 export type FitFact =
   | { kind: "naics"; code: string; says: string }
-  | { kind: "setAside"; code: "WOSB" | "SBA"; says: string }
+  | { kind: "setAside"; code: NonNullable<SetAside>; says: string }
   | { kind: "valueInRange"; says: string }
   | { kind: "valueAboveRange"; says: string }
   | { kind: "distance"; says: string }
@@ -56,7 +56,9 @@ export type FitFact =
   /** The work names one provider's own platform or crew (opportunity `exclusiveProvider`). */
   | { kind: "providerLock"; says: string }
   /** Set aside for a group the member is not in. */
-  | { kind: "setAsideGap"; says: string };
+  | { kind: "setAsideGap"; says: string }
+  /** Only some firms may bid: holders of a contract vehicle, approved carriers, a mandatory source (opportunity `lockedTo`). */
+  | { kind: "lockedOut"; says: string };
 
 export type GrantVerdict = "bid" | "review" | "no_bid";
 
@@ -135,6 +137,8 @@ export interface StoryOpportunity {
   clearanceRequired?: string;
   /** Set when the work is written around one provider's own platform, crew or data. */
   exclusiveProvider?: string;
+  /** Set when only some firms may bid, and the member is not one: who, in plain words, as "Only … can bid" reads ("holders of Fort Bragg's HUBZone construction MATOC"). */
+  lockedTo?: string;
   /** True when the agency is one of the member's target buyers. */
   targetAgency?: boolean;
   hunter: {
