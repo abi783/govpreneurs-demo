@@ -1,6 +1,7 @@
-// DEMO: the agency's hero, Family Advocacy print and digital ads: a federal
-// quote set aside for woman-owned firms. Rows follow Grant's hand-written
-// brief (members/agency/grantBriefs.ts, `compliance`), with Dana's facts.
+// DEMO: the consultant's hero, the supervisor leadership program at the
+// Fayetteville VA: a VA quote set aside for service-disabled veteran-owned
+// firms. Rows follow Grant's hand-written brief (members/consulting/grantBriefs.ts,
+// `compliance`), with Simone's facts.
 //
 // Built when Grant's read is opened, from the helpers src/demo/ava/grantRead.ts
 // lends it, so this file imports no app code (no import cycle).
@@ -13,58 +14,58 @@ export const HERO_ID: string = HERO_IDS.hero;
 
 export function grantRead({ row, active, limits }: GrantReadKit): GrantSample {
   return {
-  rows: [
-    row(
-      "ga-setaside",
-      "Certified woman-owned small business when you quote",
-      "§1.2",
-      "WOSB",
-      "Certified in SBA's MySBA Certifications",
-      "have",
-    ),
-    row(
-      "ga-size",
-      "Small under the size standard for industry code 541810",
-      "§1.2",
-      "Small",
-      "Small, as your registration says",
-      "have",
-    ),
-    row(
-      "ga-sam",
-      "Active federal registration when you quote, and through award",
-      "§5.2",
-      "Active",
-      active,
-      "have",
-    ),
-    row(
-      "ga-app",
-      "Ads on the contractor's own mobile app",
-      "PWS 3.4",
-      "Own app",
-      "No app on file. Ask in Q&A whether a news partner's app counts",
-      "missing",
-    ),
-    row(
-      "ga-pm",
-      "Named project manager and alternate",
-      "PWS 4.1",
-      "Named",
-      "Not named yet. No résumés on file",
-      "confirm",
-    ),
-    row(
-      "ga-insurance",
-      "General liability insurance before work starts",
-      "§5.5",
-      "$500,000",
-      "General liability $1M per occurrence, on file",
-      "have",
-    ),
-  ],
-  warnings: limits(HERO_IDS.hero, []),
-  deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 5, subQuoteDays: 0, writingDays: 3 },
-  questions: [],
-};
+    rows: [
+      row(
+        "cv-sdvosb",
+        "Certified service-disabled veteran-owned firm when you quote, and at award",
+        "§1.2",
+        "SDVOSB",
+        "Certified by SBA on 14 Jan 2024. Eligibility ends 14 Jan 2027; VA checks it at award",
+        "have",
+      ),
+      row(
+        "cv-size",
+        "Small under the size standard for industry code 611430",
+        "§1.2",
+        "Small",
+        "Small, as your registration says",
+        "have",
+      ),
+      row(
+        "cv-sam",
+        "Active federal registration when you quote, and through award",
+        "§5.2",
+        "Active",
+        active,
+        "have",
+      ),
+      row(
+        "cv-limits",
+        "At most half of what VA pays to firms that aren't veteran-owned",
+        "§5.3",
+        "50% or less",
+        "Two of your four cohort leads are 1099 facilitators. Count the hours by person, then sign the certificate",
+        "confirm",
+      ),
+      row(
+        "cv-coach",
+        "Coaches with an ICF PCC credential or equal",
+        "PWS 3.3",
+        "PCC or equal",
+        "One PCC and two ACC. Ask in Q&A whether an ACC counts",
+        "confirm",
+      ),
+      row(
+        "cv-leads",
+        "Named Program Manager and Lead Facilitator",
+        "PWS 4.1",
+        "Named",
+        "Not named yet. Ava asks who",
+        "missing",
+      ),
+    ],
+    warnings: limits(HERO_IDS.hero, []),
+    deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 3, subQuoteDays: 0, writingDays: 3 },
+    questions: [],
+  };
 }
