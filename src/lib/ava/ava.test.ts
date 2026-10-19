@@ -24,6 +24,11 @@ import {
 import { ALL_AVA_BIDS, AVA_BIDS } from "./fixtures";
 import { FAMILY_ADVOCACY_ID } from "./fixtures/familyAdvocacy";
 import { HERO_IDS as CONSTRUCTION_IDS } from "../../demo/members/construction/opportunities";
+import { HERO_IDS as STORY_HERO_IDS } from "../../demo/story/opportunities";
+
+const PACK_HEROES = Object.values(
+  import.meta.glob<typeof import("../../demo/members/agency/ava")>("/src/demo/members/*/ava/index.ts", { eager: true }),
+).map((p) => p.HERO_BID.noticeId);
 import { MEMBER } from "../../demo/member";
 import { STAFFING_KEY } from "./flow";
 import { cumberlandBid } from "./fixtures/cumberland";
@@ -198,17 +203,12 @@ describe("fixtures", () => {
     const caterer = CATERER_IDS.map((id) => ALL_AVA_BIDS[id]);
     expect(caterer.every(Boolean)).toBe(true);
     expect(new Set(caterer.map((b) => b.kind)).size).toBe(4);
+    // Every pack member's hero (src/demo/members/<id>/ava/index.ts), once.
     expect(Object.keys(ALL_AVA_BIDS).sort()).toEqual(
-      [...CATERER_IDS, FAMILY_ADVOCACY_ID, CONSTRUCTION_IDS.hero].sort(),
+      [...new Set([...CATERER_IDS, FAMILY_ADVOCACY_ID, CONSTRUCTION_IDS.hero, ...PACK_HEROES])].sort(),
     );
     for (const [id, bid] of Object.entries(ALL_AVA_BIDS)) expect(bid.noticeId).toBe(id);
-    expect(BIDS.map((b) => b.noticeId)).toEqual(
-      MEMBER === "caterer"
-        ? CATERER_IDS
-        : MEMBER === "agency"
-          ? [FAMILY_ADVOCACY_ID]
-          : [CONSTRUCTION_IDS.hero],
-    );
+    expect(BIDS.map((b) => b.noticeId)).toEqual(MEMBER === "caterer" ? CATERER_IDS : [STORY_HERO_IDS.hero]);
   });
 
   for (const bid of BIDS) {
