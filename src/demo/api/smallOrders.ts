@@ -1,11 +1,13 @@
 // DEMO API area: Small Orders (DLA product buys).
 // Owns: /small-orders*.
 //
-// The orders are 20 made-up food-service buys (src/demo/explore/orders/data.ts).
-// Amira's answers on the board live in the demo store under `explore.smallOrders.state`.
+// The orders are made-up DLA buys (src/demo/explore/orders/data.ts): 20 food-service
+// buys for the caterer, 10 parts and supplies orders for the agency.
+// The member's answers on the board live in the demo store under `explore.smallOrders.state`.
 // A saved order is a saved opportunity: the shared saved list (src/demo/state/workspace.ts)
 // holds the key, and the resolver below tells the Pipeline how to draw the card.
 
+import { MEMBER } from "../member";
 import type { DemoRouteDef } from "../runtime/router";
 import { demoResponse } from "../runtime/router";
 import { readDemoState, writeDemoState } from "../runtime/store";
@@ -34,8 +36,9 @@ registerSavedResolver((oppKey) => {
 
 // Amira already sent a price on the pasta order (memberState.ts), so she has kept it.
 // Seed it once per demo session: the flag stops it coming back after she un-saves it.
+// DEMO: the caterer only. No order fits the agency, so she has saved none.
 const SEEDED = "explore.smallOrders.seeded";
-if (typeof window !== "undefined" && !readDemoState<boolean>(SEEDED, false)) {
+if (MEMBER === "caterer" && typeof window !== "undefined" && !readDemoState<boolean>(SEEDED, false)) {
   setSaved("mp-109", true);
   writeDemoState(SEEDED, true);
 }
