@@ -107,6 +107,8 @@ export const GRANT_BRIEFS: GrantBrief[] = [
         "Your two routes, truck by truck, and the spare. Name your PM and Alternate, show GPS on every truck, and state your diesel base price if VA won't add a fuel clause. Ava will fill the price schedule in that order.",
       "Can I win it?":
         "No one can promise that. What I can say: only service-disabled veteran-owned firms can quote, your yard is across town from the warehouse, and you already run daily clinic routes.",
+      "Do I need a bond?":
+        "Not a bid or performance bond. The VA wants bonded drivers but doesn't say the amount, so ask in Q&A with the license question.",
       "Do I have enough time?":
         "Yes. 24 days, and Ava needs about 2 hours of your answers. The items with a lead time are the Q&A answers and your drivers' background checks.",
     },
