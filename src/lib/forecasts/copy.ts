@@ -8,6 +8,9 @@
 import { money } from "../money";
 
 import type { UnsupportedFilter, UnsupportedFilterKey } from "./hunterFilters";
+// DEMO: the code example uses the member's own trade (D85).
+import { byMember } from "../../demo/member";
+const CODE_EXAMPLE = byMember({ caterer: "7223 does not show 722310.", agency: "5418 does not show 541810." });
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -120,7 +123,7 @@ export const FILTERS = {
   naicsGloss:
     "NAICS is the industry code the buyer chose for the work. A forecast is shown only when its code is exactly one you choose.",
   naicsNote:
-    "While you choose a code, a forecast with no industry code is not shown. A code matches exactly, so 7223 does not show 722310. These codes and Kind of work both apply.",
+    `While you choose a code, a forecast with no industry code is not shown. A code matches exactly, so ${CODE_EXAMPLE} These codes and Kind of work both apply.`,
   naicsSearch: "Search a code or an industry",
   noNaics: "No forecast carries an industry code",
   place: { any: "Anywhere", served: "States you serve" },

@@ -18,6 +18,12 @@ import {
   whyThisAward,
   type AwardRecord,
 } from "../lib/awardsApi";
+// DEMO: how the member knows the partner, and what to ask (D85).
+import { byMember } from "@/demo/member";
+const KNOWN_PARTNER_NOTE = byMember({
+  caterer: "from your 2024 subcontract. Ask him about the recompete.",
+  agency: "who wrote to you about the VA campaign. Ask him which shoots he needs a crew for.",
+});
 
 interface DetailSearch {
   /** Absolute path to return to, INCLUDING its own search params. */
@@ -376,7 +382,7 @@ function AwardDetailPage() {
           // DEMO: Amira already knows a person at Carolina Dining Group.
           <p className="award-note">
             You already know {KEY_PARTNER.contact}, {KEY_PARTNER.contactTitle}, at{" "}
-            {award.winner.name}, from your 2024 subcontract. Ask him about the recompete.
+            {award.winner.name}, {KNOWN_PARTNER_NOTE}
           </p>
         ) : (
           <p className="award-note">

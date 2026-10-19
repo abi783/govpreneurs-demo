@@ -56,7 +56,7 @@ export const AGENCY_VOCAB: HunterVocab = {
     chip: "We also make Spanish-language videos",
   },
   avaLine: `Ava is already working on the ${hero.plainTitle} quote. ${hero.ava!.statusLine} Open Ava under Your Workspace, on the left.`,
-  certLine: "You already hold Small Business, Woman-Owned (WOSB) and NC HUB status.",
+  certLine: "You already hold Small Business and Woman-Owned (WOSB) status.",
   competitionExample: "",
   searchHint: "a kind of campaign",
   canon: [

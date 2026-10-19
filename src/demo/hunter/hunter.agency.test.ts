@@ -337,7 +337,7 @@ describe.runIf(MEMBER === "agency")("Hunter for the agency", () => {
       expect(ask("can you write my proposal").chatReply).toMatch(
         /Family Advocacy ad campaign at Fort Bragg quote\. Ava has 3 questions/,
       );
-      expect(ask("how do I get certified").chatReply).toMatch(/NC HUB/);
+      expect(ask("how do I get certified").chatReply).toMatch(/WOSB/);
       expect(ask("who is the incumbent for the VA one").chatReply).toMatch(/Grant/);
       expect(ask("We also make Spanish-language videos").uiPayload.kind).toBe("profile_update");
     });

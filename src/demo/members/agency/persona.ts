@@ -38,7 +38,8 @@ export const PERSONA: Persona = {
     { code: "541820", label: "Public Relations Agencies" },
   ],
   setAsideEligibility: ["SBA", "WOSB"],
-  certifications: ["Small Business", "Woman-Owned Small Business (WOSB)", "NC HUB (Historically Underutilized Business)"],
+  // No NC HUB: North Carolina ended HUB certification on 7 July 2026 (S.L. 2026-41).
+  certifications: ["Small Business", "Woman-Owned Small Business (WOSB)"],
   clearances: [],
   employeesW2: 9,
   kitchen: "Studio and edit suite at 112 Person St, a 2-person video crew",

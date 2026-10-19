@@ -17,6 +17,8 @@ import {
   type AwardSort,
   type SavedAward,
 } from "@/lib/awardsApi";
+import { byMember } from "../member";
+import { STORY_SAVED_AWARD_IDS as AGENCY_SAVED_AWARD_IDS } from "../members/agency/market/awards";
 
 const SAVED_KEY = "explore.awards.saved";
 const PAGE_SIZE = 10;
@@ -30,10 +32,12 @@ const MY_TRADE_CODES = new Set<string>([PERSONA.primaryNaics, ...PERSONA.seconda
 
 /** Amira has already saved the two awards that tell her story: Fort Bragg dining and her own Womack job. */
 function initialSaved(): SavedAward[] {
-  return [
-    { awardId: "W91247-19-C-0021", sourceTag: "from Awards", savedAt: isoDaysFromNow(-3, 14) },
-    { awardId: "W81K04-24-P-0187", sourceTag: "from Awards", savedAt: isoDaysFromNow(-6, 11) },
-  ];
+  // DEMO: each member starts with two awards saved (D85).
+  const ids = byMember<readonly string[]>({
+    caterer: ["W91247-19-C-0021", "W81K04-24-P-0187"],
+    agency: AGENCY_SAVED_AWARD_IDS,
+  });
+  return ids.map((awardId, i) => ({ awardId, sourceTag: "from Awards", savedAt: isoDaysFromNow(i === 0 ? -3 : -6, i === 0 ? 14 : 11) }));
 }
 
 const saved = (): SavedAward[] => readDemoState<SavedAward[]>(SAVED_KEY, initialSaved);
