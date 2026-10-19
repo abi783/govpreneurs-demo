@@ -4,6 +4,7 @@
 //      DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
 //      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
 //      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
+//      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
 import { MEMBER } from "../src/demo/member";
@@ -47,6 +48,19 @@ const COPY = {
     extraRows: [
       ["PSC", "PSC Z2AA · Z2JZ"],
       ["Bonding", `$${(PERSONA.bondLine?.single ?? 0) / 1_000_000}M a job · $${(PERSONA.bondLine?.aggregate ?? 0) / 1_000_000}M in total`],
+    ] as [string, string][],
+  },
+  // The pack's line (it-services-pack.md §1).
+  it: {
+    who: `8(a) IT services firm 12 miles from Fort Bragg: help desk, desktop and video-conference support, Microsoft 365 and SharePoint admin, and network support, with Security+ techs who already work on Army and Air Force networks. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, South Carolina and Virginia.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Imaging and asset tracking, from one office to 4,800 devices in a summer",
+      "CMMC Level 1 (Self), affirmed in SPRS",
+    ],
+    extraRows: [
+      ["PSC", "PSC DE01 · DG01"],
+      ["Contract vehicles", "GSA MAS, SIN 54151S"],
     ] as [string, string][],
   },
 }[MEMBER];
