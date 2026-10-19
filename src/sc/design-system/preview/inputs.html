@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Inputs & checkbox" subtitle="text · mono · checkbox" viewport="700x200" -->
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../type-and-components.css">
+<style>body{padding:24px;background:var(--surface);display:grid;grid-template-columns:1fr 1fr;gap:18px;}</style>
+</head><body>
+<div>
+  <label class="label">Business name</label>
+  <input class="input" value="Talos Defense LLC">
+  <div class="hint">Pulled from your SAM.gov registration.</div>
+</div>
+<div>
+  <label class="label">UEI</label>
+  <input class="input mono" value="ABCD1234EFGH">
+  <div class="hint">Unique Entity Identifier.</div>
+</div>
+<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;">
+  <input type="checkbox" class="chk" checked> <span style="font-size:13px;color:var(--text);">Restrict to small-business set-asides</span>
+</div>
+</body></html>

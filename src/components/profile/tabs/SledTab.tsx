@@ -1,33 +1,18 @@
-import { Section } from "../Section";
-import { FieldRow } from "../FieldRow";
+import { ProfileTabSection } from "../ProfileTabSection";
 import { SledRegistrationsTable } from "../SledRegistrationsTable";
+import { useSledRegistrations } from "../../../demo/profile/sled";
 
+// DEMO: the registrations table and the target states come from the demo store.
 export function SledTab() {
+  const rows = useSledRegistrations();
+  const registered = rows.filter((r) => r.status === "registered").length;
+  const pending = rows.filter((r) => r.status === "pending_dfy").length;
   return (
-    <Section
-      t1Fields={[<SledRegistrationsTable key="sled-table" />]}
-      t2Fields={[
-        <FieldRow
-          key="sled-target-states"
-          tier="T2"
-          label="SLED Target States"
-          state="attested"
-          value="North Carolina, Virginia, South Carolina, Georgia"
-          source="You told Hunter on 2026-04-18"
-          chatEditable
-        />,
-      ]}
-      t3Fields={[
-        <FieldRow key="state-tax-ids" tier="T3" label="State Tax IDs" state="missing" />,
-        <FieldRow
-          key="insurance-state"
-          tier="T3"
-          label="Insurance Certificates per State"
-          state="missing"
-        />,
-      ]}
-      footerProgressText="0 of 4 states registered (1 in progress)"
-      footerUnlocksText="SLED registrations unlock state and local opportunities in each registered state"
+    <ProfileTabSection
+      tab="sled"
+      unlocks="SLED registrations unlock state and local opportunities in each registered state"
+      extra={{ T1: [<SledRegistrationsTable key="sled-table" />] }}
+      progress={`${registered} of ${rows.length} states registered${pending ? ` (${pending} in progress)` : ""}`}
     />
   );
 }

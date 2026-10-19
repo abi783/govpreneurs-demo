@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import * as Dialog from "@radix-ui/react-dialog";
 import { Link } from "@tanstack/react-router";
 import { X } from "lucide-react";
@@ -137,12 +138,17 @@ export function PrimeDetailPanel({
 
             <section className="prime-detail__block">
               <h3 className="prime-detail__h">Do they hire small firms?</h3>
-              <p className="t-body-sm">
-                They have brought in {atLeastSubs(partner.bench)} on work like this
-                {partner.bench.repeatSubs > 0
-                  ? `, and went back to ${partner.bench.repeatSubs} of them more than once.`
-                  : "."}
-              </p>
+              {/* DEMO: a company with no subcontracts on record says so, not "at least 0 firms". */}
+              {partner.bench.distinctSubs === 0 ? (
+                <p className="t-body-sm">We have no record of them hiring outside firms.</p>
+              ) : (
+                <p className="t-body-sm">
+                  They have brought in {atLeastSubs(partner.bench)} on work like this
+                  {partner.bench.repeatSubs > 0
+                    ? `, and went back to ${partner.bench.repeatSubs} of them more than once.`
+                    : "."}
+                </p>
+              )}
               <p className="award-note">
                 Counts come from public filings that only cover the largest subcontracts, so treat
                 them as &ldquo;at least this many&rdquo;.
@@ -223,10 +229,18 @@ export function PrimeDetailPanel({
               <h3 className="prime-detail__h">How to reach them</h3>
               {/* We cannot name a person: the government publishes company records, not
             people, and a plausible-looking name would be invented. */}
-              <p className="t-body-sm">
-                We cannot tell you who to call — the government publishes company records, not
-                people. Start at their website and ask for whoever handles subcontracting.
-              </p>
+              {/* DEMO: Amira already knows a person at Carolina Dining Group (a "your_contact" flag). */}
+              {partner.flags.some((f) => f.id === "your_contact") ? (
+                <p className="t-body-sm">
+                  You already know someone here. Start with the person named under &ldquo;Worth
+                  knowing&rdquo; and mention the work you did together in 2024.
+                </p>
+              ) : (
+                <p className="t-body-sm">
+                  We cannot tell you who to call — the government publishes company records, not
+                  people. Start at their website and ask for whoever handles subcontracting.
+                </p>
+              )}
               {partner.website && (
                 <p className="t-body-sm">
                   <a

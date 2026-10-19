@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -13,8 +14,9 @@ export const Route = createFileRoute("/labor-pricing")({
       { title: "Labor Pricing — Know your market · GovPreneurs" },
       {
         name: "description",
+        // DEMO: "price fairly", not "price to win": the demo never promises a win.
         content:
-          "What the government expects to pay — so you price to win without leaving money on the table.",
+          "What the government expects to pay — so you price fairly without leaving money on the table.",
       },
     ],
   }),
@@ -31,7 +33,7 @@ function LaborPricingPage() {
         <div className="t-label" style={{ marginBottom: "var(--s-3)" }}>Know your market</div>
         <h1 className="t-display-lg">Labor Pricing</h1>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 700 }}>
-          What the government expects to pay — so you price to win without leaving money on the table.
+          What the government expects to pay — so you price fairly without leaving money on the table.
         </p>
       </header>
 
@@ -49,19 +51,20 @@ function LaborPricingPage() {
       >
         <ul className="market-what-list">
           <li>
-            There are <strong>two pricing worlds</strong>. <strong>Construction</strong> (like
-            roofing) is priced <em>by the job</em>, and you must pay at least the government's{" "}
-            <JargonGloss term="prevailing wage">
-              The Davis-Bacon hourly rate set by the U.S. Department of Labor for the trade and
-              county. The legal minimum on federal construction work.
+            There are <strong>two pricing worlds</strong>. <strong>Food service</strong> contracts
+            are priced <em>by the meal or by the month</em>, and you must pay your workers at least
+            the government's{" "}
+            <JargonGloss term="wage determination">
+              The hourly rate set by the U.S. Department of Labor under the Service Contract Act for
+              each job title and county. The legal minimum on federal service contracts.
             </JargonGloss>{" "}
-            for your area. <strong>Services / staffing</strong> work is priced{" "}
+            for your area. <strong>Professional services / staffing</strong> work is priced{" "}
             <em>per person per hour</em> by labor category — less relevant to you today.
           </li>
           <li>
-            We've defaulted your view to <strong>construction</strong>: your county's wage floor for
-            roofer / laborer / equipment operator, plus what comparable NC roofing jobs actually
-            awarded for.
+            We've defaulted your view to <strong>food service</strong>: your county's wage floor for
+            cook / food service worker / dishwasher / dining facility attendant, plus what
+            comparable NC food service jobs actually awarded for.
           </li>
           <li>
             Quick answer to "what should I charge": <em>here's the wage floor you must meet, plus
@@ -85,8 +88,8 @@ function LaborPricingPage() {
           <div>
             <div className="lcat-disclosure-title">Service-contract labor benchmarks (LCAT)</div>
             <div className="lcat-disclosure-sub">
-              Full hourly-rate benchmarking tool — for service contracts, not roofing. Available if
-              you need it later.
+              Full hourly-rate benchmarking tool — for professional service contracts, not meals.
+              Available if you need it later.
             </div>
           </div>
         </button>

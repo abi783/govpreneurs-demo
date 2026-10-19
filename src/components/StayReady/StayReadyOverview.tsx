@@ -1,21 +1,24 @@
 import { useEffect } from "react";
-import { ShieldCheck, MessageSquare, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ShieldCheck, MessageSquare, Upload } from "lucide-react";
 import {
   computeStatus,
   useStayReady,
   useStayReadySummary,
-  resetItemDemo,
+  useSmsOutbox,
 } from "../../lib/stayReady";
-import { useSMSOutbox } from "../../lib/mockSMS";
-import { useKnowledge, attachFile, getKnowledge } from "../../lib/knowledgeBase";
-import { primeSeen, scanForFreshness } from "../../lib/capStatementFreshness";
+import { useKnowledge, attachUploadedFile, markFileRead, getKnowledge } from "../../lib/knowledgeBase";
+import { primeSeen, scanForFreshness, usePendingRefresh } from "../../lib/capStatementFreshness";
+import { wait } from "../../demo/profile/delay";
 import { StayReadyItemRow } from "./StayReadyItemRow";
+import { useFileChooser } from "../../demo/profile/useFileChooser";
 
 export function StayReadyOverview() {
   const items = useStayReady();
   const summary = useStayReadySummary();
-  const sms = useSMSOutbox();
+  const sms = useSmsOutbox();
   const { files } = useKnowledge();
+  const pending = usePendingRefresh();
 
   // Prime "seen" so existing knowledge sources don't trigger refresh prompts.
   useEffect(() => {
@@ -30,17 +33,19 @@ export function StayReadyOverview() {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
 
-  function simulateCert() {
-    attachFile({ name: "CMMC Level 1 Certification.pdf", sizeKB: 188, mime: "pdf" });
-    // Scan immediately so the prompt appears
-    window.setTimeout(() => {
+  // DEMO: a real upload. Any file is accepted, listed in the knowledge base, and
+  // checked for a capability statement refresh prompt.
+  const chooser = useFileChooser(
+    async (list) => {
+      for (const f of list) {
+        const entry = await attachUploadedFile(f);
+        await wait(900);
+        markFileRead(entry.id, ["renewal date"]);
+      }
       scanForFreshness(getKnowledge().files);
-    }, 50);
-  }
-
-  function resetDemo() {
-    items.forEach((i) => resetItemDemo(i.id));
-  }
+    },
+    { multiple: true },
+  );
 
   return (
     <div className="sr-overview">
@@ -53,6 +58,25 @@ export function StayReadyOverview() {
         </p>
       </header>
 
+      {pending.length > 0 && (
+        <section className="sr-sms-panel" aria-label="Capability statement refresh">
+          <ul className="sr-sms-list">
+            {pending.map((p) => (
+              <li key={p.id} className="sr-sms-item">
+                <div className="sr-sms-body">
+                  You just added {p.triggerLabel}. Refresh your capability statement?
+                </div>
+                <div className="sr-sms-meta">
+                  <Link to="/cap-statement/builder" search={{ refresh: p.id }} className="sr-row-link">
+                    Update it now →
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="sr-list">
         {sorted.map((it) => (
           <StayReadyItemRow key={it.id} item={it} />
@@ -64,7 +88,6 @@ export function StayReadyOverview() {
           <header className="sr-sms-head">
             <MessageSquare size={13} />
             <h3>Recent text alerts</h3>
-            <span className="sr-sms-count">(demo)</span>
           </header>
           <ul className="sr-sms-list">
             {sms.slice(0, 5).map((m) => (
@@ -80,16 +103,18 @@ export function StayReadyOverview() {
       <footer className="sr-honesty">
         <ShieldCheck size={11} />
         We track these so you don't lose work to a lapsed registration.
-        SMS sends and filings shown here are demo.
       </footer>
 
       <div className="sr-demo-tools">
-        <button type="button" className="sr-demo-btn" onClick={simulateCert}>
-          <Sparkles size={11} /> Simulate: upload a new cert
+        <button type="button" className="sr-demo-btn" onClick={chooser.open}>
+          <Upload size={11} /> Add a new certificate or permit
         </button>
-        <button type="button" className="sr-demo-btn" onClick={resetDemo}>
-          Reset Stay Ready demo
-        </button>
+        {chooser.input}
+        {chooser.choosing && (
+          <span className="fr-note" role="status">
+            Choose a file in the window that opened.
+          </span>
+        )}
       </div>
     </div>
   );

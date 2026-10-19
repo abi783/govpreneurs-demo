@@ -11,10 +11,12 @@
 
 
 :root{
-  --font-ui:    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* DEMO: the "… DS" names are the self-hosted copies (public/ds-fonts, declared in
+     src/sc/sc.css). They only show when Google Fonts did not load, for example offline. */
+  --font-ui:    "Inter", "Inter DS", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: var(--font-ui);
-  --font-ed:    "Instrument Serif", "Tiempos Headline", ui-serif, serif;
-  --font-mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-ed:    "Instrument Serif", "Instrument Serif DS", "Tiempos Headline", ui-serif, serif;
+  --font-mono:  "JetBrains Mono", "JetBrains Mono DS", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 html, body {
@@ -28,7 +30,12 @@ html, body {
   text-rendering: optimizeLegibility;
   font-feature-settings: "cv11" 1, "ss01" 1, "ss03" 1;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* DEMO: in the `base` layer so Tailwind utilities (p-4, m-2) in the lifted Success Center
+   code can win. An unlayered `*` rule would beat every layered utility. Nothing changes for
+   frontend-v2 pages: unlayered class rules beat a layered rule, as they beat this one before. */
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+}
 
 /* Tabular numerals on any data-bearing class */
 .mono, .tnum, .num, table td, th {

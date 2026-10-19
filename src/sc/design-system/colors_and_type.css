@@ -1,0 +1,43 @@
+/* =================================================================
+   GovPreneurs DS v4.1 — colors_and_type.css
+   Aggregated foundation file: brings in tokens + type/components
+   Use this single import for any new GovPreneurs surface.
+   ================================================================= */
+
+@import url("./tokens.css");
+@import url("./type-and-components.css");
+
+/* Convenience semantic aliases (h1, h2, p, code) so plain HTML
+   inherits the GovPreneurs vocabulary without applying class names. */
+
+h1 { font-size: 36px; line-height: 1.08; letter-spacing: -0.025em; font-weight: 500; font-variation-settings: "opsz" 32; color: var(--text-ink); }
+h2 { font-size: 28px; line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; color: var(--text-ink); }
+h3 { font-size: 20px; line-height: 1.25; letter-spacing: -0.012em; font-weight: 600; color: var(--text); }
+h4 { font-size: 16px; line-height: 1.4; letter-spacing: -0.005em; font-weight: 600; color: var(--text); }
+h5 { font-size: 13px; line-height: 1; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+p  { font-size: 14px; line-height: 1.55; color: var(--text); }
+small { font-size: 12px; line-height: 1.45; color: var(--text-2); }
+
+a { color: var(--blue-7); text-decoration: none; }
+a:hover { color: var(--blue-8); text-decoration: underline; text-underline-offset: 2px; }
+
+code, pre, .code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--n-3);
+  color: var(--n-10);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-feature-settings: "tnum" 1;
+}
+
+em.editorial, .editorial { font-family: var(--font-ed); font-style: italic; font-weight: 400; color: var(--text-ink); }
+
+/* Foreground/Background semantic shortcuts */
+.fg1 { color: var(--text); }
+.fg2 { color: var(--text-2); }
+.fg3 { color: var(--text-3); }
+.fg-ink { color: var(--text-ink); }
+.bg1 { background: var(--bg); }
+.bg2 { background: var(--bg-subtle); }
+.bg-surface { background: var(--surface); }

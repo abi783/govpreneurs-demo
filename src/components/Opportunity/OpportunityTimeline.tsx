@@ -63,8 +63,11 @@ function fmtFull(iso: string): string {
 export function OpportunityTimeline({
   opp,
   keyDates = [],
+  dueNoun = "proposal",
 }: {
   opp: Opportunity;
+  /** DEMO: what the buyer asks for: "proposal", "quote", "bid" or "reply". */
+  dueNoun?: string;
   /** Key-date bullets from the RAG summary; real Questions/Site-visit dates are sourced from here. */
   keyDates?: string[];
 }) {
@@ -83,7 +86,7 @@ export function OpportunityTimeline({
   if (opp.postedAt) milestones.push({ key: "posted", label: "Posted", iso: opp.postedAt });
   if (siteVisit) milestones.push({ key: "site", label: "Site visit", iso: siteVisit.iso, timeText: siteVisit.timeText });
   if (questions) milestones.push({ key: "questions", label: "Questions due", iso: questions.iso, timeText: questions.timeText });
-  if (opp.closesAt) milestones.push({ key: "proposal", label: "Proposal due", iso: opp.closesAt, timeText: deadline?.timeText ?? null });
+  if (opp.closesAt) milestones.push({ key: "proposal", label: `${dueNoun.charAt(0).toUpperCase()}${dueNoun.slice(1)} due`, iso: opp.closesAt, timeText: deadline?.timeText ?? null });
   if (award) {
     // Many stated award dates are themselves projections ("estimated"/"anticipated").
     const isEstimate = /estimate|anticipat|proposed|projected|tentative|on or about/i.test(award.raw);
@@ -127,8 +130,8 @@ export function OpportunityTimeline({
     daysToProposal < 0
       ? "Closed"
       : daysToProposal === 0
-      ? "Proposal due today"
-      : `${daysToProposal} ${daysToProposal === 1 ? "day" : "days"} to proposal`;
+      ? `${dueNoun.charAt(0).toUpperCase()}${dueNoun.slice(1)} due today`
+      : `${daysToProposal} ${daysToProposal === 1 ? "day" : "days"} to ${dueNoun}`;
 
   return (
     <section className="opp-timeline" aria-label="Opportunity timeline">

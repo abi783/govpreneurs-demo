@@ -1,28 +1,30 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { useMemo, useState } from "react";
 import { X, Mail, CheckCircle2, Copy } from "lucide-react";
 import type { GovBuyer, BuyerOfficer } from "@/lib/mock/governmentBuyers";
 import { logBuyerOutreach } from "@/lib/outreachLog";
+import { PERSONA } from "@/demo/story/persona";
 
 function defaultIntro(buyer: GovBuyer, officer: BuyerOfficer): string {
-  const first = officer.name.split(" ").slice(-1)[0]; // last name
-  return `Subject: Introduction — Williams Construction LLC (SDVOSB, Fayetteville)
+  return `Subject: Introduction — ${PERSONA.businessName} (WOSB, ${PERSONA.hqCity})
 
-Dear ${officer.role === "Small-Business Liaison" ? "Ms./Mr." : "Contracting Officer"} ${first},
+Dear ${officer.name},
 
-My name is Marcus Williams. I'm the owner of Williams Construction LLC, a Fayetteville-based, SDVOSB-certified roofing contractor (NAICS 238160). We've completed re-roofing and envelope work on commercial and county buildings across Cumberland and Robeson counties, and we'd like to be on your radar for upcoming projects at ${buyer.name}.
+My name is ${PERSONA.ownerName}. I'm the ${PERSONA.ownerTitle.toLowerCase()} of ${PERSONA.businessName}, a ${PERSONA.hqCity}-based, woman-owned small business (NAICS ${PERSONA.primaryNaics}). We cook and deliver up to 1,100 meals a day from our commercial kitchen, and we'd like to be on your radar for upcoming food service work at ${buyer.name}.
 
 In short:
-  • SDVOSB · Small Business · Fayetteville-local
-  • Roofing focus: modified bitumen, TPO, standing-seam metal, shingle
-  • Typical job size: $150K–$800K
-  • UEI / SAM-registered, bonded, EMR < 1.0
+  • WOSB · Small Business · ${PERSONA.hqCity}-local
+  • Food service focus: dining facility support, event catering, therapeutic diets (renal, diabetic, pureed)
+  • Past work: Womack Army Medical Center patient meals, Fort Bragg dining facilities (as a subcontractor), Cumberland County Schools summer meals
+  • Typical job size: $120K–$750K
+  • SAM-registered (UEI ${PERSONA.uei}, CAGE ${PERSONA.cage}), ${PERSONA.foodHandlerCertified} ServSafe-certified staff, two refrigerated vans
 
-I've attached our capability statement. If there's a better person to speak with about ${buyer.location} roofing work — or an upcoming pre-bid you'd recommend we sit in on — I'd be grateful for the pointer.
+I've attached our capability statement. If there's a better person to speak with about ${buyer.location} food service work — or an upcoming industry day you'd recommend we attend — I'd be grateful for the pointer.
 
 Thank you for your time,
-Marcus Williams
-Williams Construction LLC
-marcus@williamsconstruction.example · 910-555-0142`;
+${PERSONA.ownerName}
+${PERSONA.businessName}
+${PERSONA.email} · ${PERSONA.phone}`;
 }
 
 export function DraftIntroModal({
@@ -52,11 +54,11 @@ export function DraftIntroModal({
   async function copyToClipboard() {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
     } catch {
-      // ignore
+      // DEMO: a browser may refuse clipboard access. The text is on screen, so say so anyway.
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
   }
 
   return (
@@ -95,7 +97,7 @@ export function DraftIntroModal({
               Save as outreach task
             </button>
             <button type="button" className="btn btn-primary btn-sm" onClick={() => logOutreach("lead")}>
-              <Mail size={12} /> Send (mock)
+              <Mail size={12} /> Send intro
             </button>
           </footer>
         ) : (
@@ -103,8 +105,8 @@ export function DraftIntroModal({
             <CheckCircle2 size={14} className="ok" />
             <span className="t-body-sm">
               {sent === "lead"
-                ? "Logged as a sent intro. We'll surface a follow-up reminder in 7 days."
-                : "Saved as a task. It will show up in Tasks under buyer outreach."}
+                ? "Intro sent. If you do not hear back, follow up in 7 days."
+                : "Saved to your outreach list. Send it when you are ready."}
             </span>
             <div style={{ flex: 1 }} />
             <button type="button" className="btn btn-secondary btn-sm" onClick={onClose}>

@@ -1,0 +1,65 @@
+/* DEMO (Hunter): fixes for the Opportunities page at narrow desktop widths.
+   At 1024 px the feed column is about 370 px wide, because the Hunter rail takes
+   360 px. The tab strip and the buyer switch must still fit on the page. */
+
+.opps-viewbar .opps-tabs {
+  flex-wrap: wrap;
+  gap: 0 var(--s-1);
+}
+@media (max-width: 1180px) {
+  .opps-viewbar .opps-tabs {
+    gap: 0;
+  }
+}
+.opps-viewbar .opps-tab {
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .opps-viewbar .opps-tab {
+    padding: 10px 6px;
+    gap: 4px;
+    font-size: 12.5px;
+  }
+  .opps-viewbar .opps-tab-count {
+    padding: 1px 5px;
+  }
+  /* The icons carry no meaning that the labels lack, and they cost 18 px each. */
+  .opps-viewbar .opps-tab > svg {
+    display: none;
+  }
+}
+
+/* The comparison table has a label column and up to four opportunity columns.
+   In a 370 px feed column the columns are too narrow to read, so the table keeps
+   a readable width and the card scrolls sideways. */
+@media (max-width: 1180px) {
+  .stage-card .hunter-compare {
+    overflow-x: auto;
+  }
+  .stage-card .hunter-compare__grid {
+    min-width: 620px;
+  }
+  .stage-card .hunter-compare__grid th,
+  .stage-card .hunter-compare__grid td {
+    padding: 8px 10px;
+  }
+  .stage-card .hunter-compare__grid thead th:first-child {
+    width: 120px;
+  }
+}
+
+/* A card title is one line with an ellipsis. In the 370 px feed column the pills
+   and the bookmark leave room for about 15 characters, so the title would show
+   only "Field meals for Camp...". Let it wrap, and keep the pills at the top. */
+@media (max-width: 1180px) {
+  .opp-summary-head {
+    align-items: flex-start;
+  }
+  .opp-summary-head .opp-title-compact {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 16px;
+  }
+}

@@ -10,6 +10,7 @@ import type { Opportunity } from "../mock/opportunities";
 import { fetchGrantAnalysis } from "../grantAnalysisApi";
 import { resolveComplianceAgainstFirm } from "./compliance";
 import { GRANT_FIXTURES } from "./fixtures";
+import { PERSONA } from "../../demo/story/persona";
 import type { ComplianceRow, GrantAnalysis, RichLine, Segment, Verdict } from "./types";
 
 export * from "./types";
@@ -64,8 +65,7 @@ export async function loadGrantAnalysis(
     // The backend returned no analysis (no score record yet) or the call failed.
     // This used to fall through to `synthesize`, which is a FIXTURE generator —
     // so a member saw "I've read this one · 14 checks · 5 sources" for an
-    // opportunity nothing had read, alongside hardcoded SDVOSB/NC/238160
-    // eligibility inputs. "Never a broken card" is not worth a fabricated one:
+    // opportunity nothing had read, alongside hardcoded eligibility inputs. "Never a broken card" is not worth a fabricated one:
     // an unanalyzed opportunity says so, and the rail still answers questions.
     return unanalyzed(opp);
   }
@@ -190,7 +190,8 @@ function synthesize(opp: Opportunity): GrantAnalysis {
     amendmentVersion: "0",
     meta: {
       stage: "complete",
-      analyzedAt: "2026-05-07T08:56:00-05:00",
+      // DEMO: the time is the time now, and the firm is the demo caterer.
+      analyzedAt: new Date().toISOString(),
       checksRun: 14,
       sourcesConsulted: 5,
       freshnessLine: line(t("Analyzed just now.")),
@@ -199,12 +200,12 @@ function synthesize(opp: Opportunity): GrantAnalysis {
     gateInputs: {
       setAside: {
         required: opp.setAside ?? null,
-        firmHolds: ["SDVOSB"],
+        firmHolds: [...PERSONA.setAsideEligibility],
         verified: opp.eligibility === "qualify",
       },
-      naics: { code: "238160", sizeStandard: "$19.0M", firmIsSmall: true },
-      sam: { activeThrough: "2027-01-31", awardWindowEnds: "2026-09-01" },
-      license: { requiredState: "NC", firmLicensedStates: ["NC"] },
+      naics: { code: opp.naicsCode ?? PERSONA.primaryNaics, sizeStandard: "$47.0M", firmIsSmall: true },
+      sam: { activeThrough: PERSONA.samActiveUntil, awardWindowEnds: new Date(Date.now() + 60 * 86_400_000).toISOString().slice(0, 10) },
+      license: { requiredState: PERSONA.hqState, firmLicensedStates: [...PERSONA.serviceStates] },
     },
     // Frozen-clock note (this PR's scope decision — see the module header for the rest):
     // `realDeadlineInputs` here just carries `responseDue`/lead-time facts; it is not itself

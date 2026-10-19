@@ -1,95 +1,83 @@
 import { Sparkles, ArrowRight, Info } from "lucide-react";
-import type { KnowledgeSource } from "../../lib/knowledgeBase";
+import { useKnowledgeHub } from "../../lib/knowledgeHub";
+import { PAST_PERFORMANCE, PERSONA } from "../../demo/story/persona";
+import { fmtLong, fmtMoneyShort } from "../../demo/profile/dates";
 
+// DEMO: what Hunter learned, from the files in the knowledge base and from the
+// profile. Every fact comes from the story. A fact from a file shows only while the
+// file is in the list, and links back to that file.
 interface LearnedFact {
   text: string;
-  // Match against file name; if no file in state matches, the fact is hidden.
-  sourceNameContains?: string;
-  // Or marked as "from your profile" when no file backs it.
-  fromProfile?: boolean;
+  /** Matches a file name; the fact is hidden when no file matches. */
+  fromFile?: string;
 }
 
+const values = PAST_PERFORMANCE.map((p) => p.totalValue);
 const FACTS: LearnedFact[] = [
   {
-    text: "4 past commercial roofing projects, up to $890K each.",
-    sourceNameContains: "Past Projects",
+    text: `${PAST_PERFORMANCE.length} past jobs, from ${fmtMoneyShort(Math.min(...values))} to ${fmtMoneyShort(Math.max(...values))}.`,
+    fromFile: "capability statement",
   },
   {
-    text: "Bonding capacity up to ~$890K per contract.",
-    sourceNameContains: "Insurance & Bonding",
+    text: `UEI ${PERSONA.uei}, CAGE ${PERSONA.cage}. SAM.gov is active until ${fmtLong(PERSONA.samActiveUntil)}.`,
+    fromFile: "sam.gov registration",
   },
   {
-    text: "NC General Contractor license — active.",
-    sourceNameContains: "NC GC License",
+    text: `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} staff hold a current food-handler certificate.`,
+    fromFile: "food-handler",
   },
-  {
-    text: "Service-disabled veteran-owned (DD-214 on file).",
-    sourceNameContains: "DD-214",
-  },
-  {
-    text: "Fort Bragg field experience documented in jobsite photos.",
-    sourceNameContains: "Ft Bragg",
-  },
-  {
-    text: "SDVOSB-eligible · Williams Construction LLC, Fayetteville NC.",
-    fromProfile: true,
-  },
-  {
-    text: "Targeting USACE, Fort Bragg-area federal, and VA work.",
-    fromProfile: true,
-  },
+  { text: "Menus and prices for event and contract catering.", fromFile: "menu" },
+  { text: "Allergen labels and halal handling are standard on every tray.", fromFile: "allergen" },
+  { text: `${PERSONA.kitchen}.`, fromFile: "kitchen" },
+  { text: `${PERSONA.businessName}, ${PERSONA.hqCity} ${PERSONA.hqState}. ${PERSONA.certifications.join(" · ")}.` },
+  { text: `Targeting ${PERSONA.targetAgencies.join(", ")}.` },
 ];
 
-const MISSING: { text: string; cta: string }[] = [
-  {
-    text: "Add your insurance certificate so Grant can answer bonding questions on every match.",
-    cta: "Attach insurance cert",
-  },
-  {
-    text: "Add your most recent capability statement (or build one) so Hunter can hand it to buyers on first contact.",
-    cta: "Build with Ava",
-  },
-];
+export function WhatWeLearned() {
+  const { files, missing } = useKnowledgeHub();
 
-export function WhatWeLearned({ files }: { files: KnowledgeSource[] }) {
-  const shown = FACTS.filter((f) => {
-    if (f.fromProfile) return true;
-    return files.some((file) => file.name.toLowerCase().includes((f.sourceNameContains ?? "").toLowerCase()));
-  });
+  const shown = FACTS.filter((f) => !f.fromFile || files.some((file) => file.name.toLowerCase().includes(f.fromFile!)));
+
+  const goTo = (id: string) => {
+    document.getElementById(`kn-file-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    // The row gets a flash class through the DOM so the file list does not need to know.
+    const el = document.getElementById(`kn-file-${id}`);
+    el?.classList.add("is-flash");
+    window.setTimeout(() => el?.classList.remove("is-flash"), 1600);
+  };
 
   return (
-    <section className="kn-learned">
-      <header className="kn-learned-head">
-        <Sparkles size={14} className="kn-learned-icon" />
-        <h3>What we learned</h3>
+    <section className="kh-block kh-learned" aria-label="What we learned">
+      <header className="kh-block-head">
+        <Sparkles size={14} aria-hidden />
+        <h3 className="kh-block-title">What we learned</h3>
       </header>
 
       {shown.length === 0 ? (
-        <p className="kn-learned-empty">
-          Once you connect a source or attach files, we'll list what we picked up
-          here — with a link back to the document for every fact.
+        <p className="kh-empty">
+          Once you connect a source or upload files, we list what we picked up here — with a link back to the
+          document for every fact.
         </p>
       ) : (
-        <ul className="kn-learned-list">
+        <ul className="kh-learned-list">
           {shown.map((fact) => {
-            const file = fact.sourceNameContains
-              ? files.find((f) =>
-                  f.name.toLowerCase().includes(fact.sourceNameContains!.toLowerCase()),
-                )
-              : null;
+            const file = fact.fromFile ? files.find((f) => f.name.toLowerCase().includes(fact.fromFile!)) : null;
             return (
-              <li key={fact.text} className="kn-learned-row">
-                <span className="kn-learned-bullet" aria-hidden />
-                <div className="kn-learned-body">
-                  <div className="kn-learned-text">{fact.text}</div>
-                  <div className="kn-learned-src">
-                    {fact.fromProfile ? (
-                      <span className="kn-learned-src-profile">from your profile</span>
-                    ) : file ? (
-                      <a href={`#kn-file-${file.id}`} className="kn-learned-src-link">
-                        {file.name} <ArrowRight size={10} />
-                      </a>
-                    ) : null}
+              <li key={fact.text} className="kh-learned-row">
+                <div>
+                  <div>{fact.text}</div>
+                  <div className="kh-learned-src">
+                    {file ? (
+                      <button
+                        type="button"
+                        className="kh-learned-src-btn"
+                        onClick={() => goTo(file.id)}
+                      >
+                        {file.name} <ArrowRight size={10} aria-hidden />
+                      </button>
+                    ) : (
+                      <span>from your profile</span>
+                    )}
                   </div>
                 </div>
               </li>
@@ -98,22 +86,14 @@ export function WhatWeLearned({ files }: { files: KnowledgeSource[] }) {
         </ul>
       )}
 
-      <div className="kn-learned-missing">
-        <div className="kn-learned-missing-label">Still missing — would help:</div>
-        <ul>
-          {MISSING.map((m) => (
-            <li key={m.text}>
-              <span className="kn-learned-missing-dot" aria-hidden />
-              {m.text}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <p className="kn-learned-honesty">
-        <Info size={12} /> We only use what you connect, upload, or enter — we
-        never invent details about your business. If we don't know something,
-        we'll say so.
+      {missing.length > 0 && (
+        <p className="kh-learned-foot">
+          <Info size={12} aria-hidden /> Not known yet: {missing.map((m) => m.label).join("; ")}.
+        </p>
+      )}
+      <p className="kh-learned-foot">
+        <Info size={12} aria-hidden /> We only use what you connect, upload, or enter. We never invent details about your
+        business.
       </p>
     </section>
   );

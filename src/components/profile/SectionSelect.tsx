@@ -1,7 +1,7 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   SECTION_GROUPS,
-  SECTION_COMPLETENESS,
+  useSectionCompleteness,
   PRIORITY_SECTIONS,
   TAB_LABELS,
   type TabSlug,
@@ -10,6 +10,7 @@ import {
 export function SectionSelect() {
   const search = useSearch({ from: "/business-profile" }) as { tab: TabSlug };
   const navigate = useNavigate({ from: "/business-profile" });
+  const completeness = useSectionCompleteness();
 
   return (
     <label className="bp-section-select-wrap">
@@ -25,7 +26,7 @@ export function SectionSelect() {
         {SECTION_GROUPS.map((group) => (
           <optgroup key={group.label} label={group.label}>
             {group.slugs.map((slug) => {
-              const status = SECTION_COMPLETENESS[slug];
+              const status = completeness[slug];
               const star = PRIORITY_SECTIONS.has(slug) ? " ★" : "";
               const dot = status === "complete" ? "● " : "○ ";
               return (

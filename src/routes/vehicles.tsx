@@ -1,3 +1,4 @@
+// DEMO: this file shows food service copy and data for Amira Haddad. Changed lines are marked.
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { usePageMeta } from "../components/Layout/page-meta";
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/vehicles")({
       {
         name: "description",
         content:
-          "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for a roofing business.",
+          "Pre-approved contracts that let agencies buy from you faster — and what they actually mean for a food service business.",
       },
     ],
   }),
@@ -31,7 +32,7 @@ function VehiclesPage() {
     [filter],
   );
 
-  const fitsCount = VEHICLES.filter((v) => v.fitsRoofing).length;
+  const fitsCount = VEHICLES.filter((v) => v.fitsFood).length;
 
   return (
     <div>
@@ -40,7 +41,7 @@ function VehiclesPage() {
         <h1 className="t-display-lg">Contract Vehicles</h1>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 700 }}>
           Pre-approved contracts that let agencies buy from you faster — and what they mean for a
-          roofing business like yours.
+          food service business like yours.
         </p>
       </header>
 
@@ -59,18 +60,19 @@ function VehiclesPage() {
             it, you compete only against the few others on it — not thousands.
           </li>
           <li>
-            For a roofer: most famous vehicles (
-            <JargonGloss term="SEWP">NASA's IT-hardware GWAC — not for construction.</JargonGloss>,{" "}
-            <JargonGloss term="Alliant">GSA's IT-services GWAC — not for construction.</JargonGloss>,{" "}
-            <JargonGloss term="CIO-SP">NIH's IT/health-IT GWAC — not for construction.</JargonGloss>,{" "}
-            <JargonGloss term="VETS 2">SDVOSB-only — but IT services scope only.</JargonGloss>,{" "}
+            For a caterer: the most famous vehicles (
+            <JargonGloss term="SEWP">NASA's IT-hardware GWAC — not for food service.</JargonGloss>,{" "}
+            <JargonGloss term="Alliant">GSA's IT-services GWAC — not for food service.</JargonGloss>,{" "}
+            <JargonGloss term="CIO-SP">NIH's IT/health-IT GWAC — not for food service.</JargonGloss>,{" "}
+            <JargonGloss term="VETS 2">Service-disabled veteran-only — and IT services only.</JargonGloss>,{" "}
             <JargonGloss term="Polaris">Small-business IT services GWAC.</JargonGloss>) are
             IT-focused — <strong>not your path</strong>.
           </li>
           <li>
-            The ones that fit construction: <strong>GSA MAS Facilities</strong> (roofing
-            subcategory) and agency <strong>construction MATOCs/IDIQs</strong>. We've defaulted you
-            to those.
+            The ones that fit food service: <strong>base and agency food service IDIQs</strong>{" "}
+            (Fort Bragg events, VA nutrition), <strong>state term contracts</strong>, and{" "}
+            <strong>teaming with the prime</strong> that holds a big dining contract. We've defaulted
+            you to those.
           </li>
         </ul>
       </WhatThisMeansCard>
@@ -83,7 +85,7 @@ function VehiclesPage() {
           className={`forecast-view-btn${filter === "fits" ? " is-active" : ""}`}
           onClick={() => setFilter("fits")}
         >
-          Fits my work (construction)
+          Fits my work (food service)
           <span className="forecast-view-count">{fitsCount}</span>
         </button>
         <button

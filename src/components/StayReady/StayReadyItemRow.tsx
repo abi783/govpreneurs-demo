@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import {
   computeStatus,
   formatDueLine,
+  isSnoozed,
   statusChip,
   type TrackedItem,
 } from "../../lib/stayReady";
@@ -34,6 +35,12 @@ export function StayReadyItemRow({
         {showActions && (
           <p className="sr-row-stakes">
             <ShieldCheck size={11} /> {item.stakes}
+          </p>
+        )}
+        {isSnoozed(item) && (
+          <p className="sr-row-stakes">
+            Reminders paused until{" "}
+            {new Date(item.snoozedUntil!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}.
           </p>
         )}
         {status === "in_progress" && (
@@ -72,7 +79,7 @@ export function StayReadyItemRow({
                 Have us do it — ${item.dfyPriceUSD}
               </button>
             )}
-            <StayReadySnoozeMenu itemId={item.id} />
+            {!isSnoozed(item) && <StayReadySnoozeMenu itemId={item.id} />}
           </>
         ) : (
           <Link

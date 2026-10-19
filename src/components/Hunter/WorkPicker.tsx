@@ -1,5 +1,5 @@
 // One control for "what you do" that serves both maturity stages:
-// - New members pick plain trade categories (Roofing, HVAC…). Each row shows
+// - New members pick plain trade categories (Food Service, HVAC…). Each row shows
 //   how many NAICS codes it covers; that's all a first-year needs.
 // - Experienced members who've learned their codes expand a selected trade
 //   and uncheck the ones that don't fit, or search by a NAICS code directly.

@@ -24,6 +24,9 @@ export interface DiscoveryPayload {
   note: string | null;
   /** Replace the client's filters entirely (profile/clear queries) vs. merge (refine). */
   fresh?: boolean;
+  /** DEMO: open this tab before the filters apply. Hunter sends it when the filters
+   *  leave nothing on the tab the member is on, but leave results on another tab. */
+  tab?: FeedTab;
 }
 
 /** Column identity in the comparison table header. */
@@ -375,6 +378,8 @@ export interface HunterTurnResponse {
   /** Chained eligibility→act only: the act card rides here so the eligibility
    *  card stays in `uiPayload` and both render. */
   actPayload?: ActPayload;
+  /** DEMO: follow-up questions that the rail shows as buttons under the reply. */
+  suggestions?: string[];
 }
 
 /** An opportunity the user is currently viewing, sent so Hunter can resolve

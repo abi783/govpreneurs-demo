@@ -1,5 +1,6 @@
 import {
   Check,
+  Download,
   FileArchive,
   FileImage,
   FileText,
@@ -7,6 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { removeFile, type HubFile } from "../../lib/knowledgeHub";
+import { downloadKnowledgeFile } from "../../demo/profile/downloads";
 
 function iconFor(ext: HubFile["ext"]) {
   if (ext === "zip") return FileArchive;
@@ -14,12 +16,17 @@ function iconFor(ext: HubFile["ext"]) {
   return FileText;
 }
 
+function formatSize(kb: number): string {
+  if (kb < 1024) return `${kb} KB`;
+  return `${(kb / 1024).toFixed(1)} MB`;
+}
+
 export function FileRow({ file }: { file: HubFile }) {
   const Icon = iconFor(file.ext);
   const isRead = file.status === "read";
 
   return (
-    <li className="kh-file-row" data-status={file.status}>
+    <li className="kh-file-row" data-status={file.status} id={`kn-file-${file.id}`}>
       <span className="kh-file-icon" aria-hidden>
         <Icon size={16} />
       </span>
@@ -32,6 +39,7 @@ export function FileRow({ file }: { file: HubFile }) {
             <>
               <Check size={12} className="kh-file-check" aria-hidden />
               <span>Hunter read it</span>
+              <span className="kh-mono">· {formatSize(file.source.sizeKB)}</span>
             </>
           ) : (
             <>
@@ -54,6 +62,15 @@ export function FileRow({ file }: { file: HubFile }) {
         )}
       </div>
 
+      <button
+        type="button"
+        className="kh-icon-btn"
+        onClick={() => void downloadKnowledgeFile(file.source)}
+        aria-label={`Download ${file.name}`}
+        disabled={!isRead}
+      >
+        <Download size={14} />
+      </button>
       <button
         type="button"
         className="kh-icon-btn"

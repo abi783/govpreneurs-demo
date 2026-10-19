@@ -1,0 +1,4454 @@
+/* =================================================================
+   Roadmap v3 — page styles, machine-extracted from the frozen prototype
+   (roadmap-v2/prototype/src/styles.css @ PR #27) and scoped under
+   .gpds-rm3. Do not hand-edit layout values here without checking the
+   prototype first — it is the spec. Colors and fonts are tokens only
+   (tokens.css is global; .gpds supplies the DS component layer).
+   ================================================================= */
+
+.gpds-rm3 .rm2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  /* Two caps, doing two different jobs.
+
+     This one is the page: uncapped, the roadmap grew to whatever the monitor
+     was, and on a 2560px display the detail card's columns ran past 1200px
+     each. width:100% keeps it filling a narrow window; the auto margins
+     centre it once the window is wider than the cap. */
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.gpds-rm3 .rm2-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--s-3);
+  padding: 7px 13px;
+  min-height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background: var(--n-2);
+  color: var(--text-ink);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-next:hover {
+  background: var(--n-3);
+}
+
+.gpds-rm3 .rm2-next:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-next__lead {
+  font-weight: 700;
+}
+
+.gpds-rm3 .rm2-next__what {
+  font-weight: 500;
+}
+
+.gpds-rm3 .rm2-next svg {
+  flex: none;
+}
+
+.gpds-rm3 .rm2-subtitle,
+.gpds-rm3 .rm2-autonote,
+.gpds-rm3 .rm2-panel-desc,
+.gpds-rm3 .dfys__sub {
+  max-width: 68ch;
+}
+
+.gpds-rm3 .rm2-header {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.gpds-rm3 .rm2-header__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-4);
+}
+
+.gpds-rm3 .rm2-steps {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 3px;
+  margin-top: var(--s-3);
+  height: 10px;
+}
+
+.gpds-rm3 .rm2-steps__bit {
+  background: var(--n-4);
+  border-radius: 2px;
+  transition: background var(--d-base) var(--ease);
+}
+
+.gpds-rm3 .rm2-steps__bit.is-done {
+  background: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-steps__bit:first-child {
+  border-radius: var(--r-pill) 2px 2px var(--r-pill);
+}
+
+.gpds-rm3 .rm2-steps__bit:last-child {
+  border-radius: 2px var(--r-pill) var(--r-pill) 2px;
+}
+
+.gpds-rm3 .rm2-steps__caption {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-steps__caption strong {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-steps__bit {
+    transition: none;
+  }
+}
+
+.gpds-rm3 .rm2-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-ink);
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .rm2-subtitle {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-program {
+  font-size: 12px;
+  color: var(--text-3);
+  text-transform: none;
+}
+
+.gpds-rm3 .rm2-tracker {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border-top: 1px solid var(--border);
+}
+
+.gpds-rm3 .rm2-tcell {
+  position: relative;
+  /* Tight. The mark is what fills this cell now, not padding — the three lines
+     of text plus the circle beside them are the whole height. */
+  padding: var(--s-2) var(--s-3);
+  border: none;
+  border-top: 3px solid transparent;
+  margin-top: -1px;
+  /* A row: the words in one column, the attention mark taking whatever is left
+     beside them. It used to be a column with the mark absolutely pinned to the
+     right edge, which needed 22px of dead padding on all four cells to stop a
+     long title running underneath it. */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-top-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-tcell__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gpds-rm3 .rm2-talert {
+  flex: 1;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--n-12);
+  pointer-events: none;
+}
+
+.gpds-rm3 .rm2-talert svg {
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+
+.gpds-rm3 .rm2-talert--late {
+  color: var(--urg-7);
+}
+
+.gpds-rm3 .rm2-tcell:hover {
+  background: var(--n-2);
+}
+
+.gpds-rm3 .rm2-tcell:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: -2px;
+}
+
+.gpds-rm3 .rm2-tcell--current {
+  border-top-color: transparent;
+}
+
+.gpds-rm3 .rm2-tcell.is-open {
+  border-top-color: var(--blue-7);
+  background: var(--blue-2);
+}
+
+.gpds-rm3 .rm2-tcell.is-open:hover {
+  background: var(--blue-3);
+}
+
+.gpds-rm3 .rm2-tcell.is-open .rm2-ttitle,
+.gpds-rm3 .rm2-tcell.is-open .rm2-tsub {
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-tkicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-tdot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--n-6);
+  display: inline-block;
+}
+
+.gpds-rm3 .rm2-tcell--current .rm2-tdot {
+  background: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-tcell--current .rm2-tkicker,
+.gpds-rm3 .rm2-tcell--current .rm2-tsub,
+.gpds-rm3 .rm2-tcell--current.is-open .rm2-tsub {
+  color: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-tcell--done .rm2-tdot {
+  background: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-tcell--done .rm2-tkicker,
+.gpds-rm3 .rm2-tcell--done .rm2-tsub,
+.gpds-rm3 .rm2-tcell--done.is-open .rm2-tsub {
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-ttitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+  line-height: 1.25;
+}
+
+.gpds-rm3 .rm2-tcell--not_started .rm2-ttitle,
+.gpds-rm3 .rm2-tcell--not_started .rm2-tsub {
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-tsub {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-work {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  padding: var(--s-3) 0 var(--s-4);
+}
+
+.gpds-rm3 .rm2-wgroup__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  font-weight: 400;
+}
+
+.gpds-rm3 .rm2-wgroup__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-wgroup__count {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--n-4);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 19px;
+  text-align: center;
+}
+
+.gpds-rm3 .rm2-wgroup--now .rm2-wgroup__count {
+  background: var(--n-12);
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .rm2-wgroup__note {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-wlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gpds-rm3 .rm2-wlist > li {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  transition: border-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-wlist > li.is-open {
+  border-color: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-wrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  width: 100%;
+  padding: var(--s-4);
+  border: none;
+  border-radius: var(--r-md);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-radius var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-wrow:hover {
+  background: var(--n-2);
+}
+
+.gpds-rm3 .rm2-wrow:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-wrow.is-open {
+  background: var(--blue-1);
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.gpds-rm3 .rm2-wrow.is-open .rm2-wrow__name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gpds-rm3 .rm2-wrow__body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px var(--s-5);
+}
+
+.gpds-rm3 .rm2-wrow__name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-wrow__note {
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+.gpds-rm3 .rm2-wrow__note.is-done {
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-wrow__note.is-action {
+  color: var(--text-ink);
+  font-weight: 600;
+}
+
+.gpds-rm3 .rm2-wrow__note.is-action-late {
+  color: var(--urg-7);
+  font-weight: 600;
+}
+
+.gpds-rm3 .rm2-wrow__note.is-ready {
+  color: var(--blue-7);
+  font-weight: 600;
+}
+
+.gpds-rm3 .rm2-wrow__note.is-gated,
+.gpds-rm3 .rm2-wrow__note.is-waiting {
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-wrow__chev {
+  flex: none;
+  color: var(--text-3);
+  transition: transform var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-wrow.is-open .rm2-wrow__chev {
+  transform: rotate(180deg);
+  color: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-detailwrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-4);
+  border-top: 1px solid var(--blue-2);
+  /* DEMO: `backwards`, not `both`. A forwards fill keeps a transform animation "in effect" for good.
+     That makes this box the containing block of a `position: fixed` child, and the booking sheet
+     inside it was cut off at the top and covered only this box. */
+  animation: rm2-reveal var(--d-base) var(--ease) backwards;
+}
+
+.gpds-rm3 .rm2-detailwrap .rm2-detail {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-detailwrap {
+    animation: none;
+  }
+  .gpds-rm3 .rm2-wrow__chev {
+    transition: none;
+  }
+}
+
+.gpds-rm3 .rm2-wgroup--done .rm2-wrow__name {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.gpds-rm3 .rm2-node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  flex: none;
+}
+
+.gpds-rm3 .rm2-node--done {
+  background: var(--pos-7);
+  color: #fff;
+}
+
+.gpds-rm3 .rm2-node--current {
+  background: var(--warn-7);
+  color: #fff;
+  font-weight: 700;
+}
+
+.gpds-rm3 .rm2-node--action {
+  background: var(--n-12);
+  color: #fff;
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--n-12) 14%, transparent);
+}
+
+.gpds-rm3 .rm2-wrow.is-open .rm2-node--action {
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--n-12) 26%, transparent);
+}
+
+.gpds-rm3 .rm2-node--action-late {
+  background: var(--urg-7);
+  color: #fff;
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--urg-7) 16%, transparent);
+}
+
+.gpds-rm3 .rm2-wrow.is-open .rm2-node--action-late {
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--urg-7) 30%, transparent);
+}
+
+.gpds-rm3 .rm2-node--ready {
+  background: var(--blue-1);
+  box-shadow: inset 0 0 0 2px var(--blue-7);
+  color: var(--blue-10);
+  font-weight: 700;
+}
+
+.gpds-rm3 .rm2-wrow.is-open .rm2-node--ready {
+  box-shadow:
+    inset 0 0 0 2px var(--blue-7),
+    0 0 0 5px color-mix(in oklab, var(--blue-7) 22%, transparent);
+}
+
+.gpds-rm3 .rm2-node--gated {
+  background: var(--n-5);
+  color: var(--n-11);
+}
+
+.gpds-rm3 .rm2-wrow:hover .rm2-node--gated {
+  background: var(--n-6);
+}
+
+.gpds-rm3 .rm2-node--gated svg {
+  color: var(--n-10);
+}
+
+.gpds-rm3 .rm2-node-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-node-hollow {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--n-9);
+}
+
+.gpds-rm3 .rm2-detail {
+  /* No min-height. It used to be 460px, from when this card was a fixed panel
+     beside the chain; inside the accordion it only ever padded the bottom out
+     with empty white and pushed "Why this matters" a screen away from the step
+     it explains. The card now ends where its content ends.
+     No grid-template-rows either — with nothing forcing extra height there is
+     no spare space for a 1fr row to absorb, so it was doing nothing. */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s-6);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-8);
+}
+
+/* ── One column, while an intake stage owns the panel ──────────────────
+   Two columns is a layout for two things; during the audit form and the call
+   it earns there is only one, and the second column was a tall empty
+   rectangle beside a tall form. Stacked instead: how long, the work, then
+   why it mattered. */
+.gpds-rm3 .rm2-detail--solo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+/* The two columns stop being boxes and hand their children straight to the
+   flex parent, so the three blocks can be ordered independently. */
+.gpds-rm3 .rm2-detail--solo .rm2-detail-left,
+.gpds-rm3 .rm2-detail--solo .rm2-detail-right {
+  display: contents;
+}
+/* How long, then the work, then why it was worth doing. The "why" reads
+   better after the form than before it: above, it stands between her and
+   twelve fields she can already see the point of. Everywhere else it still
+   leads, because everywhere else it introduces a checklist, not a form. */
+.gpds-rm3 .rm2-detail--solo .rm2-h2row {
+  order: 1;
+}
+.gpds-rm3 .rm2-detail--solo .dca,
+.gpds-rm3 .rm2-detail--solo .rm2-mentor {
+  order: 2;
+}
+/* The results card had no order, so it defaulted to 0 and sorted ABOVE
+   everything with one — the audit's findings landed on top of the page and
+   pushed "Book your free call" below a screen of gap rows. The call is what
+   she came to this step to do, so it goes directly under the heading and the
+   findings read as the detail behind it. Every child of this layout needs an
+   order now; a new one without it goes back to the top. */
+.gpds-rm3 .rm2-detail--solo .rm3-results {
+  order: 3;
+}
+.gpds-rm3 .rm2-detail--solo .rm2-why {
+  order: 4;
+  margin-bottom: 0;
+}
+
+/* The findings list's own disclosure. Full width and quiet — it is a way in
+   to detail, not an action competing with the call button above it. */
+.gpds-rm3 .rm3-results__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  width: 100%;
+  margin-top: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.gpds-rm3 .rm3-results__toggle:hover {
+  background: var(--blue-1);
+  color: var(--text-primary);
+}
+.gpds-rm3 .rm3-results__toggle:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+.gpds-rm3 .rm3-results__count {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.gpds-rm3 .rm3-results__toggle svg {
+  flex: none;
+  transition: transform 140ms ease;
+}
+.gpds-rm3 .rm3-results__toggle svg.is-open {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm3-results__toggle,
+  .gpds-rm3 .rm3-results__toggle svg {
+    transition: none;
+  }
+}
+/* Two up, not auto-fit: given a whole panel, auto-fit would deal twelve short
+   fields into four columns of nothing. One on a phone. */
+.gpds-rm3 .rm2-detail--solo .dca__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 700px) {
+  .gpds-rm3 .rm2-detail--solo .dca__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Digital Compliance audit form ─────────────────────────────────────
+   Step one of Digital Compliance, and the only thing in the panel until she
+   submits it. Twelve fields, two required. */
+.gpds-rm3 .dca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.gpds-rm3 .dca__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pos-7);
+}
+/* The rule before the label, matching .rm2-mentor__eyebrow — the two cards
+   are consecutive states of one step and must not arrive as different
+   objects. */
+.gpds-rm3 .dca__eyebrow::before {
+  content: "";
+  width: 14px;
+  height: 1.5px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.gpds-rm3 .dca__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-ink);
+}
+.gpds-rm3 .dca__lede {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.gpds-rm3 .dca__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--s-3);
+}
+.gpds-rm3 .dca__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.gpds-rm3 .dca__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+/* The one place this surface reaches for the alert colour: a required marker
+   is the field saying "submitting fails without this". It marks nothing else. */
+.gpds-rm3 .dca__req {
+  margin-left: 4px;
+  color: var(--urg-7);
+}
+.gpds-rm3 .dca__input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--n-7);
+  border-radius: var(--r-sm);
+  transition:
+    border-color var(--d-fast) var(--ease),
+    box-shadow var(--d-fast) var(--ease);
+}
+.gpds-rm3 .dca__input::placeholder {
+  color: var(--text-3);
+}
+.gpds-rm3 .dca__input:hover {
+  border-color: var(--text-3);
+}
+.gpds-rm3 .dca__input:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 1px;
+  border-color: var(--blue-7);
+}
+/* Greyed until both required fields are in, rather than hidden: a button she
+   can see is a button she knows she is working towards. */
+.gpds-rm3 .dca .rm2-btn--green:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.gpds-rm3 .rm2-statusrow {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  max-width: 100%;
+}
+
+.gpds-rm3 .rm2-status-aside {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-status {
+  align-self: flex-start;
+  max-width: 100%;
+  /* flex-start, not center: the sentence wraps to two lines at 390px and a
+     vertically-centred dot then floats beside the gap between them. */
+  align-items: flex-start;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.gpds-rm3 .rm2-status::before {
+  transform: none;
+  margin-top: 0.42em;
+}
+
+.gpds-rm3 .rm2-status__text {
+  display: block;
+  min-width: 0;
+}
+
+.gpds-rm3 .rm2-status svg {
+  flex: none;
+  margin-top: 0.2em;
+}
+
+.gpds-rm3 .rm2-status__fig {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.gpds-rm3 .rm2-status__date {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-status__tasks {
+    animation: none;
+  }
+}
+
+.gpds-rm3 .rm2-h2row {
+  display: flex;
+  /* Centre, not baseline: against a 28px heading a baselined pill hangs off
+     the bottom of the word. Beside the name rather than pushed to the far
+     edge (19 Aug 2026, Shyam) — at this width space-between put it a foot
+     away from the thing it describes. */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-3);
+  margin: var(--s-3) 0 var(--s-4);
+}
+
+.gpds-rm3 .rm2-h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-ink);
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .rm2-timing {
+  padding: 5px 11px;
+  font-size: 12px;
+  gap: 5px;
+  /* Wraps rather than overflows. A finished step carries two full dates, and
+     at a narrow viewport that is wider than the pill can be — the dates
+     themselves stay unbroken (.rm2-status__fig is nowrap), so it folds
+     between the pairs and never mid-date. */
+  flex-wrap: wrap;
+}
+
+.gpds-rm3 .rm2-timing__sep {
+  opacity: 0.4;
+}
+
+.gpds-rm3 .rm2-timing__label {
+  font-weight: 500;
+}
+
+.gpds-rm3 .rm2-timing__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds-rm3 .rm2-timing .rm2-status__fig {
+  font-weight: 700;
+}
+
+.gpds-rm3 .rm2-timing .rm2-status__date {
+  text-decoration: none;
+}
+
+.gpds-rm3 .rm2-inside-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pos-7);
+  margin-bottom: var(--s-3);
+}
+
+.gpds-rm3 .rm2-check-list {
+  list-style: none;
+  /* Was indented 28px to clear the group heading's radio, which is gone. */
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  row-gap: 8px;
+  column-gap: var(--s-5);
+  align-content: start;
+}
+
+.gpds-rm3 .rm2-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* 15px until 18 Aug 2026. Dropped 2px (Shyam): the list is a scan, not
+     prose — she is checking names off, not reading sentences — and at 15 a
+     thirteen-item list pushed the automated-check note well below the fold. */
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.gpds-rm3 .rm2-check-bullet {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--n-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .rm2-check.is-done .rm2-check-bullet {
+  background: var(--pos-7);
+  border-color: var(--pos-7);
+  color: #fff;
+}
+
+.gpds-rm3 .rm2-check.is-done .rm2-check-label {
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-header__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+}
+
+.gpds-rm3 .rm2-help {
+  width: auto;
+  white-space: nowrap;
+  padding: var(--s-2) var(--s-3);
+  font-size: 13px;
+}
+
+.gpds-rm3 .rm2-devfoot {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border-soft);
+}
+
+.gpds-rm3 .rmdev {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border: 1px dashed var(--n-7);
+  border-radius: var(--r-sm);
+  background: var(--n-2);
+  font-size: 11.5px;
+}
+
+.gpds-rm3 .rmdev__tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rmdev__pick {
+  font: inherit;
+  max-width: 190px;
+  padding: 2px 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rmdev__all {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.gpds-rm3 .dfys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+}
+
+.gpds-rm3 .dfys--working {
+  background: var(--warn-2);
+  border-color: var(--warn-3);
+}
+
+.gpds-rm3 .dfys--done {
+  background: var(--pos-2);
+  border-color: var(--pos-3);
+}
+
+.gpds-rm3 .dfys__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .dfys__mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.gpds-rm3 .dfys--working .dfys__mark {
+  background: var(--warn-3);
+  color: var(--warn-9);
+}
+
+.gpds-rm3 .dfys--done .dfys__mark {
+  background: var(--pos-7);
+  color: #fff;
+}
+
+.gpds-rm3 .dfys__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.gpds-rm3 .dfys--working .dfys__title {
+  color: var(--warn-11);
+}
+
+.gpds-rm3 .dfys--done .dfys__title {
+  color: var(--pos-9);
+}
+
+.gpds-rm3 .dfys__sub {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfys__owned {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfys-call {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--pos-3);
+  border-radius: var(--r-md);
+}
+
+.gpds-rm3 .dfys-call__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .dfys-call__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  background: var(--pos-2);
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfys-call__icon--lg {
+  width: 40px;
+  height: 40px;
+}
+
+.gpds-rm3 .dfys-call__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfys-call__with {
+  margin: 1px 0 0;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfys-call__why {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfys-call .rm2-btn {
+  width: 100%;
+}
+
+.gpds-rm3 .dfys-call.is-booked {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--pos-2);
+  border-color: var(--pos-3);
+}
+
+.gpds-rm3 .dfys-call__mark {
+  display: inline-flex;
+  flex: none;
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfys-call__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gpds-rm3 .dfys-call__when {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pos-9);
+}
+
+.gpds-rm3 .dfys-call__sub {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfys-call__join {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: none;
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border-radius: var(--r-sm);
+  background: var(--pos-7);
+  color: var(--text-inverse);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .dfys-call__join:hover {
+  background: var(--pos-9);
+}
+
+.gpds-rm3 .dfys-call__join:focus-visible {
+  outline: 2px solid var(--pos-9);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .dfys-call__change {
+  flex: none;
+  min-height: 44px;
+  padding: 0 var(--s-2);
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-7);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+
+.gpds-rm3 .dfys-call__change:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .dfys-trail {
+  list-style: none;
+  margin: var(--s-4) 0 0;
+  padding: var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.gpds-rm3 .dfys-trail__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  position: relative;
+}
+
+.gpds-rm3 .dfys-trail__row:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 22px;
+  bottom: calc(var(--s-3) * -1);
+  width: 1px;
+  background: var(--n-4);
+}
+
+.gpds-rm3 .dfys-trail__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 21px;
+  height: 21px;
+  border-radius: var(--r-pill);
+}
+
+.gpds-rm3 .dfys-trail__row.is-done .dfys-trail__mark {
+  background: var(--pos-2);
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfys-trail__row.is-now .dfys-trail__mark {
+  background: var(--warn-3);
+  color: var(--warn-9);
+}
+
+.gpds-rm3 .dfys-trail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gpds-rm3 .dfys-trail__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfys-trail__row.is-done .dfys-trail__title {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfys-trail__sub {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-3);
+}
+
+@media (max-width: 700px) {
+  .gpds-rm3 .dfys-call.is-booked {
+    flex-wrap: wrap;
+  }
+  .gpds-rm3 .dfys-call__change {
+    margin-left: auto;
+  }
+}
+
+.gpds-rm3 .dfys__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3) var(--s-4);
+  margin: var(--s-2) 0 0;
+}
+
+.gpds-rm3 .dfys__cell {
+  min-width: 0;
+}
+
+.gpds-rm3 .dfys__label {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfys__term {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  opacity: 0.8;
+}
+
+.gpds-rm3 .dfys__value {
+  margin: 3px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 600;
+  color: var(--text-ink);
+  overflow-wrap: anywhere;
+}
+
+.gpds-rm3 .dfys__fresh {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfys__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: 0;
+}
+
+.gpds-rm3 .dfys__fact dt {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfys__fact dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+/* The purchase's receipt (PRD §8.5). Same link treatment as the autonote. */
+.gpds-rm3 .dfys__receipt-link {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gpds-rm3 .dfys__receipt-muted {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.gpds-rm3 .dfys__scope-h {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfys__scope {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gpds-rm3 .dfys__scope li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfys__scope li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.52em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--warn-7);
+}
+
+@media (max-width: 640px) {
+  .gpds-rm3 .dfys__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gpds-rm3 .rm2-autonote {
+  margin: var(--s-3) 0 0;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border-soft);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-autonote__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.gpds-rm3 .rm2-autonote__link:hover {
+  color: var(--blue-9);
+}
+
+.gpds-rm3 .rm2-check.is-todo .rm2-check-label {
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .rm2-detail-left {
+  order: 2;
+}
+
+.gpds-rm3 .rm2-detail-right {
+  order: 1;
+}
+
+.gpds-rm3 .rm2-stepstat {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--warn-3);
+  background: var(--warn-2);
+}
+
+.gpds-rm3 .rm2-stepstat--done {
+  border-color: var(--pos-3);
+  background: var(--pos-2);
+}
+
+.gpds-rm3 .rm2-stepstat__mark {
+  display: inline-flex;
+  flex: none;
+  color: var(--warn-9);
+}
+
+.gpds-rm3 .rm2-stepstat--done .rm2-stepstat__mark {
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-stepstat__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--warn-11);
+}
+
+.gpds-rm3 .rm2-stepstat--done .rm2-stepstat__title {
+  color: var(--pos-9);
+}
+
+.gpds-rm3 .rm2-stepstat__sub {
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-panel {
+  border-radius: var(--r-md);
+  padding: var(--s-4);
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .rm2-panel--dark {
+  background: var(--n-2);
+  border-color: var(--border);
+}
+
+.gpds-rm3 .rm2-panel-icon--dark {
+  background: var(--n-12);
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .rm2-panel-title--dark {
+  display: flex;
+  /* Centred, not baseline. The chip is 11px inside 2px of padding and the
+     title is 16px, so sharing a baseline dropped the chip visibly below the
+     heading's optical middle. */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-panel-rec {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--n-11);
+  color: var(--text-inverse);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.gpds-rm3 .rm2-proof {
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.gpds-rm3 .rm2-proof__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--s-3);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-proof__head svg {
+  flex: none;
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-proof__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-6);
+}
+
+.gpds-rm3 .rm2-proof__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.gpds-rm3 .rm2-proof__fig {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-proof__cap {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-proof__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.gpds-rm3 .rm2-proof__rating:hover .rm2-proof__see {
+  text-decoration: underline;
+}
+
+.gpds-rm3 .rm2-proof__ratingtext strong {
+  color: var(--text-ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds-rm3 .rm2-proof__see {
+  margin-left: auto;
+  color: var(--blue-7);
+  font-weight: 600;
+  text-underline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-proof__rating svg:last-child {
+  flex: none;
+  color: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-stars {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+}
+
+.gpds-rm3 .rm2-stars__bg,
+.gpds-rm3 .rm2-stars__fg {
+  display: flex;
+  gap: 1px;
+}
+
+.gpds-rm3 .rm2-stars__clip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.gpds-rm3 .rm2-stars__bg svg {
+  fill: var(--n-4);
+  color: var(--n-6);
+}
+
+.gpds-rm3 .rm2-stars__fg svg {
+  fill: var(--hl-4);
+  color: var(--hl-9);
+}
+
+.gpds-rm3 .rm2-panel-desc--dark {
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-btn--dark {
+  background: var(--n-12);
+  color: var(--text-inverse);
+  border-color: var(--n-12);
+}
+
+.gpds-rm3 .rm2-btn--pop {
+  /* No token this long — --d-slow is 360ms, and this deliberately outruns it
+     so the whole arc is legible rather than glimpsed. */
+  animation: rm2-btn-pop 1100ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-btn--pop {
+    animation: none;
+  }
+}
+
+.gpds-rm3 .rm2-btn--dark:hover {
+  background: var(--n-11);
+  border-color: var(--n-11);
+}
+
+.gpds-rm3 .rm2-panel--green {
+  background: var(--pos-2);
+  border-color: var(--pos-3);
+}
+
+.gpds-rm3 .rm2-panel--blue {
+  background: var(--blue-1);
+  border-color: var(--blue-2);
+}
+
+/* Footnote under a sub-step's checklist — an asterisk and a link out to
+   whatever changed the list. Quiet, but a real link, not a dead mark. */
+.gpds-rm3 .rm2-note {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: var(--s-3) 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.gpds-rm3 .rm2-note__mark {
+  color: var(--text-3);
+}
+.gpds-rm3 .rm2-note__link {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.gpds-rm3 .rm2-note__link:hover {
+  color: var(--blue-9);
+}
+
+.gpds-rm3 .rm2-panel-row {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+}
+
+.gpds-rm3 .rm2-panel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .rm2-panel-icon--green {
+  background: color-mix(in oklab, var(--pos-7) 14%, var(--surface));
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-panel-icon--blue {
+  background: color-mix(in oklab, var(--blue-7) 12%, var(--surface));
+  color: var(--blue-7);
+}
+
+.gpds-rm3 .rm2-panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.gpds-rm3 .rm2-panel-title--green {
+  color: var(--pos-9);
+}
+
+.gpds-rm3 .rm2-panel-title--blue {
+  color: var(--blue-10);
+}
+
+.gpds-rm3 .rm2-panel--ai {
+  padding: var(--s-4);
+  border-color: transparent;
+}
+
+.gpds-rm3 .rm2-panel-title--ai {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-panel-isai {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 5px;
+  border-radius: var(--r-sm);
+  background: var(--ai-3);
+  color: var(--ai-9);
+}
+
+.gpds-rm3 .rm2-panel-desc--ai {
+  color: var(--ai-9);
+  opacity: 0.85;
+}
+
+.gpds-rm3 .rm2-panel-say {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* The agent card's optional call to action. Amber because it sits inside an
+   .ai-surface — AI attribution owns this colour, and a blue button here would
+   read as ordinary chrome rather than as the agent speaking. */
+.gpds-rm3 .rm2-agent-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: var(--s-4);
+  padding: 11px 16px;
+  border-radius: var(--r-md);
+  background: var(--ai-8);
+  color: var(--n-0);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition: background var(--d-fast, 120ms) ease;
+}
+
+.gpds-rm3 .rm2-agent-cta:hover {
+  background: var(--ai-9);
+}
+
+.gpds-rm3 .rm2-agent-cta:focus-visible {
+  outline: 2px solid var(--ai-7);
+  outline-offset: 2px;
+}
+
+/* Stacked cards need air between them and whatever card follows. */
+.gpds-rm3 .rm2-detail-right > .rm2-panel--ai + * {
+  margin-top: var(--s-3);
+}
+
+.gpds-rm3 .rm2-dual {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .rm2-dual__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 76px;
+  padding: var(--s-4);
+  border: 1px solid var(--n-11);
+  border-radius: var(--r-md);
+  background: var(--n-12);
+  text-decoration: none;
+  text-align: left;
+  transition:
+    border-color var(--d-fast) var(--ease),
+    box-shadow var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-dual__btn:hover {
+  border-color: var(--brand-7);
+  box-shadow: var(--sh-hover);
+}
+
+.gpds-rm3 .rm2-dual__btn:focus-visible {
+  outline: 2px solid var(--brand-5);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-dual__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  color: var(--brand-7);
+}
+
+.gpds-rm3 .rm2-dual__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gpds-rm3 .rm2-dual__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gpds-rm3 .rm2-dual__label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .rm2-dual__sub {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--n-7);
+}
+
+.gpds-rm3 .rm2-dual__go {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--n-7);
+}
+
+.gpds-rm3 .rm2-mentor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--pos-3);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.gpds-rm3 .rm2-mentor__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-mentor__eyebrow::before {
+  content: "";
+  width: 14px;
+  height: 1.5px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.gpds-rm3 .rm2-mentor--brand {
+  border-color: var(--brand-2);
+}
+
+.gpds-rm3 .rm2-mentor--brand .rm2-mentor__eyebrow {
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-mentor--brand .rm2-mentor__role {
+  color: var(--blue-7);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.gpds-rm3 .rm2-mentor__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .rm2-mentor__name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .rm2-mentor__role {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-mentor__say {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.gpds-rm3 .rm2-mentor__mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.gpds-rm3 .rm2-mentor__mail svg {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-mentor__mail:hover {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-mentor__state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--warn-2);
+  color: var(--warn-9);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gpds-rm3 .rm2-mentor__state.is-done {
+  background: var(--pos-2);
+  color: var(--pos-9);
+}
+
+.gpds-rm3 .rm2-mentor__state svg {
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .rm2-mentor__gate {
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+}
+
+.gpds-rm3 .rm2-mentor__gate-title {
+  margin: 0 0 var(--s-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .rm2-mentor__gate-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gpds-rm3 .rm2-mentor__gate-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-height: 32px;
+}
+
+.gpds-rm3 .rm2-mentor__gate-list button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--blue-7);
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-mentor__gate-list button:hover {
+  text-decoration-color: currentColor;
+}
+
+.gpds-rm3 .rm2-mentor__gate-list button:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.gpds-rm3 .rm2-mentor__gate-phase {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-panel-desc {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.gpds-rm3 .rm2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px var(--s-4);
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 120ms var(--ease, ease);
+}
+
+.gpds-rm3 .rm2-btn--green {
+  background: var(--pos-7);
+  color: #fff;
+  border-color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-btn--green:hover {
+  background: var(--pos-9);
+}
+
+.gpds-rm3 .rm2-btn--blue-outline {
+  background: var(--surface);
+  color: var(--blue-7);
+  border-color: var(--blue-3);
+}
+
+.gpds-rm3 .rm2-btn--blue-outline:hover {
+  background: var(--blue-1);
+}
+
+.gpds-rm3 .rm2-btn--ai {
+  background: var(--ai-7);
+  color: var(--text-inverse);
+  border-color: var(--ai-7);
+  text-decoration: none;
+}
+
+.gpds-rm3 .rm2-btn--ai:hover {
+  background: var(--ai-8);
+  border-color: var(--ai-8);
+}
+
+.gpds-rm3 .rm2-btn--ai:focus-visible {
+  outline: 2px solid var(--ai-9);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-btn--brand {
+  background: var(--brand-7);
+  color: var(--text-inverse);
+  border-color: var(--brand-7);
+  text-decoration: none;
+}
+
+.gpds-rm3 .rm2-btn--brand:hover {
+  background: var(--brand-8);
+  border-color: var(--brand-8);
+}
+
+.gpds-rm3 .rm2-btn--brand:focus-visible {
+  outline: 2px solid var(--brand-9);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-why {
+  background: var(--blue-1);
+  border: 1px solid var(--blue-2);
+  border-radius: var(--r-md);
+  padding: var(--s-4);
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  /* Sits inside the left column now, under the step title, so it carries its
+     own bottom spacing — it used to get it from .rm2-detailwrap's flex gap. */
+  margin-bottom: var(--s-4);
+}
+
+.gpds-rm3 .rm2-why-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--blue-7);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .rm2-why-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue-10);
+  margin-bottom: 2px;
+}
+
+.gpds-rm3 .rm2-why-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+@media (max-width: 900px) {
+  .gpds-rm3 .rm2-tracker {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gpds-rm3 .rm2-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gpds-rm3 .add-funds-modal {
+  max-width: 460px;
+  /* inherit .gate-modal's position: fixed — see .mentor-modal note. */
+}
+
+.gpds-rm3 .add-funds-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.gpds-rm3 .add-funds-preset {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds-rm3 .add-funds-preset:hover {
+  background: var(--bg-subtle);
+}
+
+.gpds-rm3 .add-funds-preset.is-selected {
+  border-color: var(--blue-7);
+  background: color-mix(in oklab, var(--blue-7) 8%, var(--bg));
+  color: var(--blue-10);
+}
+
+.gpds-rm3 .add-funds-custom {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+}
+
+.gpds-rm3 .add-funds-custom__prefix {
+  color: var(--text-2);
+  margin-right: 4px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.gpds-rm3 .add-funds-custom__input {
+  border: 0;
+  background: transparent;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  width: 100px;
+  padding: 4px 0;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.gpds-rm3 .add-funds-custom__input::-webkit-outer-spin-button,
+.gpds-rm3 .add-funds-custom__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.gpds-rm3 .add-funds-custom__input:focus {
+  outline: 0;
+}
+
+.gpds-rm3 .add-funds-total {
+  background: var(--bg-subtle);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gpds-rm3 .add-funds-total__amount {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--text-ink, var(--text));
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .add-funds-total__pm {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .agent-avatar {
+  --agent-accent: var(--ai-7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--agent-accent) 12%, var(--surface));
+  box-shadow: 0 0 0 2px var(--agent-accent);
+  overflow: hidden;
+  flex-shrink: 0;
+  color: var(--agent-accent);
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.gpds-rm3 .agent-avatar--hunter {
+  --agent-accent: var(--ai-7);
+}
+
+.gpds-rm3 .agent-avatar--grant {
+  --agent-accent: var(--blue-7);
+}
+
+.gpds-rm3 .agent-avatar--ava {
+  --agent-accent: var(--ava-7);
+}
+
+.gpds-rm3 .agent-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gpds-rm3 .agent-avatar__letter {
+  font-size: 0.45em;
+  letter-spacing: 0;
+}
+
+.gpds-rm3 .agent-avatar--20 {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.gpds-rm3 .agent-avatar--24 {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+}
+
+.gpds-rm3 .agent-avatar--28 {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+}
+
+.gpds-rm3 .agent-avatar--32 {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  box-shadow: 0 0 0 2px var(--agent-accent);
+}
+
+.gpds-rm3 .agent-avatar--40 {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+}
+
+.gpds-rm3 .agent-avatar--48 {
+  width: 48px;
+  height: 48px;
+  font-size: 48px;
+}
+
+.gpds-rm3 .ui-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
+  animation: ui-modal-fade-in var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .ui-modal-overlay[data-state="closed"] {
+  animation: ui-modal-fade-out var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .ui-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-cta-rest);
+  z-index: 91;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  animation: ui-modal-pop-in var(--d-base) var(--ease);
+  outline: none;
+}
+
+.gpds-rm3 .ui-modal-content[data-state="closed"] {
+  animation: ui-modal-pop-out var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .ui-modal-content--sm {
+  width: min(420px, calc(100vw - 32px));
+}
+
+.gpds-rm3 .ui-modal-content--md {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.gpds-rm3 .ui-modal-content--lg {
+  width: min(720px, calc(100vw - 32px));
+}
+
+.gpds-rm3 .ui-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.gpds-rm3 .ui-modal-header__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.gpds-rm3 .ui-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.gpds-rm3 .ui-modal-description {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.45;
+}
+
+.gpds-rm3 .ui-modal-close {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  color: var(--text-3);
+  transition:
+    background var(--d-fast) var(--ease),
+    color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .ui-modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.gpds-rm3 .ui-modal-close:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 1px;
+}
+
+.gpds-rm3 .ui-modal-body {
+  padding: 16px 20px;
+  overflow: auto;
+}
+
+.gpds-rm3 .ui-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.gpds-rm3 .ui-avatar {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-element);
+  color: var(--text);
+  overflow: hidden;
+  flex-shrink: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .ui-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gpds-rm3 .ui-avatar__initials {
+  font-size: 0.42em;
+  line-height: 1;
+}
+
+.gpds-rm3 .ui-avatar--20 {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+.gpds-rm3 .ui-avatar--24 {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+}
+
+.gpds-rm3 .ui-avatar--28 {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+}
+
+.gpds-rm3 .ui-avatar--32 {
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+}
+
+.gpds-rm3 .ui-avatar--40 {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+}
+
+.gpds-rm3 .ui-avatar--48 {
+  width: 48px;
+  height: 48px;
+  font-size: 48px;
+}
+
+.gpds-rm3 .mbook__who {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border: 1px solid var(--blue-2);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+}
+
+.gpds-rm3 .mbook__who-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .mbook__who-role {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .mbook__h {
+  margin: var(--s-5) 0 var(--s-3);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .mbook__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 240px);
+  gap: var(--s-5);
+  align-items: start;
+}
+
+.gpds-rm3 .mbook__cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  margin-bottom: var(--s-3);
+}
+
+.gpds-rm3 .mbook__month {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-ink);
+  min-width: 11ch;
+  text-align: center;
+}
+
+.gpds-rm3 .mbook__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--blue-3);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--blue-7);
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .mbook__nav:hover:not(:disabled) {
+  background: var(--blue-1);
+}
+
+.gpds-rm3 .mbook__nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gpds-rm3 .mbook__nav:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .mbook__dow,
+.gpds-rm3 .mbook__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.gpds-rm3 .mbook__dow {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.gpds-rm3 .mbook__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--n-7);
+  cursor: not-allowed;
+}
+
+.gpds-rm3 .mbook__day.is-open {
+  background: var(--blue-2);
+  color: var(--blue-9);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .mbook__day.is-open:hover {
+  background: var(--blue-3);
+}
+
+.gpds-rm3 .mbook__day.is-picked {
+  background: var(--blue-7);
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .mbook__day:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .mbook__times-head {
+  margin-bottom: var(--s-2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .mbook__slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gpds-rm3 .mbook__slot {
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--blue-3);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--blue-9);
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .mbook__slot:hover {
+  background: var(--blue-1);
+}
+
+.gpds-rm3 .mbook__slot.is-picked {
+  background: var(--blue-7);
+  border-color: var(--blue-7);
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .mbook__slot:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .mbook__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+.gpds-rm3 .mbook__retry {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-7);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.gpds-rm3 .mbook__retry:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+
+.gpds-rm3 .mbook__tz {
+  display: block;
+  margin-top: var(--s-5);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--border);
+}
+
+.gpds-rm3 .mbook__tz-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .mbook__tz-select {
+  width: 100%;
+  max-width: 320px;
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-6);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.gpds-rm3 .mbook__tz-select:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .mbook__tz-note {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .mbook__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.gpds-rm3 .mbook__price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .mbook__price strong {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--text);
+}
+
+.gpds-rm3 .mbook__short {
+  margin-top: 2px;
+  color: var(--text-3);
+  max-width: 46ch;
+  line-height: 1.45;
+}
+
+.gpds-rm3 .mbook__cta {
+  width: auto;
+  min-width: 200px;
+}
+
+.gpds-rm3 .mbook__cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .gpds-rm3 .mbook__cols {
+    grid-template-columns: 1fr;
+  }
+  .gpds-rm3 .mbook__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .gpds-rm3 .mbook__cta {
+    width: 100%;
+  }
+}
+
+.gpds-rm3 .dfyd__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 10, 8, 0.32);
+  z-index: 60;
+  animation: dfyd-fade var(--d-base) var(--ease);
+}
+
+.gpds-rm3 .dfyd {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  width: clamp(380px, 36%, 620px);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--sh-sheet);
+  animation: dfyd-slide var(--d-base) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .dfyd,
+  .gpds-rm3 .dfyd__overlay {
+    animation: none;
+  }
+}
+
+.gpds-rm3 .dfyd__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.gpds-rm3 .dfyd__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+  letter-spacing: -0.01em;
+}
+
+.gpds-rm3 .dfyd__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.gpds-rm3 .dfyd__close:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__close:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .dfyd__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-5);
+}
+
+.gpds-rm3 .dfyd__svc {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pos-7);
+  margin-bottom: var(--s-2);
+}
+
+.gpds-rm3 .dfyd__benefit {
+  margin: 0 0 var(--s-5);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__h {
+  margin: 0 0 var(--s-3);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.gpds-rm3 .dfyd__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__list svg {
+  flex-shrink: 0;
+  /* Sits on the NAME's line, not the middle of a two-line item. */
+  margin-top: 1px;
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfyd__pkgwrap {
+  margin: 0 0 var(--s-5);
+  overflow-x: auto;
+}
+
+.gpds-rm3 .dfyd__pkg {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.gpds-rm3 .dfyd__pkg thead th {
+  padding: var(--s-2);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.gpds-rm3 .dfyd__pkg thead th:first-child {
+  width: 100%;
+  text-align: left;
+}
+
+.gpds-rm3 .dfyd__pkg-name {
+  display: block;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__pkg-price {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.gpds-rm3 .dfyd__pkg tbody th {
+  padding: var(--s-3) var(--s-3) var(--s-3) 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--text-2);
+  vertical-align: top;
+  border-bottom: 1px solid var(--n-3);
+}
+
+.gpds-rm3 .dfyd__pkg tbody td {
+  min-width: 88px;
+  padding: var(--s-2);
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--n-3);
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfyd__pkg tbody td svg {
+  vertical-align: middle;
+}
+
+.gpds-rm3 .dfyd__pkg tbody tr:last-child th,
+.gpds-rm3 .dfyd__pkg tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gpds-rm3 .dfyd__pkg .is-picked {
+  background: var(--blue-1);
+}
+
+.gpds-rm3 .dfyd__pkg thead th.is-picked {
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+
+.gpds-rm3 .dfyd__pkg-no {
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__foot {
+  flex-shrink: 0;
+  padding: var(--s-4) var(--s-5);
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.gpds-rm3 .dfyd__price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__price {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__wallet {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__wallet strong,
+.gpds-rm3 .dfyd__short strong {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__short {
+  margin: var(--s-2) 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__topup {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gpds-rm3 .dfyd__foot .rm2-btn {
+  margin-top: var(--s-3);
+}
+
+.gpds-rm3 .dfyd__confirm-h {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__confirm,
+.gpds-rm3 .dfyd__addmoney {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.gpds-rm3 .dfyd__check {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-4);
+  background: var(--n-2);
+  border: 1px solid var(--n-3);
+  border-radius: var(--r-md);
+}
+
+.gpds-rm3 .dfyd__check-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) 0;
+}
+
+.gpds-rm3 .dfyd__check-row + .dfyd__check-row {
+  border-top: 1px solid var(--n-3);
+}
+
+.gpds-rm3 .dfyd__check-row dt {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__check-row dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-ink);
+  text-align: right;
+}
+
+.gpds-rm3 .dfyd__check-amount {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+.gpds-rm3 .dfyd__confirm-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__confirm-acts {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-2);
+}
+
+.gpds-rm3 .dfyd__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: none;
+  background: none;
+  border-radius: var(--r-sm);
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .dfyd__back:hover {
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__back:focus-visible {
+  outline: 2px solid var(--blue-7);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .dfyd__addmoney-why {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__preset-note {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .add-funds-preset.is-selected .dfyd__preset-note {
+  color: var(--blue-7);
+}
+
+.gpds-rm3 .dfyd__done {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .dfyd__done-icon {
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .dfyd__done-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__done-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__done .rm2-btn {
+  width: auto;
+  margin-top: var(--s-2);
+}
+
+@media (max-width: 700px) {
+  .gpds-rm3 .dfyd {
+    width: 100%;
+  }
+}
+
+.gpds-rm3 .dfyd__tiers {
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gpds-rm3 .dfyd__tiers-legend {
+  padding: 0;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__tier {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--n-6);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color var(--d-fast) var(--ease),
+    background var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .dfyd__tier:hover {
+  border-color: var(--pos-7);
+}
+
+.gpds-rm3 .dfyd__tier.is-picked {
+  border-color: var(--pos-7);
+  background: var(--pos-2);
+}
+
+.gpds-rm3 .dfyd__tier:focus-within {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .dfyd__tier input {
+  accent-color: var(--pos-7);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .dfyd__tier-name {
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gpds-rm3 .dfyd__tier-price {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--n-3);
+  object-fit: cover;
+}
+
+.gpds-rm3 .dfyd__video--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  border: 1px dashed var(--n-6);
+  color: var(--text-3);
+  font-size: 12px;
+  text-align: center;
+  padding: var(--s-4);
+}
+
+.gpds-rm3 .dfyd__block {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+}
+
+.gpds-rm3 .dfyd__block-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 var(--s-2);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__block-title svg {
+  flex-shrink: 0;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__block-value {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+/* The coupon row splits 70:30 between the input and Apply.
+   Each item takes its share as an explicit flex-basis rather than a grow
+   factor, because grow factors divide the space left AFTER the gap and give
+   67:33 here. Each basis therefore subtracts its own share of the gap, so the
+   two bases plus the gap add up to exactly 100%.
+   .rm2-btn is width:100% by default, which is why the button has to opt out. */
+.gpds-rm3 .dfyd__coupon {
+  --coupon-gap: var(--s-3);
+  display: flex;
+  align-items: stretch;
+  gap: var(--coupon-gap);
+}
+
+.gpds-rm3 .dfyd__coupon-input {
+  flex: 0 1 calc(70% - var(--coupon-gap) * 0.7);
+  min-width: 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.gpds-rm3 .dfyd__coupon-input:focus {
+  outline: 0;
+  border-color: var(--blue-3);
+}
+
+.gpds-rm3 .dfyd__coupon-apply {
+  flex: 0 1 calc(30% - var(--coupon-gap) * 0.3);
+  min-width: 0;
+  width: auto;
+  padding: var(--s-3) var(--s-4);
+  font-size: 14px;
+}
+
+.gpds-rm3 .dfyd__item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.gpds-rm3 .dfyd__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .dfyd__item-note {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__facts {
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.gpds-rm3 .dfyd__fact dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.gpds-rm3 .dfyd__fact dt svg {
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .dfyd__fact dd {
+  margin: 3px 0 0 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.gpds-rm3 .rm2-titlerow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+/* The mentor-approval sign, beside the page title. Derived from a completed
+   Positioning Call — see RoadmapV3Client.tsx. Ground, text, hairline and dot
+   come from .badge and its badge-pos/badge-neutral tone (ds.css) — approving
+   flips one class rather than needing a second colour of its own here. Sized
+   to match .rm2-timing, the other pill on this page, so two pills never read
+   as two different kinds of object. */
+.gpds-rm3 .rm2-approval {
+  padding: 5px 11px;
+  font-size: 12px;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.gpds-rm3 .rm2-intake {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 5px var(--s-3);
+  border: 1px solid var(--brand-3);
+  border-radius: var(--r-pill);
+  background: var(--brand-1);
+  color: var(--brand-9);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--d-fast) var(--ease),
+    border-color var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-intake:hover {
+  background: var(--brand-2);
+  border-color: var(--brand-5);
+  /* Stop shaking while she is actually looking at it. */
+  animation-play-state: paused;
+}
+
+.gpds-rm3 .rm2-intake:focus-visible {
+  outline: 2px solid var(--brand-7);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-intake {
+  animation: rm2-intake-shake 20s var(--ease) 6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-intake {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .rm2-intake {
+    animation: none;
+  }
+}
+
+.gpds-rm3 .rm2-intake__days {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  background: var(--brand-7);
+  color: var(--text-inverse);
+}
+
+.gpds-rm3 .iom {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  width: clamp(340px, 65vw, 1040px);
+  max-height: 88vh;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sheet);
+  overflow: hidden;
+  animation: iom-in var(--d-base) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .iom {
+    animation: none;
+  }
+}
+
+.gpds-rm3 .iom__sub {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .iom__body {
+  flex: 1;
+  min-height: 0;
+}
+
+.gpds-rm3 .iom__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--s-5);
+  align-items: start;
+}
+
+.gpds-rm3 .iom__note {
+  margin: var(--s-4) 0 0;
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--pos-2);
+  color: var(--pos-9);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gpds-rm3 .iom__prices {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  /* How far right of its slot the list price pauses to be struck. Roughly the
+     width of the offer price that lands there afterwards. */
+  --iom-hold: 92px;
+}
+
+.gpds-rm3 .iom__was {
+  position: relative;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 700;
+  transform-origin: left center;
+  opacity: 0;
+  animation: iom-was 1800ms var(--ease) forwards;
+}
+
+.gpds-rm3 .iom__was::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: 50%;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: iom-strike 520ms var(--ease) 420ms forwards;
+}
+
+.gpds-rm3 .iom__now {
+  opacity: 0;
+  transform-origin: center;
+  animation: iom-land 620ms var(--ease) 1880ms forwards;
+}
+
+.gpds-rm3 .iom__off {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: var(--pos-2);
+  color: var(--pos-9);
+  opacity: 0;
+  animation: iom-pop 320ms var(--ease) 2440ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gpds-rm3 .iom__was,
+  .gpds-rm3 .iom__now,
+  .gpds-rm3 .iom__off {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .gpds-rm3 .iom__was {
+    color: var(--n-7);
+  }
+  .gpds-rm3 .iom__was::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+.gpds-rm3 .iom__save {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--pos-9);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .gpds-rm3 .iom {
+    width: min(94vw, 640px);
+  }
+  .gpds-rm3 .iom__cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gpds-rm3 .rm2-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border: 1px solid var(--blue-2);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+  cursor: pointer;
+  transition:
+    border-color var(--d-fast) var(--ease),
+    background var(--d-fast) var(--ease);
+}
+
+.gpds-rm3 .rm2-confirm:hover {
+  border-color: var(--blue-5);
+}
+
+.gpds-rm3 .rm2-confirm:focus-within {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.gpds-rm3 .rm2-confirm__box {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  accent-color: var(--pos-7);
+  cursor: pointer;
+}
+
+.gpds-rm3 .rm2-confirm__text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.gpds-rm3 .rm2-confirm:has(.rm2-confirm__box:checked) {
+  border-color: var(--pos-3);
+  background: var(--pos-2);
+}
+
+.gpds-rm3 .rm2-confirm.is-blocked {
+  border-color: var(--border);
+  background: var(--bg-subtle);
+  cursor: not-allowed;
+}
+
+.gpds-rm3 .rm2-confirm.is-blocked:hover {
+  border-color: var(--border);
+}
+
+.gpds-rm3 .rm2-confirm.is-blocked .rm2-confirm__box {
+  cursor: not-allowed;
+}
+
+.gpds-rm3 .rm2-confirm.is-blocked .rm2-confirm__text {
+  color: var(--text-2);
+}
+
+@keyframes rm2-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rm2-btn-pop {
+  0% {
+    transform: scale(0.82);
+    opacity: 0.4;
+    animation-timing-function: cubic-bezier(0.34, 0.6, 0.35, 1);
+  }
+  45% {
+    transform: scale(1.12);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+  }
+  72% {
+    transform: scale(0.97);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ui-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ui-modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ui-modal-pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes ui-modal-pop-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.98);
+  }
+}
+
+@keyframes dfyd-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dfyd-slide {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+@keyframes rm2-intake-shake {
+  0%,
+  4%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  0.5%,
+  1.5%,
+  2.5%,
+  3.5% {
+    transform: translateX(-4px) rotate(-1.5deg);
+  }
+  1%,
+  2%,
+  3% {
+    transform: translateX(4px) rotate(1.5deg);
+  }
+}
+
+@keyframes iom-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 8px));
+  }
+}
+
+@keyframes iom-was {
+  /* Arrives as the price: full size, full-strength ink. */
+  0% {
+    opacity: 0;
+    color: var(--text-ink);
+    transform: translateX(260px) scale(1.35);
+  }
+  17% {
+    opacity: 1;
+    color: var(--text-ink);
+    transform: translateX(var(--iom-hold)) scale(1.35);
+  }
+  /* Holds, still the price, while the line is drawn through it. */
+  56% {
+    opacity: 1;
+    color: var(--text-ink);
+    transform: translateX(var(--iom-hold)) scale(1.35);
+  }
+  /* Demoted: shrinks and fades to context grey on its way left. */
+  100% {
+    opacity: 1;
+    color: var(--n-7);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes iom-strike {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes iom-land {
+  0% {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes iom-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =================================================================
+   HAND-WRITTEN ADDITIONS — everything above this line is machine-
+   extracted from the frozen prototype; everything below is v3's own.
+   Same rule applies: every selector scoped under .gpds-rm3, colors
+   from tokens only.
+   ================================================================= */
+
+/* ── Member-run verification panel (VerifyPanel.tsx) ── */
+.gpds-rm3 .rm3-verify {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+  font-size: 13px;
+  color: var(--n-9);
+  line-height: 1.5;
+}
+.gpds-rm3 .rm3-verify--form { display: block; }
+.gpds-rm3 .rm3-verify--pass {
+  background: var(--pos-2);
+  border-color: var(--pos-3);
+  color: var(--pos-9);
+}
+.gpds-rm3 .rm3-verify--warn {
+  background: var(--warn-2);
+  border-color: var(--warn-3);
+  color: var(--warn-9);
+}
+.gpds-rm3 .rm3-verify--fail {
+  background: var(--urg-2);
+  border-color: var(--urg-3);
+  color: var(--urg-9);
+}
+.gpds-rm3 .rm3-verify__mark { flex-shrink: 0; margin-top: 2px; }
+.gpds-rm3 .rm3-verify__body { flex: 1; }
+.gpds-rm3 .rm3-verify__body p { margin: 0 0 var(--s-2); }
+.gpds-rm3 .rm3-verify__title {
+  font-weight: 700;
+  color: var(--n-11);
+  margin: 0 0 2px;
+}
+.gpds-rm3 .rm3-verify__hint { margin: 0 0 var(--s-3); color: var(--n-8); }
+.gpds-rm3 .rm3-verify__link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--blue-7);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.gpds-rm3 .rm3-verify__link:disabled { opacity: 0.5; cursor: default; }
+.gpds-rm3 .rm3-verify__fields { display: flex; flex-direction: column; gap: var(--s-2); }
+.gpds-rm3 .rm3-verify__row { display: flex; gap: var(--s-2); align-items: center; }
+.gpds-rm3 .rm3-verify__input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--n-0);
+  color: var(--n-11);
+  font-size: 13px;
+}
+.gpds-rm3 .rm3-verify__input:focus-visible { outline: 2px solid var(--blue-7); outline-offset: 1px; }
+.gpds-rm3 .rm3-verify__input--state { flex: 0 0 64px; text-transform: uppercase; }
+.gpds-rm3 .rm3-verify__drop {
+  display: block;
+  width: 100%;
+  padding: var(--s-4);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--n-0);
+  color: var(--blue-10);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.gpds-rm3 .rm3-verify__drop.is-done {
+  border-color: var(--pos-3);
+  background: var(--pos-2);
+  color: var(--pos-9);
+}
+.gpds-rm3 .rm3-verify__drop:disabled { opacity: 0.6; cursor: wait; }
+.gpds-rm3 .rm3-verify__error { color: var(--urg-7); margin: var(--s-2) 0 0; font-size: 12.5px; }
+.gpds-rm3 .rm3-verify__acts {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+  margin-top: var(--s-3);
+}
+.gpds-rm3 .rm3-verify__btn { font-size: 13px; }
+
+/* ── Form results card ──
+   The audit's findings, shown in the right column once the form is in. Rows
+   are a scan — name on the left, verdict on the right — so the badge column
+   stays aligned and she can run her eye down it. */
+.gpds-rm3 .rm3-results { display: flex; flex-direction: column; gap: var(--s-3); }
+.gpds-rm3 .rm3-results__head { display: flex; flex-direction: column; gap: 4px; }
+.gpds-rm3 .rm3-results__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gpds-rm3 .rm3-results__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle, var(--n-2));
+}
+.gpds-rm3 .rm3-results__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.gpds-rm3 .rm3-results__title { font-size: 13px; font-weight: 600; color: var(--text-ink); }
+.gpds-rm3 .rm3-results__ev,
+.gpds-rm3 .rm3-results__note { font-size: 11.5px; line-height: 1.45; }
+.gpds-rm3 .rm3-results__ev { color: var(--text-3); }
+/* A gap she has not closed — the sentence explains WHY it is required, so it
+   carries the same weight as the badge beside it. */
+.gpds-rm3 .rm3-results__note { color: var(--urg-7); }
+
+/* ── Verification result cards ──
+   What was verified, not just that it was. These sit inside .rm3-verify's
+   tone variants (pass/warn/fail), so colour comes from the card; everything
+   here is layout. */
+.gpds-rm3 .rm3-verify__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-2) var(--s-4);
+  margin: var(--s-3) 0 0;
+}
+@media (max-width: 480px) {
+  .gpds-rm3 .rm3-verify__grid { grid-template-columns: minmax(0, 1fr); }
+}
+.gpds-rm3 .rm3-verify__k {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+.gpds-rm3 .rm3-verify__v {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  /* A UEI or an address should not push the grid wide. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gpds-rm3 .rm3-verify__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--s-3);
+}
+.gpds-rm3 .rm3-verify__sub {
+  margin-top: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.gpds-rm3 .rm3-verify__sub p { margin: 0 0 2px; }
+.gpds-rm3 .rm3-verify__sub p:last-child { margin-bottom: 0; }
+.gpds-rm3 .rm3-verify__issues { margin: 4px 0 0; padding-left: 18px; }
+.gpds-rm3 .rm3-verify__issues li { margin-bottom: 2px; }
+.gpds-rm3 .rm3-verify__out {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-3);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.gpds-rm3 .rm3-verify__when { margin: var(--s-3) 0 0; font-size: 11.5px; opacity: 0.7; }
+.gpds-rm3 .rm3-verify__reset {
+  margin-top: var(--s-3);
+  padding: var(--s-3);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--urg-3);
+  background: var(--urg-2);
+  color: var(--urg-9);
+  font-size: 12.5px;
+}
+.gpds-rm3 .rm3-verify__reset p { margin: 0 0 var(--s-2); }
+.gpds-rm3 .rm3-verify__link--danger { color: var(--urg-7); }
+
+/* ── Internal form drawer ──
+   The verify panel asks for one or two things and labels them with a
+   placeholder. A form asks for twelve, where a placeholder disappears the
+   moment she types and she can no longer tell which box is which — so these
+   fields carry real labels above them. Everything else (the input, the error,
+   the actions row) is the verify panel's, unchanged. */
+.gpds-rm3 .rm3-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+.gpds-rm3 .rm3-form__field { display: flex; flex-direction: column; gap: 4px; }
+.gpds-rm3 .rm3-form__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--n-8);
+}
+.gpds-rm3 .rm3-form__req { color: var(--urg-7); }
+
+/* ── Action Plan checklist: one plain column ──
+   The default checklist is a 6-row column-flow grid, sized for the short
+   template lists. A member's Action Plan can be long and its titles wide —
+   in the grid it fans into ragged columns. As a plan it reads top to
+   bottom, one item per line. */
+.gpds-rm3 .rm2-check-list--plain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The N/A / REFUSE opt-out callout on the audit form drawer. Deliberately
+   louder than a hint (owner, 2026-09-02): members missed the grey version and
+   left blank fields they meant to opt out of, which read back as "Gap found". */
+.gpds-rm3 .rm3-optout {
+  background: var(--warn-2);
+  border: 1px solid var(--warn-3);
+  color: var(--warn-11);
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+
+/* Result-row enrichment (2026-09-03): every audit item explains itself and
+   shows what the member answered, with links clickable. */
+.gpds-rm3 .rm3-results__desc {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-3);
+  max-width: 58ch;
+}
+.gpds-rm3 .rm3-results__prov {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+.gpds-rm3 .rm3-results__prov a {
+  color: var(--blue-8);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Underfunded booking footer: the wallet door and the re-check, stacked so
+   neither reads as the primary action on its own. The wallet opens in a new
+   tab deliberately — the day and time she has already picked live in this
+   component's state and a same-tab navigation throws them away. */
+.gpds-rm3 .mbook__topup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+}
+.gpds-rm3 .mbook__topup .mbook__cta {
+  text-decoration: none;
+}
+
+/* Why the Verify button is off. Quiet, beside the control it explains — the
+   member reads it as an instruction, not as a failure, so it never borrows
+   the fail palette. */
+.gpds-rm3 .rm3-verify__blocked {
+  align-self: center;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+/* "Complete this step" — a step the member finishes herself, line by line
+   (SELF_TICK_STEPS). Each line is a checkbox: any number may be ticked, and
+   the whole row is the target, so the circle is never a 22px bullseye. */
+.gpds-rm3 .rm2-selftick-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pos-7);
+  margin-bottom: var(--s-3);
+}
+
+.gpds-rm3 .rm2-selftick-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.gpds-rm3 .rm2-selftick {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  padding: 8px 10px;
+  margin-left: -10px;
+  background: none;
+  border: 0;
+  border-radius: var(--r-md);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gpds-rm3 .rm2-selftick:hover,
+.gpds-rm3 .rm2-selftick:focus-visible {
+  background: var(--n-2);
+}
+
+.gpds-rm3 .rm2-selftick__ring {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--n-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.gpds-rm3 .rm2-selftick:hover .rm2-selftick__ring {
+  border-color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-selftick.is-ticked .rm2-selftick__ring {
+  background: var(--pos-7);
+  border-color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-selftick__label {
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm2-selftick.is-ticked .rm2-selftick__label {
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm2-selftick__dash,
+.gpds-rm3 .rm2-selftick__hint {
+  color: var(--text-3);
+}
+
+.gpds-rm3 .rm2-selftick:hover .rm2-selftick__hint {
+  color: var(--pos-7);
+}
+
+.gpds-rm3 .rm2-selftick__error {
+  margin: var(--s-2) 0 0;
+  font-size: 13px;
+  color: var(--red-7);
+}
+
+/* The business address step before a wallet purchase (AddressStep.tsx).
+   It takes the place of the confirm area in the "Done for you" drawer, the
+   intake offer and the booking sheet. Two columns: the street and the suite,
+   then the city and the state, then the ZIP. Tokens only. */
+.gpds-rm3 .rm3-addr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+  margin: 0;
+}
+
+.gpds-rm3 .rm3-addr__title,
+.gpds-rm3 .rm3-addr__note,
+.gpds-rm3 .rm3-addr__error--server,
+.gpds-rm3 .rm3-addr__actions {
+  grid-column: 1 / -1;
+}
+
+.gpds-rm3 .rm3-addr__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm3-addr__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .rm3-addr__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.gpds-rm3 .rm3-addr__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+
+.gpds-rm3 .rm3-addr__input {
+  min-width: 0;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.gpds-rm3 .rm3-addr__input:focus {
+  outline: 0;
+  border-color: var(--blue-3);
+}
+
+.gpds-rm3 .rm3-addr__input[aria-invalid="true"] {
+  border-color: var(--red-7);
+}
+
+.gpds-rm3 .rm3-addr__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--red-7);
+}
+
+.gpds-rm3 .rm3-addr__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-2);
+}
+
+/* Federal Blue: saving the address is the step that continues the purchase. */
+.gpds-rm3 .rm3-addr__submit {
+  background: var(--blue-7);
+  color: var(--text-inverse);
+  border-color: var(--blue-7);
+}
+
+.gpds-rm3 .rm3-addr__submit:hover {
+  background: var(--blue-9);
+}
+
+.gpds-rm3 .rm3-addr__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The booking sheet footer is a row; the form takes the whole row. */
+.gpds-rm3 .mbook__foot .rm3-addr {
+  flex: 1 1 100%;
+}
+
+@media (max-width: 560px) {
+  .gpds-rm3 .rm3-addr {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Pilot checkout and success view (PRD §8.2, §8.3; PilotCheckout.tsx) ── */
+
+.gpds-rm3 .dfyd__govfee {
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  background: var(--blue-1);
+  border-left: 3px solid var(--blue-7);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__terms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.gpds-rm3 .dfyd__terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-ink);
+  cursor: pointer;
+}
+
+.gpds-rm3 .dfyd__terms-row input {
+  margin-top: 2px;
+  accent-color: var(--blue-7);
+}
+
+.gpds-rm3 .dfyd__terms-error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--red-7);
+}
+
+.gpds-rm3 .dfyd__terms-row input[aria-invalid="true"] {
+  outline: 2px solid var(--red-7);
+  outline-offset: 1px;
+}
+
+.gpds-rm3 .dfyd__terms-row a,
+.gpds-rm3 .dfyd__invoice a {
+  color: var(--blue-7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gpds-rm3 .dfyd__invoice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.gpds-rm3 .dfyd__invoice-line {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.gpds-rm3 .dfyd__invoice-history {
+  font-size: 13px;
+}
+
+.gpds-rm3 .gpds-toast .rm3-toast-link {
+  color: var(--pos-3);
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-decoration: none;
+}

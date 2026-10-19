@@ -22,8 +22,9 @@ export function ConflictCallout() {
           <li key={c.id} className="kh-conflict-row">
             <div className="kh-conflict-body">
               <span>
-                Your capability statement says{" "}
-                <strong>{c.docValue} bonding capacity</strong> but your profile
+                {/* DEMO: the text names the fact, so any conflict reads right. */}
+                Your <strong>{c.field.toLowerCase()}</strong> is{" "}
+                <strong>{c.docValue}</strong> in the document, but your profile
                 says <strong>{c.profileValue}</strong> — which is right?
               </span>
               <div className="kh-conflict-source">

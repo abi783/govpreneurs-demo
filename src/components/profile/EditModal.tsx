@@ -12,7 +12,8 @@ export type EditInputType =
   | "range"
   | "date"
   | "boolean"
-  | "file";
+  | "file"
+  | "number";
 
 export interface EditModalProps {
   open: boolean;
@@ -22,6 +23,11 @@ export interface EditModalProps {
   inputType?: EditInputType;
   options?: string[];
   initialValue?: unknown;
+  // DEMO: the modal hands the value back to the field, which saves it in the demo store.
+  onSave?: (value: unknown) => void;
+  /** Returns a sentence when the value is wrong, or null. */
+  validate?: (value: unknown) => string | null;
+  placeholder?: string;
 }
 
 export function EditModal({
@@ -32,6 +38,9 @@ export function EditModal({
   inputType = "text",
   options = [],
   initialValue,
+  onSave,
+  validate,
+  placeholder,
 }: EditModalProps) {
   const [textValue, setTextValue] = useState("");
   const [chips, setChips] = useState<string[]>([]);
@@ -39,12 +48,19 @@ export function EditModal({
   const [rangeMin, setRangeMin] = useState("");
   const [rangeMax, setRangeMax] = useState("");
   const [boolValue, setBoolValue] = useState(false);
+  // DEMO: the file the visitor picked, and the reason a value was refused.
+  const [fileName, setFileName] = useState("");
+  const [problem, setProblem] = useState<string | null>(null);
 
   // Reset when reopening
   useEffect(() => {
     if (!open) return;
-    if (inputType === "multiselect" && Array.isArray(initialValue)) {
-      setChips(initialValue as string[]);
+    setProblem(null);
+    setFileName("");
+    setChipDraft("");
+    if (inputType === "multiselect") {
+      // DEMO: a list field with no answer yet starts empty, not with the last list.
+      setChips(Array.isArray(initialValue) ? (initialValue as string[]) : []);
     } else if (inputType === "range" && initialValue && typeof initialValue === "object") {
       const r = initialValue as { min?: number; max?: number };
       setRangeMin(r.min?.toString() ?? "");
@@ -58,14 +74,48 @@ export function EditModal({
 
   function handleSave() {
     let value: unknown = textValue;
-    if (inputType === "multiselect") value = chips;
-    else if (inputType === "range")
+    if (inputType === "multiselect") {
+      // DEMO: a word typed but not yet entered still counts.
+      value = chipDraft.trim() ? [...chips, chipDraft.trim()] : chips;
+    } else if (inputType === "range")
       value = {
         min: rangeMin ? Number(rangeMin) : null,
         max: rangeMax ? Number(rangeMax) : null,
       };
     else if (inputType === "boolean") value = boolValue;
-    console.log("EditModal save", { fieldLabel, value });
+    else if (inputType === "file") value = fileName;
+    else if (typeof value === "string") value = value.trim();
+    // DEMO: refuse a wrong or empty answer in the modal, in plain words.
+    if (inputType === "file" && !fileName) {
+      setProblem("Choose a file first.");
+      return;
+    }
+    if (inputType === "range") {
+      const r = value as { min: number | null; max: number | null };
+      if (r.min == null && r.max == null) {
+        setProblem("Enter at least one amount.");
+        return;
+      }
+      if (r.min != null && r.max != null && r.min > r.max) {
+        setProblem("The minimum cannot be higher than the maximum.");
+        return;
+      }
+    } else if (inputType === "multiselect") {
+      if ((value as string[]).length === 0) {
+        setProblem("Add at least one item.");
+        return;
+      }
+    } else if (inputType !== "boolean" && value === "") {
+      setProblem("Enter an answer, or press Cancel.");
+      return;
+    }
+    const message = validate?.(value) ?? null;
+    if (message) {
+      setProblem(message);
+      return;
+    }
+    setProblem(null);
+    onSave?.(value);
     onOpenChange(false);
   }
 
@@ -91,7 +141,14 @@ export function EditModal({
             </Dialog.Description>
           )}
 
-          <div className="bp-modal-form">{renderInput()}</div>
+          <div className="bp-modal-form">
+            {renderInput()}
+            {problem && (
+              <p className="bp-modal-problem" role="alert">
+                {problem}
+              </p>
+            )}
+          </div>
 
           <div className="bp-modal-footer">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
@@ -119,7 +176,11 @@ export function EditModal({
           <textarea
             className="bp-modal-textarea"
             value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
+            placeholder={placeholder}
+            onChange={(e) => {
+              setTextValue(e.target.value);
+              setProblem(null);
+            }}
             rows={5}
           />
         );
@@ -128,10 +189,14 @@ export function EditModal({
           <select
             className="bp-modal-select"
             value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
+            onChange={(e) => {
+              setTextValue(e.target.value);
+              setProblem(null);
+            }}
           >
             <option value="">Select…</option>
-            {options.map((o) => (
+            {/* DEMO: keep the current answer in the list even when it is not one of the options. */}
+            {[...(textValue && !options.includes(textValue) ? [textValue] : []), ...options].map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>
@@ -158,7 +223,7 @@ export function EditModal({
               value={chipDraft}
               onChange={(e) => setChipDraft(e.target.value)}
               onKeyDown={handleChipKey}
-              placeholder={chips.length ? "" : "Type and press Enter"}
+              placeholder={chips.length ? "" : (placeholder ?? "Type and press Enter")}
             />
           </div>
         );
@@ -172,7 +237,10 @@ export function EditModal({
                 variant="number"
                 aria-label={`${fieldLabel} minimum`}
                 value={rangeMin}
-                onChange={(e) => setRangeMin(e.target.value)}
+                onChange={(e) => {
+                  setRangeMin(e.target.value);
+                  setProblem(null);
+                }}
               />
             </label>
             <label className="bp-modal-range-field">
@@ -182,7 +250,10 @@ export function EditModal({
                 variant="number"
                 aria-label={`${fieldLabel} maximum`}
                 value={rangeMax}
-                onChange={(e) => setRangeMax(e.target.value)}
+                onChange={(e) => {
+                  setRangeMax(e.target.value);
+                  setProblem(null);
+                }}
               />
             </label>
           </div>
@@ -211,7 +282,31 @@ export function EditModal({
           </label>
         );
       case "file":
-        return <Input type="file" variant="text" aria-label={fieldLabel} />;
+        return (
+          <Input
+            type="file"
+            variant="text"
+            aria-label={fieldLabel}
+            onChange={(e) => {
+              setFileName(e.target.files?.[0]?.name ?? "");
+              setProblem(null);
+            }}
+          />
+        );
+      case "number":
+        return (
+          <Input
+            type="number"
+            variant="text"
+            aria-label={fieldLabel}
+            value={textValue}
+            min={0}
+            onChange={(e) => {
+              setTextValue(e.target.value);
+              setProblem(null);
+            }}
+          />
+        );
       case "text":
       default:
         return (
@@ -219,7 +314,11 @@ export function EditModal({
             variant="text"
             aria-label={fieldLabel}
             value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
+            placeholder={placeholder}
+            onChange={(e) => {
+              setTextValue(e.target.value);
+              setProblem(null);
+            }}
           />
         );
     }

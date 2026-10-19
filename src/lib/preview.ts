@@ -1,4 +1,5 @@
 import { API_BASE_URL, apiFetch, buildApiError } from "./api";
+import { menuLinkPath } from "../demo/nav/menuLinks";
 import type { ServerFilters, ServerSort } from "./discoverApi";
 import type { CardOpportunity, Dibbs, OppCategory } from "./mock/opportunities";
 import { WORK_TYPES } from "./vocab/trades";
@@ -26,6 +27,8 @@ export interface PreviewOpportunityDto {
   id: string;
   solNumber?: string;
   title: string;
+  /** DEMO: the plain-English title. The demo sends it on every tab, so a card has one name everywhere. */
+  geminiPlainEnglishTitle?: string | null;
   scope: "fed" | "sled";
   agency: { name: string };
   noticeType: string;
@@ -63,7 +66,7 @@ export interface NaicsSearchResult {
  *
  *  Deliberately delegates to {@link roadmapUrl} rather than keeping a second id:
  *  one destination, one constant to change if the menu-link is ever re-issued. */
-export function capabilityStatementUrl(locationId: string): string {
+export function capabilityStatementUrl(locationId?: string): string {
   return roadmapUrl(locationId);
 }
 
@@ -74,8 +77,9 @@ const BUSINESS_PROFILE_MENU_LINK_ID = "fd379a59-2793-4d35-bec4-4541260e12cc";
 
 /** Builds the GHL Success Center URL for the business-profile custom menu
  *  link, scoped to the given location. */
-export function businessProfileUrl(locationId: string): string {
-  return `https://app.govpreneurs.com/v2/location/${locationId}/custom-menu-link/${BUSINESS_PROFILE_MENU_LINK_ID}`;
+export function businessProfileUrl(_locationId?: string): string {
+  // DEMO: the business profile lives under My Business (menu link 614a7424).
+  return menuLinkPath("614a7424") ?? "/my-business";
 }
 
 /** GHL custom-menu-link id for the Success Center's Roadmap page (used by the
@@ -89,8 +93,9 @@ const ROADMAP_MENU_LINK_ID = "fd379a59-2793-4d35-bec4-4541260e12cc";
  *  to the given location. The app runs inside the GHL iframe, so callers open
  *  this with target="_blank" to break out to a new tab rather than nesting GHL
  *  inside our iframe. */
-export function roadmapUrl(locationId: string): string {
-  return `https://app.govpreneurs.com/v2/location/${locationId}/custom-menu-link/${ROADMAP_MENU_LINK_ID}`;
+export function roadmapUrl(_locationId?: string): string {
+  // DEMO: an in-app path. fd379a59 maps to /roadmap in src/demo/nav/menuLinks.ts.
+  return menuLinkPath(ROADMAP_MENU_LINK_ID) ?? "/roadmap";
 }
 /** Show the preview only to a member with nothing real to show: no live match,
  *  and no profile vector. An embedded member whose matches have all closed gets
@@ -130,6 +135,8 @@ export function mapPreviewToCard(dto: PreviewOpportunityDto): CardOpportunity {
   return {
     id: dto.id,
     title: dto.title,
+    // DEMO: show the plain-English title on the All and Saved tabs, as on For You.
+    geminiPlainEnglishTitle: dto.geminiPlainEnglishTitle || undefined,
     agency: dto.agency.name,
     agencyAbbrev: dto.agency.name,
     workType: noticeType ?? dto.noticeType,

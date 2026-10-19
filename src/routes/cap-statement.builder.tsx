@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -11,17 +11,22 @@ import {
   Sparkles,
 } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
-import { useCurrentMember } from "../lib/mock/currentMember";
 import { useKnowledge, saveGeneratedCapStmt } from "../lib/knowledgeBase";
 import { markCapStatementSaved } from "../lib/capStatementState";
 import {
   buildCapStatementDraft,
   conciseSection,
   regenerateSection,
+  useCapFacts,
   type CapSection,
   type CapStatementDraft,
   type CapStatementOverrides,
 } from "../lib/capStatementBuilder";
+// DEMO: the builder keeps its work in the demo store and downloads real files.
+import { useDemoState } from "../demo/runtime/store";
+import { wait } from "../demo/profile/delay";
+import { buildCapStatementDocx, buildCapStatementPdf, saveBlob } from "../demo/profile/downloads";
+import { CAP_STATEMENT_FILE_NAME } from "../lib/capStatementState";
 import { AvaAvatar, AVA_IDENTITY } from "../components/Companion/identities/avaIdentity";
 import { BuilderStepper } from "../components/CapStatement/BuilderStepper";
 import { SourceFactsList, type FactKey } from "../components/CapStatement/SourceFactsList";
@@ -52,9 +57,20 @@ export const Route = createFileRoute("/cap-statement/builder")({
 
 type Step = 1 | 2 | 3 | 4;
 
+// DEMO: what the builder holds between visits. A reload keeps the step, the edited
+// facts and the draft; "Reset demo" clears them.
+interface BuilderSaved {
+  step: Step;
+  overrides: CapStatementOverrides;
+  confirmed: FactKey[];
+  draft: CapStatementDraft | null;
+  saved: boolean;
+}
+const BUILDER_INIT: BuilderSaved = { step: 1, overrides: {}, confirmed: [], draft: null, saved: false };
+
 function CapStatementBuilderPage() {
   usePageMeta({ layout: "wide" });
-  const member = useCurrentMember();
+  const member = useCapFacts();
   const { files } = useKnowledge();
   const navigate = useNavigate();
   const { refresh } = useSearch({ from: "/cap-statement/builder" });
@@ -63,29 +79,47 @@ function CapStatementBuilderPage() {
     [refresh],
   );
 
-  const [step, setStep] = useState<Step>(1);
-  const [overrides, setOverrides] = useState<CapStatementOverrides>({});
-  const [confirmed, setConfirmed] = useState<Set<FactKey>>(new Set());
-  const initialDraft = useMemo(() => buildCapStatementDraft(member), [member]);
-  const [draft, setDraft] = useState<CapStatementDraft>(initialDraft);
+  const [saveState, setSaveState] = useDemoState<BuilderSaved>("profile.capBuilder", BUILDER_INIT);
   const [generating, setGenerating] = useState(false);
-  const [saved, setSaved] = useState(false);
+  // The saved step is 1, 3 or 4. Step 2 is only the moment Ava is "drafting".
+  const step: Step = generating ? 2 : saveState.step === 2 ? 1 : saveState.step;
+  const overrides = saveState.overrides;
+  const confirmed = useMemo(() => new Set<FactKey>(saveState.confirmed), [saveState.confirmed]);
+  const draft: CapStatementDraft = useMemo(
+    () => saveState.draft ?? buildCapStatementDraft(member, saveState.overrides),
+    [saveState.draft, saveState.overrides, member],
+  );
+  const setStep = (n: Step) => setSaveState((s) => ({ ...s, step: n }));
+  const setDraft = (next: CapStatementDraft | ((d: CapStatementDraft) => CapStatementDraft)) =>
+    setSaveState((s) => {
+      const base = s.draft ?? buildCapStatementDraft(member, s.overrides);
+      return { ...s, draft: typeof next === "function" ? next(base) : next };
+    });
+  const [busyFile, setBusyFile] = useState<"pdf" | "docx" | null>(null);
+  const saved = saveState.saved && step === 4;
+  const aliveRef = useRef(true);
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+    };
+  }, []);
 
   const handleOverrideChange = (key: FactKey, value: string | null) => {
-    setOverrides((cur) => {
-      const next = { ...cur } as CapStatementOverrides;
+    setSaveState((s) => {
+      const next = { ...s.overrides } as CapStatementOverrides;
       const k = key as keyof CapStatementOverrides;
       if (value === null) delete next[k];
       else next[k] = value;
-      return next;
+      return { ...s, overrides: next };
     });
   };
   const handleConfirmedChange = (key: FactKey, on: boolean) => {
-    setConfirmed((cur) => {
-      const n = new Set(cur);
+    setSaveState((s) => {
+      const n = new Set(s.confirmed);
       if (on) n.add(key);
       else n.delete(key);
-      return n;
+      return { ...s, confirmed: [...n] };
     });
   };
 
@@ -96,22 +130,30 @@ function CapStatementBuilderPage() {
     }));
   };
 
-  const handleGenerate = () => {
-    setStep(2);
+  const handleGenerate = async () => {
     setGenerating(true);
-    window.setTimeout(() => {
-      setDraft(buildCapStatementDraft(member, overrides));
-      setGenerating(false);
-      setStep(3);
-    }, 1200);
+    await wait(1200);
+    // DEMO: the draft is built fresh from the profile and the facts she edited.
+    setSaveState((s) => ({ ...s, draft: buildCapStatementDraft(member, s.overrides), step: 3, saved: false }));
+    if (aliveRef.current) setGenerating(false);
   };
 
   const handleSave = () => {
     saveGeneratedCapStmt();
-    markCapStatementSaved();
+    markCapStatementSaved(draft);
     if (refresh) dismissRefresh(refresh);
-    setSaved(true);
-    setStep(4);
+    setSaveState((s) => ({ ...s, step: 4, saved: true }));
+  };
+
+  // DEMO: real files, built in the browser from the draft on screen.
+  const handleDownload = async (kind: "pdf" | "docx") => {
+    setBusyFile(kind);
+    try {
+      const blob = kind === "pdf" ? await buildCapStatementPdf(draft) : await buildCapStatementDocx(draft);
+      saveBlob(blob, CAP_STATEMENT_FILE_NAME.replace(/\.pdf$/, kind === "pdf" ? ".pdf" : ".docx"));
+    } finally {
+      if (aliveRef.current) setBusyFile(null);
+    }
   };
 
   return (
@@ -123,7 +165,7 @@ function CapStatementBuilderPage() {
             className="cs-back"
             onClick={() => navigate({ to: "/business-profile", search: { tab: "capabilities" } })}
           >
-            <ArrowLeft size={13} /> My Business
+            <ArrowLeft size={13} /> Business Profile
           </button>
           <div className="cs-head-main">
             <div className="cs-head-agent">
@@ -140,6 +182,13 @@ function CapStatementBuilderPage() {
             </p>
           </div>
         </header>
+
+        {pendingRefresh && (
+          <div className="cs-honesty" role="note">
+            <Sparkles size={12} />
+            You just added {pendingRefresh.triggerLabel}. Check the facts below, then draft a fresh capability statement.
+          </div>
+        )}
 
         <BuilderStepper current={step} />
 
@@ -173,7 +222,7 @@ function CapStatementBuilderPage() {
               >
                 Add to my knowledge first
               </Link>
-              <button type="button" className="cs-btn-primary" onClick={handleGenerate}>
+              <button type="button" className="cs-btn-primary" onClick={() => void handleGenerate()}>
                 Draft my capability statement <ArrowRight size={13} />
               </button>
             </div>
@@ -195,7 +244,7 @@ function CapStatementBuilderPage() {
           </section>
         )}
 
-        {step === 3 && !generating && (
+        {step === 3 && (
           <section className="cs-review">
             <div className="cs-review-grid">
               <div className="cs-review-edit">
@@ -249,15 +298,21 @@ function CapStatementBuilderPage() {
             </div>
 
             <div className="cs-export-actions">
-              <button type="button" className="cs-btn-ghost" onClick={() => window.print()}>
-                <Download size={13} /> Download PDF
+              <button
+                type="button"
+                className="cs-btn-ghost"
+                disabled={busyFile !== null}
+                onClick={() => void handleDownload("pdf")}
+              >
+                <Download size={13} /> {busyFile === "pdf" ? "Preparing…" : "Download PDF"}
               </button>
               <button
                 type="button"
                 className="cs-btn-ghost"
-                onClick={() => window.print()}
+                disabled={busyFile !== null}
+                onClick={() => void handleDownload("docx")}
               >
-                <Download size={13} /> Download DOCX
+                <Download size={13} /> {busyFile === "docx" ? "Preparing…" : "Download DOCX"}
               </button>
               {saved ? (
                 <button type="button" className="cs-btn-primary is-saved" disabled>

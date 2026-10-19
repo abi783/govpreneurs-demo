@@ -8,16 +8,10 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { usePostHog } from "posthog-js/react";
-import {
-  consumePendingNavIntent,
-  consumeOppDeepLink,
-  consumeReviewDeepLink,
-  oppDeepLinkRoute,
-} from "../lib/ghlNav";
 
 import { AppShell } from "../components/Layout/AppShell";
+import { DemoShell } from "../demo/shell/DemoShell";
 import { CommandBarProvider } from "../components/CommandBar/CommandBarProvider";
-import { DemoSessionProvider } from "../lib/demoSession";
 import { UIStateProvider } from "../lib/uiState";
 import { GhlUserProvider, useGhlUser } from "../lib/ghlUser";
 import { BusinessProfileProvider } from "../lib/businessProfile";
@@ -79,45 +73,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    // A cross-page nav from another GHL custom page (e.g. My Bids) leaves an
-    // intent in shared localStorage; consume it once on boot. Delete-before-
-    // navigate + 15s TTL make this idempotent under StrictMode double-invoke.
-    consumePendingNavIntent((route) => {
-      void router.navigate({ to: route });
-    });
-
-    // A notification deep-link stores the target opportunity or small-order id in
-    // localStorage before hard-redirecting into the GHL menu page (see
-    // routes/redirect.tsx); consume it here on boot. Skip on the /redirect
-    // route itself — that's the page that SETS the deep-link, so consuming it
-    // immediately would clear it before the GHL redirect happens. Checking
-    // window.location.pathname (not router.state.location.pathname) is
-    // deliberately robust to whether the /v2/ui basepath is included.
-    if (!window.location.pathname.endsWith("/redirect")) {
-      consumeOppDeepLink((id, kind) => {
-        void router.navigate(oppDeepLinkRoute(id, kind));
-      });
-      consumeReviewDeepLink((reviewId) => {
-        void router.navigate({ to: "/mentors/$reviewId", params: { reviewId } });
-      });
-    }
-  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <HeadContent />
       <UIStateProvider>
-        {/* DemoSessionProvider kept for /admin and /internal bypass routes */}
-        <DemoSessionProvider>
-          <GhlUserProvider>
-            <BusinessProfileProvider>
-              <AuthGate />
-            </BusinessProfileProvider>
-          </GhlUserProvider>
-        </DemoSessionProvider>
+        <GhlUserProvider>
+          <BusinessProfileProvider>
+            <AuthGate />
+          </BusinessProfileProvider>
+        </GhlUserProvider>
       </UIStateProvider>
     </QueryClientProvider>
   );
@@ -127,12 +92,6 @@ function AuthGate() {
   const { loading, error, session, refetch } = useGhlUser();
   const { location } = useRouter().state;
   const posthog = usePostHog();
-  const isPublicBypass =
-    location.pathname.startsWith("/admin") ||
-    location.pathname.startsWith("/internal") ||
-    location.pathname.startsWith("/mentor-directory") ||
-    location.pathname.startsWith("/redirect") ||
-    location.pathname.startsWith("/tools");
 
   // Tag every event from this app with app_version:"v2" so v2 traffic is
   // distinguishable from the v1 app in PostHog (v1 doesn't register this).
@@ -181,11 +140,6 @@ function AuthGate() {
       $search: location.searchStr,
     });
   }, [posthog, location.pathname, location.searchStr]);
-
-  // Admin/internal/mentor-directory bypass routes don't need GHL auth
-  if (isPublicBypass) {
-    return <Outlet />;
-  }
 
   if (loading) {
     return (
@@ -236,9 +190,12 @@ function AuthGate() {
 
   return (
     <CommandBarProvider>
-      <AppShell>
-        <Outlet />
-      </AppShell>
+      {/* DEMO: the left menu, the sample-data strip and the scrolling main area. */}
+      <DemoShell>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </DemoShell>
     </CommandBarProvider>
   );
 }

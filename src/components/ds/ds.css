@@ -1,0 +1,1147 @@
+/* DEMO: the agent workspace primitives (`.ds-*`) that Ava's chat and workspace
+   are built on, lifted from the prototype's src/styles/components.css. Only the
+   rules that Ava uses: the record primitives for My Business are left out. */
+
+/* =================================================================
+   AGENT WORKSPACE PRIMITIVES — an agent builds something with her in a
+   conversation (Ava, two phases: docs/ava/build-handoff-two-phase.md).
+   Generic: no agent name in any class. Ava composes them in styles.css
+   (.ava2-*). Colour discipline: the agent's words are amber (machine-made,
+   check it); her own words and anything she can press are blue; a person
+   (a mentor) is white with a dark edge, never amber. Nothing missing is red.
+   ================================================================= */
+
+/* ─── A side panel that folds to a strip (the right-hand twin of the rail).
+   The page sets --side-w to the panel's width; the fold handle sits on the
+   line between the page and the panel. ─── */
+.ds-side--closed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 0;
+  padding: 10px 0;
+  background: var(--surface);
+}
+.ds-side__btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.ds-side__btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.ds-side__btn:focus-visible,
+.ds-side__fold:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.ds-side__dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blue-7);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.ds-side__fold {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  right: calc(var(--side-w, 0px) - 13px);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text-2);
+  box-shadow: var(--sh-rest);
+  cursor: pointer;
+}
+.ds-side__fold:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+/* ─── Phase stepper: steps grouped under phase captions ─── */
+.ds-phases {
+  display: grid;
+  margin-top: var(--s-3);
+}
+.ds-phases__cap {
+  margin: 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+.ds-phases__cap.is-on {
+  color: var(--text-ink);
+  border-bottom-color: var(--n-11);
+}
+.ds-phases__cap .mono {
+  margin-right: 4px;
+  font-size: 11px;
+}
+.ds-steps {
+  list-style: none;
+  display: grid;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+}
+.ds-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  text-align: center;
+}
+.ds-step + .ds-step::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--n-4);
+}
+.ds-step.is-done::before,
+.ds-step.is-now::before,
+.ds-step.is-wait::before,
+.ds-step.is-human::before,
+.ds-step.is-paused::before {
+  background: var(--pos-7);
+}
+.ds-step.is-phase-start {
+  border-left: 1px dashed var(--border-strong);
+}
+.ds-step__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--n-5);
+  background: var(--surface);
+}
+.ds-step__dot svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+}
+.ds-step__dot i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.ds-step__l {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--text-2);
+}
+.ds-step__s {
+  margin-top: -3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue-7);
+}
+.ds-step.is-done .ds-step__dot {
+  border-color: var(--pos-7);
+  background: var(--pos-7);
+  color: var(--n-0);
+}
+.ds-step.is-now .ds-step__dot {
+  border-color: var(--ai-6);
+  box-shadow: 0 0 0 4px var(--ai-2);
+}
+.ds-step.is-now .ds-step__dot i {
+  background: var(--ai-7);
+  animation: ai-pulse 2.4s ease-in-out infinite;
+}
+.ds-step.is-now .ds-step__l {
+  color: var(--text);
+  font-weight: 650;
+}
+.ds-step.is-wait .ds-step__dot {
+  border-color: var(--blue-6);
+  box-shadow: 0 0 0 4px var(--blue-2);
+}
+.ds-step.is-wait .ds-step__dot i {
+  background: var(--blue-7);
+}
+.ds-step.is-wait .ds-step__l {
+  color: var(--blue-9);
+  font-weight: 650;
+}
+.ds-step.is-next .ds-step__l {
+  color: var(--text-3);
+}
+.ds-step.is-opt .ds-step__dot {
+  border-style: dashed;
+  border-color: var(--n-6);
+}
+.ds-step.is-opt .ds-step__l,
+.ds-step.is-opt .ds-step__s {
+  color: var(--text-3);
+  font-weight: 500;
+}
+.ds-step.is-human .ds-step__dot {
+  border-color: var(--n-9);
+  box-shadow: 0 0 0 4px var(--n-3);
+}
+.ds-step.is-human .ds-step__dot i {
+  background: var(--n-10);
+}
+.ds-step.is-human .ds-step__l {
+  color: var(--text);
+  font-weight: 650;
+}
+.ds-step.is-human .ds-step__s {
+  color: var(--text-2);
+}
+/* Compact: one small row, no phase captions (the dashed line still parts
+   the phases). For a workspace that gives its height to the work. */
+.ds-stepper--sm .ds-steps {
+  margin: 0;
+}
+.ds-stepper--sm .ds-step {
+  gap: 2px;
+}
+.ds-stepper--sm .ds-step + .ds-step::before {
+  top: 6px;
+}
+.ds-stepper--sm .ds-step__dot {
+  width: 14px;
+  height: 14px;
+  border-width: 1.5px;
+}
+.ds-stepper--sm .ds-step__dot svg {
+  width: 9px;
+  height: 9px;
+}
+.ds-stepper--sm .ds-step__dot i {
+  width: 5px;
+  height: 5px;
+}
+.ds-stepper--sm .ds-step.is-now .ds-step__dot,
+.ds-stepper--sm .ds-step.is-wait .ds-step__dot,
+.ds-stepper--sm .ds-step.is-human .ds-step__dot {
+  box-shadow: 0 0 0 3px var(--n-2);
+}
+.ds-stepper--sm .ds-step.is-now .ds-step__dot {
+  box-shadow: 0 0 0 3px var(--ai-2);
+}
+.ds-stepper--sm .ds-step.is-wait .ds-step__dot {
+  box-shadow: 0 0 0 3px var(--blue-2);
+}
+.ds-stepper--sm .ds-step__l {
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+.ds-stepper--sm .ds-step__s {
+  margin-top: -1px;
+  font-size: 11px;
+}
+/* When the stepper itself is narrow (a phone, or a column squeezed by the
+   panels beside it): the dots alone, and one line naming the current step.
+   Down to that point a long name wraps to two lines, so a laptop still shows
+   every step by name (8 October 2026: Ava's bid column is 60% of the screen,
+   about 560 to 650 pixels on a laptop). */
+.ds-stepper--sm {
+  container-type: inline-size;
+}
+.ds-stepper__now {
+  display: none;
+}
+@container (max-width: 500px) {
+  .ds-stepper--sm .ds-step__l,
+  .ds-stepper--sm .ds-step__s {
+    display: none;
+  }
+  .ds-stepper__now {
+    display: block;
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 650;
+    color: var(--text);
+  }
+  .ds-stepper__now span {
+    font-weight: 500;
+    color: var(--text-2);
+  }
+  .ds-stepper__now.is-wait {
+    color: var(--blue-9);
+  }
+}
+.ds-step.is-paused .ds-step__dot {
+  border-color: var(--n-7);
+  background: var(--bg-element);
+}
+.ds-step.is-paused .ds-step__dot i {
+  width: 8px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--n-8);
+}
+.ds-step.is-paused .ds-step__l {
+  color: var(--text);
+  font-weight: 650;
+}
+.ds-step.is-paused .ds-step__s {
+  color: var(--text-2);
+}
+
+/* ─── The conversation ─── */
+.ds-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* One turn from the agent: the portrait, then its messages stacked. */
+.ds-turn {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.ds-turn__av {
+  flex: none;
+  margin-top: 2px;
+}
+.ds-turn__col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding-top: 4px;
+}
+.ds-msg {
+  max-width: 88%;
+  padding: 10px 14px;
+  font-size: 15px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.ds-turn__col .ds-msg {
+  max-width: 100%;
+  align-self: flex-start;
+}
+/* The agent's words are a soft amber bubble, the way a messaging app shows
+   the other side (WhatsApp, iMessage, Intercom): a fill and no border, round
+   corners, the small corner toward its portrait (Shyam, 8 October 2026: keep
+   the amber; research in docs/ava/research/
+   chat-presentation-design-2026-10-08.md). Amber says a machine wrote it.
+   Her own words are a blue bubble; a person is white with a dark edge. */
+.ds-msg--agent {
+  padding: 10px 15px;
+  border-radius: 6px 18px 18px 18px;
+  background: var(--ai-2);
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.ds-msg--you {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 9px 15px;
+  border-radius: 18px;
+  background: var(--blue-2);
+  color: var(--blue-11);
+}
+.ds-msg--person {
+  align-self: stretch;
+  border-radius: 4px var(--r-lg) var(--r-lg) var(--r-lg);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  box-shadow: inset 3px 0 0 var(--n-10);
+  color: var(--text);
+}
+.ds-msg__tap,
+.ds-msg__voice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--blue-8);
+}
+.ds-msg__file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ds-msg__who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.ds-msg__who b {
+  font-weight: 650;
+  color: var(--text);
+}
+/* A longer answer from the agent: the same amber bubble, full width, with a
+   heading and plain text inside, never a box inside it. Three treatments
+   only: one heading size, body text, and bold. A section inside a long
+   answer is a bold line (h5) and a plain list. */
+.ds-chatcard {
+  align-self: stretch;
+  padding: 13px 16px 15px;
+  border-radius: 6px 18px 18px 18px;
+  background: var(--ai-2);
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.ds-chatcard h4 {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.4;
+  font-weight: 650;
+  color: var(--text);
+}
+.ds-chatcard h5 {
+  margin: 18px 0 0;
+  font-size: 15.5px;
+  line-height: 1.4;
+  font-weight: 650;
+  color: var(--text);
+}
+.ds-chatcard p {
+  margin: 6px 0 0;
+}
+/* Plain lists, with their bullets and numbers. :where keeps them weaker than
+   any list with its own class (file rows, ticks). */
+.ds-chatcard :where(ul, ol) {
+  margin: 6px 0 0;
+  padding-left: 22px;
+  list-style: disc;
+}
+.ds-chatcard :where(ol) {
+  list-style: decimal;
+}
+.ds-chatcard :where(li + li) {
+  margin-top: 4px;
+}
+.ds-chatcard :where(ol > li)::marker {
+  font-weight: 650;
+}
+/* A quiet one-line note under a heading. Never a whole paragraph. */
+.ds-chatcard .ds-note {
+  font-size: 14px;
+  color: var(--text-2);
+}
+.ds-chatcard--person {
+  padding: 12px 14px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: inset 3px 0 0 var(--n-10);
+}
+
+/* Files she sends: attachment rows, an icon, the name and its kind. */
+.ds-files {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--ai-3);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.ds-files li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 9px 12px;
+  background: var(--surface);
+}
+.ds-files li + li {
+  border-top: 1px solid var(--ai-3);
+}
+.ds-files__ic {
+  flex: none;
+  color: var(--text-2);
+}
+.ds-files__n {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  overflow-wrap: break-word;
+}
+.ds-files__k {
+  flex: none;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+/* Steps she ticks off: a circle and the words; a done step is struck
+   through. Never a form checkbox. */
+.ds-todo {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.ds-todo li + li .ds-todo__row {
+  border-top: 1px solid var(--ai-3);
+}
+.ds-todo__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+.ds-todo__row:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-sm);
+}
+.ds-todo__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1.5px solid var(--n-7);
+  border-radius: 50%;
+  color: var(--surface);
+}
+.ds-todo__row:hover .ds-todo__mark {
+  border-color: var(--blue-7);
+}
+.ds-todo__row[aria-checked="true"] .ds-todo__mark {
+  border-color: var(--pos-7);
+  background: var(--pos-7);
+}
+.ds-todo__row[aria-checked="true"] .ds-todo__t {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+/* Quick replies: the answers she can give, under the question. */
+.ds-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-left: 42px;
+}
+.ds-replies .btn {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  font-size: 14.5px;
+}
+/* A quiet answer reads as one: blue words, never grey text that looks like
+   more of the message (8 October 2026). */
+.ds-replies .btn-ghost {
+  color: var(--blue-8);
+}
+.ds-replies .btn-ghost:hover {
+  text-decoration: underline;
+}
+.ds-replies--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+.ds-replies--stack .btn {
+  justify-content: flex-start;
+  min-height: 48px;
+  height: auto;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  text-align: left;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+/* What a question wants, and where the answer goes. */
+.ds-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ds-proof {
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.ds-proof--later {
+  border-style: dashed;
+  color: var(--text-2);
+}
+.ds-goes {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.ds-whylink {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-7);
+  cursor: pointer;
+}
+.ds-whylink:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-sm);
+}
+
+/* The composer: talk first, type second. */
+.ds-composer__box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--sh-rest);
+}
+.ds-composer__box:focus-within {
+  border-color: var(--blue-6);
+  box-shadow: var(--ring-focus);
+}
+.ds-composer__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+}
+.ds-composer__input:focus {
+  outline: none;
+}
+.ds-composer__input::placeholder {
+  color: var(--text-3);
+}
+.ds-composer__talk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--blue-7);
+  box-shadow: var(--sh-cta-rest);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--n-0);
+  cursor: pointer;
+}
+.ds-composer__talk:hover {
+  background: var(--blue-8);
+}
+.ds-composer__talk.is-live {
+  background: var(--blue-9);
+}
+.ds-composer__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--blue-1);
+  color: var(--blue-7);
+  cursor: pointer;
+}
+.ds-composer__icon.is-live {
+  background: var(--blue-7);
+  color: var(--n-0);
+}
+.ds-composer__send {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg-element);
+  color: var(--text-2);
+  cursor: pointer;
+}
+.ds-composer__send:not(:disabled):hover {
+  background: var(--blue-7);
+  color: var(--n-0);
+}
+.ds-composer__talk:focus-visible,
+.ds-composer__icon:focus-visible,
+.ds-composer__send:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.ds-composer__note {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ─── The thinking trace: the agent shows its work ─── */
+.ds-think {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 42px;
+}
+.ds-think__row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  text-align: left;
+}
+.ds-think__row:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.ds-think__time {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.ds-think__chev {
+  width: 15px;
+  height: 15px;
+  color: var(--text-3);
+  transition: transform var(--d-fast) var(--ease);
+}
+.ds-think__row[aria-expanded="true"] .ds-think__chev {
+  transform: rotate(90deg);
+}
+.ds-think--done .ds-think__row {
+  font-size: 14px;
+  color: var(--text-3);
+}
+.ds-think__steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 0 7px;
+  padding: 2px 0 2px 16px;
+  border-left: 2px solid var(--border-strong);
+}
+.ds-think__steps li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.ds-think__steps b {
+  font-weight: 600;
+  color: var(--text);
+}
+.ds-think__found {
+  display: block;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.ds-spin {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--ai-3);
+  border-top-color: var(--ai-7);
+  animation: ds-spin 0.9s linear infinite;
+}
+.ds-think__steps .ds-spin {
+  width: 14px;
+  height: 14px;
+  margin: 2px 2px 0;
+}
+@keyframes ds-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ds-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--n-8) 0%,
+    var(--n-8) 30%,
+    var(--ai-7) 48%,
+    var(--ai-5) 52%,
+    var(--n-8) 70%,
+    var(--n-8) 100%
+  );
+  background-size: 260% 100%;
+  background-position: 45% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ds-shimmer 2.2s linear infinite;
+}
+@keyframes ds-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+/* ─── Status marks: done, needs her, working, not yet, locked ─── */
+.ds-ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+.ds-ic svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.25;
+}
+.ds-ic--done {
+  background: var(--pos-2);
+  color: var(--pos-7);
+}
+.ds-ic--need {
+  border: 1.5px dashed var(--blue-5);
+}
+.ds-ic--now {
+  background: var(--ai-2);
+  box-shadow: 0 0 0 1px var(--ai-4);
+}
+.ds-ic--now i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ai-7);
+  animation: ai-pulse 2.4s ease-in-out infinite;
+}
+.ds-ic--next {
+  border: 1.5px dashed var(--n-6);
+}
+.ds-ic--lock {
+  border-radius: var(--r-sm);
+  background: var(--bg-element);
+  color: var(--text-2);
+}
+.ds-ic--sm {
+  width: 18px;
+  height: 18px;
+}
+.ds-ic--sm svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ─── "Showing you": what the agent is reading, asking or writing ─── */
+.ds-show {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-subtle);
+}
+.ds-show__h {
+  flex: none;
+  padding: 14px var(--s-5);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.ds-show__l {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ai-8);
+}
+.ds-show__l i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ai-7);
+}
+.ds-show__t {
+  display: block;
+  margin-top: 2px;
+  font-size: 15.5px;
+  font-weight: 650;
+  color: var(--text);
+}
+.ds-show__b {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-height: 0;
+  padding: var(--s-4);
+  overflow: auto;
+}
+.ds-show__note {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+/* ─── A hole: a part of her document waiting on her input ─── */
+.ds-hole {
+  display: block;
+  width: 100%;
+  margin-top: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border: 1.5px dashed var(--blue-5);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+  font: inherit;
+  text-align: left;
+  color: var(--blue-11);
+  cursor: pointer;
+}
+.ds-hole b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--blue-11);
+}
+.ds-hole__p {
+  display: block;
+  margin-top: 2px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--blue-9);
+}
+.ds-hole__act {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--blue-7);
+}
+.ds-hole:hover {
+  border-color: var(--blue-6);
+}
+.ds-hole.is-on {
+  border-style: solid;
+  border-color: var(--blue-7);
+  box-shadow: 0 0 0 3px var(--blue-3);
+}
+.ds-hole:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+/* A hole inside a sentence: the blank she fills. */
+.ds-hole--inline {
+  display: inline;
+  width: auto;
+  margin: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--blue-9);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ─── The fold-away rail (a checklist that folds to a strip) ───
+   Attached to the page's left edge, full height, with one line on its right:
+   a plain strip, not a floating box (Shyam, 8 October 2026). The page puts
+   it against the edge and lets it run from the header to the bottom. */
+.ds-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+.ds-rail--closed {
+  align-items: center;
+  gap: var(--s-2);
+  padding: 10px 0;
+}
+.ds-rail__btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.ds-rail__btn:hover {
+  background: var(--bg-hover);
+}
+.ds-rail__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.ds-rail__count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+.ds-rail__head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 10px var(--s-4) 10px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.ds-rail__head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+}
+.ds-rail__head .ds-rail__count {
+  font-size: 14px;
+}
+.ds-rail__body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--s-3);
+  overflow: auto;
+}
+.ds-rail__grp + .ds-rail__grp {
+  margin-top: var(--s-4);
+}
+.ds-rail__gh {
+  padding: 0 var(--s-2) 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.ds-rail__needs {
+  padding: 2px var(--s-1);
+  border: 1px solid var(--blue-3);
+  border-radius: var(--r-md);
+  background: var(--blue-1);
+}
+.ds-rail__row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: var(--s-3);
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px var(--s-2);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--text);
+}
+button.ds-rail__row {
+  cursor: pointer;
+}
+button.ds-rail__row:hover {
+  background: var(--bg-hover);
+}
+button.ds-rail__row:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+}
+.ds-rail__row + .ds-rail__row {
+  border-top: 1px solid var(--border-soft);
+}
+.ds-rail__needs .ds-rail__row + .ds-rail__row {
+  border-top-color: var(--blue-3);
+}
+.ds-rail__act {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--blue-7);
+}
+.ds-rail__act--quiet {
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-spin,
+  .ds-shimmer,
+  .ds-step.is-now .ds-step__dot i,
+  .ds-ic--now i {
+    animation: none;
+  }
+  .ds-shimmer {
+    color: var(--text-2);
+    background: none;
+  }
+  .ds-think__chev {
+    transition: none;
+  }
+}

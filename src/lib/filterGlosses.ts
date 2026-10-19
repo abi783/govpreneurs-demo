@@ -21,8 +21,9 @@ export const FACET_GLOSS: Record<string, Gloss> = {
   },
   setAsides: {
     label: "Set-aside",
+    // DEMO: the sample member is woman-owned (WOSB), not a service-disabled veteran.
     gloss:
-      "Contracts only certain businesses can bid — your SDVOSB status qualifies you for several.",
+      "Contracts only certain businesses can bid — your woman-owned (WOSB) and small-business status qualifies you for several.",
   },
   valueRange: {
     label: "Estimated Contract Value",
@@ -34,7 +35,8 @@ export const FACET_GLOSS: Record<string, Gloss> = {
   },
   naics: {
     label: "NAICS code",
-    gloss: "The government's industry codes — we've prefilled yours (238160 Roofing Contractors).",
+    // DEMO: the sample member's own code is 722310, Food Service Contractors.
+    gloss: "The government's industry codes — we've prefilled yours (722310 Food Service Contractors).",
   },
   psc: {
     label: "PSC / FSC code",

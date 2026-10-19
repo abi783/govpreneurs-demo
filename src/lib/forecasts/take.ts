@@ -99,7 +99,7 @@ function lineOf(fact: ForecastTakeFact | undefined, unit: Unit, cap: CapMeaning 
   return counted && count ? { fact: counted, count } : null;
 }
 
-/** "Acme Roofing (12), Beta Build (9)", from the market-winners tally. */
+/** "Acme Catering (12), Beta Food Group (9)", from the market-winners tally. */
 function topFirms(fact: Counted): string | null {
   const firms = fact.source.provenance.tally?.firms;
   if (!Array.isArray(firms)) return null;

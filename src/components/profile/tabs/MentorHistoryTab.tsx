@@ -1,35 +1,29 @@
-import { MentorSessionCard, type MentorSession } from "../MentorSessionCard";
+import { Link } from "@tanstack/react-router";
+import { MentorSessionCard } from "../MentorSessionCard";
+import { useMentorSessions } from "../../../demo/profile/mentor";
+import { MENTOR } from "../../../demo/story/persona";
 
-const SESSIONS: MentorSession[] = [
-  {
-    id: "session-2026-04-22",
-    date: "April 22, 2026",
-    time: "9:00 AM",
-    mentor: "Sarah Mitchell",
-    status: "completed",
-    takeaway:
-      "Focus on USACE small business set-asides; capability statement needs more recent past performance.",
-  },
-];
-
+// DEMO: the sessions come from the story's mentor reviews (Sarah Mitchell) and the
+// takeaways the visitor writes are kept in the demo store.
 export function MentorHistoryTab() {
+  const sessions = useMentorSessions();
   return (
     <div className="pp-tab">
       <header className="pp-tab-header">
         <h2 className="pp-tab-title">Mentor History</h2>
         <div className="pp-tab-actions">
-          <button
-            type="button"
-            className="pp-btn-primary"
-            onClick={() => console.log("Book your next session clicked")}
-          >
+          <Link to="/find-a-mentor" className="pp-btn-primary">
             Book your next session
-          </button>
+          </Link>
         </div>
       </header>
 
+      <p className="pp-import-note">
+        Your mentor is {MENTOR.name}, {MENTOR.title.toLowerCase()}.
+      </p>
+
       <div className="pp-list">
-        {SESSIONS.map((s) => (
+        {sessions.map((s) => (
           <MentorSessionCard key={s.id} session={s} />
         ))}
       </div>

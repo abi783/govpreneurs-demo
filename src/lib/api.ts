@@ -1,13 +1,9 @@
 // API client for GovPreneurs backend
 // Uses VITE_API_BASE_URL from .env (copied from .env.example)
 
-// tools.govpreneurs.com serves the SPA and the API from the same origin —
-// force same-origin requests there regardless of the build-time env var.
-const TOOLS_HOST = import.meta.env.VITE_TOOLS_HOST ?? 'tools.govpreneurs.com';
-const API_BASE_URL =
-  typeof window !== 'undefined' && window.location.hostname === TOOLS_HOST
-    ? ''
-    : (import.meta.env.VITE_API_BASE_URL ?? '');
+// DEMO: every backend call goes to this fixed prefix. src/demo/runtime/fetchInterceptor.ts
+// answers it in the browser, so no request ever leaves the page.
+const API_BASE_URL = '/__demo_api';
 
 const GHL_TOKEN_KEY = 'ghl_token';
 const MOCK_LOCATION_ID_KEY = 'mock_location_id';

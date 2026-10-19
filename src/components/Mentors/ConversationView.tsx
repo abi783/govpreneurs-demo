@@ -13,6 +13,8 @@ import {
 } from "../../lib/mentorReviewsApi";
 import { ReplyComposer } from "./ReplyComposer";
 import { relTime } from "./format";
+// DEMO: shows the numbers of a numbered list in a mentor's message.
+import "../../demo/explore/explore.css";
 
 function Initials({ name }: { name: string }) {
   const parts = name.split(/\s+/).filter(Boolean);

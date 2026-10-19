@@ -33,7 +33,7 @@ function selectGap(m: ReturnType<typeof useCurrentMember>, dismissCount: number)
       primaryModal: "tell_value_range",
     };
   }
-  // Default Marcus gap
+  // Default gap
   if (!m.capabilityStatementUploaded) {
     return {
       id: "capability_statement",
@@ -200,8 +200,6 @@ export function HunterKnowsYouEmbed({
                   {session?.locationId ? (
                     <a
                       href={capabilityStatementUrl(session.locationId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="ky-btn-primary ky-btn-icon"
                       onClick={() => setModal(null)}
                     >

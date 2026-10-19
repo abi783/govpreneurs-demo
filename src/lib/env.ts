@@ -14,10 +14,6 @@
  * tests can stub `window`/`import.meta.env` before calling it.
  */
 export function isMockEnv(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    (import.meta.env.DEV ||
-      window.location?.hostname === "localhost" ||
-      window.location?.hostname === "127.0.0.1")
-  );
+  // DEMO: always false. The demo behaves the same on localhost and on a deployed host.
+  return false;
 }

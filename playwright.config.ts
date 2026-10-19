@@ -1,24 +1,31 @@
 import { defineConfig } from "@playwright/test";
+import os from "node:os";
 
-// Headless E2E for the Grant rail UX. Boots the Vite dev server and drives the
-// harness page (e2e/harness.html) which mounts the real GrantRail component;
-// backend calls (/grants-take/rail) are intercepted per-test.
+// QA crawl: chromium, headless, against `vite preview` of a production build.
+// Port: QA_PORT (default 4318). Use a different port if two runs share a machine.
+// Workers: QA_WORKERS (default: half the CPUs, at most 6).
+const PORT = Number(process.env.QA_PORT ?? 4318);
+const WORKERS = Number(process.env.QA_WORKERS ?? Math.max(2, Math.min(6, Math.floor(os.cpus().length / 2))));
+
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./qa",
   testMatch: "**/*.spec.ts",
-  fullyParallel: false,
-  workers: 1,
-  timeout: 30_000,
+  fullyParallel: true,
+  workers: WORKERS,
+  timeout: 10 * 60_000,
   reporter: [["list"]],
+  globalSetup: "./qa/globalSetup.ts",
+  globalTeardown: "./qa/globalTeardown.ts",
   use: {
-    // The app is served under Vite's base ('/v2/ui'); the harness lives there too.
-    baseURL: "http://localhost:5199/v2/ui/",
+    baseURL: `http://127.0.0.1:${PORT}`,
     headless: true,
+    viewport: { width: 1280, height: 800 },
   },
   webServer: {
-    command: "npm run dev -- --port 5199 --strictPort",
-    port: 5199,
+    // The build goes to its own folder so a QA run never touches `dist/`.
+    command: `bunx vite build --outDir .qa-dist/${PORT} --emptyOutDir && bunx vite preview --outDir .qa-dist/${PORT} --port ${PORT} --strictPort`,
+    url: `http://127.0.0.1:${PORT}/`,
     reuseExistingServer: false,
-    timeout: 120_000,
+    timeout: 180_000,
   },
 });

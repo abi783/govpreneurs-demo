@@ -12,7 +12,8 @@ import {
 
 export const OPPORTUNITY_HELP_OPTIONS: MentorHelpOption[] = [
   { label: "Should I bid on this?" },
-  { label: "Am I eligible?", detail: "(set-aside, licences, bonding, experience)" },
+  // DEMO: "licenses", the US spelling.
+  { label: "Am I eligible?", detail: "(set-aside, licenses, bonding, experience)" },
   { label: "Pricing" },
   { label: "Writing the proposal" },
   { label: "Teaming or subcontracting" },
@@ -51,7 +52,7 @@ export function SendToMentorModal({
       }
       readLabel="I've read the scope of work"
       helpOptions={OPPORTUNITY_HELP_OPTIONS}
-      questionPlaceholder={`e.g. "I do roofing but haven't done a water plant. Does my past work count, and is the bond a problem?"`}
+      questionPlaceholder={`e.g. "I cook 1,100 meals a day for a school district but have never run a dining hall. Does my past work count, and is the bond a problem?"`}
     />
   );
 }

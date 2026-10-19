@@ -6,14 +6,13 @@
  * plain external link rather than requestCrossPageNav — adding a page key
  * there is out of scope here.
  */
-const SUCCESS_CENTER_URL = "https://scv2.govpreneurs.com";
+// DEMO: the Success Center is the app home ("/"), so this is an in-app link.
+const SUCCESS_CENTER_URL = "/";
 
 export function SuccessCenterLink() {
   return (
     <a
       href={SUCCESS_CENTER_URL}
-      target="_blank"
-      rel="noreferrer"
       className="btn btn-primary btn-sm"
     >
       Add your trade

@@ -1678,7 +1678,7 @@ export function narrowedSummary(
       ? null
       : categories.length === 1
         ? `Only ${CATEGORY_LABEL[categories[0]].toLowerCase()}.`
-        : `Only the ${categories.length} kinds of parts you picked.`;
+        : `Only the ${categories.length} kinds of items you picked.`;
   return [parts, filterSummary(filters)].filter(Boolean).join(" ");
 }
 
@@ -2578,7 +2578,7 @@ export function heldBack(r: MicroResult): string[] {
  * slot on those. This takes the tail slot only where she has told us nothing.
  */
 const BOARD_COVERS =
-  "This board only has parts DLA buys. If you sell something else, it will not be here yet.";
+  "This board only has items DLA buys. If you sell something else, it will not be here yet.";
 
 /**
  * Hunter's opening line on the For you tab (owner's wording, 2026-09-15): how

@@ -1,0 +1,440 @@
+/* DEMO: styles for the parts of Grant's take that the demo adds to production's page:
+   the "I would change this call if" list, the post-No-Bid roadmap, and the Ava action. */
+
+.gt-change__ifs {
+  margin-top: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border-soft);
+}
+.gt-change__ifslabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.gt-change__ifs ul {
+  list-style: none;
+  margin: var(--s-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gt-change__ifs li {
+  position: relative;
+  padding-left: 1.1em;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.gt-change__ifs li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 6px;
+  height: 2px;
+  background: var(--text-3);
+}
+
+/* Post-No-Bid roadmap: an ordered list of what to fix. */
+.gt-roadmap {
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--warn-7);
+  background: var(--surface);
+}
+.gt-roadmap__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.gt-roadmap__item {
+  display: flex;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.gt-roadmap__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.gt-roadmap__n {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--warn-9);
+  background: var(--warn-2);
+}
+.gt-roadmap__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.gt-roadmap__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.gt-roadmap__line {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.gt-roadmap__label {
+  display: inline-block;
+  margin-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.gt-roadmap__body .btn {
+  margin-top: var(--s-2);
+}
+.gt-roadmap__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pos-9);
+}
+
+/* Header action: build this bid with Ava. */
+.opp-ava-btn {
+  gap: 6px;
+}
+
+.grant-light__unlock-note {
+  margin: var(--s-2) 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* A contact line that is text, not a link. It keeps the look of the contact grid. */
+.contact-link--plain {
+  color: var(--text);
+  text-decoration: none;
+  cursor: text;
+}
+
+/* "Show N more" under the strengths. */
+.gt-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--s-2);
+  padding: 4px 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue-7);
+  cursor: pointer;
+}
+.gt-more:hover {
+  text-decoration: underline;
+}
+.gt-more__chev {
+  transition: transform var(--d-fast) var(--ease);
+}
+.gt-more__chev.is-open {
+  transform: rotate(90deg);
+}
+
+/* The page header: a long official title needs a whole line, so the actions drop below it
+   when the three buttons and the title do not fit side by side. */
+.opp-detail-main--opp .opp-sticky {
+  flex-wrap: wrap;
+  row-gap: var(--s-2);
+}
+.opp-detail-main--opp .opp-sticky__heading {
+  flex: 1 1 22rem;
+}
+.opp-detail-main--opp .opp-sticky__actions {
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+/* ═══ Styles production's full analysis was missing ═══════════════════════════
+   The compliance checklist, the reads that open to their reasoning, the red team
+   and the section ledger had class names in the markup and no rules for them, so
+   the browser drew them as bare text with native triangles. */
+
+/* One look for every "tap to open" line in the full analysis. */
+.grant-matrix > summary,
+.grant-redteam > summary,
+.grant-coverage > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.grant-matrix > summary::-webkit-details-marker,
+.grant-redteam > summary::-webkit-details-marker,
+.grant-coverage > summary::-webkit-details-marker,
+.grant-read__summary::-webkit-details-marker {
+  display: none;
+}
+.grant-matrix,
+.grant-redteam,
+.grant-coverage {
+  border-top: 1px solid var(--border);
+  padding-top: var(--s-3);
+}
+.grant-matrix__chev,
+.grant-redteam__chev,
+.grant-coverage__chev {
+  flex: none;
+  transition: transform var(--d-fast) var(--ease);
+}
+.grant-matrix[open] .grant-matrix__chev,
+.grant-redteam[open] .grant-redteam__chev,
+.grant-coverage[open] .grant-coverage__chev {
+  transform: rotate(90deg);
+}
+.grant-redteam__icon {
+  flex: none;
+  color: var(--text-3);
+}
+.grant-redteam b,
+.grant-coverage b {
+  color: var(--text-ink);
+}
+
+/* Compliance checklist */
+.grant-matrix__title {
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.grant-matrix__count {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+.grant-matrix__flag {
+  font-weight: 700;
+}
+.grant-matrix__flag--ok {
+  color: var(--pos-9);
+}
+.grant-matrix__flag--blocked {
+  color: var(--urg-8);
+}
+.grant-matrix__flag--confirm {
+  color: var(--warn-9);
+}
+.grant-matrix__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+}
+.grant-matrix__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.grant-matrix__row:last-child {
+  border-bottom: none;
+}
+.grant-matrix__row > .grant-glyph {
+  flex: none;
+  margin-top: 2px;
+}
+.grant-matrix__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.grant-matrix__req {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.grant-matrix__req .grant-pin {
+  margin-left: 6px;
+}
+.grant-matrix__vals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--s-4);
+  font-size: 12.5px;
+}
+.grant-matrix__need {
+  color: var(--text-3);
+}
+.grant-matrix__you {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Reads: each one is a line that opens to its reasoning. */
+.grant-read__static,
+.grant-read__d {
+  flex: 1;
+  min-width: 0;
+}
+.grant-read__summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.grant-read__d[open] .grant-read__chev {
+  transform: rotate(90deg);
+}
+.grant-read__chev {
+  transition: transform var(--d-fast) var(--ease);
+}
+.grant-read__static {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.grant-read__pins {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: 6px;
+  vertical-align: baseline;
+}
+.grant-read__dossier {
+  margin: var(--s-2) 0 0 calc(11px + var(--s-3));
+  padding: var(--s-2) var(--s-3);
+  border-left: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.grant-read__dline {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+/* Red team */
+.grant-redteam__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.grant-redteam__q {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-ink);
+}
+.grant-redteam__a {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* Section coverage ledger */
+.grant-coverage__openflag {
+  color: var(--warn-9);
+  font-weight: 700;
+}
+.grant-coverage__list {
+  list-style: none;
+  margin: var(--s-3) 0 0;
+  padding: 0;
+}
+.grant-coverage__row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: start;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.grant-coverage__row:last-child {
+  border-bottom: none;
+}
+.grant-coverage__sec {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-3);
+}
+.grant-coverage__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.grant-coverage__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-ink);
+}
+.grant-coverage__owners {
+  margin-left: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+.grant-coverage__finding {
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.grant-coverage__state {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.grant-coverage__state--open {
+  color: var(--warn-9);
+}
+
+.grant-degraded__body {
+  min-width: 0;
+}
+
+/* Reference documents: the whole row is the link. */
+.ref-doc__link:hover .ref-doc__name {
+  text-decoration: underline;
+}
+.feedback-comment__title {
+  font-weight: 600;
+  color: var(--text-ink);
+}

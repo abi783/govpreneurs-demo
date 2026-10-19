@@ -23,7 +23,7 @@ import { NarrowSheet } from "./NarrowSheet";
 import { MicroSheet } from "./MicroSheet";
 import { NO_FILTERS, EMPTY_CONTEXT } from "../../lib/microPurchases/relevance";
 import { type BoardFeed } from "../../lib/microPurchases/feed";
-import type { MicroCategory } from "../../lib/microPurchases/categories";
+import { MICRO_CATEGORIES, type MicroCategory } from "../../lib/microPurchases/categories";
 import { CORPUS, MICRO_ORDERS, TODAY } from "../../lib/mock/microPurchaseOrders";
 
 afterEach(cleanup);
@@ -164,7 +164,8 @@ describe("the category list in the filter menu is the list and nothing else", ()
     expect(inDocument("textarea")).toBeNull();
     expect(inDocument(".mp-heard")).toBeNull();
     expect(screen.queryByText("Or pick from these")).toBeNull();
-    expect(document.querySelectorAll(".mp-cats .mp-cat")).toHaveLength(12);
+    // DEMO: the demo adds three food-service categories to the twelve, so the count follows the list.
+    expect(document.querySelectorAll(".mp-cats .mp-cat")).toHaveLength(MICRO_CATEGORIES.length);
   });
 
   it("lays the twelve out in two columns once the sheet has the width", () => {

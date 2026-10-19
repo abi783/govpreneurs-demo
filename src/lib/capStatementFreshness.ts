@@ -1,8 +1,8 @@
-// Cap-statement freshness — in-memory store of pending refresh prompts
-// triggered when new cert/project/capability sources land in the KB.
+// Cap-statement freshness — refresh prompts that appear when a new certificate,
+// project or capability file lands in the knowledge base.
+// DEMO: kept in the demo store (key `profile.capFresh`), so a prompt survives a reload.
 
-import { useSyncExternalStore } from "react";
-import { bus } from "./eventBus";
+import { readDemoState, updateDemoState, useDemoState } from "../demo/runtime/store";
 import type { KnowledgeSource } from "./knowledgeBase";
 
 export interface PendingRefresh {
@@ -18,7 +18,7 @@ export const CAP_FRESH_CHANGED_EVENT = "cap-fresh-changed";
 const KEYWORDS: { match: RegExp; kind: PendingRefresh["triggerKind"]; label: (n: string) => string }[] = [
   { match: /cmmc/i, kind: "cert", label: (n) => labelFromName(n, "cert") },
   { match: /cert(ificate|ification)?/i, kind: "cert", label: (n) => labelFromName(n, "cert") },
-  { match: /license/i, kind: "cert", label: (n) => labelFromName(n, "license") },
+  { match: /license|permit/i, kind: "cert", label: (n) => labelFromName(n, "license") },
   { match: /project|past performance|past-performance|award/i, kind: "project", label: (n) => labelFromName(n, "project") },
   { match: /capabilit/i, kind: "capability", label: (n) => labelFromName(n, "capability") },
 ];
@@ -28,75 +28,68 @@ function labelFromName(name: string, fallback: string): string {
   return base || fallback;
 }
 
-let pending: PendingRefresh[] = [];
-let seen: Record<string, true> = {};
+interface FreshState {
+  pending: PendingRefresh[];
+  seen: Record<string, true>;
+}
+
+const KEY = "profile.capFresh";
+const seed = (): FreshState => ({ pending: [], seen: {} });
 
 export function scanForFreshness(sources: KnowledgeSource[]) {
-  const newOnes: PendingRefresh[] = [];
-  for (const src of sources) {
-    if (seen[src.id]) continue;
-    if (src.kind === "generated") {
+  updateDemoState<FreshState>(KEY, seed, (state) => {
+    const seen = { ...state.seen };
+    const newOnes: PendingRefresh[] = [];
+    for (const src of sources) {
+      if (seen[src.id]) continue;
       seen[src.id] = true;
-      continue;
+      if (src.kind === "generated") continue;
+      const hit = KEYWORDS.find((k) => k.match.test(src.name));
+      if (!hit) continue;
+      if (state.pending.some((p) => p.triggerSourceId === src.id)) continue;
+      newOnes.push({
+        id: `refresh_${src.id}`,
+        triggerSourceId: src.id,
+        triggerLabel: hit.label(src.name),
+        triggerKind: hit.kind,
+        createdAt: new Date().toISOString(),
+      });
     }
-    const hit = KEYWORDS.find((k) => k.match.test(src.name));
-    if (!hit) {
-      seen[src.id] = true;
-      continue;
-    }
-    if (pending.some((p) => p.triggerSourceId === src.id)) {
-      seen[src.id] = true;
-      continue;
-    }
-    newOnes.push({
-      id: `refresh_${src.id}`,
-      triggerSourceId: src.id,
-      triggerLabel: hit.label(src.name),
-      triggerKind: hit.kind,
-      createdAt: new Date().toISOString(),
-    });
-    seen[src.id] = true;
-  }
-  if (newOnes.length > 0) {
-    pending = [...pending, ...newOnes];
-    bus.publish("capFresh");
-  }
+    return { pending: [...state.pending, ...newOnes], seen };
+  });
 }
 
 export function listPendingRefresh(): PendingRefresh[] {
-  return pending;
+  return readDemoState<FreshState>(KEY, seed).pending;
 }
 
 export function getPendingRefresh(id: string): PendingRefresh | undefined {
-  return pending.find((p) => p.id === id);
+  return listPendingRefresh().find((p) => p.id === id);
 }
 
 export function dismissRefresh(id: string) {
-  pending = pending.filter((p) => p.id !== id);
-  bus.publish("capFresh");
+  updateDemoState<FreshState>(KEY, seed, (s) => ({ ...s, pending: s.pending.filter((p) => p.id !== id) }));
 }
 
 export function clearAllRefresh() {
-  pending = [];
-  bus.publish("capFresh");
+  updateDemoState<FreshState>(KEY, seed, (s) => ({ ...s, pending: [] }));
 }
 
 export function primeSeen(sources: KnowledgeSource[]) {
-  for (const s of sources) seen[s.id] = true;
-}
-
-function snapshot(): PendingRefresh[] {
-  return pending;
+  updateDemoState<FreshState>(KEY, seed, (s) => {
+    const seen = { ...s.seen };
+    let changed = false;
+    for (const src of sources) {
+      if (!seen[src.id]) {
+        seen[src.id] = true;
+        changed = true;
+      }
+    }
+    return changed ? { ...s, seen } : s;
+  });
 }
 
 export function usePendingRefresh(): PendingRefresh[] {
-  return useSyncExternalStore(
-    (cb) => {
-      const a = bus.subscribe("capFresh", cb);
-      const b = bus.subscribe("knowledge", cb);
-      return () => { a(); b(); };
-    },
-    snapshot,
-    snapshot,
-  );
+  const [state] = useDemoState<FreshState>(KEY, seed);
+  return state.pending;
 }

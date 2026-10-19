@@ -1,5 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { dismissMissing, useKnowledgeHub } from "../../lib/knowledgeHub";
+import { useKnowledgeHub } from "../../lib/knowledgeHub";
 
 export function StillMissing() {
   const { missing } = useKnowledgeHub();
@@ -18,16 +19,11 @@ export function StillMissing() {
           <li key={m.key} className="kh-missing-row">
             <span className="kh-missing-dot" aria-hidden />
             <span className="kh-missing-label">{m.label}</span>
-            <button
-              type="button"
-              className="kh-btn-link"
-              onClick={() => {
-                console.log("add missing:", m.key);
-                dismissMissing(m.key);
-              }}
-            >
+            {/* DEMO: Add opens the Business Profile tab where the answer is entered.
+                The item leaves this list once the field has an answer. */}
+            <Link to="/business-profile" search={{ tab: m.tab }} className="kh-btn-link">
               <Plus size={12} /> Add
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

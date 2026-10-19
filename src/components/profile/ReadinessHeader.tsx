@@ -1,41 +1,75 @@
 import { useState } from "react";
-import { AlertTriangle, ArrowRight, HelpCircle, Sparkles } from "lucide-react";
-import * as Tooltip from "@radix-ui/react-tooltip";
-import { hasAnyDfy } from "../../lib/mock/businessProfile";
-import { AggregatedDfyModal } from "./AggregatedDfyModal";
-import { useProfileMode } from "./BusinessProfileMode";
+import { Link } from "@tanstack/react-router";
+import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
+import { HelpPopover } from "./HelpPopover";
+import { AggregatedDfyModal, useDfyCandidates } from "./AggregatedDfyModal";
 import { Card } from "../ui/Card";
-import { useGhlUser } from "../../lib/ghlUser";
-import { roadmapUrl } from "../../lib/preview";
+import { FOR_YOU } from "../../demo/story/opportunities";
+import { PERSONA } from "../../demo/story/persona";
+import { FIELD_DEFS, effectiveField } from "../../demo/profile/fields";
+import { useFieldOverrides } from "../../demo/profile/store";
+import { useSledRegistrations } from "../../demo/profile/sled";
+import { usePastPerformance } from "../../demo/profile/pastPerformance";
+import type { TabSlug } from "./TabNavigation";
 
-// Hardcoded per H2 Step 5 anti-hallucination guard.
-const NOT_READY_DEFAULT = [
-  "SDVOSB set-asides (need certification document)",
-  "SLED in VA, SC, GA (no state vendor registration yet)",
-];
-const COULD_HELP_DEFAULT = [
-  "a capability statement (improves match across the board)",
-  "a DSBS profile (so federal buyers can find you)",
-];
+interface Gap {
+  key: string;
+  label: string;
+  tab: TabSlug;
+}
 
-const NOT_READY_COLD = [
-  "SDVOSB set-asides (need cert document)",
-  "SLED in NC, VA, SC, GA (no state registrations)",
-];
-const COULD_HELP_COLD = [
-  "your target value range",
-  "your set-aside appetite",
-  "a capability statement",
-];
-
+// DEMO: the counts and both lists are worked out from the story and the profile, so
+// they change as the visitor fills in fields. Each line opens the tab that fixes it.
 export function ReadinessHeader() {
   const [dfyOpen, setDfyOpen] = useState(false);
-  const showDfy = hasAnyDfy();
-  const mode = useProfileMode();
-  const { session } = useGhlUser();
-  const locationId = session?.locationId;
-  const NOT_READY = mode === "onboarding" ? NOT_READY_COLD : NOT_READY_DEFAULT;
-  const COULD_HELP = mode === "onboarding" ? COULD_HELP_COLD : COULD_HELP_DEFAULT;
+  const overrides = useFieldOverrides();
+  const sled = useSledRegistrations();
+  const pp = usePastPerformance();
+  const candidates = useDfyCandidates();
+  const showDfy = candidates.length > 0;
+
+  // The opportunities on Hunter's "for you" list that he rates a priority or a strong fit.
+  const ready = FOR_YOU.filter(
+    (o) => o.closesInDays > 6 && (o.hunter.tier === "priority" || o.hunter.tier === "strong"),
+  );
+  const fed = ready.filter((o) => o.scope === "fed").length;
+  const sledCount = ready.filter((o) => o.scope === "sled").length;
+
+  const state = (id: string) => effectiveField(FIELD_DEFS[id], overrides).state;
+  const open = sled.filter((r) => r.status !== "registered");
+
+  const notReady: Gap[] = [];
+  if (open.length > 0) {
+    notReady.push({
+      key: "sled",
+      label: `SLED in ${open.map((r) => r.state).join(", ")} (no state vendor registration yet)`,
+      tab: "sled",
+    });
+  }
+  if (state("ein") === "missing") {
+    notReady.push({ key: "ein", label: "Federal payments and invoices (your EIN is not on file)", tab: "identity" });
+  }
+  if (PERSONA.clearances.length === 0) {
+    notReady.push({
+      key: "clearance",
+      label: "Bids that need cleared staff (no one on your team holds a clearance)",
+      tab: "capabilities",
+    });
+  }
+
+  const couldHelp: Gap[] = [];
+  if (state("dsbs") === "missing") {
+    couldHelp.push({ key: "dsbs", label: "a DSBS profile (so federal buyers can find you)", tab: "certifications" });
+  }
+  if (pp.some((e) => e.cpars === "Awaiting rating")) {
+    couldHelp.push({ key: "cpars", label: "a performance rating (CPARS) for your Womack job", tab: "past-performance" });
+  }
+  if (state("win-themes") === "missing") {
+    couldHelp.push({ key: "win", label: "your win themes (so Ava drafts in your voice)", tab: "positioning" });
+  }
+  if (state("psc-codes") === "missing") {
+    couldHelp.push({ key: "psc", label: "your PSC codes (another way buyers search)", tab: "capabilities" });
+  }
 
   return (
     <Card asChild className="ui-card--readiness">
@@ -43,30 +77,18 @@ export function ReadinessHeader() {
         {/* KPI */}
         <div className="rh-kpi">
           <div className="rh-kpi-value">
-            <span>247</span>
+            <span>{fed}</span>
             <span className="rh-kpi-unit">federal</span>
             <span className="rh-kpi-dot">·</span>
-            <span>0</span>
+            <span>{sledCount}</span>
             <span className="rh-kpi-unit">SLED</span>
           </div>
           <div className="rh-kpi-caption">
             <span>Opportunities you're ready to bid on today</span>
-            <Tooltip.Provider delayDuration={150}>
-              <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <button type="button" className="rh-help-btn" aria-label="About these counts">
-                    <HelpCircle size={13} />
-                  </button>
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content className="rh-tooltip" side="top" sideOffset={6}>
-                    Numbers refresh daily. Federal count includes opportunities where you meet all
-                    hard prerequisites.
-                    <Tooltip.Arrow className="rh-tooltip-arrow" />
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
-            </Tooltip.Provider>
+            <HelpPopover label="About these counts" buttonClass="rh-help-btn" size={13}>
+              Numbers refresh daily. Federal count includes opportunities where you meet all
+              hard prerequisites.
+            </HelpPopover>
           </div>
         </div>
 
@@ -78,20 +100,12 @@ export function ReadinessHeader() {
               <span id="rh-blocked-title">Not ready yet</span>
             </div>
             <ul className="rh-status-list">
-              {NOT_READY.map((item) => (
-                <li key={item} className="rh-status-item">
-                  {locationId ? (
-                    <a
-                      href={roadmapUrl(locationId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rh-status-link"
-                    >
-                      {item}
-                    </a>
-                  ) : (
-                    <span className="rh-status-link">{item}</span>
-                  )}
+              {notReady.length === 0 && <li className="rh-status-item">Nothing is blocking you.</li>}
+              {notReady.slice(0, 3).map((item) => (
+                <li key={item.key} className="rh-status-item">
+                  <Link to="/business-profile" search={{ tab: item.tab }} className="rh-status-link">
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -103,15 +117,16 @@ export function ReadinessHeader() {
               <span id="rh-improve-title">Could match better with</span>
             </div>
             <ul className="rh-status-list">
-              {COULD_HELP.map((item) => (
-                <li key={item} className="rh-status-item">
-                  <button
-                    type="button"
+              {couldHelp.length === 0 && <li className="rh-status-item">Your profile is complete for matching.</li>}
+              {couldHelp.slice(0, 3).map((item) => (
+                <li key={item.key} className="rh-status-item">
+                  <Link
+                    to="/business-profile"
+                    search={{ tab: item.tab }}
                     className="rh-status-link rh-status-btn"
-                    onClick={() => console.log("readiness gap clicked:", item)}
                   >
-                    {item}
-                  </button>
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -120,16 +135,9 @@ export function ReadinessHeader() {
 
         {/* Footer CTAs */}
         <div className="rh-footer">
-          {locationId && (
-            <a
-              href={roadmapUrl(locationId)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rh-btn-primary"
-            >
-              Open Roadmap
-            </a>
-          )}
+          <Link to="/roadmap" className="rh-btn-primary">
+            Open Roadmap
+          </Link>
           {showDfy && (
             <button
               type="button"

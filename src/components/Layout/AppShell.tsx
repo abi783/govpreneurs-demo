@@ -6,7 +6,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <PageMetaProvider>
       <div className="brand-stripe" />
-      <div style={{ minHeight: "calc(100vh - 3px)", background: "var(--bg)" }}>
+      {/* DEMO: the shell's main area scrolls, so fill it rather than the window. */}
+      <div style={{ minHeight: "calc(100% - 3px)", display: "flex", flexDirection: "column", background: "var(--bg)" }}>
         <ShellMain>{children}</ShellMain>
       </div>
     </PageMetaProvider>

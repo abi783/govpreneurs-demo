@@ -19,7 +19,17 @@ import path from "path";
 // `*.test.ts` is vitest, `*.spec.ts` under `e2e/` is Playwright.
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+  // Same aliases as vite.config.ts, so tests can import lifted Success Center code.
+  resolve: {
+    alias: [
+      { find: /^next\/link$/, replacement: path.resolve(__dirname, "./src/demo/shims/next-link.tsx") },
+      { find: /^next\/navigation$/, replacement: path.resolve(__dirname, "./src/demo/shims/next-navigation.ts") },
+      { find: /^next\/image$/, replacement: path.resolve(__dirname, "./src/demo/shims/next-image.tsx") },
+      { find: /^next\/dynamic$/, replacement: path.resolve(__dirname, "./src/demo/shims/next-dynamic.tsx") },
+      { find: /^@sc\//, replacement: `${path.resolve(__dirname, "./src/sc")}/` },
+      { find: /^@\//, replacement: `${path.resolve(__dirname, "./src")}/` },
+    ],
+  },
   test: {
     environment: "node",
     globals: true,
@@ -27,6 +37,8 @@ export default defineConfig({
     // The forecast tests read forecasts recorded on this day, so their clock is pinned
     // to it. The app itself counts from today (lib/forecasts/engine.ts, FORECASTS_TODAY).
     env: { VITE_FORECASTS_TODAY: "2026-09-16" },
-    exclude: [...configDefaults.exclude, "e2e/**/*.spec.ts"],
+    // Only this repo's tests: agent worktrees under .claude/ hold other copies.
+    include: ["src/**/*.test.{ts,tsx}", "e2e/**/*.test.ts"],
+    exclude: [...configDefaults.exclude, "qa/**"],
   },
 });

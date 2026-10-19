@@ -15,10 +15,10 @@
 // against the same types and 10 MB ceiling the hint states.
 import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { Send, X, ArrowRight, Paperclip } from "lucide-react";
 import { formatUSD } from "../../lib/wallet";
-import { GHL_WALLET_BILLING_URL } from "../../lib/walletApi";
+// DEMO: "Add funds" opens an in-app top-up, not the GHL billing page.
+import { TopUpDialog } from "../../demo/explore/TopUpDialog";
 import { useWalletBalancePolling } from "../../lib/useWalletBalancePolling";
 import { Button } from "@/components/ui";
 import "./mentor-send-modal.css";
@@ -127,6 +127,7 @@ export function MentorSendModal({
   const [question, setQuestion] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [topUpOpen, setTopUpOpen] = useState(false);
 
   // Clear the form once the dialog closes — not on confirm, so a failed send
   // leaves her answers in place for a retry.
@@ -313,20 +314,15 @@ export function MentorSendModal({
                   <div className="mentor-modal__shortfall" role="note">
                     Your wallet has {formatUSD(effectiveBalance)} — a review costs{" "}
                     {formatUSD(chargeAmount)}.{" "}
-                    {locationId ? (
-                      <a
-                        href={GHL_WALLET_BILLING_URL.replace("{locationId}", locationId)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mentor-modal__shortfall-link"
-                      >
-                        Add funds <ArrowRight size={11} />
-                      </a>
-                    ) : (
-                      <Link to="/wallet" className="mentor-modal__shortfall-link">
-                        Add funds <ArrowRight size={11} />
-                      </Link>
-                    )}
+                    {/* DEMO: an in-app top-up replaces the link to the billing page. */}
+                    <button
+                      type="button"
+                      className="mentor-modal__shortfall-link"
+                      style={{ background: "none", border: 0, padding: 0, cursor: "pointer", font: "inherit" }}
+                      onClick={() => setTopUpOpen(true)}
+                    >
+                      Add funds <ArrowRight size={11} />
+                    </button>
                   </div>
                 )}
               </>
@@ -355,6 +351,8 @@ export function MentorSendModal({
               {sending ? "Sending…" : loading ? "Loading…" : `Send for ${formatUSD(chargeAmount)}`}
             </Button>
           </div>
+          {/* DEMO: the balance poll above picks up the new funds within a second. */}
+          <TopUpDialog open={topUpOpen} onOpenChange={setTopUpOpen} />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

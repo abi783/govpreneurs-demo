@@ -5,10 +5,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts",
-    "playwright.stubbed.config.ts",
-    "playwright.live.config.ts",
-    "e2e/**/*.ts",
-    "e2e/**/*.tsx",
+    "qa/**/*.ts",
     "eslint.config.js"
   ],
   "compilerOptions": {
@@ -32,7 +29,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sc/*": ["./src/sc/*"],
+      "next/link": ["./src/demo/shims/next-link.tsx"],
+      "next/navigation": ["./src/demo/shims/next-navigation.ts"],
+      "next/image": ["./src/demo/shims/next-image.tsx"],
+      "next/dynamic": ["./src/demo/shims/next-dynamic.tsx"]
     }
   }
 }

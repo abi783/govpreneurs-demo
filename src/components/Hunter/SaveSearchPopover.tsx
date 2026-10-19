@@ -55,7 +55,7 @@ export function SaveSearchPopover({
               className="ssp__input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Name it — e.g. Bragg re-roofs"
+              placeholder="Name it — e.g. Fort Bragg catering"
               aria-label="Saved search name"
               autoFocus
             />

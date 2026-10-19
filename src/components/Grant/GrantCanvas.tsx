@@ -8,6 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
+  CheckCircle2,
+  Compass,
   Ban,
   Bookmark,
   BookmarkCheck,
@@ -35,6 +37,12 @@ import { ComplianceMatrix } from "./ComplianceMatrix";
 import { GateStrip } from "./GateStrip";
 import { EvidencePin, RichLines, RichText, SkeletonRow } from "./primitives";
 import { lineText } from "../../lib/grant/richText";
+import { dfyService } from "../../lib/grant/dfyServices";
+import { DFYServiceModal } from "../Opportunity/DFYServiceModal";
+// DEMO: a "Have us do it" request stays in the demo store, so it is still there after a reload.
+import { addDfyRequest } from "../../demo/grant/state";
+import { useDemoState } from "../../demo/runtime/store";
+import "./grant-demo.css";
 
 const EPISTEMIC_LABEL: Record<Read["epistemic"], string> = {
   verified: "confirmed",
@@ -84,6 +92,9 @@ function VerdictGlyph({ value }: { value: Verdict }) {
   const Icon = value === "bid" ? Check : value === "review" ? Search : Ban;
   return <Icon size={22} strokeWidth={2.6} aria-hidden />;
 }
+
+/** DEMO: how many strengths show before "Show more". */
+const STRENGTH_LIMIT = 5;
 
 const REDUCED = () =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -231,6 +242,96 @@ export function GrantCanvasSkeleton() {
   );
 }
 
+/**
+ * DEMO: the post-No-Bid roadmap. A No-Bid is never delivered cold: Grant lists, in
+ * order, what to fix so that the next one fits. A gap that maps to a real service
+ * gets "Have us do it". A strategy moment gets "Send to Mentor". The rest are plain.
+ */
+function PostNoBidRoadmap({
+  items,
+  onReviewWithMentor,
+  mentorDisabledReason,
+}: {
+  items: NonNullable<GrantAnalysis["postNoBidRoadmap"]>;
+  onReviewWithMentor?: () => void;
+  mentorDisabledReason?: string | null;
+}) {
+  const [requested] = useDemoState<string[]>("grant.dfy", []);
+  const [asking, setAsking] = useState<{ key: string; label: string; price: number } | null>(null);
+  return (
+    <section className="gt-roadmap" aria-label="What to fix so the next one fits">
+      <h3 className="gt-kicker gt-kicker--rule">What to fix so the next one fits</h3>
+      <ol className="gt-roadmap__list">
+        {items.map((it, i) => {
+          const svc = it.cta?.kind === "dfy" ? dfyService(it.cta.service) : null;
+          const price = svc ? Number(/\$([\d,]+)/.exec(svc.price)?.[1]?.replace(/,/g, "") ?? 0) : 0;
+          const key = svc ? `${i}-${svc.name}` : "";
+          const done = key !== "" && requested.includes(key);
+          return (
+            <li key={i} className="gt-roadmap__item">
+              <span className="gt-roadmap__n mono" aria-hidden>
+                {i + 1}
+              </span>
+              <div className="gt-roadmap__body">
+                <p className="gt-roadmap__title">
+                  <RichText line={it.item} />
+                </p>
+                <p className="gt-roadmap__line">
+                  <span className="gt-roadmap__label">Why it mattered</span>
+                  <RichText line={it.whyItMattered} />
+                </p>
+                <p className="gt-roadmap__line">
+                  <span className="gt-roadmap__label">What it takes</span>
+                  <RichText line={it.whatItTakes} />
+                </p>
+                {svc ? (
+                  done ? (
+                    <span className="gt-roadmap__done">
+                      <CheckCircle2 size={14} strokeWidth={2.2} aria-hidden /> Requested. Our team will contact you within 1 business day.
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setAsking({ key, label: svc.name, price })}
+                    >
+                      Have us do it — {svc.price}
+                    </button>
+                  )
+                ) : it.cta?.kind === "mentor" ? (
+                  mentorDisabledReason ? (
+                    <span title={mentorDisabledReason}>
+                      <button type="button" className="btn btn-secondary btn-sm" disabled>
+                        <Send size={13} strokeWidth={2} aria-hidden /> Send to Mentor
+                      </button>
+                    </span>
+                  ) : (
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={onReviewWithMentor}>
+                      <Send size={13} strokeWidth={2} aria-hidden /> Send to Mentor
+                    </button>
+                  )
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <DFYServiceModal
+        open={asking !== null}
+        onOpenChange={(o) => {
+          if (!o) setAsking(null);
+        }}
+        prereqs={asking ? [{ key: asking.key, label: asking.label, why: "", dfyPrice: asking.price }] : []}
+        total={asking?.price ?? 0}
+        onSubmitted={() => {
+          if (asking) addDfyRequest(asking.key);
+        }}
+        onConfirmed={() => setAsking(null)}
+      />
+    </section>
+  );
+}
+
 /** The backend's label for the bid-flow primary action (build-grant-analysis.ts).
  *  This is the "not working" secondary CTA (Vikunja #24) — the /pipeline route it
  *  points at is a dead end, so for this case we render a working Save-for-Later
@@ -304,8 +405,11 @@ export function GrantCanvas({
   );
   const reads = useMemo(() => [...analysis.reads].sort((a, b) => a.order - b.order), [analysis]);
   const { verdict, action } = analysis;
+  // DEMO: the mentor button uses the brief's own wording when the analysis has it.
+  const mentorLabel = action.secondaries.find((x) => x.target === "mentor")?.label ?? "Review with mentor";
 
   const take = useMemo(() => buildTake(analysis, gates, deadline), [analysis, gates, deadline]);
+  const [showAllStrengths, setShowAllStrengths] = useState(false);
 
   return (
     <section className="grant-canvas" aria-label="Grant's analysis">
@@ -395,6 +499,7 @@ export function GrantCanvas({
           </div>
         </div>
 
+        {take.paths.length > 0 ? (
         <div className="gt-paths">
           {take.paths.map((pth) => (
             <div key={pth.label} className={`gt-path gt-path--${pth.state}`}>
@@ -412,6 +517,7 @@ export function GrantCanvas({
             </div>
           ))}
         </div>
+        ) : null}
 
         {streaming ? (
           <div className="grant-stream">
@@ -441,8 +547,23 @@ export function GrantCanvas({
           {take.strengths.length === 0 ? (
             <p className="gt-empty">Nothing scored as a clear strength yet.</p>
           ) : (
-            take.strengths.map((it, k) => <TakeCell key={k} item={it} />)
+            (showAllStrengths ? take.strengths : take.strengths.slice(0, STRENGTH_LIMIT)).map((it, k) => (
+              <TakeCell key={k} item={it} />
+            ))
           )}
+          {/* DEMO: a long list of met requirements made this column three times the height of the
+              other. The first few stay open, and the rest are one tap away. */}
+          {take.strengths.length > STRENGTH_LIMIT ? (
+            <button
+              type="button"
+              className="gt-more"
+              aria-expanded={showAllStrengths}
+              onClick={() => setShowAllStrengths((v) => !v)}
+            >
+              {showAllStrengths ? "Show fewer" : `Show ${take.strengths.length - STRENGTH_LIMIT} more`}
+              <ChevronRight size={14} strokeWidth={2} className={showAllStrengths ? "gt-more__chev is-open" : "gt-more__chev"} aria-hidden />
+            </button>
+          ) : null}
         </section>
         <section className="gt-col gt-col--neg" aria-label="What limits the opportunity">
           <h3 className="gt-kicker gt-kicker--rule gt-col__h">What limits the opportunity</h3>
@@ -473,6 +594,21 @@ export function GrantCanvas({
             </p>
           </div>
         ))}
+        {/* DEMO: the conditions that would move the call, in Grant's words. */}
+        {take.wouldChange.length > 0 ? (
+          <div className="gt-change__ifs">
+            <span className="gt-change__ifslabel">
+              <Compass size={13} strokeWidth={2} aria-hidden /> I would change this call if
+            </span>
+            <ul>
+              {take.wouldChange.map((ln, k) => (
+                <li key={k}>
+                  <RichText line={ln} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </section>
 
       {/* ── The thesis, in Grant's own words ── */}
@@ -487,6 +623,15 @@ export function GrantCanvas({
         </section>
       ) : null}
 
+      {/* DEMO: a No-Bid is never delivered cold. */}
+      {analysis.postNoBidRoadmap && analysis.postNoBidRoadmap.length > 0 ? (
+        <PostNoBidRoadmap
+          items={analysis.postNoBidRoadmap}
+          onReviewWithMentor={onReviewWithMentor}
+          mentorDisabledReason={mentorDisabledReason}
+        />
+      ) : null}
+
       {/* ── The next move ── */}
       <section className="gt-next" aria-label="Recommended next move">
         <h3 className="gt-kicker gt-kicker--rule">Recommended next move</h3>
@@ -498,34 +643,15 @@ export function GrantCanvas({
                 <RichText line={take.next.body} />
               </p>
             ) : null}
-            {/* A mentor review is the safest next step on any verdict, so it is
-                the filled primary. Grant's own tactical action sits beside it as
-                a secondary — the Save-for-Later fix (Vikunja #24) still applies:
-                the backend's "Start your bid" label points at a dead /pipeline
-                route, so that case renders a working Save-for-Later toggle
-                instead of the broken link. */}
+            {/* DEMO: the story's next move is the filled primary button. A mentor
+                review is the secondary beside it, worded as the brief words it
+                ("Send to Sarah for a second opinion"). Production made the mentor
+                review the filled primary on every verdict. */}
             <div className="gt-next__actions">
-              {mentorDisabledReason ? (
-                <span title={mentorDisabledReason}>
-                  <button type="button" className="btn btn-primary gt-next__btn" disabled>
-                    <Send size={14} strokeWidth={2} aria-hidden />
-                    Review with mentor
-                  </button>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  className="btn btn-primary gt-next__btn"
-                  onClick={onReviewWithMentor}
-                >
-                  <Send size={14} strokeWidth={2} aria-hidden />
-                  Review with mentor
-                </button>
-              )}
               {action.primary.label === START_BID_LABEL ? (
                 <button
                   type="button"
-                  className="btn btn-secondary gt-next__btn"
+                  className="btn btn-primary gt-next__btn"
                   onClick={onSaveForLater}
                   aria-pressed={saved}
                 >
@@ -536,16 +662,33 @@ export function GrantCanvas({
                   )}
                   {saved ? "Saved for later" : "Save for Later"}
                 </button>
-              ) : action.path === SUB_PATH && verdict.value !== "no-bid" ? null : (
-                <a className="btn btn-secondary gt-next__btn" href={action.primary.target}>
+              ) : action.path === SUB_PATH && verdict.value !== "no-bid" && !/^\/partners\b/.test(action.primary.target) ? null : (
+                <a className="btn btn-primary gt-next__btn" href={action.primary.target}>
                   {take.next.title}
                   <ArrowRight size={15} strokeWidth={2} aria-hidden />
                 </a>
               )}
+              {mentorDisabledReason ? (
+                <span title={mentorDisabledReason}>
+                  <button type="button" className="btn btn-secondary gt-next__btn" disabled>
+                    <Send size={14} strokeWidth={2} aria-hidden />
+                    {mentorLabel}
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-secondary gt-next__btn"
+                  onClick={onReviewWithMentor}
+                >
+                  <Send size={14} strokeWidth={2} aria-hidden />
+                  {mentorLabel}
+                </button>
+              )}
               {action.secondaries
                 .filter((s) => s.target !== "mentor")
                 .map((s) => (
-                  <a key={s.label} className="btn btn-secondary gt-next__btn" href={s.target}>
+                  <a key={s.label} className="btn btn-ghost gt-next__btn" href={s.target}>
                     {s.label}
                   </a>
                 ))}

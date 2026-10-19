@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { Button, Input } from "@/components/ui";
+import { PERSONA } from "../../demo/story/persona";
+import type { PpCustomerType, PpEntry } from "../../demo/profile/pastPerformance";
 
+// DEMO: the modal adds a project, or edits the one it is given. The tab saves it.
 interface PpModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Set to edit an existing project. */
+  entry?: PpEntry;
+  onSave?: (entry: Omit<PpEntry, "id">) => void;
 }
 
 const CUSTOMER_TYPES = [
@@ -36,6 +42,7 @@ const CPARS_RATINGS = [
   "Satisfactory",
   "Marginal",
   "Unsatisfactory",
+  "Awaiting rating",
   "N/A",
 ];
 
@@ -81,9 +88,44 @@ const EMPTY: FormState = {
   cpars: "",
 };
 
-export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
+function formFrom(e?: PpEntry): FormState {
+  if (!e) return EMPTY;
+  return {
+    title: e.title,
+    customer: e.customer,
+    customerType: e.customerType,
+    contractType: e.contractType ?? "",
+    periodStart: e.periodStart,
+    periodEnd: e.periodEnd,
+    value: String(e.value),
+    role: e.role,
+    naics: e.naics,
+    vehicle: "",
+    successful: "Yes",
+    scope: e.scope,
+    refName: e.referenceName ?? "",
+    refTitle: e.referenceTitle ?? "",
+    refEmail: e.referenceEmail ?? "",
+    refPhone: e.referencePhone ?? "",
+    cpars: e.cpars ?? "",
+  };
+}
+
+export function PastPerformanceModal({ open, onOpenChange, entry, onSave }: PpModalProps) {
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<FormState>(EMPTY);
+  const [form, setForm] = useState<FormState>(() => formFrom(entry));
+  const [problem, setProblem] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<string[]>([]);
+
+  // Start from the project being edited (or empty) each time the modal opens.
+  useEffect(() => {
+    if (open) {
+      setForm(formFrom(entry));
+      setDocuments(entry?.documents ?? []);
+      setStep(1);
+      setProblem(null);
+    }
+  }, [open, entry]);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -91,6 +133,7 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
   const reset = () => {
     setStep(1);
     setForm(EMPTY);
+    setProblem(null);
   };
 
   const handleClose = (next: boolean) => {
@@ -98,8 +141,55 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
     onOpenChange(next);
   };
 
+  // DEMO: each step says what is missing, in plain words.
+  const check = (n: number): string | null => {
+    if (n === 1) {
+      if (!form.title.trim()) return "Enter the project title.";
+      if (!form.customer.trim()) return "Enter the customer name.";
+      if (!form.customerType) return "Choose a customer type.";
+    }
+    if (n === 2) {
+      if (!form.periodStart || !form.periodEnd) return "Enter the start and end dates.";
+      if (form.periodStart > form.periodEnd) return "The end date cannot be before the start date.";
+      if (!form.value.trim() || Number.isNaN(Number(form.value))) return "Enter the total value as a number.";
+      if (!form.role) return "Choose Prime or Sub.";
+      if (scopeLen < 50) return "Describe the work in at least 50 characters.";
+    }
+    if (n === 3 && !emailValid) return "Enter a valid email address.";
+    return null;
+  };
+
+  const next = () => {
+    const message = check(step);
+    setProblem(message);
+    if (!message) setStep((s) => s + 1);
+  };
+
   const handleSave = () => {
-    console.log("PastPerformanceModal save", form);
+    const message = check(1) ?? check(2) ?? check(3);
+    if (message) {
+      setProblem(message);
+      return;
+    }
+    onSave?.({
+      title: form.title.trim(),
+      customer: form.customer.trim(),
+      customerType: form.customerType as PpCustomerType,
+      contractType: form.contractType || undefined,
+      periodStart: form.periodStart,
+      periodEnd: form.periodEnd,
+      value: Number(form.value),
+      role: form.role === "Sub" ? "Sub" : "Prime",
+      naics: form.naics.trim(),
+      scope: form.scope.trim(),
+      referenceName: form.refName.trim() || undefined,
+      referenceTitle: form.refTitle.trim() || undefined,
+      referenceEmail: form.refEmail.trim() || undefined,
+      referencePhone: form.refPhone.trim() || undefined,
+      cpars: form.cpars || undefined,
+      documents: documents.length ? documents : undefined,
+      status: "attested",
+    });
     handleClose(false);
   };
 
@@ -113,7 +203,7 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="ky-modal-overlay" />
         <Dialog.Content className="bp-modal-content bp-modal-content-lg">
-          <Dialog.Title className="bp-modal-title">Add a project</Dialog.Title>
+          <Dialog.Title className="bp-modal-title">{entry ? "Edit project" : "Add a project"}</Dialog.Title>
 
           <div className="pp-wizard-progress">
             <div className="pp-wizard-step-name">
@@ -241,9 +331,10 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
                   onChange={(e) => set("naics", e.target.value)}
                 />
                 <datalist id="pp-naics-list">
-                  <option value="238160" />
-                  <option value="238170" />
-                  <option value="236220" />
+                  <option value={PERSONA.primaryNaics} />
+                  {PERSONA.secondaryNaics.map((n) => (
+                    <option key={n.code} value={n.code} />
+                  ))}
                 </datalist>
               </label>
               <label className="pp-wizard-field">
@@ -353,9 +444,22 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
               </label>
               <label className="pp-wizard-field">
                 <span className="pp-wizard-label">Supporting Documents</span>
-                <Input type="file" multiple variant="text" aria-label="Supporting documents" />
+                <Input
+                  type="file"
+                  multiple
+                  variant="text"
+                  aria-label="Supporting documents"
+                  onChange={(e) => setDocuments(Array.from(e.target.files ?? []).map((f) => f.name))}
+                />
+                {documents.length > 0 && <span className="pp-wizard-counter">{documents.join(", ")}</span>}
               </label>
             </div>
+          )}
+
+          {problem && (
+            <p className="bp-modal-problem" role="alert">
+              {problem}
+            </p>
           )}
 
           <div className="bp-modal-footer">
@@ -365,7 +469,7 @@ export function PastPerformanceModal({ open, onOpenChange }: PpModalProps) {
               </Button>
             )}
             {step < 3 && (
-              <Button variant="primary" onClick={() => setStep((s) => s + 1)}>
+              <Button variant="primary" onClick={next}>
                 Next
               </Button>
             )}
