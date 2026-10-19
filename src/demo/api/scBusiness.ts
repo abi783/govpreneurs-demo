@@ -40,12 +40,16 @@ import {
 } from "../sc/business/ops";
 import { PSC_GROUPS, pscDescriptions, pscGroupCodes, searchPsc } from "../sc/business/data/psc";
 import { addressForPlace, citiesFor, suggestAddresses } from "../sc/business/data/geo";
+// DEMO: trade words for the command palette, per member (D85).
+import { byMember } from "../member";
+const SELL_WORDS = byMember({ caterer: ["menus"], agency: ["portfolio", "reel"] });
+const PAPER_WORDS = byMember({ caterer: ["food handler", "haccp"], agency: ["releases", "music licenses"] });
 
 // The command palette can open every part of My Business.
 registerSearchEntries([
-  { label: "My Business: What you sell", hint: "My Business", to: "/my-business/sell", keywords: ["services", "trade", "naics", "capability statement", "differentiators", "menus"] },
+  { label: "My Business: What you sell", hint: "My Business", to: "/my-business/sell", keywords: ["services", "trade", "naics", "capability statement", "differentiators", ...SELL_WORDS] },
   { label: "My Business: Work you have done", hint: "My Business", to: "/my-business/jobs", keywords: ["past performance", "references", "jobs", "customers"] },
-  { label: "My Business: Your papers", hint: "My Business", to: "/my-business/papers", keywords: ["insurance", "permits", "licenses", "food handler", "haccp", "w-9", "certificates"] },
+  { label: "My Business: Your papers", hint: "My Business", to: "/my-business/papers", keywords: ["insurance", "permits", "licenses", ...PAPER_WORDS, "w-9", "certificates"] },
   { label: "My Business: What you can take on", hint: "My Business", to: "/my-business/capacity", keywords: ["capacity", "bonding", "service area", "equipment", "payment terms"] },
   { label: "My Business: Your legal details", hint: "My Business", to: "/my-business/business", keywords: ["sam", "uei", "cage", "ein", "address", "owners", "certifications", "wosb"] },
   { label: "My Business: Digital identity", hint: "My Business", to: "/my-business/digital", keywords: ["website", "email", "phone", "a2p", "audit"] },

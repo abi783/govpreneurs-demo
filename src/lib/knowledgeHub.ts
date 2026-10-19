@@ -140,7 +140,8 @@ export function useKnowledgeHub(): HubState {
       const w = pp.find((e) => e.cpars === "Awaiting rating")!;
       missing.push({
         key: "cpars",
-        label: `the performance rating (CPARS) for your ${w.customer.split(" ")[0]} job`,
+        // DEMO: "Womack" for the caterer; an initials-first name ("NC Army National Guard") keeps more words.
+        label: `the performance rating (CPARS) for your ${shortCustomer(w.customer)} job`,
         tab: "past-performance",
       });
     }
@@ -201,4 +202,11 @@ export function formatRelative(iso: string | null): string {
   const h = Math.round(diffMin / 60);
   if (h < 24) return `${h}h ago`;
   return `${Math.round(h / 24)}d ago`;
+}
+
+/** "Womack Army Medical Center, U.S. Army" → "Womack"; "NC Army National Guard Recruiting…" → "NC Army National Guard". */
+function shortCustomer(customer: string): string {
+  const name = customer.split(",")[0];
+  const words = name.split(" ");
+  return words[0].length <= 3 ? words.slice(0, 4).join(" ") : words[0];
 }
