@@ -11,6 +11,7 @@ import { domainFor, offerWord, type Domain } from "./domains";
 import { documentsFor, heroDetailFor, solicitationFor, type DocSpec } from "./detail";
 import { factsFor, longDate, termText, type OppFacts } from "./facts";
 import { naicsLabel, type Solicitation } from "./solicitation";
+import { V } from "./vocab";
 
 interface Block {
   kind: "h1" | "h2" | "p" | "bullet" | "table" | "gap" | "kv";
@@ -95,24 +96,13 @@ function pwsBlocks(f: OppFacts, d: Domain): Block[] {
   return out;
 }
 
-/** Sample wage rates. They are for the demonstration and are not the Department of Labor's. */
-const WAGE_ROWS: string[][] = [
-  ["Occupation", "Hourly rate", "Health and welfare"],
-  ["Cook I", "$14.58", "$5.36"],
-  ["Cook II", "$16.24", "$5.36"],
-  ["Baker", "$15.10", "$5.36"],
-  ["Food Service Worker", "$11.89", "$5.36"],
-  ["Dishwasher", "$11.53", "$5.36"],
-  ["Driver, light truck", "$14.12", "$5.36"],
-  ["Dining Facility Attendant", "$12.07", "$5.36"],
-];
-
+// Sample wage rates are the member's (vocab.ts). They are not the Department of Labor's.
 function wageBlocks(f: OppFacts): Block[] {
   return [
     { kind: "h1", text: "WAGE DETERMINATION" },
     { kind: "p", text: `Service Contract Labor Standards. Locality: ${f.place.city}, ${f.place.state}. Applies to ${f.id}.` },
     { kind: "gap" },
-    { kind: "table", head: true, widths: [250, 140, 140], rows: WAGE_ROWS },
+    { kind: "table", head: true, widths: [250, 140, 140], rows: V.wageRows },
     { kind: "gap" },
     { kind: "p", text: "Paid holidays: New Year's Day, Martin Luther King Jr.'s Birthday, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, Christmas Day." },
     { kind: "p", text: "Vacation: two weeks after one year of service, three weeks after five years. Uniform allowance applies where the employer requires a uniform." },

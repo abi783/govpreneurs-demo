@@ -32,6 +32,7 @@ import type {
 import type { OppFacts } from "./facts";
 import { boldIn, firstSentence, rt } from "./rich";
 import { clauseOf, clausePin, type Solicitation } from "./solicitation";
+import { V } from "./vocab";
 
 // ── The shapes ───────────────────────────────────────────────────────────
 
@@ -138,7 +139,7 @@ export function gateInputsFor(f: OppFacts, clearance?: Extras["clearance"]): Gra
     },
     naics: {
       code: f.opp.naics,
-      sizeStandard: f.opp.naics === PERSONA.primaryNaics ? "$47.0M" : "",
+      sizeStandard: f.opp.naics === PERSONA.primaryNaics ? (V.sizeStandard?.short ?? "") : "",
       firmIsSmall: true,
     },
     sam: { activeThrough: PERSONA.samActiveUntil, awardWindowEnds: dateDaysFromNow(f.opp.closesInDays + 45) },

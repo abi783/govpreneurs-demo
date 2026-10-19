@@ -9,6 +9,7 @@
 import type { GrantAnalysis, OpenQuestion, RichLine, SuggestedChip } from "@/lib/grant/types";
 import { PARTNER } from "./facts";
 import { plain, rt } from "./rich";
+import { V } from "./vocab";
 
 const YES = /^\s*(y|yes|yeah|yep|sure|we did|i did|i have|already)\b/i;
 const NO = /^\s*(n|no|nope|not yet|not really|we didn't|i didn't|haven't)\b/i;
@@ -20,6 +21,8 @@ export const isNo = (v: string): boolean => NO.test(v) && !YES.test(v);
 function reaction(id: string, value: string): { gist: string; ack: string; dots: number } {
   const yes = isYes(value);
   const no = isNo(value);
+  const own = V.reactions[id];
+  if (own) return yes ? { ...own.yes, dots: 1 } : { ...own.no, dots: 0 };
   switch (id) {
     case "talked-to-partner":
       return yes
@@ -44,9 +47,7 @@ function reaction(id: string, value: string): { gist: string; ack: string; dots:
         ? { gist: "You know a prime who bids this kind of work, so the subcontract path is a plan.", ack: "Good. Then call that prime this week and ask for the sub quote deadline. I raised my confidence.", dots: 1 }
         : { gist: "You do not know a prime yet. Partners lists the firms that look for subcontractors.", ack: "That is fine. Open Partners: it lists the primes that look for subcontractors. My confidence stays where it was.", dots: 0 };
     case "local-crew":
-      return yes
-        ? { gist: "You said you can place a crew or a partner nearby, so the distance is less of a limit.", ack: "Good. A local crew or a partner is what makes a long daily run workable. I raised my confidence.", dots: 1 }
-        : { gist: "You cannot place a crew nearby, so the distance stays a real limit.", ack: "Then the distance stays a real limit. A partner on Partners may be the way around it. My confidence stays where it was.", dots: 0 };
+      return yes ? { ...V.localQuestion.yes, dots: 1 } : { ...V.localQuestion.no, dots: 0 };
     case "second-crew":
       return yes
         ? { gist: "You said you can add a second crew or team up, so the size is less of a limit.", ack: "Good. A second crew or a team-up is what makes a contract this size workable. I raised my confidence.", dots: 1 }

@@ -1,4 +1,5 @@
-// DEMO: what each kind of food-service contract in the story asks for.
+// DEMO: what each kind of contract in the story asks for. The caterer's kinds of
+// food-service work are here; the agency's are in src/demo/members/agency/grant/domains.ts.
 //
 // The story gives every opportunity a title, a summary and facts. This file adds
 // the ordinary detail that a real notice for that kind of work carries: what the
@@ -10,12 +11,15 @@
 // request for quote, a "proposal" for a request for proposal, a "bid" for an
 // invitation for bid, and a "reply" for sources sought.
 
+import { byMember } from "@/demo/member";
+import * as agency from "@/demo/members/agency/grant/domains";
 import type { StoryOpportunity } from "@/demo/story/opportunities";
+import type { PastPerformanceId } from "@/demo/story/persona";
 import { customerShort, EVENT_RANGE, MEALS_PER_DAY, PP } from "./facts";
 
 const MEALS = MEALS_PER_DAY.toLocaleString("en-US");
 
-export type DomainKey =
+export type CatererDomainKey =
   | "dining"
   | "cafe"
   | "events"
@@ -28,8 +32,10 @@ export type DomainKey =
   | "staffing"
   | "construction";
 
-/** Which kind of work each story opportunity is. A new story entry needs a line here. */
-export const DOMAIN_OF: Record<string, DomainKey> = {
+export type DomainKey = CatererDomainKey | agency.AgencyDomainKey;
+
+/** The caterer's kinds of work, by opportunity. */
+const CATERER_DOMAIN_OF: Record<string, CatererDomainKey> = {
   "SP4701-26-Q-0021": "field",
   "W912EE-26-R-0066": "dining",
   "SP4701-26-R-0078": "dining",
@@ -75,8 +81,14 @@ export const DOMAIN_OF: Record<string, DomainKey> = {
   "RCBOE-GA-2026-7": "school",
 };
 
+/** Which kind of work each story opportunity is. A new story entry needs a line here. */
+export const DOMAIN_OF: Record<string, DomainKey> = byMember<Record<string, DomainKey>>({
+  agency: agency.DOMAIN_OF,
+  caterer: CATERER_DOMAIN_OF,
+});
+
 export function domainOf(opp: StoryOpportunity): DomainKey {
-  return DOMAIN_OF[opp.id] ?? "dining";
+  return DOMAIN_OF[opp.id] ?? byMember<DomainKey>({ agency: "campaign", caterer: "dining" });
 }
 
 /** The word a notice type uses for what the cook sends. */
@@ -136,9 +148,19 @@ export interface Domain {
   priceLines: string[];
   /** Sentence about who else is likely to compete, from the public record. */
   competition: string;
+  /** The past job that is the best reference. Default: by kind of work (generator.ts). */
+  reference?: PastPerformanceId;
+  /** Bold phrase inside `fit.text`. Default: the generator's own list. */
+  fitBold?: string;
+  /** What a response should lead with. Default: the rail's own list. */
+  leadWith?: string;
+  /** Product and service code on the page. Default: food service. */
+  psc?: string;
+  /** The checklist's planning line. */
+  plan?: string;
 }
 
-const DOMAINS: Record<DomainKey, Domain> = {
+const CATERER_DOMAINS: Record<CatererDomainKey, Domain> = {
   dining: {
     key: "dining",
     service: "dining facility food service",
@@ -652,6 +674,8 @@ const DOMAINS: Record<DomainKey, Domain> = {
     competition: "Design-build galley work draws large construction and food service teams.",
   },
 };
+
+const DOMAINS: Record<DomainKey, Domain> = { ...CATERER_DOMAINS, ...agency.DOMAINS };
 
 export function domainFor(opp: StoryOpportunity): Domain {
   return DOMAINS[domainOf(opp)];
