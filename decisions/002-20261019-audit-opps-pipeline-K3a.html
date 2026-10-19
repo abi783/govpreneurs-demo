@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K3a · Opportunities and Pipeline audit</title>
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#ffffff; --ink:#1c1b19; --muted:#6b6862; --line:#e3e0da; --band:#efede8;
+  --accent:#b4441c; --accent-soft:#f6e6de; --on-accent:#ffffff; --ok:#2f6b3f; --ok-soft:#e3efe5;
+  --no:#9b2c2c; --no-soft:#f6e1e1; --node:#ffffff; --node-line:#cfcac2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151413; --surface:#1d1c1a; --ink:#ecebe7; --muted:#a19d95; --line:#33312d; --band:#232220;
+    --accent:#e2774f; --accent-soft:#3a2219; --on-accent:#1c1b19; --ok:#7cc08d; --ok-soft:#1e2e22;
+    --no:#e58a8a; --no-soft:#3a1f1f; --node:#1d1c1a; --node-line:#4a4741;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151413; --surface:#1d1c1a; --ink:#ecebe7; --muted:#a19d95; --line:#33312d; --band:#232220;
+  --accent:#e2774f; --accent-soft:#3a2219; --on-accent:#1c1b19; --ok:#7cc08d; --ok-soft:#1e2e22;
+  --no:#e58a8a; --no-soft:#3a1f1f; --node:#1d1c1a; --node-line:#4a4741;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+.sample{background:var(--accent-soft);color:var(--accent);font-size:13px;text-align:center;padding:6px 16px}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 0;font-size:14px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+h1{font-size:30px;line-height:1.2;margin:14px 0 18px;letter-spacing:-.015em;max-width:720px}
+.rec{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.rec .call{font-weight:700;color:var(--ok)}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-left:6px}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink)}
+.rec span{color:var(--muted);font-size:14px}
+section{padding:28px 0 0}
+.label{font-size:13px;color:var(--muted);font-weight:600;margin:0 0 10px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.compare{grid-template-columns:1fr} h1{font-size:24px}}
+.compare figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.compare figure.pick{border:2px solid var(--ok)}
+.compare figcaption{font-size:14px;margin-top:8px;display:flex;justify-content:space-between}
+.compare figcaption span{color:var(--muted)}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:inherit}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.trio{grid-template-columns:1fr}}
+.chipbox{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.chipbox small{display:block;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:4px}
+.matrix{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.matrix th,.matrix td{padding:9px 12px;text-align:center;border-top:1px solid var(--line)}
+.matrix th{font-size:12px;color:var(--muted);font-weight:600;border-top:0}
+.matrix td:first-child,.matrix th:first-child{text-align:left}
+.y{color:var(--ok);font-weight:700}.n{color:var(--muted)}.q{color:var(--accent)}
+.ev{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+ul.plain{list-style:none;margin:0;padding:0}
+ul.plain li{padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:3px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.chip.x{text-decoration:line-through;color:var(--muted)}
+.appendix{margin-top:32px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 18px}
+.appendix summary{cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+.appendix summary span{color:var(--muted);font-weight:400;font-size:14px}
+.appendix summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.gallery{grid-template-columns:1fr 1fr}}
+.gallery figure{margin:0}
+.gallery svg{border:1px solid var(--line);border-radius:6px}
+.gallery figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.gallery figcaption b{display:block;color:var(--ink);font-size:14px}
+.gallery figcaption small{display:block;font-size:12px;margin-top:2px}
+.note{font-size:13px;color:var(--muted);margin:16px 0 4px}
+.answer{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);margin-top:32px;padding:14px 0 18px}
+.answer .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.answer button{font:inherit;font-weight:600;padding:10px 22px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.answer button.yes[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.answer button.no[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:var(--bg)}
+.answer button.chg[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.answer button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.answer textarea{display:none;width:100%;margin-top:10px;min-height:64px;font:inherit;font-size:15px;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.answer textarea.show{display:block}
+.answer .copy{margin-left:auto;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.status{font-size:13px;color:var(--muted);width:100%}
+.compare img,.gallery img{display:block;width:100%;height:auto;border-radius:6px;border:1px solid var(--line)}
+.compare figcaption{display:block}
+.compare figcaption:first-child{margin-top:0}
+.olabel{font-weight:700}
+.ocap{color:var(--muted);margin-top:2px}
+.rules{margin-top:12px;font-size:14px}
+.rules label{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
+.preview{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent)}
+.usage{font-size:13px;color:var(--muted);margin:14px 0 0}
+.pair{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:16px}
+.pair .side{display:flex;flex-direction:column;gap:8px}
+.pair .txt{padding:12px;background:var(--band);border-radius:6px;white-space:pre-wrap}
+.pair label.pk{display:flex;gap:8px;font-weight:600}
+.pair input[type=text]{width:100%;font:inherit;font-size:15px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="meta"><span><b>Decision 1 of 2</b> · Govpreneurs · Opportunities and Pipeline audit</span><span>~60 sec</span></div>
+  <h1>Approve batches A and B?</h1>
+  <div class="rec">
+    <div>Claude recommends <span class="call">Yes</span></div>
+    <div>Confidence <span class="dots" aria-label="4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+    <span>Two-way door: easy to undo</span>
+  </div>
+  <a class="preview" href="http://127.0.0.1:4401/opportunities" target="_blank" rel="noopener">Open the live preview</a>
+
+  <section>
+    <p class="label">Options</p>
+    <div class="compare">
+      <figure class="pick"><img src="/Users/karthikanand/dev/GovPreneurs/demo-GovPreneurs-studio-20261019-audit-opps-pipeline/.studio/runs/20261019-audit-opps-pipeline/baseline-tiles/pipeline__default__375x812__1.png" alt="A: Phone, access"><figcaption><div class="olabel">A: Phone, access</div><div class="ocap">6 fixes · effort M · K4: one shared colour token and the shared tab bar · both pages unusable at 375 today</div></figcaption></figure>
+      <figure><img src="/Users/karthikanand/dev/GovPreneurs/demo-GovPreneurs-studio-20261019-audit-opps-pipeline/.studio/runs/20261019-audit-opps-pipeline/baseline-tiles/pipeline__default__1440x900__1.png" alt="B: Next step"><figcaption><div class="olabel">B: Next step</div><div class="ocap">7 fixes · effort S–M · one primary action, banner names the real step, stage order, outcome marks</div></figcaption></figure>
+      <figure><img src="/Users/karthikanand/dev/GovPreneurs/demo-GovPreneurs-studio-20261019-audit-opps-pipeline/.studio/runs/20261019-audit-opps-pipeline/baseline-tiles/opportunities__default__1440x900__3.png" alt="C: Plain facts"><figcaption><div class="olabel">C: Plain facts</div><div class="ocap">7 fixes · effort S · full dates, plain chips, quiet card labels · next run</div></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">The brief in three lines</p>
+    <div class="trio">
+      <div class="chipbox"><small>Job</small>Find contracts I can win (Opportunities) and track my bids (Pipeline)</div>
+      <div class="chipbox"><small>We're testing</small>Which two fix batches go first, out of three</div>
+      <div class="chipbox"><small>Kill it if</small>Gate still fails or a severity 3–4 Job-path finding is still open after both batches</div>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">What others do</p>
+    <table class="matrix">
+      <thead><tr><th></th><th>Census</th><th>Product review</th><th>Slop review</th><th>Design review</th></tr></thead>
+      <tbody><tr><td>Phone layout broken at 375</td><td class="y">✓</td><td class="y">✓</td><td class="n">—</td><td class="y">✓</td></tr><tr><td>37 contrast failures, one token</td><td class="y">✓</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr><tr><td>13 primary buttons on Pipeline</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr><tr><td>Dates not shown in full</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr><tr><td>Hunter intro shown twice</td><td class="n">—</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr></tbody>
+    </table>
+    <div class="ev"><span><b class="y">✓</b> seen in product</span><span><b class="q">?</b> claimed, not verified</span><span><b class="n">—</b> not found</span></div>
+  </section>
+
+  <section class="two">
+    <div><p class="label">Risks</p><ul class="plain"><li>A changes a shared colour token and tab bar; the fix gate also checks Forecasts and Small orders</li><li>Opportunities keeps cryptic chips and relative dates until the next run</li></ul></div>
+    <div><p class="label">Not doing</p><div class="chips"><span class="chip x">C this run: highest score, but it smooths friction where B fixes failing steps</span><span class="chip x">Pipeline heading: the unmerged pipeline-heading branch already covers it</span><span class="chip x">Removing Hunter&#39;s intro: Opportunities is the booth&#39;s resting page</span><span class="chip x">Fit groups on cards: the reviewers disagree, so it needs your call</span><span class="chip x">Phone board layout, shared card, filter drawer: structural, Prototype later</span><span class="chip x">Title length blockers in the gate: titles are data, not labels</span></div></div>
+  </section>
+
+  <section><p class="label">Rules to add</p><div class="rules" id="rules"><label><input type="checkbox" value="0"> <span>Skip data titles in the label length check</span></label></div></section>
+  <p class="usage">audit: +3% window, +1% week · run: +4% window, +1% week · window 59%, week 33%</p>
+
+  <div class="answer">
+    <div class="row">
+      <button class="yes" aria-pressed="false">Yes</button>
+      <button class="no" aria-pressed="false">No</button>
+      <button class="chg" aria-pressed="false">Change</button>
+      <button class="copy" id="copy">Copy answer</button>
+    </div>
+    <textarea id="note" aria-label="What should change?" placeholder="What should change?"></textarea>
+    <div class="status" id="status" role="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var D={"kind":"K3a","title":"Opportunities and Pipeline audit","rules":["Skip data titles in the label length check"]};
+  var btns=[].slice.call(document.querySelectorAll('.answer .yes,.answer .no,.answer .chg')), pick='', note=document.getElementById('note');
+  btns.forEach(function(b){b.onclick=function(){pick=pick===b.textContent?'':b.textContent;
+    btns.forEach(function(x){x.setAttribute('aria-pressed',x.textContent===pick)});
+    note.classList.toggle('show',pick==='Change'||pick==='No');if(note.classList.contains('show'))note.focus()}});
+  document.getElementById('copy').onclick=function(){
+    var st=document.getElementById('status');
+    if(!pick){st.textContent='Pick Yes, No or Change first.';return}
+    var rules=[].slice.call(document.querySelectorAll('#rules input:checked')).map(function(c){return D.rules[c.value]});
+    var text=D.kind+' ('+D.title+'): '+pick+(note.value&&pick!=='Yes'?' — '+note.value:'')+(rules.length?' | add rules: '+rules.join('; '):'');
+    function done(){st.textContent='Copied. Paste it into Claude.'}
+    function fb(){var t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){st.textContent=text}t.remove()}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fb)}else{fb()}
+  };
+})();
+</script>
+</body>
+</html>
