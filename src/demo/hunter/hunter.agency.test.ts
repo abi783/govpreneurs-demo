@@ -250,7 +250,7 @@ describe.runIf(MEMBER === "agency")("Hunter for the agency", () => {
         /Not possible today \(1\): Family Advocacy TV and streaming ads at Fort Bragg\. The work names one provider/,
       );
       expect(r.chatReply).toMatch(
-        /A stretch on your own \(1\): VA's national health-care hiring campaign: who could run it\./,
+        /A stretch on your own \(1\): VA's national health-care hiring campaign \(sources sought\)\./,
       );
     });
 

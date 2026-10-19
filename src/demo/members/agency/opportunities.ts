@@ -268,7 +268,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
   {
     id: "36C77627Q0031",
     title: "Sources Sought — VHA Recruitment Marketing and Advertising Campaign (Follow-on)",
-    plainTitle: "VA's national health-care hiring campaign: who could run it?",
+    plainTitle: "VA's national health-care hiring campaign (sources sought)",
     agency: "Department of Veterans Affairs",
     office: "Program Contracting Activity Central (PCAC)",
     scope: "fed",
