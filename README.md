@@ -12,11 +12,15 @@ commit `fddbf283`, 16 Oct 2026), plus:
 - a left menu that copies the GoHighLevel member menu.
 
 There is **no backend, no login and no network call**. Every API call is answered
-in the browser from sample data about one fictional member. There are two
-(`src/demo/member.ts`, D85): **Dana Okafor of Lantern Row Creative LLC**, an ad
-agency (the Level Up story, and the default), and **Amira Haddad of Haddad
-Catering & Food Services LLC**. Add `?member=caterer` to any URL, or use the
-presenter panel (Shift+Alt+P), to switch.
+in the browser from sample data about one fictional member. There are seven
+(`src/demo/member.ts`, D85, D93): **Lantern Row Creative** (ad agency, the Level
+Up story and the default), **Haddad Catering**, **Ninebark Builders**
+(construction), **Rockfish Run Freight** (trucking), **Gallberry Technology
+Group** (IT services), **Coppervale Advisory Group** (consulting) and **Gray Owl
+Facility Services** (janitorial). Add `?member=<id>` to any URL (`agency`,
+`caterer`, `construction`, `trucking`, `it`, `consulting`, `janitorial`), or use
+the presenter panel (Shift+Alt+P), to switch. A new member is one folder:
+`src/demo/members/README.md`.
 
 ## For Abhi: build and host
 
