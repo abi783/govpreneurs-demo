@@ -21,6 +21,13 @@ first time; does not know what NAICS, UEI or set-aside mean, and should not need
   the smaller line under it. Dates in full ("15 April 2027"). Verdict first.
 - **Voice:** calm and professional. Outcome-framed ("so Hunter stops showing
   jobs that are too big"), never field-framed. Never blame her for missing data.
+- **Never a dead chip.** Every source reference opens the real thing, or says
+  "unavailable" and why.
+- **One fact, one owner.** My Business owns every business fact; other screens
+  link to it. Nothing is typed twice.
+- **Progress counts to the next milestone, with a real date.** Never a completion %.
+- **Zero high-severity questions before she has given one fact.** Count every
+  question a screen asks that is not about her business; fix the high ones first.
 - Marcus Williams (roofing, SDVOSB) is a legacy fixture in older docs. Never design to him.
 
 ## Jobs
@@ -38,7 +45,7 @@ first time; does not know what NAICS, UEI or set-aside mean, and should not need
 - Set-aside type — which group a set-aside is for
 - SDVOSB — service-disabled veteran-owned small business
 - WOSB — women-owned small business
-- HUBZone — a small business in a historically underused business zone
+- HUBZone — the SBA program for small businesses in historically underused business zones
 - 8(a) — the SBA program for disadvantaged small businesses
 - Period of performance — the dates the work runs
 - SAM.gov registration — the sign-up that lets a business sell to the US government
@@ -49,6 +56,8 @@ first time; does not know what NAICS, UEI or set-aside mean, and should not need
 - Solicitation — the government's request for bids
 - RFP — request for proposal
 - RFQ — request for quote
+- IFB — invitation for bid; sealed bids, lowest fair price wins
+- PSC — product and service code; the government's code for what it is buying
 - Sources sought — the government asking who could do a job, before it asks for bids
 - Notice ID — the number on a solicitation
 - Response deadline — when the bid must arrive
@@ -65,9 +74,10 @@ first time; does not know what NAICS, UEI or set-aside mean, and should not need
 - Wage determination — the lowest pay the contract allows for each job
 - Bonding — a guarantee that the business will finish the work
 - SLED — state, local and education buyers
-- Bid — Grant's call to go after a contract
+- Bid — Grant's call to go after a contract; also the response Ava writes and you send
 - No-bid — Grant's call to skip a contract
 - Bid as a subcontractor — Grant's call to join a prime instead
+- Needs review — Grant's call when a contract is not a clear bid or no-bid
 - Hunter — the agent that finds and matches opportunities
 - Grant — the agent that reads a solicitation and calls bid or no-bid
 - Ava — the agent that writes the bid
@@ -96,8 +106,7 @@ first time; does not know what NAICS, UEI or set-aside mean, and should not need
 
 ## Competitors
 SAM.gov (the official system she must use), GovWin IQ (Deltek), HigherGov,
-GovTribe, GovSpend; GovCon AI tools GovDash, Sweetspot and Rogue; APEX
-Accelerators (free government help, the human alternative). They show the
+GovTribe, Unison; GovCon AI tools GovDash, Sweetspot and Rogue. They show the
 member a black box; we show her what we know and let her correct it.
 
 ## Trusted references
@@ -110,6 +119,18 @@ Approved by Karthik, 19 October 2026 (`decisions/001-trusted-references.md`).
 - Wise — verification status and "what happens next" in plain English for a global audience
 - Granola — you talk, it writes a clean draft you can edit
 - Linear — list-to-detail triage and a board, one primary action per view
+
+## Sample data
+No backend: every API call is answered in the browser from sample data about Amira.
+- `src/demo/story/` — the story: Amira's facts, opportunities (`HERO_IDS`), Grant's
+  calls, pipeline, tasks, mentor replies. `bunx vitest run src/demo/story` checks it.
+- `src/demo/api/` — one handler file per area (`ENDPOINTS.md` lists every call);
+  `src/demo/<area>/` holds per-area data.
+- Scenarios: the 11 story segments in `src/demo/presenter/segments.ts` (`jumpTo`;
+  presenter panel Shift+Alt+P). Visitor changes live in `sessionStorage`; "Reset
+  demo" restores the start. Roadmap test states exist in
+  `src/sc/lib/roadmapV3/scenarios.ts`, but the demo pins `scenarioId: null`, so
+  `?scenario=` does nothing here yet.
 
 ## Viewports
 `1440x900,1366x768,375x812` — 375 because Amira is phone-first and opens the

@@ -2,21 +2,21 @@
 
 Judgement lives here; values live in the stylesheet. Plain CSS custom properties
 and bespoke class names with inline `style={}`: no Tailwind utilities in JSX
-(`source(none)`), no `@theme`, no shadcn/ui, icons from `lucide-react` only.
+(`source(none)`), no `@theme`, no shadcn/ui (the repo's own `@/components/ui` is fine), icons from `lucide-react` only.
 Where `docs/frontend-v2/KNOWLEDGE_DESIGN_SYSTEM.md` disagrees (it predates the
 `--insight-*`, `--ava-*`, `--hl-*` tokens), this file and `tokens.css` win.
 
 ## Tokens
 Source of truth: `src/styles/tokens.css` (`:root`). Read values there; never copy
 them into components. `src/sc/design-system/tokens.css` is the Success Center
-mirror with the same values — change `src/styles/tokens.css`.
+copy and may drift from it — change `src/styles/tokens.css`.
 - **Neutrals** `--n-0…12`, warm gray. Use the aliases: `--bg`, `--bg-subtle`,
   `--surface`, `--text`, `--text-2`, `--text-3`, `--border`, `--border-strong`.
 - **Federal blue** `--blue-*`. `--accent` is the one primary-action colour;
   `--text-ink` for page headings.
 - **Reserved families — one job each, never cross-used:**
   `--brand-*` brand moments only (logo, upsell, brand CTA, brand stripe) ·
-  `--ai-*` output Hunter or Grant wrote · `--ava-*` Ava surfaces only ·
+  `--ai-*` any AI-written text (Hunter, Grant, Ava's drafts) · `--ava-*` Ava's own frame only ·
   `--insight-*` read-only analysis chrome · `--hl-*` the highlighted source span ·
   `--urg-*` deadlines under 7 days, destructive actions, errors.
 - **Status** `--pos-*` verified or awarded · `--warn-*` pending or needs review.
@@ -46,21 +46,24 @@ in new code.
 Product UI for a busy owner, not marketing. Calm and quiet; light theme only.
 - One primary action per screen (`.btn-primary`); the rest `.btn-secondary` or `.btn-ghost`.
 - Verdict first, then the data behind it.
-- Status is a dot plus a label, never colour alone (the nine field states).
+- Status is a mark plus a label, never colour alone (the nine field states).
 - AI output sits on the amber AI surface and names the agent that wrote it.
-- A missing fact is a light grey row with one action, never red.
+- A missing fact is a light grey row, never red, with "Add now" — plus
+  "Have us do it — $<price>" when one of the nine real services fills it.
 - Cards `.card` on `--surface`; the brand stripe tops every page (`AppShell`).
 
 ## Banned
 - Raw hex, `var(--x, #hex)` fallbacks, unloaded font names (check-tokens.sh).
 - New colour families, or a reserved family used outside its job.
 - Dark mode, radial gradients, gradients outside buttons, AI surfaces and the stripe.
-- Tailwind utilities in JSX, `@theme`, `@/components/ui/*`, non-lucide icons.
+- Tailwind utilities in JSX, `@theme`, shadcn/ui (`components.json`), non-lucide icons.
+  Reuse `@/components/ui` (Button, Card, Chip, GlossTerm, Input, Modal, Tabs, Avatar)
+  first; a missing building block goes to the system queue, not a one-off.
 - New spacing steps. Off-token `border-radius: 12px` (use `--r-md`).
 - Raw `oklch(... 162)` for Ava (use `--ava-*`); `var(--font-display, …)` (use `--font-ui`).
 - Confidence scores, completion percentages, badges, streaks, confetti.
 - Exclamation marks; "please" in errors; "must" or "required" without what it gates.
-- Invented done-for-you services; a done-for-you button on a fact that is not missing.
+- Invented done-for-you services; a done-for-you button on a fact that is not missing or error.
 - The label code's banned words (`~/.claude/studio/GUARDRAILS.md`); the gate enforces them.
 
 ## Exceptions
