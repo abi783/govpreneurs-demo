@@ -24,6 +24,11 @@ import {
 import { ALL_AVA_BIDS, AVA_BIDS } from "./fixtures";
 import { FAMILY_ADVOCACY_ID } from "./fixtures/familyAdvocacy";
 import { HERO_IDS as CONSTRUCTION_IDS } from "../../demo/members/construction/opportunities";
+import { HERO_IDS as STORY_HERO_IDS } from "../../demo/story/opportunities";
+
+const PACK_HEROES = Object.values(
+  import.meta.glob<typeof import("../../demo/members/agency/ava")>("/src/demo/members/*/ava/index.ts", { eager: true }),
+).map((p) => p.HERO_BID.noticeId);
 import { MEMBER } from "../../demo/member";
 import { STAFFING_KEY } from "./flow";
 import { cumberlandBid } from "./fixtures/cumberland";
