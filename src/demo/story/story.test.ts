@@ -10,7 +10,7 @@ describe("demo story", () => {
   it("catches false claims (the checks can fail)", () => {
     const o = getOpportunity(HERO_IDS.hero)!;
     expect(factProblem(o, { kind: "valueInRange", says: "about $900K" })).toMatch(/outside/);
-    expect(factProblem(o, { kind: "distance", says: "60 miles from your office" })).toMatch(/miles/);
+    expect(factProblem(o, { kind: "distance", says: "500 miles from your office" })).toMatch(/miles/);
     expect(factProblem(o, { kind: "setAside", code: "SBA", says: "x" })).toMatch(/set-aside/);
     expect(factProblem(o, { kind: "clearanceGap", says: "x" })).toMatch(/not true/);
     expect(factProblem(o, { kind: "noticeType", says: "a sealed price bid" })).toMatch(/non-IFB/);

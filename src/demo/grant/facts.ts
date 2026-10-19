@@ -194,6 +194,34 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
     ],
   },
   {
+    match: /Defense Logistics/i,
+    team: [
+      { name: "Marisa Okonjo", title: "Contracting Officer" },
+      { name: "Russell Tierney", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Department of Defense/i,
+    team: [
+      { name: "Annika Severson", title: "Contracting Officer" },
+      { name: "Darnell Prewitt", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Postal/i,
+    team: [
+      { name: "Annette Castile", title: "Contracting Officer" },
+      { name: "Byron Medlock", title: "Purchasing Specialist" },
+    ],
+  },
+  {
+    match: /Interior/i,
+    team: [
+      { name: "Lydia Achterberg", title: "Contracting Officer" },
+      { name: "Simon Hartsell", title: "Contract Specialist" },
+    ],
+  },
+  {
     match: /Transportation|Aviation/i,
     team: [
       { name: "Rosalind Mercer", title: "Contracting Officer" },
