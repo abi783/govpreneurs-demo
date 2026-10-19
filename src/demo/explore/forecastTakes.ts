@@ -283,7 +283,8 @@ export function buildForecastTake(oppKey: string): ForecastTakeResponse | null {
     subUse: NOT_CHECKED,
   };
 
-  if (MEMBER !== "caterer" && record.lane === "federal" && AGENCY_TRADE.has(record.naicsCode ?? "")) {
+  // The team-up can sit outside her own codes (the trucker's is base logistics, 561210); it still gets the counted facts.
+  if (MEMBER !== "caterer" && record.lane === "federal" && (AGENCY_TRADE.has(record.naicsCode ?? "") || oppKey === FORT_BRAGG_FORECAST_KEY)) {
     agencyCounted(record, counted);
   }
 

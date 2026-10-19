@@ -1,37 +1,42 @@
-// THE AGENCY's labor pricing (read through src/lib/mock/laborRates.ts, which picks the
-// active member). Every rate is real:
+// THE TRUCKING COMPANY's labor pricing (read through src/lib/mock/laborRates.ts, which
+// picks the active member). Source: demo-storyboard/trucking-pack.md, "Wage rules".
+// Every rate is real:
 //
-// 1. The wage floor: the Service Contract Act wage determination for Cumberland and
-//    Hoke counties, NC, WD 2015-4377, Revision 33 (20 Aug 2026), for the creative
-//    titles it lists. Health and welfare is $5.92 an hour ($5.42 where Executive Order
-//    13706 paid sick leave applies). https://sam.gov/wage-determination/2015-4377/33
+// 1. The wage floor: Service Contract Act wage determination 2015-4377, Rev. 33
+//    (20 Aug 2026), Cumberland and Hoke counties, NC. Health and welfare is $5.92 an
+//    hour for every title ($5.42 where EO 13706 paid sick leave applies). FAR 52.222-43
+//    raises the price when a new determination comes with an option year.
+//    https://sam.gov/wage-determination/2015-4377/33
 //    (raw text: https://sam.gov/api/prod/wdol/v1/wd/2015-4377/33)
 // 2. Comparable awards: the award record in awards.ts (each modeled on a real award).
-// 3. Labor categories: GSA CALC+ ceiling rates, current year, pulled 19 Oct 2026,
-//    for rows on the Marketing and Public Relations SINs (541810, 541430, 541613,
-//    512110, 541910, 541820). Low = 25th percentile, median, high = 75th percentile.
-//    Education is the most common stated minimum; experience is the median minimum.
-//    https://api.gsa.gov/acquisition/calc/v3/api/ceilingrates/?keyword=graphic%20designer&page=1&page_size=500
-// 4. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
-//    NC metro area (22180): graphic designers' median wage $23.63 an hour (series
-//    OEUM002218000000027102408). https://data.bls.gov/oes/
+// 3. Local pay: BLS Occupational Employment and Wage Statistics, May 2025, Fayetteville
+//    NC metro area (22180), hourly: low = 25th percentile, median, high = 75th
+//    percentile (series OEUM0022180000000<SOC><07|08|09>, pulled 19 Oct 2026).
+//    https://api.bls.gov/publicAPI/v2/timeseries/data/
+//    Experience and education are the usual entry for each job, not from BLS.
+//
+// The heavy-truck floor ($24.03) is the local median, so a driver paid the floor is
+// paid what the market pays. Grant prices the 26-ft box trucks as Heavy, the safe
+// reading (the pack could not verify the SCA's tonnage cut-offs).
 
 import type { ComparableAward, LcatRate, PrevailingWage } from "@/lib/mock/laborRates";
 
-const HEALTH_AND_WELFARE = 5.92;
+const HW = 5.92;
 
 export const PREVAILING_WAGES: PrevailingWage[] = [
-  { trade: "Graphic Artist", baseHourly: 23.63, fringeHourly: HEALTH_AND_WELFARE, notes: "Layouts, production art and social graphics" },
-  { trade: "Illustrator II", baseHourly: 25.81, fringeHourly: HEALTH_AND_WELFARE, notes: "Designs ads and infographics from a brief" },
-  { trade: "Illustrator III", baseHourly: 31.57, fringeHourly: HEALTH_AND_WELFARE, notes: "Leads the design work on a campaign" },
-  { trade: "Photographer II", baseHourly: 19.35, fringeHourly: HEALTH_AND_WELFARE, notes: "Event and portrait shoots" },
-  { trade: "Photographer III", baseHourly: 23.97, fringeHourly: HEALTH_AND_WELFARE, notes: "Planned shoots, lighting and editing" },
-  { trade: "Photographer IV", baseHourly: 29.33, fringeHourly: HEALTH_AND_WELFARE, notes: "Senior photographer or videographer" },
-  { trade: "Media Specialist II", baseHourly: 20.83, fringeHourly: HEALTH_AND_WELFARE, notes: "Runs audiovisual and media equipment" },
+  { trade: "Truckdriver, Heavy (31363)", baseHourly: 24.03, fringeHourly: HW, notes: "Price the 26-ft box trucks here, the safe reading" },
+  { trade: "Truckdriver, Tractor-Trailer (31364)", baseHourly: 24.03, fringeHourly: HW, notes: "Dry-van and reefer truckload" },
+  { trade: "Truckdriver, Medium (31362)", baseHourly: 20.11, fringeHourly: HW },
+  { trade: "Truckdriver, Light (31361)", baseHourly: 18.83, fringeHourly: HW, notes: "The cargo van" },
+  { trade: "Driver Courier (31043)", baseHourly: 17.52, fringeHourly: HW, notes: "Lab and pharmacy courier runs" },
+  { trade: "Dispatcher, Motor Vehicle (01060)", baseHourly: 22.44, fringeHourly: HW },
+  { trade: "Forklift Operator (21020)", baseHourly: 24.74, fringeHourly: HW },
+  { trade: "Material Handling Laborer (21050)", baseHourly: 18.03, fringeHourly: HW, notes: "Helpers on furniture moves" },
+  { trade: "Motor Vehicle Mechanic (05190)", baseHourly: 22.53, fringeHourly: HW },
 ];
 
 export const PREVAILING_WAGE_META = {
-  county: "Cumberland County, NC",
+  county: "Cumberland and Hoke counties, NC",
   determination: "WD 2015-4377, Rev. 33",
   effectiveDate: "2026-08-20",
   source: "U.S. Dept. of Labor — Service Contract Act wage determination (SAM.gov)",
@@ -39,55 +44,56 @@ export const PREVAILING_WAGE_META = {
 
 export const COMPARABLE_AWARDS: ComparableAward[] = [
   {
-    awardId: "W91247-19-P-1874",
-    title: "Print and digital advertisements, Army Community Service, Fort Bragg",
+    awardId: "W9124725PA044",
+    title: "On-call trailer and container hauling, 18th Airborne Corps (yours)",
     agency: "Army / MICC Fort Bragg",
-    awardValue: 356_624,
-    unitNote: "Two years of weekly print and digital ads, about $178K a year",
+    awardValue: 41_400,
+    unitNote: "46 on-call moves in 12 months, about $900 a move",
     location: "Fort Bragg, NC",
   },
   {
-    awardId: "W91242-25-P-A118",
-    title: "Digital recruiting campaign: NC Army National Guard (yours)",
-    agency: "Army / NC Army National Guard",
-    awardValue: 86_400,
-    unitNote: "12 months of videos, geofenced ads and lead routing, $7,200 a month",
-    location: "Raleigh, NC",
-  },
-  {
-    awardId: "H92257-25-P-0041",
-    title: "Geofencing and lead-generation recruiting campaign, MARSOC",
-    agency: "Special Operations / MARSOC",
-    awardValue: 129_712,
-    unitNote: "The first year; up to $688K with the option years",
+    awardId: "M6700122P1187",
+    title: "On-call trailer transport, Camp Lejeune",
+    agency: "Navy / MCB Camp Lejeune",
+    awardValue: 164_400,
+    unitNote: "Four years of on-call moves, about $41K a year; one of 5 quotes",
     location: "Camp Lejeune, NC",
   },
   {
-    awardId: "36C24626P2971",
-    title: "Patient-education and outreach video production, Durham VA",
+    awardId: "36C24622P0031",
+    title: "Chilled freight routes, Hampton VA to eight sites",
     agency: "VA / Network Contracting Office 6",
-    awardValue: 200_000,
-    unitNote: "The first year; up to $800K with the option years",
+    awardValue: 1_481_323,
+    unitNote: "Weekly routes for five years, about $296K a year; 2 veteran-owned quotes",
+    location: "Hampton, VA",
+  },
+  {
+    awardId: "36C24626P1893",
+    title: "Lab specimen courier, Durham VA",
+    agency: "VA / Network Contracting Office 6",
+    awardValue: 251_916,
+    unitNote: "Scheduled and rush courier runs",
     location: "Durham, NC",
+  },
+  {
+    awardId: "W9124721P9617",
+    title: "Barracks furniture removal, Fort Bragg",
+    agency: "Army / MICC Fort Bragg",
+    awardValue: 24_782,
+    unitNote: "A box-truck job that drew 8 quotes; an out-of-state mover won",
+    location: "Fort Bragg, NC",
   },
 ];
 
-// GSA CALC+ ceiling rates on the marketing SINs: 25th percentile, median, 75th percentile.
+// BLS local pay, Fayetteville metro, May 2025: 25th percentile, median, 75th percentile.
 export const LCAT_RATES: LcatRate[] = [
-  { id: "lcat-account-director", category: "Account Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 179.73, median: 205.8, high: 230.57 },
-  { id: "lcat-creative-director", category: "Creative Director", experience: "7–15 yrs", education: "Bachelor", location: "Nationwide", low: 154.25, median: 185.53, high: 217.88 },
-  { id: "lcat-art-director", category: "Art Director", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 122.59, median: 145.95, high: 167.86 },
-  { id: "lcat-project-manager", category: "Project Manager (marketing)", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 119.72, median: 144.63, high: 177.22 },
-  { id: "lcat-account-executive", category: "Account Executive", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 107.06, median: 129.81, high: 157.88 },
-  { id: "lcat-copywriter", category: "Copywriter", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 105.58, median: 133.53, high: 153.05 },
-  { id: "lcat-video-producer", category: "Video Producer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 100.78, median: 123.56, high: 138.62 },
-  { id: "lcat-video-editor", category: "Video Editor", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 85.12, median: 93.13, high: 108.61 },
-  { id: "lcat-graphic-designer", category: "Graphic Designer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 87.58, median: 108.61, high: 132.93 },
-  { id: "lcat-media-buyer", category: "Media Buyer / Media Planner", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 98.72, median: 121.23, high: 146.6 },
-  { id: "lcat-social-media", category: "Social Media Manager / Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 102.87, median: 125.5, high: 142.02 },
-  { id: "lcat-digital-marketing", category: "Digital Marketing Specialist", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 131.52, median: 151.49, high: 167.12 },
-  { id: "lcat-web-developer", category: "Web Developer", experience: "3–7 yrs", education: "Bachelor", location: "Nationwide", low: 113.01, median: 138.08, high: 164.55 },
+  { id: "lcat-heavy-truck-driver", category: "Heavy and tractor-trailer truck driver", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 22.09, median: 24.03, high: 28.35 },
+  { id: "lcat-light-truck-driver", category: "Light truck driver", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 14.14, median: 18.83, high: 21.68 },
+  { id: "lcat-courier", category: "Courier", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 16.54, median: 17.57, high: 19.81 },
+  { id: "lcat-dispatcher", category: "Dispatcher", experience: "3–7 yrs", education: "HS", location: "Fayetteville", low: 19.66, median: 21.96, high: 26.87 },
+  { id: "lcat-truck-mechanic", category: "Truck and diesel mechanic", experience: "3–7 yrs", education: "Associate", location: "Fayetteville", low: 21.69, median: 26.81, high: 29.98 },
+  { id: "lcat-mover-helper", category: "Laborer and freight mover", experience: "0–3 yrs", education: "HS", location: "Fayetteville", low: 15.88, median: 18.03, high: 19.66 },
 ];
 
-/** BLS, May 2025: a Fayetteville graphic designer's median pay, an hour. */
-export const LOCAL_DESIGNER_MEDIAN = 23.63;
+/** BLS, May 2025: a Fayetteville heavy-truck driver's median pay, an hour. (The name is the agency's export.) */
+export const LOCAL_DESIGNER_MEDIAN = 24.03;
