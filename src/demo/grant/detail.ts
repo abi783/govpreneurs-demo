@@ -15,6 +15,7 @@ import { keyDateBullets, keyDatesFor, type KeyDate } from "./dates";
 import { HERO_DETAILS } from "./heroDetails";
 import { buildSolicitation, type ClausePatch, type Solicitation } from "./solicitation";
 import { V } from "./vocab";
+import { SET_ASIDES } from "@/demo/story/setAsides";
 
 export type DocKind = "solicitation" | "pws" | "wage" | "price" | "menu" | "sites" | "amendment" | "custom";
 
@@ -67,6 +68,7 @@ function isStub(opp: StoryOpportunity): boolean {
 function setAsideSentence(f: OppFacts): string {
   if (f.setAside === "WOSB") return "Only woman-owned small businesses can compete.";
   if (f.setAside === "SBA") return "Only small businesses can compete.";
+  if (f.setAside) return `Only ${SET_ASIDES[f.setAside].firms} can compete.`;
   return "Any qualified firm can compete.";
 }
 
@@ -93,7 +95,9 @@ function eligibilityBullets(f: OppFacts, d: Domain): string[] {
       ? "Set-aside: Women-Owned Small Business (WOSB). The firm must hold an active SBA certification when it sends the offer and at award."
       : f.setAside === "SBA"
         ? "Set-aside: total small business. The firm must be small under the size standard when it sends the offer."
-        : "No set-aside. Any qualified firm can compete.",
+        : f.setAside
+          ? `Set-aside: ${f.setAsideLabel.replace(/ set-aside$/, "")}. Only ${SET_ASIDES[f.setAside].firms} can compete.`
+          : "No set-aside. Any qualified firm can compete.",
   );
   if (f.isFederal) {
     out.push(

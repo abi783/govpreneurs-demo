@@ -103,6 +103,14 @@ export interface GrantVocab {
   extraClauses(f: OppFacts): ClausePatch[];
   /** The wage determination's sample rows, header first. */
   wageRows: string[][];
+  /** The law the wage determination is under. Default: the Service Contract Labor Standards. */
+  wageLaw?: string;
+  /** A sealed bid with no set-aside: who wins, and what keeps the member's price down. */
+  priceOnlyWin?: string;
+  /** A sealed bid: the money read. */
+  priceOnlyMoney?: string;
+  /** No-bid roadmap for work outside the trade: the item (one bold phrase) and why. */
+  offTrade?: { item: string; why: string };
 }
 
 export const V: GrantVocab = byMember<GrantVocab>({ pack: pack.VOCAB, caterer: caterer.VOCAB });

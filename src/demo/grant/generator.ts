@@ -191,6 +191,13 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const cp = (kind: string, label?: string): Pin | null => clausePinMaybe(sol, kind, label);
   const pins = (...list: (Pin | null)[]): Pin[] => list.filter((p): p is Pin => p !== null);
   const hasBond = clausePinMaybe(sol, "bond") !== null;
+  // A member with a bond line bonds most of its jobs: a bond is a limit only when the job does not fit the line.
+  const line = PERSONA.bondLine;
+  const bondFits = hasBond && line !== undefined && mid <= line.single && line.inUse + mid <= line.aggregate;
+  const bondLimit = hasBond && !bondFits;
+  const bondSays = line
+    ? `The ${offer} needs performance and payment bonds of about ${usdAbout(mid)}. ${mid > line.single ? `That is more than your ${usd(line.single)} single-job bond.` : bondFits ? `That fits your ${usd(line.single)} single-job bond, with ${usd(line.aggregate - line.inUse)} of room left in your total.` : `Only ${usd(line.aggregate - line.inUse)} of room is left in your ${usd(line.aggregate)} total.`}`
+    : `The notice asks for a bond near the annual price, about ${usdAbout(annual)}. Your largest bond is ${usd(PERSONA.largestBond)}.`;
   const srcOf = (kindOf: string): string => {
     const hit = clauseOf(sol, kindOf);
     return hit ? `§${hit.clause.ref}` : "Notice";
@@ -309,7 +316,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
         : f.setAside === "SBA"
           ? `Only small businesses can compete. That removes the large national firms, but other small ${V.peers} will bid.${ref ? ` Your ${customerShort(ref)} record is your closest reference.` : ""}`
           : priceOnly
-            ? `The lowest price from a qualified bidder wins. Your cost is low if the kitchen is close.`
+            ? (V.priceOnlyWin ?? `The lowest price from a qualified bidder wins. Your cost is low if the kitchen is close.`)
             : `No set-aside. Large and small firms can bid, so your record and your price decide it.${ref ? ` Your ${customerShort(ref)} record helps.` : " You have no past job of this kind."}`;
   const winBold =
     subGo && call.prime === "no_go"
@@ -341,7 +348,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
             : band === "above" || band === "far" || share >= 0.95
               ? `A contract this large pays slowly at first: ${V.frontCost} before the first invoice is paid.`
               : priceOnly
-                ? "A price-only bid is thin. Hold food cost low or walk away."
+                ? (V.priceOnlyMoney ?? "A price-only bid is thin. Hold food cost low or walk away.")
                 : V.priceAdvice;
   const money: Take = {
     name: "Will you make money?",
@@ -353,15 +360,15 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
 
   const survive: Take = {
     name: "Can you survive winning?",
-    rating: hasBond || band === "far" ? "weak" : band === "above" || share >= 0.95 ? "watch" : "good",
+    rating: bondLimit || band === "far" ? "weak" : band === "above" || share >= 0.95 ? "watch" : "good",
     text: hasBond
-      ? `The notice asks for a bond near the annual price, about ${usdAbout(annual)}. Your largest bond is ${usd(PERSONA.largestBond)}.`
+      ? bondSays
       : band === "far"
         ? `A win would be ${ratioText} times your yearly revenue. You would need a crew and cash far beyond what you have today.`
         : band === "above" || share >= 0.95
           ? `A win would add about as much work as you do in a year. You would need new staff and a cash cushion for the first 90 days.`
           : `No bond is needed. ${V.fitsWin}`,
-    bold: hasBond ? "a bond near the annual price" : band === "far" ? "far beyond what you have today" : band === "above" || share >= 0.95 ? "as much work as you do in a year" : "No bond is needed",
+    bold: hasBond ? (line ? "performance and payment bonds" : "a bond near the annual price") : band === "far" ? "far beyond what you have today" : band === "above" || share >= 0.95 ? "as much work as you do in a year" : "No bond is needed",
     pins: pins(cp("bond"), cp("term")),
   };
 
@@ -437,7 +444,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   const issues: Issue[] = [];
   const add = (key: Issue["key"], sev: number, kindOf: WarningKind, label: string, text: string) =>
     issues.push({ key, sev, w: { kind: kindOf, summary: [{ text: label, bold: true }, { text: `: ${text}` }] } });
-  if (hasBond) add("bond", 10, "responsibility", "Bond", `the notice asks for a bond near the annual price, about ${usdAbout(annual)}. Your largest bond is ${usd(PERSONA.largestBond)}.`);
+  if (bondLimit) add("bond", 10, "responsibility", "Bond", `${bondSays.charAt(0).toLowerCase()}${bondSays.slice(1)}`);
   if (fitWeak) add("fit", 9, "proposal-weakness", "Fit", d.fit.text);
   if (band === "far") add("size", 9.5, "winning-hurts", "Size", `the total is ${ratioText} times your yearly revenue and above your usual range of ${range}.`);
   else if (bigJob) add("size", 6.5, "winning-hurts", "Size", band === "above" ? `the total is above your usual range of ${range}. ${cap(V.crew)} would need more staff and more cash.` : `a year of it is ${shareWords(share)}. ${cap(V.crew)} would need more staff and more cash.`);
@@ -517,7 +524,8 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
   if (!fitWeak) row("Written food-safety plan (HACCP)", "haccp", "submission", "a written plan", "On file from your Fort Bragg subcontract", "have");
   row("General liability insurance, $1M per occurrence", "insurance", "insurance", "$1M per occurrence", "On file", "have");
   if (WITH_VANS.has(d.key)) row("Commercial vehicle insurance", "insurance", "insurance", "commercial vehicle cover", "Both vans covered", "have");
-  if (hasBond) row(`Performance and payment bond (about ${usd(annual)})`, "bond", "bonding", `${usd(annual)} single job`, `${usd(PERSONA.largestBond)} largest bond`, "missing", false);
+  if (hasBond && line) row(`Performance and payment bonds (about ${usd(mid)})`, "bond", "bonding", `${usd(mid)} for this job`, `${usd(line.single)} single, ${usd(line.aggregate - line.inUse)} room left`, bondFits ? "have" : "missing", false);
+  else if (hasBond) row(`Performance and payment bond (about ${usd(annual)})`, "bond", "bonding", `${usd(annual)} single job`, `${usd(PERSONA.largestBond)} largest bond`, "missing", false);
   if (!f.isSourcesSought && d.key !== "staffing" && d.key !== "construction") {
     row(
       "Past-performance references",
@@ -605,7 +613,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
           ? { glyph: "blocked" as const, text: rt(caveat.trail), source: srcOf("setAside") }
           : { glyph: f.setAside ? "ok" : "neutral", text: rt(f.setAside ? `Set-aside: **${f.setAsideLabel.replace(/ set-aside$/, "")}**. You are eligible.` : "No set-aside. Any qualified firm can bid."), source: srcOf("setAside") },
         { glyph: "neutral", text: rt(`Scoring: ${priceOnly ? "**lowest price** from a qualified bidder" : d.scoring.map((s) => `${s.factor.toLowerCase()} ${s.weight}`).join(", ")}.`), source: srcOf("factors") !== "Notice" ? srcOf("factors") : srcOf("evaluate") },
-        { glyph: hasBond ? "blocked" : "ok", text: rt(hasBond ? `A **bond near ${usd(annual)}** is required.` : "No bond is required."), source: hasBond ? srcOf("bond") : srcOf("insurance") },
+        { glyph: bondLimit ? "blocked" : "ok", text: rt(hasBond ? (line ? `Performance and payment bonds of **about ${usd(mid)}**. ${bondFits ? "They fit your bond line." : "They don't fit your bond line."}` : `A **bond near ${usd(annual)}** is required.`) : "No bond is required."), source: hasBond ? srcOf("bond") : srcOf("insurance") },
         { glyph: "neutral", text: rt(`Key dates: due ${longDate(f.closes)}, ${dueTimeOf(f.opp)}.`), source: "Notice" },
       ],
     },
@@ -677,14 +685,14 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
                   far || outsideArea
                     ? `A **partner or crew** near ${place}`
                     : fitWeak
-                      ? `A **kitchen-based** contract that fits`
+                      ? (V.offTrade?.item ?? `A **kitchen-based** contract that fits`)
                       : V.cashLine,
                 ),
                 whyItMattered: rt(
                   far || outsideArea
                     ? `${place} is ${miles} miles from ${V.base}. ${V.localPartner}`
                     : fitWeak
-                      ? "This notice does not use your kitchen, so it does not build the record you want."
+                      ? (V.offTrade?.why ?? "This notice does not use your kitchen, so it does not build the record you want.")
                       : `The yearly value is ${shareWords(share)}. A larger contract needs more cash cover and more staff.`,
                 ),
                 whatItTakes: rt("A conversation with a mentor about who to team with, and a plan for the next year."),

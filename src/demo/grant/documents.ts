@@ -100,12 +100,17 @@ function pwsBlocks(f: OppFacts, d: Domain): Block[] {
 function wageBlocks(f: OppFacts): Block[] {
   return [
     { kind: "h1", text: "WAGE DETERMINATION" },
-    { kind: "p", text: `Service Contract Labor Standards. Locality: ${f.place.city}, ${f.place.state}. Applies to ${f.id}.` },
+    { kind: "p", text: `${V.wageLaw ?? "Service Contract Labor Standards"}. Locality: ${f.place.city}, ${f.place.state}. Applies to ${f.id}.` },
     { kind: "gap" },
     { kind: "table", head: true, widths: [250, 140, 140], rows: V.wageRows },
     { kind: "gap" },
-    { kind: "p", text: "Paid holidays: New Year's Day, Martin Luther King Jr.'s Birthday, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, Christmas Day." },
-    { kind: "p", text: "Vacation: two weeks after one year of service, three weeks after five years. Uniform allowance applies where the employer requires a uniform." },
+    // Paid holidays and vacation are service-contract terms; a construction decision has none.
+    ...(V.wageLaw
+      ? []
+      : ([
+          { kind: "p", text: "Paid holidays: New Year's Day, Martin Luther King Jr.'s Birthday, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, Christmas Day." },
+          { kind: "p", text: "Vacation: two weeks after one year of service, three weeks after five years. Uniform allowance applies where the employer requires a uniform." },
+        ] as Block[])),
     { kind: "p", text: "The rates in this sample show the shape of a wage determination. The contractor pays the rates in the determination that the buyer attaches at award." },
   ];
 }

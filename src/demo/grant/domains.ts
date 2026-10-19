@@ -13,7 +13,8 @@
 
 import { byMember, own } from "@/demo/member";
 import type { StoryOpportunity } from "@/demo/story/opportunities";
-import type { AgencyDomainKey as PackDomainKey } from "@/demo/members/agency/grant/domains";
+import type { AgencyDomainKey } from "@/demo/members/agency/grant/domains";
+import type { AgencyDomainKey as ConstructionDomainKey } from "@/demo/members/construction/grant/domains";
 import type { PastPerformanceId } from "@/demo/story/persona";
 import { customerShort, EVENT_RANGE, MEALS_PER_DAY, PP } from "./facts";
 
@@ -35,6 +36,8 @@ export type CatererDomainKey =
   | "detention"
   | "staffing"
   | "construction";
+
+type PackDomainKey = AgencyDomainKey | ConstructionDomainKey;
 
 export type DomainKey = CatererDomainKey | PackDomainKey;
 
@@ -679,7 +682,8 @@ const CATERER_DOMAINS: Record<CatererDomainKey, Domain> = {
   },
 };
 
-const DOMAINS: Record<DomainKey, Domain> = { ...CATERER_DOMAINS, ...pack.DOMAINS };
+// The pack on stage brings only its own keys.
+const DOMAINS = { ...CATERER_DOMAINS, ...pack.DOMAINS } as Record<DomainKey, Domain>;
 
 export function domainFor(opp: StoryOpportunity): Domain {
   return DOMAINS[domainOf(opp)];

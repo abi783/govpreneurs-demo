@@ -8,6 +8,7 @@
 import { FOR_YOU, getOpportunity } from "@/demo/story/opportunities";
 import { getGrantBrief } from "@/demo/story/grantBriefs";
 import { PERSONA } from "@/demo/story/persona";
+import { OWN, SET_ASIDES } from "@/demo/story/setAsides";
 import type { GrantAnalysis, Pin } from "@/lib/grant/types";
 import type { RailReply } from "@/lib/grant/rail";
 import { acknowledge, findOpenQuestion } from "./answers";
@@ -183,7 +184,9 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
     case "money":
       return `${readOf("Will you make money?")} ${f.annual !== null ? `At about ${usdAbout(f.annual)} a year, check each line of the price form against ${V.cost}.` : ""}`.trim();
     case "bond":
-      return a.complianceMatrix.some((r) => r.category === "bonding")
+      return PERSONA.bondLine && a.complianceMatrix.some((r) => r.category === "bonding")
+        ? plain(a.reads.find((r) => r.name === "Can you survive winning?")?.sentence ?? [])
+        : a.complianceMatrix.some((r) => r.category === "bonding")
         ? `The notice asks for a bond near the annual price, about ${usd(f.annual ?? 0)}. Your largest bond is ${usd(PERSONA.largestBond)}. A surety needs weeks to approve a larger line, so this is a limit for you today.`
         : V.insuranceLine;
     case "team":
@@ -212,7 +215,7 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
       if (f.setAside && !f.eligibleSetAside)
         return `This is a ${f.setAsideLabel}. You are not eligible for it, so you would join as a subcontractor to a firm that is.`;
       return f.setAside
-        ? `This is a ${f.setAsideLabel.toLowerCase()}. You are eligible: you are a small business, and your woman-owned certification is active.`
+        ? `This is a ${f.setAsideLabel.toLowerCase()}. You are eligible: you are a small business${OWN !== "SBA" ? `, and your ${SET_ASIDES[OWN].short} certification is active` : ""}.`
         : "There is no set-aside. Any qualified firm can bid, so you compete with larger firms.";
     case "clearance":
       return opp.clearanceRequired

@@ -1,168 +1,173 @@
-// THE AGENCY: Grant's written reviews of the two story opportunities that
-// members/agency/grantBriefs.ts does not brief: the look-alike twin (No-bid) and
-// the VA team-up (prime no-go, subcontract go). The hero's brief is in
-// members/agency/grantBriefs.ts.
+// THE CONTRACTOR: Grant's written reviews of the two story opportunities that
+// members/construction/grantBriefs.ts does not brief: the look-alike twin (No-bid)
+// and the VA team-up (prime no-go, subcontract go). The hero's brief is in
+// members/construction/grantBriefs.ts.
 //
-// Source: demo-storyboard/marketing-agency-pack.md (approved 19 Oct 2026).
+// Source: demo-storyboard/construction-pack.md, sections 4 and 5.
 // Rules for these words:
-// - The twin is said neutrally. The work statement names one provider's own app,
-//   crew and data; Grant says what that means for Dana, never why the Army wrote it.
-// - No subcontracting-limit argument anywhere (13 CFR 125.6 can exclude mass-media
-//   purchases, so it is not a sound No-bid reason).
+// - The twin is said plainly: only MATOC holders can offer, and the bond is over
+//   his single limit. Grant never says why the Army runs its work that way.
+// - An SDVOSB prime may pay up to 85% (materials excluded) to other firms on
+//   general construction (13 CFR 125.6), so a half-share subcontract is allowed.
 // - No promise of a win.
 
 import type { AuthoredBrief } from "@/demo/grant/encode";
-import { numWord, PARTNER, shareWords, STAFF, usd } from "@/demo/grant/facts";
+import { PARTNER, usd, usdAbout } from "@/demo/grant/facts";
 import { getOpportunity } from "@/demo/story/opportunities";
-import { findPastPerformance, PERSONA } from "@/demo/story/persona";
+import { PERSONA } from "../persona";
 import { PLACES } from "@/demo/story/places";
 import { HERO_IDS } from "../opportunities";
 
-const hero = getOpportunity(HERO_IDS.hero)!;
 const twin = getOpportunity(HERO_IDS.twin)!;
 const teamUp = getOpportunity(HERO_IDS.teamUp)!;
 
-const mid = (o: typeof hero): number => Math.round((o.valueLow! + o.valueHigh!) / 2);
-const TWIN_ANNUAL = mid(twin);
-const TEAM_ANNUAL = mid(teamUp);
-/** "six": a year of the VA campaign against her yearly revenue. */
-const TIMES = numWord(Math.round(TEAM_ANNUAL / PERSONA.annualRevenue));
-/** "Bluestone": the partner's short name. */
-const BLUE = PARTNER.name.split(" ")[0];
-const HIRES = /(\d+) hires/.exec(findPastPerformance("pp-longleaf-hiring")?.scopeDescription ?? "")?.[1] ?? "140";
+const mid = (o: typeof twin): number => Math.round((o.valueLow! + o.valueHigh!) / 2);
+const TWIN_MID = mid(twin);
+const TEAM_MID = mid(teamUp);
+/** His share as the prime's subcontractor: about half the job. */
+const TEAM_HALF = usdAbout(TEAM_MID / 2);
+const LINE = PERSONA.bondLine!;
+const SINGLE = usd(LINE.single);
+/** "Blackjack Oak": the partner's short name. */
+const BLUE = PARTNER.name.split(" ").slice(0, 2).join(" ");
 const FORT_BRAGG_MILES = PLACES[twin.place].milesFromBase;
+const VA_MILES = PLACES[teamUp.place].milesFromBase;
+const SOURCES_SOUGHT = "W91247-27-R-0007";
 
 export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
-  // ── The twin: Family Advocacy TV and streaming ads — No-bid ────────────
+  // ── The twin: barracks HVAC repair, MATOC holders only — No-bid ───────
   [HERO_IDS.twin]: {
     oppId: HERO_IDS.twin,
     confidence: 5,
     gist: twin.grant.oneLine,
     thesis:
-      "The work statement names one provider's own streaming app, production team and viewer data. Only that provider can deliver all three, so you would be reselling a package you don't control. Spend this month on the print and digital campaign instead.",
+      "Only the firms on Fort Bragg's HUBZone Vertical Construction MATOC can offer, and you are not on it. The bond for the full price is also more than your single-job bond. Price the HVAC for one of the holders, and answer the Minor Construction MATOC sources sought.",
     reads: {
       "Is it your kind of work?": {
         rating: "good",
-        text: "Commercials for the Family Advocacy Program are your advertising code, and your crew makes captioned video. Here, though, the provider's own team makes the ads.",
+        text: "Barracks HVAC is your trades: air handlers, piping and controls, the same kind of job you did as Turnrow Federal's electrical sub. Here, though, only MATOC holders can offer.",
       },
       "Does the size fit?": {
-        rating: "good",
-        text: `About ${usd(TWIN_ANNUAL)} a year, ${shareWords(TWIN_ANNUAL / PERSONA.annualRevenue)} and inside your range. On size alone it fits.`,
+        rating: "weak",
+        text: `About ${usd(TWIN_MID)}. That is more than your ${SINGLE} single-job bond, and with the ${usd(LINE.inUse)} you have in use it would top your ${usd(LINE.aggregate)} total.`,
       },
       "Can you perform there?": {
         rating: "strong",
-        text: `Fort Bragg is ${FORT_BRAGG_MILES} miles from your office, and the ads reach households around post.`,
+        text: `Fort Bragg is ${FORT_BRAGG_MILES} miles from your shop, and your crews already badge onto post.`,
       },
       "Can you do the work?": {
-        rating: "weak",
-        text: "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three.",
+        rating: "good",
+        text: "Your crews could do the work. What stops you is who can offer, not the work.",
       },
       "Can you win it?": {
         rating: "weak",
-        text: "Only the provider that owns that app, crew and data can meet all three. Any other firm would be reselling its package.",
+        text: "Offers will be accepted only from holders of Fort Bragg's Vertical Construction MATOC. You are not on it, so you can't send an offer.",
       },
       "Will you make money?": {
-        rating: "weak",
-        text: "As a reseller you would add a markup to the provider's own price. The provider can quote the same package without one.",
+        rating: "watch",
+        text: "Not as prime. As a sub to a holder you'd price only the HVAC work, on the holder's terms.",
       },
       "Can you survive winning?": {
-        rating: "watch",
-        text: "Every deliverable would come from another company: its app, its crew and its reports. Your name would be on the contract.",
+        rating: "weak",
+        text: `As prime you'd need bonds of about ${usd(TWIN_MID)} for one job, more than your single limit. Your surety would have to raise your line first.`,
       },
       "Do you understand the buyer's intent?": {
         rating: "good",
-        text: "The Family Advocacy Program wants its messages on the screens families around post watch, with viewer numbers it can report.",
+        text: "Fort Bragg buys most of its HUBZone repair work through its MATOCs, so the holders get the orders. The way in is to be on the next one.",
       },
       "Does this move you forward?": {
-        rating: "weak",
-        text: "Not much. Reselling another firm's package builds no video record of your own. The print and digital campaign does.",
+        rating: "watch",
+        text: "Not as prime. Pricing the HVAC for a holder adds Fort Bragg barracks work to your record, and the Minor Construction MATOC sources sought is your way onto the next vehicle.",
       },
     },
     limits: [
-      "Provider lock: the work statement requires one local provider's own subscriber app, production team and viewer data. You don't own any of them.",
-      "Reselling: any other firm would pass that provider's package through with a markup, and control none of the work.",
+      "Holders only: offers will be accepted only from holders of the Fort Bragg DPW Vertical Construction MA IDIQ. You are not on it.",
+      `Bond: about ${usd(TWIN_MID)} for one job, more than your ${SINGLE} single-job bond.`,
     ],
     wouldChange: [
-      `If an amendment lets other platforms and production teams qualify, an "or equal", I'd read the notice again and tell you.`,
-      "If the provider asked you to produce its spots, I'd look at that as a subcontract.",
+      "If the Army opens this order to firms off the MATOC, I'd read it again, but the bond would still need a larger line.",
+      "If a holder asks you to price the HVAC work, I'd look at that as a subcontract.",
     ],
     nextMove: {
-      label: "Go to the print and digital campaign",
-      to: `/opportunities/${HERO_IDS.hero}`,
-      rationale: "Same office, same program, and only woman-owned firms can bid. Spend this month on that quote.",
+      label: "Go to the MATOC sources sought",
+      to: `/opportunities/${SOURCES_SOUGHT}`,
+      rationale: "It is the way onto the Minor Construction MATOC, where most of Fort Bragg's HUBZone repair work goes. Answer it before it closes.",
     },
     secondaryMove: { label: "Add the next step to my Roadmap", to: "/roadmap" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
-      { requirement: "Total small business set-aside", status: "have", note: "You are a small business." },
-      { requirement: "Registered under NAICS 541810", status: "have", note: "Your primary code." },
-      { requirement: "Streaming through the provider's own subscriber app", status: "missing", note: "You don't own it." },
-      { requirement: "Commercials made by the provider's production team", status: "missing", note: "Your crew is not that team." },
-      { requirement: "The provider's viewer data and dashboard", status: "missing", note: "Only the provider holds it." },
+      { requirement: "HUBZone certification", status: "have", note: "Certified by SBA on 2 Dec 2023." },
+      { requirement: `Registered under NAICS ${twin.naics}`, status: "have", note: "Your primary code." },
+      { requirement: "Holder of the Vertical Construction MATOC", status: "missing", note: "You are not on it." },
+      { requirement: `Performance and payment bonds, about ${usd(TWIN_MID)}`, status: "missing", note: `More than your ${SINGLE} single-job bond.` },
       { requirement: "General liability insurance, $1M per occurrence", status: "have", note: "On file." },
     ],
     redTeam: [
       {
-        challenge: `Am I too quick to pass on ${usd(TWIN_ANNUAL)} a year?`,
-        answer: `No. Your share would be a markup on another company's package, not ${usd(TWIN_ANNUAL)} of your own work.`,
+        challenge: `Am I too quick to pass on ${usd(TWIN_MID)}?`,
+        answer: `No. You can't send an offer, so there is no ${usd(TWIN_MID)} to pass on. Pricing the HVAC for a holder is the part open to you.`,
       },
       {
-        challenge: "Could I team with the provider?",
-        answer: "Only if it asks. The work statement names its own production team, so it does not need a producer.",
+        challenge: "Could I team with a holder?",
+        answer: "Yes, as a sub. Turnrow Federal holds this MATOC and hired your electricians for a barracks job before. Ask whether it is pricing this order.",
       },
       {
-        challenge: "Can a buyer name one provider?",
-        answer: `Yes. A buyer can ask for a platform when it needs that audience or that data. The time to ask for "or equal" is the sources sought, before the work statement is written.`,
+        challenge: "How do I get on a MATOC?",
+        answer: "Answer the sources sought when the next one is planned. Fort Bragg's Minor Construction MATOC follow-on is asking now: three similar jobs from the last six years, a surety letter and your ratings.",
       },
     ],
     keyDates: [
-      { label: "Questions due", inDays: twin.closesInDays - 12 },
-      { label: "Quotes due", inDays: twin.closesInDays },
-      { label: "Expected award", inDays: twin.closesInDays + 21 },
+      { label: "Questions due", inDays: twin.closesInDays - 10 },
+      { label: "Proposals due", inDays: twin.closesInDays },
+      { label: "Expected award", inDays: twin.closesInDays + 30 },
     ],
     railBriefing: [
-      "I read the quote request and the work statement.",
-      "I stopped at the streaming clause. It names one provider's own app, crew and viewer data.",
-      "Ask me anything, or pick a question below. There is no bid here this cycle.",
+      "I read the task order request and the statement of work.",
+      "I stopped at the clause on who can offer. Only holders of Fort Bragg's Vertical Construction MATOC can.",
+      "Ask me anything, or pick a question below. There is no bid here for you this cycle.",
     ],
-    chips: ["Why can't I bid this?", "What should I bid instead?", "How do I get in next time?"],
+    chips: ["Why can't I bid this?", "How do I get on the MATOC?", "Who could I price it for?"],
     railAnswers: {
       "Why can't I bid this?":
-        "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three, so you could only resell that provider's package.",
-      "What should I bid instead?": `The print and digital campaign for the same program. Same office, only woman-owned firms can bid, about ${usd(mid(hero))} a year, and it is open for ${hero.closesInDays} days. Open it from the button on this page.`,
-      "How do I get in next time?": `Watch for the next sources sought for Family Advocacy video. Reply, and ask the Army to accept "or equal" platforms and production teams. That is when a work statement can still change.`,
-      "What would put me in range?": `A reply to the next sources sought for this work, asking for "or equal" platforms and production teams. Until then, the print and digital campaign is the one to bid.`,
+        "Offers will be accepted only from holders of Fort Bragg's Vertical Construction MATOC, and you are not on it. The bond for the full price would also be more than your single-job bond.",
+      "How do I get on the MATOC?":
+        "Answer the sources sought for the next one. Fort Bragg's Minor Construction MATOC follow-on is asking now: send three similar jobs from the last six years, a surety letter with your single and total limits, and your Pope rating. Open it from the button on this page.",
+      "Who could I price it for?":
+        "A holder of the Vertical Construction MATOC. Turnrow Federal holds it and hired your electricians for a Fort Bragg barracks job before. Ask whether it is pricing this order and needs the HVAC work.",
       "Why not bid?":
-        "The work statement requires streaming through one local provider's own subscriber app, commercials made by that provider's production team, and that provider's viewer data. You don't own any of the three, so you could only resell that provider's package.",
-      "Where am I weak?": "Here it is not your work. It is the provider lock: the app, the crew and the viewer data belong to one company.",
-      "How do I team with them?": "Only if the provider asks. Its own production team is named, so it does not need one. Spend the time on the print and digital campaign.",
-      "Can I win it?": "No. You can't deliver the provider's own app, crew or viewer data, so the Army could not award it to you.",
-      "Do I have enough time?": `Time is not the problem. The notice is open for ${twin.closesInDays} days, but the requirement names another company's app and crew.`,
+        "Offers will be accepted only from holders of Fort Bragg's Vertical Construction MATOC, and you are not on it. The bond for the full price would also be more than your single-job bond.",
+      "What should I bid instead?":
+        "Answer the Minor Construction MATOC sources sought; it is the way onto the next vehicle. To bid now, the training building HVAC and electrical upgrade is open to HUBZone firms and fits your size.",
+      "What would put me in range?":
+        "A seat on a Fort Bragg MATOC and more bond room. The Minor Construction MATOC sources sought is asking now; your surety can tell you what a larger line needs.",
+      "Where am I weak?": "Here it is not your work. It is who can offer: only MATOC holders. The bond is the second limit.",
+      "Can I win it?": "No. You can't send an offer, because only MATOC holders can.",
+      "Do I have enough time?": `Time is not the problem. The order is open for ${twin.closesInDays} days, but only MATOC holders can offer.`,
     },
   },
 
-  // ── The team-up: VA hiring campaign — prime no-go, subcontract go ──────
+  // ── The team-up: Fayetteville VA fan coils — prime no-go, subcontract go ──
   [HERO_IDS.teamUp]: {
     oppId: HERO_IDS.teamUp,
     confidence: 3,
     gist: teamUp.grant.oneLine,
-    thesis: `The work fits, but the prime seat is not yours: the VA expects to set it aside for service-disabled veteran-owned firms, and a year of it is about ${TIMES} times your revenue. Team with ${PARTNER.name} and run the Southeast video shoots.`,
+    thesis: `The work fits, but the prime seat is not yours: the VA expects to set it aside for service-disabled veteran-owned firms, and it is more than twice your single-job bond. Team with ${PARTNER.name} and self-perform the fan coils, piping and power.`,
     reads: {
       "Is it your kind of work?": {
         rating: "strong",
-        text: `Hiring campaigns are your record: ${HIRES} hires for Longleaf Home Health, with recruiting videos, paid social and a lead form. The VA's campaign is the same work at national size.`,
+        text: "Fan coils, piping and power are both your trades. Your Pope job joined the same HVAC and electrical work, and was rated Very Good.",
       },
       "Does the size fit?": {
         rating: "weak",
-        text: `About ${usd(TEAM_ANNUAL)} a year. That is about ${TIMES} times your revenue. As a subcontractor you take a share sized for your team.`,
+        text: `About ${usd(TEAM_MID)}, more than twice your ${SINGLE} single-job bond. As a sub you'd take about half, about ${TEAM_HALF}.`,
       },
       "Can you perform there?": {
-        rating: "good",
-        text: "The shoots are at VA medical centers across the Southeast, including Fayetteville, Durham and Salisbury. Your crew can reach most of the NC, VA and SC sites in a day.",
+        rating: "strong",
+        text: `The Fayetteville VA is ${VA_MILES} miles from your shop. Your crews can be on site every day.`,
       },
       "Can you do the work?": {
         rating: "watch",
-        text: `A national campaign needs strategy, a national media buy, a hiring website and shoots in many states. Your ${STAFF}-person team can run the Southeast shoots, not the whole program.`,
+        text: "Your crews can self-perform the fan coils, piping and power, about half the job. The medical center stays open, so infection control slows every room.",
       },
       "Can you win it?": {
         rating: "weak",
@@ -170,75 +175,75 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       },
       "Will you make money?": {
         rating: "watch",
-        text: "A subcontract pays for your crew's shoot and edit days, not the media buy. The margin is in that work, and you carry none of the national media cost.",
+        text: "A subcontract pays for your crews' half of the work. Price it from real equipment quotes, and agree on who carries the bond.",
       },
       "Can you survive winning?": {
-        rating: "good",
-        text: `No bond. ${BLUE} pays you after the VA pays it, often 30 days later, so price for a longer wait.`,
+        rating: "watch",
+        text: `Your half, about ${TEAM_HALF}, is more than your single-job bond. Agree on sub bonds before you sign, and price for being paid after ${BLUE} is paid.`,
       },
       "Do you understand the buyer's intent?": {
         rating: "strong",
-        text: "The VA wants doctors, nurses and staff to apply when the current contract ends in September 2027. Local stories filmed at each center are part of the work it describes.",
+        text: "The VA wants the work done floor by floor while the medical center stays open, as it did on the 3rd floor. A team that has phased work in occupied buildings fits that.",
       },
       "Does this move you forward?": {
         rating: "strong",
-        text: "A VA subcontract adds a second federal buyer and a national program to your record. It is the step toward priming VA work in your region.",
+        text: "A VA subcontract adds a medical center job to your record, and VA construction near you is veteran-owned first. Teaming is how you get in.",
       },
     },
     limits: [
-      "Set-aside: the VA expects to set the follow-on aside for service-disabled veteran-owned firms. You can't hold the prime contract.",
-      `Size: about ${usd(TEAM_ANNUAL)} a year, about ${TIMES} times your revenue.`,
-      `Teaming: nothing is signed with ${PARTNER.name} yet. A teaming agreement sets your share before the RFP.`,
+      "Set-aside: the VA expects to set the sealed bid aside for service-disabled veteran-owned firms. You can't hold the prime contract.",
+      `Size: about ${usd(TEAM_MID)}, more than twice your ${SINGLE} single-job bond.`,
+      `Teaming: nothing is signed with ${PARTNER.name} yet. A teaming agreement sets your share and the sub bonds before the bid.`,
     ],
     wouldChange: [
-      "If the VA opens the follow-on to all small businesses, I'd check it again, but the size still points to a subcontract.",
+      "If the VA opens the bid to HUBZone or small businesses, I'd check it again, but the size still points to a subcontract.",
       `If ${BLUE} does not reply, I'd look for another veteran-owned prime on Partners.`,
     ],
     nextMove: {
       label: `See ${PARTNER.name} on Partners`,
       to: "/partners",
-      rationale: `${BLUE} wants a woman-owned video crew for VA medical center shoots in NC, VA and SC. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the RFP.`,
+      rationale: `${BLUE} wants a HUBZone firm that self-performs the mechanical and electrical work. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the bid.`,
     },
     secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
-      { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "One of your codes." },
-      { requirement: "Service-disabled veteran-owned small business (SDVOSB), expected", status: "missing", note: "You are woman-owned, not veteran-owned." },
+      { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "Your primary code." },
+      { requirement: "Service-disabled veteran-owned small business (SDVOSB), expected", status: "missing", note: "You are HUBZone, not veteran-owned." },
       { requirement: "Capability statement", status: "have", note: "On file in My Business." },
-      { requirement: "Recruitment campaign record", status: "have", note: `Longleaf Home Health: ${HIRES} hires.` },
-      { requirement: "Teaming agreement with a veteran-owned prime", status: "partial", note: `${BLUE} asked for a woman-owned crew. Nothing is signed yet.` },
+      { requirement: "Similar jobs, with a contact for each", status: "have", note: "Your Pope office building job, rated Very Good." },
+      { requirement: "Teaming agreement with a veteran-owned prime", status: "partial", note: `${BLUE} wants a HUBZone firm. Nothing is signed yet.` },
     ],
     redTeam: [
       {
         challenge: "Could I lead it with a veteran-owned partner?",
-        answer: `Not as the lead. The veteran-owned firm has to lead, and a year of this is about ${TIMES} times your revenue.`,
+        answer: "Not as the lead. The veteran-owned firm has to lead, and the job is more than twice your single-job bond.",
       },
       {
-        challenge: "Is a subcontract worth it?",
-        answer: "Yes. A national VA program on your record is worth more than the margin. It is what lets you prime VA work in your region later.",
+        challenge: "Can the prime give half the job to a sub?",
+        answer: "Yes. On general construction a veteran-owned prime may pay up to 85 percent of the price, less materials, to firms that are not veteran-owned. Half is well inside that.",
       },
       {
         challenge: `Does ${BLUE} need me?`,
-        answer: "It says it does: it wants a woman-owned crew for shoots in NC, VA and SC. Your hiring videos for Longleaf Home Health are the proof to send.",
+        answer: "It says it does: its crews are tied up on the Fayetteville VA's health-record wiring job, and it wants a HUBZone firm that self-performs the mechanical and electrical work. Your Pope job is the proof to send.",
       },
     ],
     keyDates: [{ label: "Replies due", inDays: teamUp.closesInDays }],
     railBriefing: [
-      "I read the sources sought notice and the work it describes.",
-      "You can do part of this work, but not as prime. The set-aside and the size decide it.",
+      "I read the sources sought notice and the draft scope.",
+      "You can do half of this work, but not as prime. The set-aside and the size decide it.",
       "I have a question for you, or pick one below.",
     ],
     chips: ["Why not as prime?", "Who could I team with?", { label: `Tell Grant about ${BLUE}`, kind: "elicit", target: "talked-to-partner" }],
     railAnswers: {
-      "Why not as prime?": `Two reasons. The VA expects to set the follow-on aside for service-disabled veteran-owned firms, and you are woman-owned. And a year of it is about ${usd(TEAM_ANNUAL)}, about ${TIMES} times your revenue.`,
-      "Who could I team with?": `${PARTNER.name}, a service-disabled veteran-owned firm in ${PARTNER.city}. It runs ${PARTNER.holds.charAt(0).toLowerCase()}${PARTNER.holds.slice(1)}, and it wants a woman-owned video crew for VA medical center shoots in NC, VA and SC. ${PARTNER.contact}, its ${PARTNER.contactTitle.toLowerCase()}, is your contact.`,
-      "How do I team with them?": `Open Partners and reply to ${PARTNER.contact}. Send your hiring videos for Longleaf Home Health and ask for a teaming agreement that names your share: the Southeast shoots and edits.`,
-      "What should my reply say?": `You don't need to reply to the VA: the notice asks who could run the whole campaign, and ${BLUE} replies. Send ${BLUE} a one-page note instead: your woman-owned certification, your 2-person video crew, the Longleaf hiring campaign and the NC Guard recruiting videos.`,
-      "What should my response say?": `You don't need to reply to the VA: the notice asks who could run the whole campaign, and ${BLUE} replies. Send ${BLUE} a one-page note instead: your woman-owned certification, your 2-person video crew, the Longleaf hiring campaign and the NC Guard recruiting videos.`,
+      "Why not as prime?": `Two reasons. The VA expects to set the bid aside for service-disabled veteran-owned firms, and you are HUBZone, not veteran-owned. And at about ${usd(TEAM_MID)}, it is more than twice your ${SINGLE} single-job bond.`,
+      "Who could I team with?": `${PARTNER.name}, a service-disabled veteran-owned general contractor in ${PARTNER.city}. It builds for VA medical centers in North Carolina, and it wants ${PARTNER.seeking.charAt(0).toLowerCase()}${PARTNER.seeking.slice(1)}. ${PARTNER.contact}, its ${PARTNER.contactTitle.toLowerCase()}, is your contact.`,
+      "How do I team with them?": `Open Partners and reply to ${PARTNER.contact}. Send your Pope job and your Fort Bragg barracks electrical work, and ask for a teaming agreement that names your share, the fan coils, piping and power, and who bonds it.`,
+      "What should my reply say?": `You don't need to reply to the VA alone: ${BLUE} replies as the prime and names you as its partner. Send ${BLUE} a one-page note: your HUBZone certification, your two HVAC and two electrical crews, your Pope job and your bond line.`,
+      "What should my response say?": `You don't need to reply to the VA alone: ${BLUE} replies as the prime and names you as its partner. Send ${BLUE} a one-page note: your HUBZone certification, your two HVAC and two electrical crews, your Pope job and your bond line.`,
       "Can I win it?": `No one can promise that. As a prime, no: the set-aside rules you out. As a subcontractor, you share in the work if ${BLUE} wins it.`,
-      "Do I have enough time?": `Yes. Replies are due in ${teamUp.closesInDays} days, and the contract itself comes later. Reply to ${PARTNER.contact} this week so your name is in ${BLUE}'s reply.`,
-      "Where am I weak?": `Size and federal record. A year of this is about ${TIMES} times your revenue, and your only federal prime is the NC Guard campaign. A subcontract with ${BLUE} builds both.`,
-      "Is this a bid?": "No. A sources sought asks which firms could do the work. There is no price and no award. The bid comes later, as a request for proposals.",
+      "Do I have enough time?": `Yes. Replies are due in ${teamUp.closesInDays} days, and the bid itself comes later. Reply to ${PARTNER.contact} this week so your name is in ${BLUE}'s reply.`,
+      "Where am I weak?": `Set-aside and size. You are not veteran-owned, and your half of the job, about ${TEAM_HALF}, is more than your single-job bond. A teaming agreement with ${BLUE} settles both.`,
+      "Is this a bid?": "No. A sources sought asks which firms could do the work. There is no price and no award. The sealed bid comes later.",
     },
   },
 };

@@ -1,22 +1,25 @@
-// THE AGENCY: what Grant's three hand-written reviews need besides words — which
-// phrase to bold, which clause backs which claim, the lead times and the trail of
-// checks. The words are in members/agency/grantBriefs.ts (the hero) and briefs.ts
-// (the twin and the team-up); src/demo/grant/encode.ts puts the two together.
+// THE CONTRACTOR: what Grant's three hand-written reviews need besides words —
+// which phrase to bold, which clause backs which claim, the lead times and the
+// trail of checks. The words are in members/construction/grantBriefs.ts (the hero)
+// and briefs.ts (the twin and the team-up); src/demo/grant/encode.ts puts the two
+// together.
 
 import { coverageFor } from "@/demo/grant/coverage";
 import type { RowSpec } from "@/demo/grant/encode";
-import { factsFor, PARTNER, usd } from "@/demo/grant/facts";
+import { PARTNER, usd } from "@/demo/grant/facts";
 import type { Maker } from "@/demo/grant/heroAnalyses";
 import { pinComputed, rt } from "@/demo/grant/rich";
 import { clausePin, naicsLabel, type Solicitation } from "@/demo/grant/solicitation";
-import { getOpportunity } from "@/demo/story/opportunities";
-import { findPastPerformance, PERSONA } from "@/demo/story/persona";
+import { findPastPerformance } from "@/demo/story/persona";
+import { PERSONA } from "../persona";
 import type { OpenQuestion, Pin, RoadmapItem } from "@/lib/grant/types";
 import { HERO_IDS } from "../opportunities";
 
 const pct = (n: number): string => `${Math.round(n * 100)}%`;
 const revenue = usd(PERSONA.annualRevenue);
-const BLUE = PARTNER.name.split(" ")[0];
+const LINE = PERSONA.bondLine!;
+/** "Blackjack Oak": the partner's short name. */
+const BLUE = PARTNER.name.split(" ").slice(0, 2).join(" ");
 
 const sourceOf = (sol: Solicitation, kind: string): string => {
   for (const s of sol.sections) {
@@ -31,6 +34,11 @@ const record = (id: string, label: string): Pin => {
   const p = findPastPerformance(id)!;
   return pinComputed(label, `${p.projectTitle}: ${p.scopeDescription}`);
 };
+const bondRoom = (job: number): Pin =>
+  pinComputed(
+    "Bond room",
+    `Single job: ${usd(job)} against your ${usd(LINE.single)} limit. Total: ${usd(LINE.inUse)} in use plus ${usd(job)} is ${usd(LINE.inUse + job)}, against your ${usd(LINE.aggregate)} limit.`,
+  );
 
 const COMMON_ROWS: RowSpec[] = [
   { match: /SAM/, kind: "sam", category: "eligibility", required: "active at award" },
@@ -39,246 +47,242 @@ const COMMON_ROWS: RowSpec[] = [
 ];
 
 // ═════════════════════════════════════════════════════════════════════════
-// The hero: Family Advocacy print and digital campaign — Bid as prime
+// The hero: HVAC and electrical upgrade, Fort Bragg training building — Bid as prime
 // ═════════════════════════════════════════════════════════════════════════
 
-const familyAdvocacyPrint: Maker = (f, sol) => {
+const trainingBuilding: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
-  const annual = f.annual ?? 0;
+  const job = f.mid ?? 0;
   return {
     path: "prime",
-    checks: [22, 6],
-    lead: { ppq: 5, subQuote: 7, writing: 3 },
-    gistBold: "only woman-owned firms can bid",
-    thesisBold: ["a strong next federal prime for you"],
-    limitKinds: ["responsibility", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: "the **other woman-owned agencies and publishers** near Fort Bragg who list your code",
+    checks: [24, 7],
+    lead: { bonding: 7, subQuote: 7, writing: 3 },
+    gistBold: "only HUBZone firms can bid",
+    thesisBold: ["a strong first USACE job for you"],
+    limitKinds: ["responsibility", "winning-hurts", "responsibility"],
+    competitiveRisk: "the **other HUBZone contractors** around Fort Bragg, in Lumberton, Maxton and Raeford",
     readBold: {
-      "Is it your kind of work?": "you ran the NC Guard's recruiting campaign the same way",
-      "Does the size fit?": "about 15% of your revenue",
-      "Can you perform there?": "12 miles from your office",
-      "Can you do the work?": "Two things need you before the due date",
-      "Can you win it?": "Your video crew",
-      "Will you make money?": "Lock rates with all four papers",
-      "Can you survive winning?": "carry about two months of print and media buys",
-      "Do you understand the buyer's intent?": "Reach and plain, trusted messages are scored first",
-      "Does this move you forward?": "A second federal prime, at Fort Bragg",
+      "Is it your kind of work?": "both your trades, self-performed",
+      "Does the size fit?": `under your ${usd(LINE.single)} single bond`,
+      "Can you perform there?": "12 miles from your shop",
+      "Can you do the work?": "long lead times against 240 days",
+      "Can you win it?": "the lowest responsive bid gets it",
+      "Will you make money?": "Price piping at the pipefitter rate",
+      "Can you survive winning?": `of your ${usd(LINE.aggregate)} aggregate`,
+      "Do you understand the buyer's intent?": "hold you to the phasing plan",
+      "Does this move you forward?": "A first USACE job and a rating from it",
     },
     readPins: {
-      "Is it your kind of work?": [cp("scope"), record("pp-ncng-recruiting", "Your NC Guard campaign")],
-      "Does the size fit?": [cp("value"), pinComputed("Size against revenue", `${usd(annual)} a year divided by ${revenue} yearly revenue is ${pct(annual / PERSONA.annualRevenue)}. The Army's range is ${usd(f.opp.valueLow!)} to ${usd(f.opp.valueHigh!)} a year, for ${f.years} years.`)],
+      "Is it your kind of work?": [cp("equipment"), cp("electrical"), record("pp-pope-office-hvac", "Your Pope job")],
+      "Does the size fit?": [cp("value"), pinComputed("Size against revenue", `${usd(job)} divided by ${revenue} yearly revenue is ${pct(job / PERSONA.annualRevenue)}. Your single-job bond is ${usd(LINE.single)}.`)],
       "Can you perform there?": [cp("place"), pinComputed("Distance", `${PERSONA.physicalAddress} to Fort Bragg: about ${f.miles} miles.`)],
-      "Can you do the work?": [cp("app"), cp("print")],
-      "Can you win it?": [cp("setAside"), cp("factors")],
-      "Will you make money?": [cp("print"), cp("price")],
-      "Can you survive winning?": [cp("insurance"), cp("term")],
-      "Do you understand the buyer's intent?": [cp("factors"), cp("needs")],
+      "Can you do the work?": [cp("equipment"), cp("qualityControl")],
+      "Can you win it?": [cp("setAside"), cp("evaluate")],
+      "Will you make money?": [cp("wage"), pinComputed("Wage rates", "NC20260122: pipefitter $33.96 plus $13.48 fringe; sheet metal worker $19.67 plus $13.27; no HVAC mechanic class.")],
+      "Can you survive winning?": [cp("bond"), cp("payments"), bondRoom(job)],
+      "Do you understand the buyer's intent?": [cp("occupied"), cp("evaluate")],
       "Does this move you forward?": [targets()],
     },
     readDossier: {
       "Can you do the work?": [
-        "**The app line.** The work statement asks for ads on the contractor's own mobile app. You have none. Ask in Q&A whether a news partner's app counts; every bidder sees the answer.",
-        "**Print rates.** One ad a week in each of four papers, at a fixed price for up to five years. Get signed quotes from all four, locked 12 months, with a stated increase for each option year.",
-      ],
-      "Can you win it?": [
-        "Only woman-owned small businesses can bid. That removes the large agencies and most publishers.",
-        "Your own crew makes the 24 videos. That is the part a publisher would have to buy.",
+        "**Lead times.** A 60-ton chiller and an 800A switchboard can each take months. Get written dates from the suppliers before you price, and plan the outages around them.",
+        "**Staff.** The Corps wants a quality control manager and a site safety officer named before work starts. Ava asks who.",
       ],
       "Will you make money?": [
-        "The Army pays a fixed price for each year. If a paper raises its rates in year three, the increase comes out of your margin unless you priced it in.",
+        "The wage decision lists no HVAC mechanic class. A class it does not list is added after award, so ask before questions close which class covers refrigerant piping.",
+        "Until the Corps answers, price piping at the pipefitter rate: $33.96 plus $13.48 fringe.",
       ],
       "Can you survive winning?": [
-        "No bond, so no cash is tied up before the work starts.",
-        `The base year adds about ${pct(annual / PERSONA.annualRevenue)} to your yearly revenue. One freelancer for the busy shoot months keeps the team from stretching.`,
+        `You have ${usd(LINE.inUse)} of bonded work. This job takes your total to about ${usd(LINE.inUse + job)} of ${usd(LINE.aggregate)}.`,
+        "The Corps pays monthly for work in place. The chiller and switchboard are paid for before the first payment, so plan to carry about two months.",
       ],
       "Do you understand the buyer's intent?": [
-        "The Family Advocacy Program helps military families prevent abuse and get help early. It wants families to know where help is before a crisis.",
-        "That is why reach is scored first. Lead your quote with how you reach families within 30 miles of post.",
+        "A Special Operations unit keeps training in the building. An outage it did not plan for costs more than a high price.",
+        "That is why the phasing plan and the 14-day outage notice matter, even in a price-only bid.",
       ],
     },
-    limiting: "Can you do the work?",
+    limiting: "Can you survive winning?",
     rows: [
       ...COMMON_ROWS,
-      { match: /WOSB/, kind: "setAside", category: "eligibility", required: "WOSB certified" },
-      { match: /mobile app/, kind: "app", category: "submission", required: "ads on the contractor's own app", closable: true },
-      { match: /project manager/, kind: "staff", category: "artifact", required: "a named project manager and alternate" },
-      { match: /local papers/, kind: "print", category: "submission", required: "a weekly ad in each of four papers" },
-      { match: /references/, kind: "content", category: "artifact", required: "two references" },
+      { match: /HUBZone/, kind: "setAside", category: "eligibility", required: "HUBZone certified" },
+      { match: /Bid bond/, kind: "bond", category: "bonding", required: "20% of the bid price" },
+      { match: /performance and payment/, kind: "bond", category: "bonding", required: "100% of the contract price" },
+      { match: /Quality control/, kind: "qualityControl", category: "artifact", required: "named before work starts", closable: true },
+      { match: /Davis-Bacon/, kind: "wage", category: "submission", required: "the wage decision's classes" },
     ],
     nextBold: `${f.daysLeft} days is enough`,
-    wouldChangeBold: ["Needs review", "a stated increase"],
-    redTeamBold: ["Two videos a month fits your crew", "the set-aside limits bidders"],
+    wouldChangeBold: ["Don't bid", "your price drops"],
+    redTeamBold: ["name a different lead for each job", "you carry no sub markup on the electrical"],
     trail: [
       {
         title: "Reading the solicitation",
-        checkCount: 8,
+        checkCount: 9,
         items: [
-          { glyph: "ok", text: rt("Set-aside: **woman-owned small business**. You hold the certification."), source: sourceOf(sol, "setAside") },
-          { glyph: "ok", text: rt(`Industry code ${f.opp.naics}, ${naicsLabel(f.opp.naics)}. It is your primary code.`), source: sourceOf(sol, "naics") },
-          { glyph: "warn", text: rt("Ads on **the contractor's own mobile app**. You have no app."), source: sourceOf(sol, "app") },
-          { glyph: "warn", text: rt("A weekly ad in **four local papers**, at a fixed price for up to five years."), source: sourceOf(sol, "print") },
-          { glyph: "ok", text: rt("**No bond** is required."), source: sourceOf(sol, "insurance") },
-          { glyph: "neutral", text: rt("Scoring: reach and messages first, past performance second, then price."), source: sourceOf(sol, "factors") },
+          { glyph: "ok", text: rt("Set-aside: **HUBZone small business**. You hold the certification."), source: sourceOf(sol, "setAside") },
+          { glyph: "ok", text: rt(`Industry code ${f.opp.naics}, ${naicsLabel(f.opp.naics)}. It is one of your codes.`), source: sourceOf(sol, "naics") },
+          { glyph: "ok", text: rt("Sealed bid: **the lowest responsive bid** gets the award."), source: sourceOf(sol, "evaluate") },
+          { glyph: "warn", text: rt("A **bid guarantee**, then 100% performance and payment bonds."), source: sourceOf(sol, "bond") },
+          { glyph: "warn", text: rt("Wage decision NC20260122 has **no HVAC mechanic class**."), source: sourceOf(sol, "wage") },
+          { glyph: "neutral", text: rt("A quality control manager and a site safety officer, named before work starts."), source: sourceOf(sol, "qualityControl") },
         ],
       },
       {
         title: "Checking the competition",
         checkCount: 6,
         items: [
-          { glyph: "ok", text: rt("The last award for this work went to a **local publisher**, not an agency."), source: "Award records" },
-          { glyph: "neutral", text: rt("Four woman-owned agencies within 100 miles list your code."), source: "SAM.gov" },
+          { glyph: "neutral", text: rt("Two recent USACE HUBZone bids near Fort Bragg drew **9 and 11 offers**."), source: "Award records" },
+          { glyph: "neutral", text: rt("HUBZone contractors in Lumberton, Maxton and Raeford list these codes."), source: "SAM.gov" },
         ],
       },
       {
         title: "Checking your business",
-        checkCount: 7,
+        checkCount: 8,
         items: [
-          { glyph: "ok", text: rt("Your 2-person video crew can make two videos a month."), source: "Your record" },
-          { glyph: "warn", text: rt("NC Guard campaign: same Army, same audience. **No performance rating** written yet."), source: "Your record" },
-          { glyph: "warn", text: rt("No résumés on file yet for a project manager and an alternate."), source: "Your record" },
+          { glyph: "ok", text: rt("Pope office building: the same HVAC and electrical mix, CPARS **Very Good**."), source: "Your record" },
+          { glyph: "ok", text: rt("Two HVAC crews and two electrical crews, all badged onto post."), source: "Your record" },
+          { glyph: "warn", text: rt(`Bond room: ${usd(LINE.inUse)} in use plus this job is about **${usd(LINE.inUse + job)} of ${usd(LINE.aggregate)}**.`), source: "Computed" },
+          { glyph: "warn", text: rt("No written lead times yet for the chiller or the switchboard."), source: "Your record" },
           { glyph: "ok", text: rt("General liability insurance on file."), source: "Your record" },
-          { glyph: "ok", text: rt(`The yearly value, about ${usd(annual)}, is about ${pct(annual / PERSONA.annualRevenue)} of your yearly revenue.`), source: "Computed" },
         ],
       },
     ],
-    coverage: coverageFor(sol, { C: "reviewed_with_findings" }),
+    coverage: coverageFor(sol, { C: "reviewed_with_findings", H: "reviewed_with_findings" }),
     briefingBold: [undefined, "strong fit", undefined],
-    remedy: "Get the Army's answer on the app line and lock your print rates, and I can call this with full confidence.",
-    citations: [cp("app"), cp("factors")],
+    remedy: "Get your surety's written OK and the Corps' answer on the piping class, and I can call this with full confidence.",
+    citations: [cp("setAside"), cp("bond")],
   };
 };
 
 // ═════════════════════════════════════════════════════════════════════════
-// The twin: Family Advocacy TV and streaming ads — No-bid
+// The twin: barracks HVAC repair, MATOC holders only — No-bid
 // ═════════════════════════════════════════════════════════════════════════
 
-const familyAdvocacyStreaming: Maker = (f, sol) => {
+const barracksHoldersOnly: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
-  const annual = f.annual ?? 0;
-  // The days left on the print and digital campaign: the quote the roadmap points at.
-  const days = factsFor(getOpportunity(HERO_IDS.hero)!).daysLeft;
+  const job = f.mid ?? 0;
   const roadmap: RoadmapItem[] = [
     {
-      item: rt("**Bid the print and digital campaign** first"),
-      whyItMattered: rt("Same office and same program. Work there puts your name in front of the people who write the next video notice."),
-      whatItTakes: rt(`The quote is open now. Answer Ava's three questions and lock your print rates. That fits inside ${days} days.`),
-    },
-    {
-      item: rt("A reply to the next **sources sought**"),
-      whyItMattered: rt(`A sources sought comes before the work statement. That is when a buyer can still add "or equal" platforms and production teams.`),
-      whatItTakes: rt(`An hour to reply when it posts: say what you can deliver, and ask for "or equal".`),
+      item: rt("A reply to the **Minor Construction MATOC** sources sought"),
+      whyItMattered: rt("Most of Fort Bragg's HUBZone repair work goes through its MATOCs. A seat on the next one is how you see orders like this."),
+      whatItTakes: rt("Three similar jobs from the last six years, a surety letter with your single and total limits, and your Pope rating. Sarah's checklist covers the rest."),
       cta: { kind: "mentor" },
     },
     {
-      item: rt("A profile that **video buyers can find**"),
-      whyItMattered: rt("Buyers search SBA's small business database before they write a notice. Video work and samples on your profile put you on their list."),
-      whatItTakes: rt("A day to set up your visibility profile."),
-      cta: { kind: "dfy", service: "SBS Visibility Setup" },
+      item: rt("A **subcontract** with a MATOC holder"),
+      whyItMattered: rt("Turnrow Federal holds this MATOC and hired your electricians for a barracks job before. Pricing the HVAC for a holder keeps you in Fort Bragg barracks work."),
+      whatItTakes: rt("A call to Turnrow Federal this week, and a price for the HVAC work."),
     },
     {
-      item: rt("A **watch** on Family Advocacy video notices"),
-      whyItMattered: rt("The next video notice gives you more time if you see it on day one."),
-      whatItTakes: rt("Save a Hunter search for Fort Bragg TV and streaming notices. It takes two minutes."),
+      item: rt("More **bond room**"),
+      whyItMattered: rt(`This order would need about ${usd(job)} in bonds for one job. Your single-job limit is ${usd(LINE.single)}.`),
+      whatItTakes: rt("Your latest financials and a talk with your surety about a larger line after the training building job."),
+    },
+    {
+      item: rt("A **watch** on Fort Bragg MATOC notices"),
+      whyItMattered: rt("The next sources sought for a MATOC gives you more time if you see it on day one."),
+      whatItTakes: rt("Save a Hunter search for Fort Bragg construction MATOCs. It takes two minutes."),
     },
   ];
   return {
     path: "skip",
-    checks: [14, 4],
-    lead: { writing: 3 },
+    checks: [15, 5],
+    lead: { writing: 1 },
     gistBold: "Don't bid",
-    thesisBold: ["one provider's own streaming app", "reselling a package you don't control", "the print and digital campaign"],
-    limitKinds: ["disqualifier", "winning-hurts"],
+    thesisBold: ["you are not on it", "more than your single-job bond", "answer the Minor Construction MATOC sources sought"],
+    limitKinds: ["disqualifier", "responsibility"],
     readBold: {
-      "Is it your kind of work?": "the provider's own team makes the ads",
-      "Does the size fit?": "On size alone it fits",
-      "Can you perform there?": `${f.miles} miles from your office`,
-      "Can you do the work?": "You don't own any of the three",
-      "Can you win it?": "Only the provider that owns that app, crew and data can meet all three",
-      "Will you make money?": "add a markup to the provider's own price",
-      "Can you survive winning?": "Every deliverable would come from another company",
-      "Do you understand the buyer's intent?": "with viewer numbers it can report",
-      "Does this move you forward?": "builds no video record of your own",
+      "Is it your kind of work?": "only MATOC holders can offer",
+      "Does the size fit?": `more than your ${usd(LINE.single)} single-job bond`,
+      "Can you perform there?": `${f.miles} miles from your shop`,
+      "Can you do the work?": "who can offer, not the work",
+      "Can you win it?": "You are not on it",
+      "Will you make money?": "price only the HVAC work",
+      "Can you survive winning?": "more than your single limit",
+      "Do you understand the buyer's intent?": "The way in is to be on the next one",
+      "Does this move you forward?": "the Minor Construction MATOC sources sought",
     },
     readPins: {
-      "Is it your kind of work?": [cp("scope"), cp("production")],
-      "Does the size fit?": [cp("value"), pinComputed("Size against revenue", `${usd(annual)} a year divided by ${revenue} yearly revenue is ${pct(annual / PERSONA.annualRevenue)}.`)],
+      "Is it your kind of work?": [cp("needs"), record("pp-turnrow-barracks-electrical", "Your barracks electrical job")],
+      "Does the size fit?": [cp("value"), bondRoom(job)],
       "Can you perform there?": [cp("place")],
-      "Can you do the work?": [cp("streaming"), cp("production"), cp("viewers")],
-      "Can you win it?": [cp("streaming")],
-      "Will you make money?": [cp("price")],
-      "Can you survive winning?": [cp("viewers"), cp("term")],
-      "Do you understand the buyer's intent?": [cp("needs")],
+      "Can you do the work?": [cp("needs")],
+      "Can you win it?": [cp("vehicle")],
+      "Will you make money?": [cp("evaluate")],
+      "Can you survive winning?": [cp("bond"), bondRoom(job)],
+      "Do you understand the buyer's intent?": [cp("vehicle"), cp("setAside")],
       "Does this move you forward?": [targets()],
     },
     readDossier: {
-      "Can you do the work?": [
-        "Three clauses decide it: streaming via the provider's own subscriber app, commercials fully produced by the provider's production team, and monthly reports from the provider's own viewer data.",
-        "Each one names something only that provider owns. Nothing you send before the due date changes that.",
+      "Can you win it?": [
+        "One clause decides it: offers will be accepted only from holders of the Fort Bragg DPW Vertical Construction MA IDIQ. The MATOC was awarded in 2023 and orders through August 2028.",
+        "Nothing you send before the due date puts you on it.",
       ],
       "Does this move you forward?": [
-        "The print and digital campaign is the same office and the same program, and only woman-owned firms can bid. Work there is the record you want.",
+        "Fort Bragg's Minor Construction MATOC follow-on is asking for sources now. That is the vehicle for electrical, HVAC and small repair work like yours.",
       ],
     },
-    limiting: "Can you do the work?",
-    blocking: ["Can you do the work?"],
+    limiting: "Can you win it?",
+    blocking: ["Can you win it?"],
     rows: [
       ...COMMON_ROWS,
-      { match: /small business set-aside/, kind: "setAside", category: "eligibility", required: "a small business" },
-      { match: /subscriber app/, kind: "streaming", category: "eligibility", required: "the provider's own app", closable: false, firmValue: "none of your own" },
-      { match: /production team/, kind: "production", category: "eligibility", required: "the provider's production team", closable: false, firmValue: "your crew is not that team" },
-      { match: /viewer data/, kind: "viewers", category: "eligibility", required: "the provider's viewer data", closable: false, firmValue: "only the provider holds it" },
+      { match: /HUBZone/, kind: "setAside", category: "eligibility", required: "HUBZone certified" },
+      { match: /MATOC/, kind: "vehicle", category: "eligibility", required: "a holder of the MATOC", closable: false, firmValue: "not a holder" },
+      { match: /Performance and payment/, kind: "bond", category: "bonding", required: "100% of the order price", closable: false, firmValue: `${usd(LINE.single)} single-job bond` },
     ],
-    nextBold: "Spend this month on that quote",
-    wouldChangeBold: ["or equal", "a subcontract"],
-    redTeamBold: ["a markup on another company's package", "Only if it asks", "the sources sought"],
-    gapToWin: [{ item: "The provider's own **subscriber app**, production team and viewer data", have: false }],
+    nextBold: "the way onto the Minor Construction MATOC",
+    wouldChangeBold: ["opens this order to firms off the MATOC", "price the HVAC work"],
+    redTeamBold: ["You can't send an offer", "Turnrow Federal holds this MATOC", "is asking now"],
+    gapToWin: [
+      { item: "A seat on Fort Bragg's **Vertical Construction MATOC**", have: false },
+      { item: `A bond line over **${usd(job)}** for one job`, have: false },
+    ],
     roadmap,
     trail: [
       {
-        title: "Reading the solicitation",
+        title: "Reading the task order request",
         checkCount: 6,
         items: [
-          { glyph: "blocked", text: rt("Streaming **via the provider's own subscriber app**."), source: sourceOf(sol, "streaming") },
-          { glyph: "blocked", text: rt("Commercials **made by the provider's production team**."), source: sourceOf(sol, "production") },
-          { glyph: "blocked", text: rt("Monthly reports from **the provider's viewer data**."), source: sourceOf(sol, "viewers") },
-          { glyph: "ok", text: rt("Set-aside: **total small business**. You are small."), source: sourceOf(sol, "setAside") },
+          { glyph: "blocked", text: rt("Offers **only from holders** of the Vertical Construction MATOC."), source: sourceOf(sol, "vehicle") },
+          { glyph: "ok", text: rt("Set-aside: **HUBZone**, as the MATOC is. You hold the certification."), source: sourceOf(sol, "setAside") },
+          { glyph: "warn", text: rt(`Performance and payment bonds of **about ${usd(job)}**.`), source: sourceOf(sol, "bond") },
         ],
       },
       {
         title: "Checking the competition",
         checkCount: 4,
         items: [
-          { glyph: "neutral", text: rt("Only the provider that owns the app, the crew and the data can meet all three."), source: "Notice" },
-          { glyph: "neutral", text: rt("The 2024 sources sought for this work used the same wording."), source: "SAM.gov" },
+          { glyph: "neutral", text: rt("Only the MATOC's holders can offer. A recent barracks HVAC order under it drew 5 offers."), source: "Award records" },
+          { glyph: "neutral", text: rt("Turnrow Federal, which hired your electricians before, is a holder."), source: "Partners" },
         ],
       },
       {
         title: "Checking your business",
-        checkCount: 4,
+        checkCount: 5,
         items: [
-          { glyph: "blocked", text: rt("Streaming app, production team, viewer data: **none** of the three."), source: "Your record" },
-          { glyph: "ok", text: rt("Captioned video and ad buying fit the rest of the work."), source: "Your record" },
+          { glyph: "blocked", text: rt("Vertical Construction MATOC: **not a holder**."), source: "Your record" },
+          { glyph: "blocked", text: rt(`Single-job bond: ${usd(LINE.single)}, **less than this order**.`), source: "Your record" },
+          { glyph: "ok", text: rt("Barracks HVAC and electrical work fit your crews."), source: "Your record" },
         ],
       },
     ],
-    coverage: coverageFor(sol, { C: "reviewed_with_findings" }),
-    briefingBold: [undefined, "I stopped at the streaming clause", undefined],
-    remedy: "Nothing you tell me changes who owns the app, the crew and the data.",
-    citations: [cp("streaming"), cp("production")],
+    coverage: coverageFor(sol, { A: "reviewed_with_findings", H: "reviewed_with_findings" }),
+    briefingBold: [undefined, "I stopped at the clause on who can offer", undefined],
+    remedy: "Nothing you tell me changes who can offer on this order.",
+    citations: [cp("vehicle"), cp("bond")],
   };
 };
 
 // ═════════════════════════════════════════════════════════════════════════
-// The team-up: VA hiring campaign — prime no-go, subcontract go
+// The team-up: Fayetteville VA fan coils — prime no-go, subcontract go
 // ═════════════════════════════════════════════════════════════════════════
 
-const vaHiring: Maker = (f, sol) => {
+const vaFanCoils: Maker = (f, sol) => {
   const cp = (k: string, label?: string): Pin => clausePin(sol, k, label);
-  const annual = f.annual ?? 0;
+  const job = f.mid ?? 0;
   const openQuestions: OpenQuestion[] = [
     {
       id: "talked-to-partner",
-      question: rt(`Have you talked with **${PARTNER.name}** about this campaign?`),
+      question: rt(`Have you talked with **${PARTNER.name}** about this job?`),
       payoff: rt("A yes turns the subcontract path from an idea into a **plan**."),
       verdictSwing: 0.6,
       input: { kind: "yesno" },
@@ -288,61 +292,61 @@ const vaHiring: Maker = (f, sol) => {
   ];
   return {
     // The notice is a sources sought, but the call is about the contract behind it:
-    // the page shows Bid with the prime path no-go and the subcontract path go (a
-    // "sources-sought" notice type would show "Reply" and hide both paths).
+    // the page shows Bid with the prime path no-go and the subcontract path go.
     path: "sub",
     checks: [16, 5],
     lead: { subQuote: 5, writing: 1 },
     gistBold: "Team up",
-    thesisBold: ["the prime seat is not yours", "run the Southeast video shoots"],
+    thesisBold: ["the prime seat is not yours", "self-perform the fan coils, piping and power"],
     limitKinds: ["disqualifier", "winning-hurts", "proposal-weakness"],
-    competitiveRisk: "other **video crews** that veteran-owned primes already use",
+    competitiveRisk: "other **mechanical and electrical firms** that veteran-owned primes already use",
     readBold: {
-      "Is it your kind of work?": "Hiring campaigns are your record",
-      "Does the size fit?": "times your revenue",
-      "Can you perform there?": "Your crew can reach most of the NC, VA and SC sites in a day",
-      "Can you do the work?": "not the whole program",
+      "Is it your kind of work?": "both your trades",
+      "Does the size fit?": "more than twice your",
+      "Can you perform there?": `${f.miles} miles from your shop`,
+      "Can you do the work?": "infection control slows every room",
       "Can you win it?": `As a subcontractor you share in the work if ${BLUE} wins`,
-      "Will you make money?": "you carry none of the national media cost",
-      "Can you survive winning?": "price for a longer wait",
-      "Do you understand the buyer's intent?": "Local stories filmed at each center",
-      "Does this move you forward?": "a second federal buyer and a national program",
+      "Will you make money?": "agree on who carries the bond",
+      "Can you survive winning?": "Agree on sub bonds before you sign",
+      "Do you understand the buyer's intent?": "while the medical center stays open",
+      "Does this move you forward?": "Teaming is how you get in",
     },
     readPins: {
-      "Is it your kind of work?": [cp("purpose"), record("pp-longleaf-hiring", "Your Longleaf campaign")],
-      "Does the size fit?": [cp("current"), pinComputed("Size against revenue", `${usd(annual)} a year divided by ${revenue} yearly revenue is ${(annual / PERSONA.annualRevenue).toFixed(1)} times.`)],
+      "Is it your kind of work?": [cp("work"), record("pp-pope-office-hvac", "Your Pope job")],
+      "Does the size fit?": [cp("current"), bondRoom(job)],
       "Can you perform there?": [cp("work")],
       "Can you do the work?": [cp("work")],
       "Can you win it?": [cp("setAside")],
-      "Will you make money?": [cp("work")],
-      "Can you survive winning?": [cp("teaming")],
+      "Will you make money?": [cp("bonds")],
+      "Can you survive winning?": [cp("bonds"), cp("teaming")],
       "Do you understand the buyer's intent?": [cp("current"), cp("work")],
       "Does this move you forward?": [targets()],
     },
     readDossier: {
       "Can you win it?": [
-        "The VA expects to set the follow-on aside for service-disabled veteran-owned firms. A woman-owned firm can't hold the prime contract.",
-        `${BLUE} is service-disabled veteran-owned and wants a woman-owned crew for the Southeast shoots. Your share comes from the teaming agreement.`,
+        "The VA expects to set the bid aside for service-disabled veteran-owned firms under its Veterans First rule. A HUBZone firm can't hold the prime contract.",
+        `${BLUE} is service-disabled veteran-owned, and its crews are tied up on the VA's health-record wiring job. It wants a HUBZone firm for the mechanical and electrical work. Your share comes from the teaming agreement.`,
       ],
       "Does this move you forward?": [
-        "Your federal record today is one prime: the NC Guard campaign. A national VA program adds a second buyer and a larger program.",
+        "VA construction near you is veteran-owned first. A subcontract with a veteran-owned prime is how a HUBZone firm gets VA work on its record.",
       ],
     },
     limiting: "Can you win it?",
     blocking: ["Can you win it?"],
     rows: [
-      ...COMMON_ROWS,
-      { match: /SDVOSB/, kind: "setAside", category: "eligibility", required: "service-disabled veteran-owned", closable: false, firmValue: "woman-owned, not veteran-owned" },
+      { match: /SAM/, kind: "sam", category: "eligibility", required: "active at award" },
+      { match: /NAICS/, kind: "naics", category: "eligibility", required: "your NAICS code" },
+      { match: /SDVOSB/, kind: "setAside", category: "eligibility", required: "service-disabled veteran-owned", closable: false, firmValue: "HUBZone, not veteran-owned" },
       { match: /Capability statement/, kind: "ask", category: "artifact", required: "what your firm does" },
-      { match: /Recruitment campaign/, kind: "ask", category: "artifact", required: "past customers, with a contact" },
+      { match: /Similar jobs/, kind: "ask", category: "artifact", required: "similar jobs, with a contact" },
       { match: /Teaming agreement/, kind: "teaming", category: "submission", required: "partners and the share each does" },
     ],
     nextBold: `Reply to ${PARTNER.contact} this week`,
     wouldChangeBold: ["the size still points to a subcontract", "another veteran-owned prime"],
-    redTeamBold: ["The veteran-owned firm has to lead", "worth more than the margin", "wants a woman-owned crew"],
+    redTeamBold: ["The veteran-owned firm has to lead", "up to 85 percent", "its crews are tied up"],
     gapToWin: [
       { item: "A **service-disabled veteran-owned prime** to team with", have: false },
-      { item: "A **teaming agreement** that names your share", have: false },
+      { item: "A **teaming agreement** that names your share and the sub bonds", have: false },
     ],
     openQuestions,
     trail: [
@@ -350,24 +354,27 @@ const vaHiring: Maker = (f, sol) => {
         title: "Reading the notice",
         checkCount: 6,
         items: [
-          { glyph: "ok", text: rt("Sources sought: the VA asks **who could run the campaign**."), source: sourceOf(sol, "purpose") },
+          { glyph: "ok", text: rt("Sources sought: the VA asks **who could replace the fan coils** on floors 2 and 4."), source: sourceOf(sol, "purpose") },
           { glyph: "blocked", text: rt("Set-aside expected: **service-disabled veteran-owned** firms."), source: sourceOf(sol, "setAside") },
-          { glyph: "warn", text: rt(`About **${usd(annual)} a year** when the current contract ends in September 2027.`), source: sourceOf(sol, "current") },
+          { glyph: "warn", text: rt(`About **${usd(job)}**, with a sealed bid in about 150 days.`), source: sourceOf(sol, "current") },
           { glyph: "neutral", text: rt("Teaming replies should name the partners and each one's share."), source: sourceOf(sol, "teaming") },
         ],
       },
       {
         title: "Checking the competition",
         checkCount: 4,
-        items: [{ glyph: "ok", text: rt(`${PARTNER.name} is looking for a woman-owned video crew.`), source: "Partners" }],
+        items: [
+          { glyph: "neutral", text: rt("The 3rd floor drew 2 bids from veteran-owned firms in 2023."), source: "Award records" },
+          { glyph: "ok", text: rt(`${PARTNER.name} is looking for a HUBZone firm for the mechanical and electrical work.`), source: "Partners" },
+        ],
       },
       {
         title: "Checking your business",
         checkCount: 6,
         items: [
-          { glyph: "blocked", text: rt("Veteran-owned certification: **none**. You are woman-owned."), source: "Your record" },
-          { glyph: "ok", text: rt("Longleaf Home Health hiring campaign: recruiting videos, paid social and a lead form."), source: "Your record" },
-          { glyph: "ok", text: rt("A 2-person video crew and an edit suite in Fayetteville."), source: "Your record" },
+          { glyph: "blocked", text: rt("Veteran-owned certification: **none**. You are HUBZone."), source: "Your record" },
+          { glyph: "ok", text: rt("Pope office building: HVAC and electrical work, CPARS Very Good."), source: "Your record" },
+          { glyph: "warn", text: rt(`Your half, about ${usd(Math.round(job / 2))}, is more than your ${usd(LINE.single)} single-job bond.`), source: "Computed" },
         ],
       },
     ],
@@ -379,7 +386,7 @@ const vaHiring: Maker = (f, sol) => {
 };
 
 export const HERO_EXTRAS: Record<string, Maker> = {
-  [HERO_IDS.hero]: familyAdvocacyPrint,
-  [HERO_IDS.twin]: familyAdvocacyStreaming,
-  [HERO_IDS.teamUp]: vaHiring,
+  [HERO_IDS.hero]: trainingBuilding,
+  [HERO_IDS.twin]: barracksHoldersOnly,
+  [HERO_IDS.teamUp]: vaFanCoils,
 };

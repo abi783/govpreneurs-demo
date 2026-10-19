@@ -222,8 +222,9 @@ describe("filters, sort and page", () => {
   });
 
   it("leaves out a facet's own filter when it counts that facet", () => {
-    const counts = facetCounts({ location: { states: ["NC"] } }, "all");
-    expect(counts.states.VA).toBeGreaterThan(0);
+    // Filter on a state with no rows: the state counts still show NC, so the filter is left out.
+    const counts = facetCounts({ location: { states: ["ZZ"] } }, "all");
+    expect(counts.states.NC).toBeGreaterThan(0);
   });
 });
 
