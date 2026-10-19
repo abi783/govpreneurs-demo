@@ -249,6 +249,27 @@ const FEDERAL_TEAMS: { match: RegExp; team: Person[] }[] = [
       { name: "Jun Tanaka", title: "Contract Specialist" },
     ],
   },
+  {
+    match: /Department of Defense/i,
+    team: [
+      { name: "Noreen Castellano", title: "Contracting Officer" },
+      { name: "Elliott Fairbanks", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Agriculture/i,
+    team: [
+      { name: "Hollis Brandt", title: "Contracting Officer" },
+      { name: "Marisol Quintero", title: "Contract Specialist" },
+    ],
+  },
+  {
+    match: /Environmental Protection/i,
+    team: [
+      { name: "Vernon Ashby", title: "Contracting Officer" },
+      { name: "Celeste Rowan", title: "Contract Specialist" },
+    ],
+  },
 ];
 
 /** State and local buyers that the Government Buyers page already names. */

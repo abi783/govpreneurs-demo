@@ -21,7 +21,7 @@
 // story/opportunities.ts, which the QA specs load outside Vite).
 
 /** Members whose story is a pack folder. */
-export type PackMemberId = "agency" | "construction" | "consulting" | "it" | "trucking";
+export type PackMemberId = "agency" | "construction" | "consulting" | "it" | "trucking" | "janitorial";
 export type MemberId = "caterer" | PackMemberId;
 
 export const MEMBERS: { id: MemberId; label: string; short: string }[] = [
@@ -31,6 +31,7 @@ export const MEMBERS: { id: MemberId; label: string; short: string }[] = [
   { id: "consulting", label: "Coppervale Advisory Group · consulting", short: "Consulting" },
   { id: "it", label: "Gallberry Technology Group · IT services", short: "IT services" },
   { id: "trucking", label: "Rockfish Run Freight · trucking", short: "Trucking" },
+  { id: "janitorial", label: "Gray Owl Facility Services · janitorial", short: "Janitorial" },
 ];
 
 /** Outside the `gp-demo:v1:` store, so "Reset demo" keeps the member. */

@@ -33,6 +33,7 @@ export const PLACES = {
   goldsboro: { city: "Goldsboro", state: "NC", milesFromBase: 75 },
   raleigh: { city: "Raleigh", state: "NC", milesFromBase: 65 },
   durham: { city: "Durham", state: "NC", milesFromBase: 85 },
+  wakeForest: { city: "Wake Forest", state: "NC", milesFromBase: 85 },
   chapelHill: { city: "Chapel Hill", state: "NC", milesFromBase: 85 },
   wilmington: { city: "Wilmington", state: "NC", milesFromBase: 90 },
   jacksonville: { city: "Jacksonville", state: "NC", milesFromBase: 100 },

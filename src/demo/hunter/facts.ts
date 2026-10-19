@@ -119,6 +119,8 @@ export function noticeText(row: FeedRow): string {
       return "a Sources Sought notice (an early look, not a bid yet)";
     case "Combined Synopsis/Solicitation":
       return "a combined notice and request";
+    case "Special Notice":
+      return "a special notice (the buyer tells sellers its plans; it asks for no price)";
     default:
       return "a solicitation";
   }

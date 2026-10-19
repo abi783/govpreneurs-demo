@@ -73,6 +73,7 @@ const NOTICE_IDS: Record<string, string[]> = {
   Solicitation: ["solicitation"],
   "Combined Synopsis/Solicitation": ["combined", "solicitation"],
   "Sources Sought": ["sources_sought"],
+  "Special Notice": ["special"],
 };
 
 const SET_ASIDE_WORDS: Record<string, string> = Object.fromEntries(Object.entries(SET_ASIDES).map(([c, s]) => [c, s.words]));
