@@ -22,13 +22,14 @@ import { MEMBER, type MemberId } from "../member";
 import * as agency from "../members/agency/opportunities";
 import * as caterer from "../members/caterer/opportunities";
 import * as construction from "../members/construction/opportunities";
+import * as janitorial from "../members/janitorial/opportunities";
 
 // Every member's opportunities. Static imports, not a glob: the QA specs load
 // this file outside Vite. A new member adds one line here.
 const MEMBER_FILES: Record<
   MemberId,
   { HERO_IDS: { readonly hero: string; readonly twin: string; readonly teamUp: string }; OPPORTUNITIES: StoryOpportunity[] }
-> = { agency, caterer, construction };
+> = { agency, caterer, construction, janitorial };
 const member = MEMBER_FILES[MEMBER];
 
 export type NoticeType =
@@ -37,7 +38,9 @@ export type NoticeType =
   | "Request for Quote"
   | "Sources Sought"
   | "Invitation for Bid"
-  | "Request for Proposal";
+  | "Request for Proposal"
+  /** A notice that asks for nothing to price: a notice of intent, a mandatory-source notice. */
+  | "Special Notice";
 
 /** SAM set-aside codes used in the story (setAsides.ts says what each means). null = open to all. */
 export type SetAside = "WOSB" | "SBA" | "SDVOSBC" | "HZC" | "8A" | null;

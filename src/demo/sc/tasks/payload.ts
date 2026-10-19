@@ -88,6 +88,13 @@ const DUE_REASON: Record<string, string> = {
   "task-wage-class": "before questions close",
   "task-va-sources-sought": "before the sources sought closes",
   "task-hubzone-recert": "so your HUBZone status does not lapse",
+  // DEMO: the janitorial firm's tasks (members/janitorial/workspace.ts); it shares the two above.
+  "task-ava-pressure-washing": "so Ava can finish the quote",
+  "task-sarah-rest-area": "before the rest-area bid opens",
+  "task-ashepoo": "so a team bid is still possible",
+  "task-sandblasting-question": "before questions close",
+  "task-blasting-sub": "so sandblasting fits your price",
+  "task-cor-letter": "while the COR remembers the job",
 };
 
 /** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */

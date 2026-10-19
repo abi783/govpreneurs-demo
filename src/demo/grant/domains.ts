@@ -110,6 +110,7 @@ export function offerWord(opp: StoryOpportunity): "quote" | "proposal" | "bid" |
     case "Invitation for Bid":
       return "bid";
     case "Sources Sought":
+    case "Special Notice":
       return "reply";
   }
 }

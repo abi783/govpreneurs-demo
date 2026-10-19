@@ -137,6 +137,7 @@ const DOC_TITLE: Record<string, string> = {
   Solicitation: "SOLICITATION",
   "Invitation for Bid": "INVITATION FOR BID",
   "Sources Sought": "SOURCES SOUGHT NOTICE",
+  "Special Notice": "SPECIAL NOTICE",
 };
 
 function defaultText(f: OppFacts, d: Domain): Record<string, string | null> {
