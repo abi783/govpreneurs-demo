@@ -50,11 +50,13 @@ const COPY = {
       ["Bonding", `$${(PERSONA.bondLine?.single ?? 0) / 1_000_000}M a job · $${(PERSONA.bondLine?.aggregate ?? 0) / 1_000_000}M in total`],
     ] as [string, string][],
   },
-  // The pack's line (it-services-pack.md §1).
+  // The pack's line (it-services-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/it/sc/business.ts).
   it: {
     who: `8(a) IT services firm 12 miles from Fort Bragg: help desk, desktop and video-conference support, Microsoft 365 and SharePoint admin, and network support, with Security+ techs who already work on Army and Air Force networks. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, South Carolina and Virginia.`,
     capabilities: [
       ...PERSONA.differentiators,
+      "Office and repair bench on Raeford Rd. Four imaging stations, 40 loaner laptops and cable testers",
       "Imaging and asset tracking, from one office to 4,800 devices in a summer",
       "CMMC Level 1 (Self), affirmed in SPRS",
     ],

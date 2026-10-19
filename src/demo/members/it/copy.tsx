@@ -56,7 +56,7 @@ export const ROADMAP_DONE_DATES: Record<string, { started?: number; done: number
 export const CMMC_SCOPE = "Office network, ticketing system and the techs' laptops";
 
 /** The size of his capability statement in public/demo-files (scripts/make-capability-statement.ts writes it). */
-export const CAPABILITY_STATEMENT_BYTES = 3404;
+export const CAPABILITY_STATEMENT_BYTES = 3483;
 
 /** What he calls a job when he says how many he can run at once (My Business, "Tell us"). */
 export const JOB_WORDS = /\b(jobs|contracts|sites|seats|clients)\b/i;
@@ -92,7 +92,6 @@ export const PSC_GROUPS: GroupDef[] = [
 export const UPLOAD_EXTRAS: { field: string; test: RegExp }[] = [
   { field: "doc_past_performance", test: /\b(CPARS|performance rating)\b/i },
   { field: "doc_certifications", test: /\b8\(a\) (?:certificate|certification|approval letter)\b/i },
-  { field: "credentials", test: /\b(Security\+|DoD 8140|certification roster)\b/i },
 ];
 
 /** How My Business turns his own words into facts (sc/business/demoTell.ts). */
