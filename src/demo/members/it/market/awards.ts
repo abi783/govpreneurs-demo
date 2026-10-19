@@ -1,36 +1,34 @@
-// THE AGENCY's award record: the Awards page, the Partners "Who's winning" strip,
-// the Government Buyers panel and the company files (read through
+// THE IT SERVICES FIRM's award record: the Awards page, the Partners "Who's winning"
+// strip, the Government Buyers panel and the company files (read through
 // src/demo/explore/awardsData.ts, which picks the active member).
 //
-// Each award is modeled on a real federal award for advertising, marketing, design
-// or video work in NC, SC or VA (sources below): the buyer, the work, the value,
-// the set-aside and the number of offers come from the real record. Changed: the
-// winner is a made-up company (D13), the award id is invented in the buyer's format
-// (each id checked unused on USAspending, 19 Oct 2026), and most dates are counted
-// from today so "Just awarded" stays true. Two awards keep their real dates because
-// the story is built on them: the VA hiring campaign (ends 24 September 2027) and
-// Dana's own NC Guard campaign (persona.ts).
+// Source: demo-storyboard/it-services-pack.md, section 13. Most awards are modeled on
+// a real federal IT award with work at or near Fort Bragg (the model is named on each
+// one): the buyer, the work, the value, the set-aside, the contract it was ordered
+// through and the number of offers come from the real record. Changed: the winner is
+// a made-up company (D13), the award id is invented in the buyer's format, and most
+// dates are counted from today so "Just awarded" stays true. Kept: the end dates the
+// pack names (the hospital order's 28 Feb 2027 option, the ITES-3S orders' ends),
+// and Hector's own Seymour Johnson job (persona.ts).
+// The Army hospital at Fort Bragg is never named: "Womack" is one of the caterer's
+// own words. Brackwater's two Navy medical center orders and the small Pinecrest
+// and Northfork jobs have no single model; they are written to fit the record.
 //
-// Sources (USAspending, pulled 19 Oct 2026):
-//   VHA recruitment marketing   https://www.usaspending.gov/award/CONT_AWD_36C77623C0104_3600_-NONE-_-NONE-
-//   VA "Same Day" promotion     https://www.usaspending.gov/award/CONT_AWD_36C24625P0814_3600_-NONE-_-NONE-
-//   NC Guard recruiting website https://www.usaspending.gov/award/CONT_AWD_W9124225FA076_9700_GS07F0382X_4732
-//   NC Guard visual design      https://www.usaspending.gov/award/CONT_AWD_W9124223P0066_9700_-NONE-_-NONE-
-//   Durham VA video (2026)      https://www.usaspending.gov/award/CONT_AWD_36C24626P0898_3600_-NONE-_-NONE-
-//   Durham VA video (2023)      https://www.usaspending.gov/award/CONT_AWD_36C24623P1780_3600_-NONE-_-NONE-
-//   Norfolk Naval Shipyard      https://www.usaspending.gov/award/CONT_AWD_N4215820PS265_9700_-NONE-_-NONE-
-//   Fort Bragg print and digital https://www.usaspending.gov/award/CONT_AWD_W9124719P1860_9700_-NONE-_-NONE-
-//   NC DMV screen ads           https://www.usaspending.gov/award/CONT_AWD_W9124225PA042_9700_-NONE-_-NONE-
-//   MARSOC geofencing           https://www.usaspending.gov/award/CONT_AWD_H9225720P0024_9700_-NONE-_-NONE-
-//   MARSOC article series       https://www.usaspending.gov/award/CONT_AWD_H9225723P0036_9700_-NONE-_-NONE-
-//   SC ANG recruiting           https://www.usaspending.gov/award/CONT_AWD_W50S9525PA007_9700_-NONE-_-NONE-
-//   Fort Jackson graphics       https://www.usaspending.gov/award/CONT_AWD_W9124C21P0030_9700_-NONE-_-NONE-
-//   USASOC short film           https://www.usaspending.gov/award/CONT_AWD_H9223922P0011_9700_-NONE-_-NONE-
-//   MARSOC video and photo shoot https://www.usaspending.gov/award/CONT_AWD_H9225722F0107_9700_H9225720D0002_9700
-//   MARSOC staff and advertising https://www.usaspending.gov/award/CONT_AWD_H9225726FE074_9700_H9240020D0039_9700
-//   Camp Lejeune media monitoring https://www.usaspending.gov/award/CONT_AWD_M6700121P1196_9700_-NONE-_-NONE-
-//   NC Guard digital recruiting (Dana's, modeled on) https://www.usaspending.gov/award/CONT_AWD_W9124221P0013_9700_-NONE-_-NONE-
-//     and https://www.usaspending.gov/award/CONT_AWD_W912K625PA019_9700_-NONE-_-NONE-
+// Models (USAspending):
+//   USARC TAC/C4, 8(a) competed  https://www.usaspending.gov/award/CONT_AWD_W9124719C9000_9700_-NONE-_-NONE-
+//   USARC knowledge mgmt (ITES)  https://www.usaspending.gov/award/CONT_AWD_W9124723F2461_9700_W52P1J18DA092_9700
+//   XVIII ABC IT (ITES-3S)       https://www.usaspending.gov/award/CONT_AWD_W9124725FA066_9700_W52P1J18DA013_9700
+//   Logistics systems (ITES-3S)  https://www.usaspending.gov/award/CONT_AWD_W9124722F0117_9700_W52P1J18DA122_9700
+//   Other Fort Bragg ITES-3S     https://www.usaspending.gov/award/CONT_AWD_W9124723F2439_9700_W52P1J18DA087_9700
+//   USARC GCSS-Army, 8(a) sole   https://www.usaspending.gov/award/CONT_AWD_W9124725CA004_9700_-NONE-_-NONE-
+//   Pope 43 CS IT support        https://www.usaspending.gov/award/CONT_AWD_FA445223P0027_9700_-NONE-_-NONE-
+//   Pope medical LAN (STARS III) https://www.usaspending.gov/award/CONT_AWD_FA445223F0078_9700_47QTCB21D0200_4732
+//   Army hospital IT (STARS III) https://www.usaspending.gov/award/CONT_AWD_HT001524F0117_9700_47QTCB21D0173_4732
+//   USSOCOM labor for seats      https://www.usaspending.gov/award/CONT_AWD_H9240323C0003_9700_-NONE-_-NONE-
+//   Fort Bragg IT (IMCS IV)      https://www.usaspending.gov/award/CONT_AWD_W91RUS25FA046_9700_W91RUS23D0001_9700
+//   Seymour Johnson telecom IDIQ https://www.usaspending.gov/award/CONT_IDV_FA480923D0006_9700
+//   Conference-room upgrade      https://www.usaspending.gov/award/CONT_AWD_W912HQ23P0115_9700_-NONE-_-NONE-
+//   MARSOC office rewire         https://www.usaspending.gov/award/CONT_AWD_H9225722P0067_9700_-NONE-_-NONE-
 
 import { findPastPerformance } from "../../../story/persona";
 import { getOpportunity } from "../../../story/opportunities";
@@ -41,15 +39,14 @@ import { KEY_PARTNER_FIRM, MEMBER_FIRM } from "./firms";
 /** The buyers. Government offices are real, so these names are real. */
 export const AWARD_AGENCIES = {
   braggMicc: { name: "Department of the Army, Mission and Installation Contracting Command (Fort Bragg)", abbrev: "MICC Fort Bragg", isDefense: true },
-  uspfoNc: { name: "Department of the Army, USPFO for North Carolina (NC Army National Guard)", abbrev: "USPFO NC", isDefense: true },
-  vaPcac: { name: "Department of Veterans Affairs, Program Contracting Activity Central", abbrev: "VA PCAC", isDefense: false },
-  vaNco6: { name: "Department of Veterans Affairs, Network Contracting Office 6", abbrev: "VA NCO 6", isDefense: false },
-  marsoc: { name: "U.S. Special Operations Command, Marine Forces Special Operations Command (Camp Lejeune)", abbrev: "MARSOC", isDefense: true },
-  usasoc: { name: "U.S. Special Operations Command, U.S. Army Special Operations Command (Fort Bragg)", abbrev: "USASOC", isDefense: true },
-  lejeune: { name: "Department of the Navy, Marine Corps Base Camp Lejeune", abbrev: "MCB Camp Lejeune", isDefense: true },
-  uspfoSc: { name: "Department of the Air Force, USPFO for South Carolina (169th Fighter Wing)", abbrev: "USPFO SC", isDefense: true },
-  fortJackson: { name: "Department of the Army, MICC Fort Jackson", abbrev: "MICC Fort Jackson", isDefense: true },
-  norfolkShipyard: { name: "Department of the Navy, Norfolk Naval Shipyard", abbrev: "Norfolk Naval Shipyard", isDefense: true },
+  accApg: { name: "Department of the Army, Army Contracting Command, Aberdeen Proving Ground", abbrev: "ACC-APG", isDefense: true },
+  usaceHecsa: { name: "Department of the Army, U.S. Army Corps of Engineers, Humphreys Engineer Center Support Activity", abbrev: "USACE HECSA", isDefense: true },
+  dha: { name: "Defense Health Agency, Enterprise Medical Services Contracting Division", abbrev: "DHA", isDefense: true },
+  pope: { name: "Department of the Air Force, 763rd Enterprise Sourcing Squadron (Pope Army Airfield)", abbrev: "763 ESS Pope", isDefense: true },
+  seymour: { name: "Department of the Air Force, 4th Contracting Squadron (Seymour Johnson AFB)", abbrev: "4th CONS", isDefense: true },
+  ussocom: { name: "U.S. Special Operations Command", abbrev: "USSOCOM", isDefense: true },
+  marsoc: { name: "Department of the Navy, Marine Forces Special Operations Command", abbrev: "MARSOC", isDefense: true },
+  ncGuard: { name: "Department of the Army, USPFO for North Carolina (NC National Guard)", abbrev: "USPFO NC", isDefense: true },
 } as const;
 
 export type AgencyAwardAgency = keyof typeof AWARD_AGENCIES;
@@ -57,408 +54,451 @@ export type AgencyAwardAgency = keyof typeof AWARD_AGENCIES;
 /** The buyer in a sentence, for "Won (job) for (buyer)". */
 export const AWARD_AGENCY_LABEL: Record<AgencyAwardAgency, string> = {
   braggMicc: "the Army contracting office at Fort Bragg",
-  uspfoNc: "the NC National Guard",
-  vaPcac: "the VA's national contracting office",
-  vaNco6: "the VA contracting office for North Carolina and Virginia",
-  marsoc: "Marine special operations at Camp Lejeune",
-  usasoc: "Army special operations at Fort Bragg",
-  lejeune: "Marine Corps Base Camp Lejeune",
-  uspfoSc: "the South Carolina Air National Guard",
-  fortJackson: "the Army at Fort Jackson",
-  norfolkShipyard: "the Navy at Norfolk Naval Shipyard",
+  accApg: "the Army's network contracting office",
+  usaceHecsa: "the Corps of Engineers' support office",
+  dha: "the Defense Health Agency",
+  pope: "Air Force contracting at Pope Army Airfield",
+  seymour: "Air Force contracting at Seymour Johnson",
+  ussocom: "Special Operations Command",
+  marsoc: "the Marine special operations command at Camp Lejeune",
+  ncGuard: "the NC National Guard",
 };
 
-const FULL_OPEN = "Full and Open Competition";
 const AFTER_EXCL = "Full and Open Competition after exclusion of sources";
 const SIMPLIFIED = "Competed under simplified acquisition procedures";
+const FAIR_OPPORTUNITY = "Subject to Multiple Award Fair Opportunity";
 const NOT_COMPETED = "Not Competed";
+const NOT_COMPETED_SIMPLIFIED = "Not competed under simplified acquisition procedures";
 const SB_SETASIDE = "Small Business Set-Aside, total";
-const SDVOSB_SETASIDE = "Service-Disabled Veteran-Owned Small Business Set-Aside";
+const EIGHT_A_COMPETED = "8(a) Competed";
 const EIGHT_A_SOLE = "8(a) Sole Source";
+const NO_SETASIDE = "No set-aside used";
 const SB_PRIME = "Not required (small business prime)";
+const PLAN_ON_FILE = "Subcontracting plan on file";
 
-const BLUESTONE = KEY_PARTNER_FIRM.key;
-const DANA = MEMBER_FIRM.key;
-const ncng = findPastPerformance("pp-ncng-recruiting")!;
+const BRACKWATER = KEY_PARTNER_FIRM.key;
+const GALLBERRY = MEMBER_FIRM.key;
+const seymour = findPastPerformance("pp-sjafb-desktop-support")!;
+
+/** The Army hospital's IT services order: the job the DHA is asking about again. */
+const HOSPITAL_IT = "HT001524F0193";
 
 export const AWARD_SEEDS: AwardSeed<AgencyAwardAgency>[] = [
-  // ── Bluestone Veteran Media Group (4001): the VA's national hiring campaign ──
+  // ── Brackwater Federal Solutions (4001): hospital IT at two Navy medical centers ──
   {
-    id: "36C77623C0298",
-    title: "VHA recruitment marketing and advertising campaign (national)",
-    winner: BLUESTONE,
-    agency: "vaPcac",
-    obligated: 34_307_425,
-    ceiling: 41_650_983,
-    startedOn: "2023-09-25",
-    endsOn: "2027-09-24",
-    rebidIsOpen: true,
-    city: "Alexandria",
-    state: "VA",
-    naics: "541613",
-    workType: "Hiring campaigns for VA doctors, nurses and staff",
-    psc: "R701",
-    offers: 11,
-    extent: AFTER_EXCL,
-    setAside: SDVOSB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 9, repeat: 3, subs: [[4003, 2], [4007, 1], [4006, 1]] },
-  },
-  {
-    id: "36C24625P2968",
-    title: "Promotional materials for the \"Same Day\" access campaign, Durham VA Health Care System",
-    winner: BLUESTONE,
-    agency: "vaNco6",
-    obligated: 22_045,
-    ceiling: 49_655,
-    startedDaysAgo: 584,
-    endsInDays: 145,
-    city: "Durham",
+    id: "HT001525F0241",
+    title: "Hospital IT services, Naval Medical Center Camp Lejeune (8(a) STARS III order)",
+    winner: BRACKWATER,
+    agency: "dha",
+    obligated: 6_240_000,
+    startedDaysAgo: 330,
+    endsInDays: 400,
+    city: "Camp Lejeune",
     state: "NC",
-    naics: "541810",
-    workType: "Printed and digital pieces for a public-affairs campaign",
-    psc: "R701",
-    offers: 1,
-    extent: SIMPLIFIED,
-    setAside: SDVOSB_SETASIDE,
+    naics: "541512",
+    workType: "Service desk, deskside support and clinic network support for a Navy hospital",
+    psc: "DE01",
+    offers: 2,
+    extent: FAIR_OPPORTUNITY,
+    setAside: EIGHT_A_COMPETED,
     subPlan: SB_PRIME,
-    bench: { distinct: 9, repeat: 3, subs: [[4003, 2], [4007, 1], [4006, 1]] },
-  },
-
-  // ── Lantern Row Creative (4000): Dana's own NC Guard campaign ─────────────
-  {
-    id: "W91242-25-P-A118",
-    title: "Digital recruiting campaign: NC Army National Guard",
-    winner: DANA,
-    agency: "uspfoNc",
-    obligated: ncng.totalValue,
-    currentValue: ncng.totalValue,
-    ceiling: ncng.totalValue,
-    startedOn: ncng.periodStart,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541810",
-    workType: "Recruiting videos, geofenced ads and leads routed to recruiters",
-    psc: "R701",
-    offers: 4,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: null,
-  },
-
-  // ── Hollowell Pike Communications (4002): NC Guard web and design ─────────
-  {
-    id: "W91242-25-F-A914",
-    title: "Recruiting website design and upkeep, NC Army National Guard (GSA schedule order)",
-    winner: 4002,
-    agency: "uspfoNc",
-    obligated: 103_010,
-    ceiling: 319_974,
-    startedDaysAgo: 417,
-    endsInDays: 312,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541613",
-    workType: "The Guard's recruiting website",
-    psc: "R701",
-    offers: 1,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 6, repeat: 2, subs: [[4005, 1], [4004, 1]] },
+    bench: { distinct: 5, repeat: 2, subs: [[4004, 1], [4003, 1]] },
   },
   {
-    id: "W91242-23-P-0071",
-    title: "Visual design support for NC National Guard public affairs",
-    winner: 4002,
-    agency: "uspfoNc",
-    obligated: 235_231,
-    ceiling: 629_321,
-    startedDaysAgo: 1115,
-    endsInDays: 345,
-    city: "Raleigh",
-    state: "NC",
-    naics: "541430",
-    workType: "An on-site designer for the Guard's public affairs office",
-    psc: "T001",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 6, repeat: 2, subs: [[4005, 1], [4004, 1]] },
-  },
-
-  // ── Kestrel Point Federal Marketing (4003): VA video and Navy recruiting ──
-  {
-    id: "36C24626P2971",
-    title: "Patient-education and outreach video production, Durham VA Health Care System",
-    winner: 4003,
-    agency: "vaNco6",
-    obligated: 200_000,
-    ceiling: 800_000,
-    startedDaysAgo: 54,
-    endsInDays: 310,
-    city: "Durham",
-    state: "NC",
-    naics: "512110",
-    workType: "Short videos for patients and veterans",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
-  },
-  {
-    id: "36C24623P1792",
-    title: "Educational video production, Durham VA Health Care System",
-    winner: 4003,
-    agency: "vaNco6",
-    obligated: 250_050,
-    ceiling: 390_050,
-    startedDaysAgo: 1130,
-    city: "Durham",
-    state: "NC",
-    naics: "512110",
-    workType: "Educational videos for veterans",
-    psc: "R701",
-    offers: 1,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
-  },
-  {
-    id: "N42158-20-P-S281",
-    title: "Recruitment and marketing campaign, Norfolk Naval Shipyard",
-    winner: 4003,
-    agency: "norfolkShipyard",
-    obligated: 638_300,
-    startedDaysAgo: 2224,
+    id: "HT001524F0306",
+    title: "Hospital IT services, Naval Medical Center Portsmouth (8(a) STARS III order)",
+    winner: BRACKWATER,
+    agency: "dha",
+    obligated: 11_820_000,
+    startedDaysAgo: 610,
+    endsInDays: 490,
     city: "Portsmouth",
     state: "VA",
-    naics: "541613",
-    workType: "Hiring campaign for shipyard trades",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
+    naics: "541512",
+    workType: "Service desk, deskside techs and imaging across a hospital and its clinics",
+    psc: "DE01",
+    offers: 3,
+    extent: FAIR_OPPORTUNITY,
+    setAside: EIGHT_A_COMPETED,
     subPlan: SB_PRIME,
-    bench: { distinct: 5, repeat: 2, subs: [[4007, 2]] },
+    bench: { distinct: 5, repeat: 2, subs: [[4004, 1], [4003, 1]] },
   },
 
-  // ── Sandhill Signal Media (4004): a local publisher with screens and an app ──
+  // ── Gallberry Technology Group (4000): Hector's own Seymour Johnson job ──
   {
-    id: "W91247-19-P-1874",
-    title: "Print and digital advertisements, Army Community Service, Fort Bragg",
-    winner: 4004,
+    id: "FA480924C0011",
+    title: "Desktop support, 4th Communications Squadron, Seymour Johnson AFB",
+    winner: GALLBERRY,
+    agency: "seymour",
+    obligated: seymour.totalValue,
+    currentValue: seymour.totalValue,
+    ceiling: seymour.totalValue,
+    startedOn: seymour.periodStart,
+    endsOn: seymour.periodEnd,
+    city: "Seymour Johnson AFB",
+    state: "NC",
+    naics: "541513",
+    workType: "Two on-site techs and an imaging surge for 1,100 Windows 11 laptops",
+    psc: "DE02",
+    offers: 5,
+    extent: AFTER_EXCL,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Larkspur Federal IT (4002): small-business ITES-3S orders at Fort Bragg ──
+  {
+    id: "W9124725FA102",
+    title: "IT and information-sharing services, XVIII Airborne Corps (ITES-3S task order)",
+    winner: 4002,
     agency: "braggMicc",
-    obligated: 356_624,
-    startedOn: "2019-09-30",
+    obligated: 872_000,
+    startedDaysAgo: 420,
+    endsInDays: 210,
     city: "Fort Bragg",
     state: "NC",
-    naics: "541810",
-    workType: "Weekly print ads and digital ads for family programs",
-    psc: "R701",
-    offers: 5,
-    extent: SIMPLIFIED,
-    setAside: null,
+    naics: "541519",
+    workType: "IT support and SharePoint sites for a corps headquarters, for ITES-3S holders only",
+    psc: "DF01",
+    offers: 12,
+    extent: FAIR_OPPORTUNITY,
+    setAside: SB_SETASIDE,
     subPlan: SB_PRIME,
-    bench: { distinct: 2, repeat: 1, subs: [[4005, 1]] },
+    bench: { distinct: 3, repeat: 1, subs: [[4003, 1]] },
   },
   {
-    id: "W91242-25-P-A931",
-    title: "Recruiting ads on screens in NC DMV offices, NC Army National Guard",
-    winner: 4004,
-    agency: "uspfoNc",
-    obligated: 143_169,
-    ceiling: 367_974,
-    startedDaysAgo: 409,
-    endsInDays: 320,
+    id: "W9124723F2517",
+    title: "Knowledge management and SharePoint support, U.S. Army Reserve Command (ITES-3S task order)",
+    winner: 4002,
+    agency: "braggMicc",
+    obligated: 510_000,
+    startedOn: "2023-07-01",
+    endsOn: "2025-06-30",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "SharePoint and records support for the Army Reserve's headquarters, for ITES-3S holders only",
+    psc: "DF01",
+    offers: 4,
+    extent: FAIR_OPPORTUNITY,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: { distinct: 3, repeat: 1, subs: [[4003, 1]] },
+  },
+
+  // ── Northfork Cyber LLC (4003): security work for the NC Guard ──
+  {
+    id: "W9124226P0137",
+    title: "Cybersecurity support and assessments, NC National Guard",
+    winner: 4003,
+    agency: "ncGuard",
+    obligated: 286_400,
+    startedDaysAgo: 60,
+    endsInDays: 305,
     city: "Raleigh",
     state: "NC",
-    naics: "541890",
-    workType: "Video ads on the screens they own in DMV offices",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 2, repeat: 1, subs: [[4005, 1]] },
-  },
-
-  // ── Quillmark Creative (4005): the Fayetteville agency that beat Dana on price ──
-  {
-    id: "H92257-25-P-0041",
-    title: "Geofencing and lead-generation recruiting campaign, MARSOC",
-    winner: 4005,
-    agency: "marsoc",
-    obligated: 129_712,
-    ceiling: 687_904,
-    startedDaysAgo: 300,
-    endsInDays: 65,
-    city: "Camp Lejeune",
-    state: "NC",
-    naics: "541810",
-    workType: "Location-based recruiting ads with lead forms",
-    psc: "R701",
-    offers: 7,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 1, repeat: 0, subs: [[4004, 1]] },
-  },
-  {
-    id: "H92257-23-P-0391",
-    title: "Article series and public relations support, MARSOC",
-    winner: 4005,
-    agency: "marsoc",
-    obligated: 48_000,
-    ceiling: 120_000,
-    startedDaysAgo: 1319,
-    endsInDays: 528,
-    city: "Camp Lejeune",
-    state: "NC",
-    naics: "541820",
-    workType: "Feature articles about the command",
-    psc: "R708",
-    offers: 7,
-    extent: SIMPLIFIED,
-    setAside: SB_SETASIDE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 1, repeat: 0, subs: [[4004, 1]] },
-  },
-
-  // ── Ironline Recruiting Media (4006): South Carolina Guard recruiting ──────
-  {
-    id: "W50S95-25-P-A917",
-    title: "Recruiting marketing campaign, 169th Fighter Wing (SC Air National Guard)",
-    winner: 4006,
-    agency: "uspfoSc",
-    obligated: 249_999,
-    startedDaysAgo: 395,
-    city: "Eastover",
-    state: "SC",
-    naics: "541810",
-    workType: "A year of recruiting ads around Columbia",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 3, repeat: 1, subs: [[4007, 1]] },
-  },
-  {
-    id: "W9124C-21-P-0917",
-    title: "Graphics upgrade, U.S. Army Chaplain Center and School, Fort Jackson",
-    winner: 4006,
-    agency: "fortJackson",
-    obligated: 247_463,
-    startedDaysAgo: 1872,
-    city: "Columbia",
-    state: "SC",
-    naics: "541430",
-    workType: "Wall graphics and displays",
-    psc: "T001",
-    offers: 1,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 3, repeat: 1, subs: [[4007, 1]] },
-  },
-
-  // ── Harbor Nine Productions (4007): video crews for special operations ────
-  {
-    id: "H92257-26-F-0021",
-    title: "Video and photo shoot, MARSOC (order under an existing contract)",
-    winner: 4007,
-    agency: "marsoc",
-    obligated: 95_750,
-    startedDaysAgo: 62,
-    city: "Jacksonville",
-    state: "NC",
-    naics: "512110",
-    workType: "A shoot for recruiting video and photos",
-    psc: "R701",
-    offers: null,
-    extent: null,
-    setAside: null,
-    subPlan: SB_PRIME,
-    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
-  },
-  {
-    id: "H92239-22-P-0391",
-    title: "Short film for USASOC, Fort Bragg",
-    winner: 4007,
-    agency: "usasoc",
-    obligated: 223_132,
-    startedOn: "2022-08-10",
-    city: "Fayetteville",
-    state: "NC",
-    naics: "512110",
-    workType: "A short film about the command",
-    psc: "R701",
-    offers: 1,
-    extent: NOT_COMPETED,
-    setAside: EIGHT_A_SOLE,
-    subPlan: SB_PRIME,
-    bench: { distinct: 4, repeat: 1, subs: [[4003, 1]] },
-  },
-
-  // ── Companies that are not partners for Dana ─────────────────────────────
-  {
-    id: "H92257-25-F-E917",
-    title: "Staff and advertising support, MARSOC (order under a multiple-award contract)",
-    winner: 4101,
-    agency: "marsoc",
-    obligated: 2_359_322,
-    ceiling: 4_757_830,
-    startedDaysAgo: 440,
-    endsInDays: 285,
-    city: "Jacksonville",
-    state: "NC",
-    naics: "541613",
-    workType: "Full-time marketing staff on site, plus ad buys",
-    psc: "R701",
+    naics: "541519",
+    workType: "Security officer support, scans and fixes for the Guard's armories and offices",
+    psc: "DJ01",
     offers: 4,
-    extent: FULL_OPEN,
-    setAside: null,
-    subPlan: "Plan on file",
+    extent: SIMPLIFIED,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Pinecrest Signal Group (4004): cabling and audio-visual work ──
+  {
+    id: "W912HQ26P0094",
+    title: "Conference-room video and audio upgrade, Fort Bragg",
+    winner: 4004,
+    agency: "usaceHecsa",
+    obligated: 71_800,
+    startedDaysAgo: 30,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "New displays, cameras and wiring in two conference rooms; mostly equipment",
+    psc: "N058",
+    offers: 3,
+    extent: SIMPLIFIED,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
     bench: null,
   },
   {
-    id: "M67001-21-P-1997",
-    title: "News and media monitoring, Marine Corps Base Camp Lejeune",
-    winner: 4102,
-    agency: "lejeune",
-    obligated: 333_600,
-    startedDaysAgo: 1853,
+    id: "H9225726P0058",
+    title: "Office IT rewire, MARSOC, Camp Lejeune",
+    winner: 4004,
+    agency: "marsoc",
+    obligated: 43_900,
+    startedDaysAgo: 140,
     city: "Camp Lejeune",
     state: "NC",
-    naics: "541820",
-    workType: "Daily news clips and media reports",
-    psc: "R708",
+    naics: "541519",
+    workType: "New network cable and switches for one office building",
+    psc: "N058",
     offers: 5,
-    extent: FULL_OPEN,
-    setAside: null,
+    extent: SIMPLIFIED,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+  {
+    id: "FA480923D0011",
+    title: "Base telecommunications systems support, Seymour Johnson AFB (IDIQ)",
+    winner: 4004,
+    agency: "seymour",
+    obligated: 1_180_000,
+    ceiling: 4_500_000,
+    startedOn: "2023-02-01",
+    endsOn: "2029-01-31",
+    city: "Seymour Johnson AFB",
+    state: "NC",
+    naics: "541519",
+    workType: "Cable, phone and network repair orders across the base",
+    psc: "DG01",
+    offers: 4,
+    extent: AFTER_EXCL,
+    setAside: SB_SETASIDE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Kettle Creek Technologies (4005): 8(a) work for the Army at Fort Bragg ──
+  {
+    id: "W9124724C9002",
+    title: "TAC/C4 signal readiness support, U.S. Army Reserve Command G-6",
+    winner: 4005,
+    agency: "braggMicc",
+    obligated: 10_100_000,
+    startedDaysAgo: 700,
+    endsInDays: 1120,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Signal and network readiness support for the Army Reserve, a base year and four options",
+    psc: "DG01",
+    offers: 6,
+    extent: AFTER_EXCL,
+    setAside: EIGHT_A_COMPETED,
+    subPlan: SB_PRIME,
+    bench: { distinct: 2, repeat: 0, subs: [[4004, 1]] },
+  },
+  {
+    id: "W9124726P0388",
+    solicitationId: "W91247-26-Q-0412",
+    title: "Windows 11 upgrade surge, XVIII Airborne Corps G-6",
+    winner: 4005,
+    agency: "braggMicc",
+    obligated: 165_540,
+    startedDaysAgo: 50,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Upgrade and re-image laptops across a corps headquarters; lowest price technically acceptable",
+    psc: "DE02",
+    offers: 5,
+    extent: SIMPLIFIED,
+    setAside: EIGHT_A_COMPETED,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+  {
+    id: "W9124725CA011",
+    title: "GCSS-Army support, U.S. Army Reserve Command",
+    winner: 4005,
+    agency: "braggMicc",
+    obligated: 2_170_000,
+    startedDaysAgo: 210,
+    endsOn: "2027-03-23",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Help for Army Reserve units on the Army's supply and finance system, given to one 8(a) firm",
+    psc: "DA01",
+    offers: 1,
+    extent: NOT_COMPETED,
+    setAside: EIGHT_A_SOLE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Ironweed Health IT (4006): the Army hospital's IT at Fort Bragg ──
+  {
+    id: HOSPITAL_IT,
+    title: "IT services, the Army medical center at Fort Bragg (8(a) STARS III order)",
+    winner: 4006,
+    agency: "dha",
+    obligated: 8_550_000,
+    startedOn: "2024-08-26",
+    endsOn: "2027-02-28",
+    rebidIsOpen: true,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541512",
+    workType: "Deskside support, the service desk and clinic network support for a hospital and its clinics",
+    psc: "DE01",
+    offers: 1,
+    extent: FAIR_OPPORTUNITY,
+    setAside: EIGHT_A_COMPETED,
+    subPlan: SB_PRIME,
+    bench: { distinct: 4, repeat: 1, subs: [[4004, 1]] },
+  },
+
+  // ── Sandy Ridge Technical Services (4007): Pope's 43 CS work ──
+  {
+    id: "FA445223P0031",
+    title: "IT support services, 43rd Communications Squadron, Pope Army Airfield",
+    winner: 4007,
+    agency: "pope",
+    obligated: 2_620_000,
+    startedOn: "2023-09-29",
+    endsOn: "2027-09-28",
+    city: "Pope Army Airfield",
+    state: "NC",
+    naics: "541513",
+    workType: "The squadron's help desk, network and phone support, given to one firm without a competition",
+    psc: "DG01",
+    offers: 1,
+    extent: NOT_COMPETED_SIMPLIFIED,
+    setAside: EIGHT_A_SOLE,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+  {
+    id: "FA445223F0082",
+    title: "Medical network support, Pope Army Airfield (8(a) STARS III order)",
+    winner: 4007,
+    agency: "pope",
+    obligated: 421_000,
+    startedOn: "2023-06-01",
+    endsOn: "2026-05-31",
+    city: "Pope Army Airfield",
+    state: "NC",
+    naics: "541513",
+    workType: "Network support for the airfield's clinic",
+    psc: "DG01",
+    offers: 1,
+    extent: FAIR_OPPORTUNITY,
+    setAside: EIGHT_A_COMPETED,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+
+  // ── Granite Ledge Federal Systems (4101): large ITES-3S orders ──
+  {
+    id: "W9124722F0164",
+    title: "Logistics systems field support, Fort Bragg (ITES-3S task order)",
+    winner: 4101,
+    agency: "braggMicc",
+    obligated: 19_130_000,
+    startedOn: "2021-11-30",
+    endsOn: "2026-11-29",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Field techs for the Army's logistics systems across the base",
+    psc: "DD01",
+    offers: 6,
+    extent: FAIR_OPPORTUNITY,
+    setAside: NO_SETASIDE,
+    subPlan: PLAN_ON_FILE,
+    bench: { distinct: 6, repeat: 2, subs: [[4002, 1], [4003, 1]] },
+  },
+  {
+    id: "W9124723F2488",
+    title: "FCCS support services, Fort Bragg (ITES-3S task order)",
+    winner: 4101,
+    agency: "braggMicc",
+    obligated: 8_500_000,
+    startedOn: "2023-02-01",
+    endsOn: "2027-01-31",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Network and communications support for units on the base",
+    psc: "DG01",
+    offers: 4,
+    extent: FAIR_OPPORTUNITY,
+    setAside: NO_SETASIDE,
+    subPlan: PLAN_ON_FILE,
+    bench: { distinct: 6, repeat: 2, subs: [[4002, 1], [4003, 1]] },
+  },
+  {
+    id: "W9124722F0233",
+    title: "Cybersecurity support, U.S. Army Reserve Command (ITES-3S task order)",
+    winner: 4101,
+    agency: "braggMicc",
+    obligated: 10_400_000,
+    startedOn: "2022-07-13",
+    endsOn: "2027-07-12",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Security officers and network defense for the Army Reserve",
+    psc: "DJ01",
+    offers: 5,
+    extent: FAIR_OPPORTUNITY,
+    setAside: NO_SETASIDE,
+    subPlan: PLAN_ON_FILE,
+    bench: { distinct: 6, repeat: 2, subs: [[4003, 2]] },
+  },
+
+  // ── Fallow Point Technologies (4102): end-user seats and the base network center ──
+  {
+    id: "H9240324C0011",
+    title: "\"Labor for seats\" end-user support, U.S. Special Operations Command",
+    winner: 4102,
+    agency: "ussocom",
+    obligated: 5_600_000,
+    startedDaysAgo: 760,
+    endsOn: "2028-09-30",
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541519",
+    workType: "Help-desk and desktop techs placed with special operations units",
+    psc: "DE01",
+    offers: 6,
+    extent: AFTER_EXCL,
+    setAside: EIGHT_A_COMPETED,
+    subPlan: SB_PRIME,
+    bench: null,
+  },
+  {
+    id: "W91RUS25FA061",
+    title: "Fort Bragg IT services, the network enterprise center (IMCS IV task order)",
+    winner: 4102,
+    agency: "accApg",
+    obligated: 6_940_000,
+    startedDaysAgo: 380,
+    endsInDays: 1400,
+    city: "Fort Bragg",
+    state: "NC",
+    naics: "541513",
+    workType: "Running the base network and its service desk, for IMCS IV holders only",
+    psc: "DG01",
+    offers: 15,
+    extent: FAIR_OPPORTUNITY,
+    setAside: SB_SETASIDE,
     subPlan: SB_PRIME,
     bench: null,
   },
 ];
 
-/** Replies to the VA's sources sought, from the story's notice. */
-function vaRepliesDays(): number {
-  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 21;
+/** Answers to the DHA's request for information, from the story's notice. */
+function rfiDays(): number {
+  return getOpportunity(HERO_IDS.teamUp)?.closesInDays ?? 14;
 }
 
-/** The line on an award whose next contract is already being asked about. */
+/** The line on an award whose next job is already being asked about. */
 export function openNowNote(awardId: string): string | undefined {
-  if (awardId === "36C77623C0298") {
-    return `The VA is asking which firms could run the next campaign. Replies are due in ${vaRepliesDays()} days, and it is expected to be set aside for service-disabled veteran-owned firms. Grant says to team up.`;
+  if (awardId === HOSPITAL_IT) {
+    return `The DHA is asking which firms could do the next one. Answers are due in ${rfiDays()} days, and it is expected to be ordered through 8(a) STARS III. Grant says to team up.`;
   }
   return undefined;
 }
 
-/** Awards the story saves on the Awards page: the VA hiring campaign and Dana's own. */
-export const STORY_SAVED_AWARD_IDS = ["36C77623C0298", "W91242-25-P-A118"] as const;
+/** Awards the story saves on the Awards page: the Army hospital's IT and his Seymour Johnson job. */
+export const STORY_SAVED_AWARD_IDS = [HOSPITAL_IT, "FA480924C0011"] as const;
