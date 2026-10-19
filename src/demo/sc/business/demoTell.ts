@@ -11,6 +11,18 @@
 
 import { extract, amountIn, daysIn, saidNumbers, sentences, type Extraction } from "@sc/lib/businessProfile/tellExtract";
 import { readTellReply } from "@sc/lib/businessProfile/tellModel";
+import { byMember } from "../../member";
+import { TELL_SAMPLE as AGENCY_SAMPLE } from "../../members/agency/sc/business";
+
+/**
+ * The sentence "Say it out loud" types into the box (D56: no microphone). Each
+ * sentence lands on a different row, so the reply shows what it understood.
+ */
+export const TELL_SAMPLE = byMember({
+  caterer:
+    "We cook and deliver up to 1,100 meals a day from our kitchen in Fayetteville. We have two refrigerated vans for same-day delivery. We can wait 30 days to be paid. We want to win our first prime contract in the next 90 days.",
+  agency: AGENCY_SAMPLE,
+});
 
 interface Fact {
   field: string;
@@ -48,8 +60,27 @@ function phrases(sentence: string): string[] {
     .filter((p) => p !== "");
 }
 
-/** Rules that turn one sentence into one fact. The first rule that fits wins. */
-const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] = [
+type FactRule = { field: string; read: (s: string) => unknown | undefined };
+
+/** Things one member names when she says how many jobs she can run at once. */
+const JOB_WORDS = byMember({
+  caterer: /\b(jobs|contracts|events|orders)\b/i,
+  agency: /\b(jobs|contracts|campaigns|clients|shoots)\b/i,
+});
+
+/** The ad agency's services, as a buyer would search for them. */
+const AGENCY_SERVICES =
+  /\b(?:short |recruiting |captioned |explainer )?videos?\b|\bpaid (?:social|search)\b|\b(?:search|display|social|print|streaming) ads\b|\blanding pages?\b|\bprint buying\b|\blead forms?\b|\bpublic relations\b|\bgraphic design\b|\bgeofenced ads\b/gi;
+
+/** "We make short videos and run paid social" → ["short videos", "paid social"]. */
+function agencyServices(sentence: string): string[] | undefined {
+  if (!/\b(we|i) (make|run|do|produce|create|design|buy|build|shoot)\b/i.test(sentence)) return undefined;
+  const found = [...new Set([...sentence.matchAll(AGENCY_SERVICES)].map((m) => m[0].toLowerCase()))];
+  return found.length > 0 ? found : undefined;
+}
+
+/** Rules every member's words go through, in this order. */
+const SHARED_FIRST: FactRule[] = [
   {
     field: "payment_terms_tolerance",
     read: (s) => (/\b(paid|payment|invoice)/i.test(s) ? (daysIn(s) ?? undefined) : undefined),
@@ -62,7 +93,7 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
   {
     field: "concurrent_contract_capacity",
     read: (s) => {
-      if (!/\b(jobs|contracts|events|orders)\b/i.test(s) || !/(at once|at the same time|at a time|concurrent)/i.test(s)) {
+      if (!JOB_WORDS.test(s) || !/(at once|at the same time|at a time|concurrent)/i.test(s)) {
         return undefined;
       }
       return saidNumbers(s)[0];
@@ -87,6 +118,10 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
         ? s.trim()
         : undefined,
   },
+];
+
+/** The caterer's own rules: vans and ovens, the kitchen, diets, "most of my work". */
+const CATERER_RULES: FactRule[] = [
   {
     field: "equipment",
     read: (s) =>
@@ -110,6 +145,31 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
       return found.length > 0 ? found : undefined;
     },
   },
+];
+
+/** The agency's own rules: the crew, the cameras, what it makes and runs, who it reaches. */
+const AGENCY_RULES: FactRule[] = [
+  {
+    field: "key_personnel",
+    read: (s) =>
+      /\b(crew|project manager|account director|producer|editors?|designers?|copywriters?|media buyers?)\b/i.test(s)
+        ? [clause(s)]
+        : undefined,
+  },
+  {
+    field: "equipment",
+    read: (s) =>
+      /\b(cameras?|drones?|lighting|lights|lenses|edit suite|microphones?|gimbals?|teleprompters?)\b/i.test(s) ? [clause(s)] : undefined,
+  },
+  { field: "search_keywords", read: agencyServices },
+  {
+    field: "differentiators",
+    read: (s) =>
+      /\b(military families|army spouse|bilingual|spanish|captioned|within (?:5|five) minutes)\b/i.test(s) ? [clause(s)] : undefined,
+  },
+];
+
+const SHARED_LAST: FactRule[] = [
   {
     field: "geographic_coverage",
     read: (s) => {
@@ -120,19 +180,41 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
   },
 ];
 
+/** Rules that turn one sentence into one fact. The first rule that fits wins. */
+const FACT_RULES: FactRule[] = [
+  ...SHARED_FIRST,
+  ...byMember({ caterer: CATERER_RULES, agency: AGENCY_RULES }),
+  ...SHARED_LAST,
+];
+
 /** Rules that spot a row that only a document, or a pick from a list, can answer. */
-const UPLOAD_RULES: { field: string; test: RegExp }[] = [
+const SHARED_UPLOADS: { field: string; test: RegExp }[] = [
   { field: "insurance_coverage", test: /\binsurance\b/i },
-  { field: "health_permits", test: /\b(health (permit|department)|food (service )?permit)\b/i },
-  { field: "food_handler_cards", test: /\b(food[- ]handler|servsafe)\b/i },
   { field: "doc_w9", test: /\bw-?9\b/i },
   { field: "doc_tax_returns", test: /\btax returns?\b/i },
-  { field: "doc_haccp_plan", test: /\bhaccp\b/i },
   { field: "doc_capability_statement", test: /\bcapability statement\b/i },
   { field: "psc_codes", test: /\bPSC\b/ },
   { field: "commodity_codes", test: /\bNIGP\b/ },
-  { field: "max_daily_output", test: /\d[\d,]*\s*(meals|plates|trays|lunches|breakfasts)\b.*\b(a day|per day|daily|each day)\b/i },
 ];
+
+const UPLOAD_RULES: { field: string; test: RegExp }[] = byMember({
+  caterer: [
+    SHARED_UPLOADS[0]!,
+    { field: "health_permits", test: /\b(health (permit|department)|food (service )?permit)\b/i },
+    { field: "food_handler_cards", test: /\b(food[- ]handler|servsafe)\b/i },
+    SHARED_UPLOADS[1]!,
+    SHARED_UPLOADS[2]!,
+    { field: "doc_haccp_plan", test: /\bhaccp\b/i },
+    ...SHARED_UPLOADS.slice(3),
+    { field: "max_daily_output", test: /\d[\d,]*\s*(meals|plates|trays|lunches|breakfasts)\b.*\b(a day|per day|daily|each day)\b/i },
+  ],
+  agency: [
+    ...SHARED_UPLOADS,
+    { field: "doc_past_performance", test: /\b(CPARS|performance rating)\b/i },
+    { field: "state_diversity_certifications", test: /\b(small business enterprise|NCSBE|state certification)\b/i },
+    { field: "doc_marketing", test: /\b(reel|portfolio|work samples)\b/i },
+  ],
+});
 
 /** The scripted "model reply" for her words, in the JSON shape the real model returns. */
 export function scriptedReply(text: string): string {

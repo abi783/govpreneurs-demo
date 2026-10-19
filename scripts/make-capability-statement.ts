@@ -1,10 +1,42 @@
-// Builds public/demo-files/haddad-catering-capability-statement.pdf from the story.
-// Run: bun scripts/make-capability-statement.ts
+// Builds the member's one-page capability statement PDF from the story, at the
+// path the persona points to (PERSONA.capabilityStatementFile, in public/).
+// Run: DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
+//      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
+import { MEMBER } from "../src/demo/member";
 import { PAST_PERFORMANCE, PERSONA } from "../src/demo/story/persona";
 
+/** What only one member's statement says. Everything else is read from the persona. */
+const COPY = {
+  caterer: {
+    who: `A woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, founded ${PERSONA.formedOn}. ${PERSONA.employeesW2} staff and one commercial kitchen. We cook, pack and deliver meals for government buyers across North Carolina, Virginia and South Carolina.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Event and ceremony catering from 50 to 600 guests",
+      "HACCP food-safety plan; USDA meal-pattern menus; daily temperature logs",
+    ],
+    extraRows: [] as [string, string][],
+  },
+  // The pack's line (marketing-agency-pack.md §1), then the facts behind it. The
+  // equipment and PSC lines are what My Business reads off this file (members/agency/sc/business.ts).
+  agency: {
+    who: `Woman-owned ad agency 12 miles from Fort Bragg: video, paid social and search, print buying, landing pages and lead routing for campaigns that reach military families. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff and three freelancers. We work across North Carolina, Virginia and South Carolina.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Studio and edit suite on Person Street. Two cinema cameras, a drone and location lighting",
+      "Weekly print buying in local papers, with rates locked in writing",
+    ],
+    extraRows: [
+      ["PSC", "PSC R701 · T006"],
+      ["Contract vehicles", "None yet (no GSA schedule)"],
+    ] as [string, string][],
+  },
+}[MEMBER];
+
 const doc = await PDFDocument.create();
+doc.setTitle(`${PERSONA.businessName} capability statement`);
+doc.setAuthor(PERSONA.businessName);
 const page = doc.addPage([612, 792]);
 const reg = await doc.embedFont(StandardFonts.Helvetica);
 const bold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -40,12 +72,10 @@ function para(t: string, size = 9.5, width = 532) {
 }
 
 heading("Who we are");
-para(`A woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, founded ${PERSONA.formedOn}. ${PERSONA.employeesW2} staff and one commercial kitchen. We cook, pack and deliver meals for government buyers across North Carolina, Virginia and South Carolina.`);
+para(COPY.who);
 y -= 6;
 heading("Core capabilities");
-for (const d of PERSONA.differentiators) para(`•  ${d}`);
-para("•  Event and ceremony catering from 50 to 600 guests");
-para("•  HACCP food-safety plan; USDA meal-pattern menus; daily temperature logs");
+for (const d of COPY.capabilities) para(`•  ${d}`);
 y -= 6;
 heading("Past performance");
 for (const p of PAST_PERFORMANCE) {
@@ -61,13 +91,27 @@ const rows: [string, string][] = [
   ["Primary NAICS", `${PERSONA.primaryNaics} ${PERSONA.primaryNaicsLabel}`],
   ["Other NAICS", PERSONA.secondaryNaics.map((n) => `${n.code} ${n.label}`).join(" · ")],
   ["Certifications", PERSONA.certifications.join(" · ")],
+  ...COPY.extraRows,
   ["SAM", "Active, renewed every year"],
 ];
 for (const [k, v] of rows) {
   page.drawText(k, { x: 40, y, size: 9, font: bold, color: navy });
-  page.drawText(v, { x: 150, y, size: 9, font: reg, color: grey });
+  // A long line wraps under its own column.
+  const words = v.split(" ");
+  let line = "";
+  for (const w of words) {
+    const next = line ? `${line} ${w}` : w;
+    if (reg.widthOfTextAtSize(next, 9) > 422) {
+      page.drawText(line, { x: 150, y, size: 9, font: reg, color: grey });
+      y -= 12;
+      line = w;
+    } else line = next;
+  }
+  page.drawText(line, { x: 150, y, size: 9, font: reg, color: grey });
   y -= 14;
 }
-page.drawText("Sample document for the GovPreneurs demo. Haddad Catering is a fictional business.", { x: 40, y: 30, size: 7.5, font: reg, color: grey });
-writeFileSync("public/demo-files/haddad-catering-capability-statement.pdf", await doc.save());
-console.log("written");
+page.drawText(`Sample document for the GovPreneurs demo. ${PERSONA.businessShortName} is a fictional business.`, { x: 40, y: 30, size: 7.5, font: reg, color: grey });
+const out = `public${PERSONA.capabilityStatementFile}`;
+const bytes = await doc.save();
+writeFileSync(out, bytes);
+console.log(`written ${out} (${bytes.length} bytes)`);

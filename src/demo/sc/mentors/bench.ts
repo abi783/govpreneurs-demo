@@ -2,12 +2,14 @@
 //
 // Sarah Mitchell comes from the story (persona.ts MENTOR), so her name, title
 // and bio are never typed here. The other five mentors are fictional. They
-// have no photo: the Mentors page draws their initials.
+// have no photo: the Mentors page draws their initials. The same six people
+// serve both members; a few lines name the member's kind of work (byMember).
 //
 // `hours` is the Eastern wall-clock window in which the mentor takes calls.
 // `busyShare` is the share of half-hour slots that the sample calendar marks
 // as taken, so that every mentor looks like a person with a real diary.
 
+import { byMember } from "@/demo/member";
 import { MENTOR } from "@/demo/story/persona";
 import { MENTOR_REVIEW_PRICE } from "@/demo/state/wallet";
 import { registerSearchEntries } from "@/demo/nav/searchIndex";
@@ -39,7 +41,11 @@ export const BENCH: BenchMentor[] = [
     title: MENTOR.title,
     bio: MENTOR.bio,
     consultationDescription:
-      "Pick the right bids, check your price, and read your proposal before you send it. Best for food-service and facilities bids.",
+      // DEMO: the line names the member's kind of work.
+      byMember({
+        caterer: "Pick the right bids, check your price, and read your proposal before you send it. Best for food-service and facilities bids.",
+        agency: "Pick the right bids, check your price, and read your proposal before you send it. Best for Army and VA services bids.",
+      }),
     price: MENTOR_REVIEW_PRICE,
     hours: { start: 9, end: 16, lunch: 12 },
     days: [1, 2, 3, 4, 5],
@@ -49,10 +55,20 @@ export const BENCH: BenchMentor[] = [
   {
     id: "mentor-renee-calloway",
     name: "Renee Calloway",
-    title: "Proposal writing and capture · former proposal director",
-    bio: "Renee led proposal teams at a facilities-services contractor for 11 years. She has written or reviewed more than 200 federal proposals.",
-    consultationDescription:
-      "Write an approach section that scores. Bring a draft or a solicitation and Renee will mark what the evaluators will look for.",
+    ...byMember({
+      caterer: {
+        title: "Proposal writing and capture · former proposal director",
+        bio: "Renee led proposal teams at a facilities-services contractor for 11 years. She has written or reviewed more than 200 federal proposals.",
+        consultationDescription:
+          "Write an approach section that scores. Bring a draft or a solicitation and Renee will mark what the evaluators will look for.",
+      },
+      agency: {
+        title: "Proposal writing and GSA schedules · former proposal director",
+        bio: "Renee led proposal teams at a federal communications contractor for 11 years, including two GSA schedule offers. She has written or reviewed more than 200 federal proposals.",
+        consultationDescription:
+          "Write an approach section that scores, or plan a GSA schedule offer. Bring a draft or a solicitation and Renee will mark what the evaluators will look for.",
+      },
+    }),
     price: 110,
     hours: { start: 10, end: 17 },
     days: [1, 2, 3, 4],
@@ -89,9 +105,18 @@ export const BENCH: BenchMentor[] = [
     id: "mentor-calvin-brooks",
     name: "Calvin Brooks",
     title: "Pricing and cost proposals · former Army contract price analyst",
-    bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, food cost and overhead without under-bidding.",
-    consultationDescription:
-      "Build a price that covers your costs and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
+    ...byMember({
+      caterer: {
+        bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, food cost and overhead without under-bidding.",
+        consultationDescription:
+          "Build a price that covers your costs and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
+      },
+      agency: {
+        bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, media buys and overhead without under-bidding.",
+        consultationDescription:
+          "Build a price that covers your costs and still pays you, option years included. Calvin checks your labor rates, media costs and margin line by line.",
+      },
+    }),
     price: 120,
     hours: { start: 11, end: 17 },
     days: [1, 3, 4, 5],
@@ -102,9 +127,18 @@ export const BENCH: BenchMentor[] = [
     id: "mentor-angela-ruiz",
     name: "Angela Ruiz",
     title: "VA contracting and veteran set-asides · former VA contracting officer",
-    bio: "Angela bought food and facility services for VA medical centers for 12 years. She explains how the VA buys and what its evaluators score.",
-    consultationDescription:
-      "Sell to VA medical centers. Learn the VA's forms, its veteran set-aside rules, and how a hospital kitchen contract is scored.",
+    ...byMember({
+      caterer: {
+        bio: "Angela bought food and facility services for VA medical centers for 12 years. She explains how the VA buys and what its evaluators score.",
+        consultationDescription:
+          "Sell to VA medical centers. Learn the VA's forms, its veteran set-aside rules, and how a hospital kitchen contract is scored.",
+      },
+      agency: {
+        bio: "Angela bought outreach, hiring and facility services for VA medical centers for 12 years. She explains how the VA buys and what its evaluators score.",
+        consultationDescription:
+          "Sell to the VA. Learn the VA's forms, its veteran set-aside rules, and how to work under a veteran-owned prime.",
+      },
+    }),
     price: 95,
     hours: { start: 9, end: 14 },
     days: [1, 2, 3, 4],

@@ -4,6 +4,7 @@
 // real system: it is saved in the demo store, the field it is about moves to
 // "Our team is preparing this", and the visitor sees when it will be ready.
 
+import { byMember } from "../member";
 import { PERSONA } from "../story/persona";
 import { isoDaysFromNow } from "../story/clock";
 import { newId, patchField, useDemoState, readDemoState, updateDemoState } from "./store";
@@ -114,16 +115,22 @@ export interface DfyOrder {
 const ORDERS_KEY = "profile.dfyOrders";
 
 function seedOrders(): DfyOrder[] {
-  const s = DFY_SERVICES["sled-nc"];
+  // DEMO: the caterer's home-state enrollment is under way. The agency is already
+  // registered in North Carolina (sled.ts), so hers is Virginia, where the VA work is.
+  const { id, state } = byMember({
+    caterer: { id: "dfy_seed_sled_nc", state: PERSONA.hqState },
+    agency: { id: "dfy_seed_sled_va", state: "VA" },
+  });
+  const s = DFY_SERVICES[state === "VA" ? "sled-va" : "sled-nc"];
   return [
     {
-      id: "dfy_seed_sled_nc",
+      id,
       serviceId: s.id,
       serviceName: s.name,
       price: s.price,
       orderedAt: isoDaysFromNow(-3, 10),
       eta: isoDaysFromNow(4, 17),
-      target: { kind: "sled", state: PERSONA.hqState },
+      target: { kind: "sled", state },
     },
   ];
 }

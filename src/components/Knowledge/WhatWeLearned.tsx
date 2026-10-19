@@ -1,5 +1,6 @@
 import { Sparkles, ArrowRight, Info } from "lucide-react";
 import { useKnowledgeHub } from "../../lib/knowledgeHub";
+import { byMember } from "../../demo/member";
 import { PAST_PERFORMANCE, PERSONA } from "../../demo/story/persona";
 import { fmtLong, fmtMoneyShort } from "../../demo/profile/dates";
 
@@ -22,13 +23,24 @@ const FACTS: LearnedFact[] = [
     text: `UEI ${PERSONA.uei}, CAGE ${PERSONA.cage}. SAM.gov is active until ${fmtLong(PERSONA.samActiveUntil)}.`,
     fromFile: "sam.gov registration",
   },
-  {
-    text: `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} staff hold a current food-handler certificate.`,
-    fromFile: "food-handler",
-  },
-  { text: "Menus and prices for event and contract catering.", fromFile: "menu" },
-  { text: "Allergen labels and halal handling are standard on every tray.", fromFile: "allergen" },
-  { text: `${PERSONA.kitchen}.`, fromFile: "kitchen" },
+  // DEMO: the facts each member's own files hold (lib/knowledgeBase.ts).
+  ...byMember<LearnedFact[]>({
+    caterer: [
+      {
+        text: `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} staff hold a current food-handler certificate.`,
+        fromFile: "food-handler",
+      },
+      { text: "Menus and prices for event and contract catering.", fromFile: "menu" },
+      { text: "Allergen labels and halal handling are standard on every tray.", fromFile: "allergen" },
+      { text: `${PERSONA.kitchen}.`, fromFile: "kitchen" },
+    ],
+    agency: [
+      { text: "Certified woman-owned (WOSB). The certification renews in 41 days.", fromFile: "wosb certification letter" },
+      { text: "Rates for video, paid social and search, and print buying.", fromFile: "rate card" },
+      { text: "Results from the NC Guard recruiting and stormwater campaigns.", fromFile: "campaign results" },
+      { text: `${PERSONA.kitchen}.`, fromFile: "studio" },
+    ],
+  }),
   { text: `${PERSONA.businessName}, ${PERSONA.hqCity} ${PERSONA.hqState}. ${PERSONA.certifications.join(" · ")}.` },
   { text: `Targeting ${PERSONA.targetAgencies.join(", ")}.` },
 ];

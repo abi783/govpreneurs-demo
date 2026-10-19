@@ -1,4 +1,4 @@
-// DEMO: the one summary of Amira's roadmap progress that other pages show
+// DEMO: the one summary of the member's roadmap progress that other pages show
 // (Success Center home, Tasks). OWNER: the Roadmap agent.
 //
 // It is computed from the same sample data the Roadmap page renders (model.ts),

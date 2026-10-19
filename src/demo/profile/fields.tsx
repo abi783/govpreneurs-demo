@@ -5,6 +5,7 @@
 // demo store (store.ts) and laid over these starting values.
 
 import type { ReactNode } from "react";
+import { MEMBER, byMember } from "../member";
 import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../story/persona";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
@@ -97,12 +98,23 @@ const STATE_NAMES: Record<string, string> = { NC: "North Carolina", VA: "Virgini
 const SAM_DAYS = SAM_CHECKED_DAYS_AGO;
 const FORMED_ISO = toIsoDay(PERSONA.formedOn);
 const SECONDARY = PERSONA.secondaryNaics;
-const CORE_CAPABILITIES = [
-  "Contract meal service from one commercial kitchen",
-  "Therapeutic diets (renal, diabetic, pureed)",
-  "Halal and allergen-labeled menus",
-  "Event and ceremony catering",
-];
+// DEMO: the member's own words for her work, and the examples in the boxes.
+const CORE_CAPABILITIES = byMember({
+  caterer: [
+    "Contract meal service from one commercial kitchen",
+    "Therapeutic diets (renal, diabetic, pureed)",
+    "Halal and allergen-labeled menus",
+    "Event and ceremony catering",
+  ],
+  agency: [
+    "Short captioned videos, shot and edited in-house",
+    "Paid social, search and display ads",
+    "Print buying for local papers",
+    "Landing pages and lead routing to a recruiter or caseworker",
+  ],
+});
+const NAICS_EXAMPLE = byMember({ caterer: "722310 Food Service Contractors", agency: "541810 Advertising Agencies" });
+const PSC_EXAMPLE = byMember({ caterer: "S203, S206", agency: "R701, T006" });
 
 // ── validation ───────────────────────────────────────────────────────────────
 
@@ -291,7 +303,7 @@ const DEFS: FieldDef[] = [
       source: `SAM.gov on ${ago(SAM_DAYS)}`,
       at: iso(SAM_DAYS),
     },
-    edit: { type: "text", placeholder: "722310 Food Service Contractors", validate: requiredCheck("a NAICS code") },
+    edit: { type: "text", placeholder: NAICS_EXAMPLE, validate: requiredCheck("a NAICS code") },
     show: (v) => {
       const t = String(v ?? "");
       const m = /^(\d{2,6})\s+(.*)$/.exec(t);
@@ -351,7 +363,7 @@ const DEFS: FieldDef[] = [
     label: "PSC Codes",
     helper: "Auto-derived from your NAICS. Refine if needed.",
     initial: { state: "missing" },
-    edit: { type: "text", placeholder: "S203, S206" },
+    edit: { type: "text", placeholder: PSC_EXAMPLE },
   },
   {
     id: "keywords",
@@ -684,7 +696,11 @@ const DEFS: FieldDef[] = [
     label: "Bonding Capability",
     initial: {
       state: "attested",
-      value: `Up to $${PERSONA.largestBond.toLocaleString("en-US")} (the largest bond you have carried)`,
+      // DEMO: the agency has never carried a bond (ad work is not bonded).
+      value:
+        PERSONA.largestBond > 0
+          ? `Up to $${PERSONA.largestBond.toLocaleString("en-US")} (the largest bond you have carried)`
+          : "None so far. Your work has never needed a bond.",
       source: told(80),
       at: iso(80),
     },
@@ -698,13 +714,17 @@ const DEFS: FieldDef[] = [
     tab: "bidder-profile",
     tier: "T3",
     label: "Teaming Partners",
-    initial: {
-      state: "attested",
-      value: `Subcontractor to Fort Bragg dining prime, ${new Date(
-        findPastPerformance("pp-cdg-sub")!.periodStart,
-      ).getUTCFullYear()}`,
-      source: "From your past performance",
-    },
+    // DEMO: the caterer once worked under a dining prime; the agency has not teamed yet.
+    initial: byMember<FieldDef["initial"]>({
+      caterer: {
+        state: "attested",
+        value: `Subcontractor to Fort Bragg dining prime, ${new Date(
+          findPastPerformance("pp-cdg-sub")!.periodStart,
+        ).getUTCFullYear()}`,
+        source: "From your past performance",
+      },
+      agency: { state: "missing" },
+    }),
     edit: { type: "textarea" },
   },
   { id: "dealbreakers", tab: "bidder-profile", tier: "T3", label: "Bid/No-Bid Deal-Breakers", initial: { state: "missing" }, edit: { type: "textarea" } },
@@ -720,6 +740,8 @@ export function fieldsOnTab(tab: ProfileTab): FieldDef[] {
 }
 
 // ── the food-handler certificates: a count, shown on the Certifications tab ──
+// DEMO: the caterer's row only. The agency has no food handlers, so the row is
+// not on her tab (the capability statement builder still reads it by id).
 
 export const FOOD_HANDLER_DEF: FieldDef = {
   id: "food-handlers",
@@ -732,7 +754,7 @@ export const FOOD_HANDLER_DEF: FieldDef = {
   whyItMatters:
     "School and base dining buyers ask for a current certificate for everyone who handles food. Missing ones cost points.",
 };
-DEFS.push(FOOD_HANDLER_DEF);
+if (MEMBER === "caterer") DEFS.push(FOOD_HANDLER_DEF);
 FIELD_DEFS[FOOD_HANDLER_DEF.id] = FOOD_HANDLER_DEF;
 
 // ── effective values: the starting values with the visitor's changes on top ──

@@ -1,4 +1,4 @@
-// DEMO: the starting My Business record for Amira Haddad.
+// DEMO: the starting My Business record for the member on stage.
 //
 // Every fact comes from the story (`../../story/persona.ts`). Nothing here types a
 // story fact a second time: names, numbers, addresses and past jobs are imported.
@@ -9,7 +9,11 @@
 // `fromMb` into the shape the database would hold. So the lifted components and the
 // validators see exactly what production data looks like.
 //
-// The record is high but not complete, on purpose:
+// This file holds the shared helpers and Amira's (the caterer's) answers. Dana's
+// (the agency's) answers live in `src/demo/members/agency/sc/business.ts` and use
+// the helpers exported here; `buildSeed()` picks the member on stage.
+//
+// Amira's record is high but not complete, on purpose (47 of 55):
 //   - all 14 questions a mentor reads before the first call are answered and sent;
 //   - the EIN, licenses, five-year receipts, key staff, owner citizenship and the
 //     state diversity programs are not answered yet;
@@ -18,6 +22,7 @@
 //   - the health permit (21 days) and the woman-owned certification (48 days) run out
 //     soon, on the same dates as the Stay Ready page.
 
+import { byMember } from "../../member";
 import { PAST_PERFORMANCE, PERSONA, MENTOR } from "../../story/persona";
 import { dateDaysFromNow, isoDaysFromNow } from "../../story/clock";
 import { MEMBER_SINCE_DAYS, POSITIONING_CALL_DAYS_AGO, SAM_CHECKED_DAYS_AGO } from "../timeline";
@@ -55,15 +60,16 @@ import type {
   DemoProposal,
 } from "./types";
 import { MEDIA_LOGO_URL } from "./media";
+import * as agency from "../../members/agency/sc/business";
 
 // ── small helpers ──────────────────────────────────────────────────────────
 
 /** When SAM last checked her registration. */
-function samCheckedOn(): string {
+export function samCheckedOn(): string {
   return isoDaysFromNow(-SAM_CHECKED_DAYS_AGO);
 }
 
-function samCheckedLabel(): string {
+export function samCheckedLabel(): string {
   return new Date(samCheckedOn()).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -71,7 +77,7 @@ function samCheckedLabel(): string {
   });
 }
 
-function samActiveLabel(): string {
+export function samActiveLabel(): string {
   return new Date(`${PERSONA.samActiveUntil}T12:00:00Z`).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -81,36 +87,37 @@ function samActiveLabel(): string {
 }
 
 /** `201 Hay St, Fayetteville, NC 28301` → parts. The story keeps one string. */
-function addressParts(oneLine: string): Address {
+export function addressParts(oneLine: string): Address {
   const [line1, city, region] = oneLine.split(",").map((p) => p.trim());
   const [state, postalCode] = (region ?? "").split(" ");
   return { line1, city, state, postalCode };
 }
 
 /** `PO Box 5512, Fayetteville, NC 28302` → parts. */
-function mailingParts(): Address {
+export function mailingParts(): Address {
   return addressParts(PERSONA.mailingAddress);
 }
 
-const PDF = "application/pdf";
+export const PDF = "application/pdf";
 
-function file(id: string, name: string, sizeBytes: number, daysAgo: number, pages = 1): StoredFile {
+export function file(id: string, name: string, sizeBytes: number, daysAgo: number, pages = 1): StoredFile {
   return { id, name, mime: PDF, sizeBytes, uploadedAt: isoDaysFromNow(-daysAgo), pages };
 }
 
 /** The capability statement is the real sample file in `public/demo-files`. */
-export const CAPABILITY_STATEMENT_NAME = "haddad-catering-capability-statement.pdf";
-export const CAPABILITY_STATEMENT_BYTES = 2960;
+export const CAPABILITY_STATEMENT_NAME = PERSONA.capabilityStatementFile.split("/").pop()!;
+// The agency's number is the size of the file scripts/make-capability-statement.ts writes.
+export const CAPABILITY_STATEMENT_BYTES = byMember({ caterer: 2960, agency: 3305 });
 
 // ── timeline ───────────────────────────────────────────────────────────────
 
 // "Days ago". The numbers are shared with Home, the Roadmap and Tasks (../timeline.ts).
-const JOINED_DAYS_AGO = MEMBER_SINCE_DAYS;
-const INTAKE_SENT_DAYS_AGO = MEMBER_SINCE_DAYS - 8;
+export const JOINED_DAYS_AGO = MEMBER_SINCE_DAYS;
+export const INTAKE_SENT_DAYS_AGO = MEMBER_SINCE_DAYS - 8;
 
 // ── provenance ─────────────────────────────────────────────────────────────
 
-function samSource(span: string, before: string, after?: string): ProvenancePayload {
+export function samSource(span: string, before: string, after?: string): ProvenancePayload {
   return {
     type: "register",
     sourceLabel: "SAM.gov registration",
@@ -123,7 +130,7 @@ function samSource(span: string, before: string, after?: string): ProvenancePayl
   };
 }
 
-function capabilitySource(span: string, before?: string, after?: string): ProvenancePayload {
+export function capabilitySource(span: string, before?: string, after?: string): ProvenancePayload {
   return {
     type: "document",
     sourceLabel: "Your capability statement",
@@ -136,7 +143,7 @@ function capabilitySource(span: string, before?: string, after?: string): Proven
   };
 }
 
-function llcSource(): ProvenancePayload {
+export function llcSource(): ProvenancePayload {
   return {
     type: "document",
     sourceLabel: "Your LLC paperwork",
@@ -153,7 +160,8 @@ function llcSource(): ProvenancePayload {
   };
 }
 
-function hunterChatSource(): ProvenancePayload {
+/** A fact Hunter learned in a chat: what she said, and what Hunter wrote back. */
+export function hunterChatSource(said: string, heard: string, daysAgo = 9): ProvenancePayload {
   return {
     type: "conversation",
     sourceLabel: "Your chat with Hunter",
@@ -164,20 +172,10 @@ function hunterChatSource(): ProvenancePayload {
     conversation: {
       channel: "hunter_chat",
       title: "Hunter chat",
-      occurred_at: isoDaysFromNow(-9),
+      occurred_at: isoDaysFromNow(-daysAgo),
       turns: [
-        {
-          id: "t1",
-          speaker: PERSONA.ownerFirstName,
-          role: "member",
-          text: "I look for dining facility work, school meal programs and anything with therapeutic diets.",
-        },
-        {
-          id: "t2",
-          speaker: "Hunter",
-          role: "assistant",
-          text: "Got it. Dining facility, school meals and therapeutic diets.",
-        },
+        { id: "t1", speaker: PERSONA.ownerFirstName, role: "member", text: said },
+        { id: "t2", speaker: "Hunter", role: "assistant", text: heard },
       ],
       cited_turn_id: "t1",
     },
@@ -187,7 +185,7 @@ function hunterChatSource(): ProvenancePayload {
 
 // ── row builders ───────────────────────────────────────────────────────────
 
-interface RowOptions {
+export interface RowOptions {
   state?: ProfileFieldState;
   originKey?: OriginKey;
   daysAgo?: number;
@@ -197,7 +195,7 @@ interface RowOptions {
 }
 
 /** Lower one authored answer and add the rows (one per key it writes). */
-function rowsFor(fieldKey: string, mb: MbValue, opts: RowOptions = {}): DemoFieldRow[] {
+export function rowsFor(fieldKey: string, mb: MbValue, opts: RowOptions = {}): DemoFieldRow[] {
   const originKey: OriginKey = opts.originKey ?? "member.typed";
   const state: ProfileFieldState = opts.state ?? (originKey === "sam.gov" ? "verified" : "attested");
   const at = isoDaysFromNow(-(opts.daysAgo ?? JOINED_DAYS_AGO));
@@ -232,7 +230,7 @@ const CORE_SERVICES = [
 ] as const;
 
 /** Several options, each with the wording the member read on the form. */
-function pick(fieldKey: string, ...values: string[]): MbValue {
+export function pick(fieldKey: string, ...values: string[]): MbValue {
   const catalog = catalogFor(fieldKey);
   const options = fieldDef(fieldKey)?.options ?? (catalog ? copyFor(catalog).options : undefined) ?? [];
   return {
@@ -241,14 +239,14 @@ function pick(fieldKey: string, ...values: string[]): MbValue {
   };
 }
 
-const NAICS = (code: string, label: string, primary = false): Code => ({
+export const NAICS = (code: string, label: string, primary = false): Code => ({
   system: "NAICS",
   code,
   label,
   ...(primary ? { primary: true } : {}),
 });
 
-function jobFor(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
+export function jobFor(pp: (typeof PAST_PERFORMANCE)[number]): JobEntry {
   const customerType: JobEntry["customerType"] =
     pp.customerType === "local"
       ? "school"
@@ -295,7 +293,7 @@ function foodHandlerCards(): Paper[] {
   }));
 }
 
-function buildRows(): DemoFieldRow[] {
+function catererRows(): DemoFieldRow[] {
   const out: DemoFieldRow[] = [];
   const add = (fieldKey: string, mb: MbValue, opts?: RowOptions) => {
     out.push(...rowsFor(fieldKey, mb, opts));
@@ -582,16 +580,17 @@ function buildRows(): DemoFieldRow[] {
 
 // ── suggestions waiting for a yes or a no ──────────────────────────────────
 
-function buildProposals(): DemoProposal[] {
-  const make = (
-    id: string,
-    fieldKey: string,
-    mb: MbValue,
-    originKey: OriginKey,
-    heard: string | null,
-    provenance: ProvenancePayload,
-    daysAgo: number,
-  ): DemoProposal => ({
+/** One suggestion that waits for a yes or a no. */
+export function proposal(
+  id: string,
+  fieldKey: string,
+  mb: MbValue,
+  originKey: OriginKey,
+  heard: string | null,
+  provenance: ProvenancePayload,
+  daysAgo: number,
+): DemoProposal {
+  return {
     id,
     fieldKey,
     value: fromMb(fieldKey, mb)[fieldKey],
@@ -601,7 +600,11 @@ function buildProposals(): DemoProposal[] {
     provenance,
     proposedAt: isoDaysFromNow(-daysAgo),
     status: "open",
-  });
+  };
+}
+
+function catererProposals(): DemoProposal[] {
+  const make = proposal;
   return [
     make(
       "prop-equipment",
@@ -630,7 +633,10 @@ function buildProposals(): DemoProposal[] {
       list("dining facility", "school meals", "therapeutic diets", "halal catering"),
       "hunter.learned",
       "I look for dining facility work, school meal programs and anything with therapeutic diets.",
-      hunterChatSource(),
+      hunterChatSource(
+        "I look for dining facility work, school meal programs and anything with therapeutic diets.",
+        "Got it. Dining facility, school meals and therapeutic diets.",
+      ),
       9,
     ),
   ];
@@ -683,6 +689,11 @@ function naicsBySource(): NaicsBySource {
   };
 }
 
+/** The logo the record starts with: a drawn mark with the business's initials. */
+export function startingLogo(): string {
+  return byMember({ caterer: MEDIA_LOGO_URL, agency: agency.AGENCY_LOGO_URL });
+}
+
 export function buildSeed(): DemoBusinessState {
   const naics = naicsBySource();
   const allCodes = [
@@ -690,11 +701,11 @@ export function buildSeed(): DemoBusinessState {
     ...PERSONA.secondaryNaics.map((n) => n.code),
   ];
   return {
-    rows: buildRows(),
-    proposals: buildProposals(),
+    rows: byMember({ caterer: catererRows, agency: agency.agencyRows })(),
+    proposals: byMember({ caterer: catererProposals, agency: agency.agencyProposals })(),
     intakeSentAt: isoDaysFromNow(-INTAKE_SENT_DAYS_AGO),
     intakeSentMentor: MENTOR.name,
-    media: { photoUrl: null, logoUrl: MEDIA_LOGO_URL },
+    media: { photoUrl: null, logoUrl: startingLogo() },
     naicsCodes: allCodes,
     naicsBySource: naics,
     onboarding: {
