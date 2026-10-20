@@ -38,11 +38,11 @@
 
 .start-shot { margin: 0; }
 .start-shot img { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--sh-rest); }
-.start-shot figcaption { color: var(--text-3); margin-top: var(--s-2); }
+.start-shot figcaption { color: var(--text-2); margin-top: var(--s-2); }
 
-.start-proof { color: var(--text-2); font-size: 14px; line-height: 1.5; border-left: 3px solid var(--accent); padding-left: var(--s-3); }
+.start-proof { color: var(--text-2); font-size: 14px; line-height: 1.5; }
 .start-proof b { color: var(--text-ink); font-size: 16px; }
-.start-proof .t-caption { color: var(--text-3); }
+.start-proof .t-caption { color: var(--text-2); }
 
 @media (min-width: 960px) {
   .start-landing {
@@ -95,7 +95,7 @@
 .start-tile.is-on { border-color: var(--accent); background: var(--blue-1); color: var(--text-ink); }
 
 .start-go { width: 100%; }
-.start-note { color: var(--text-3); }
+.start-note { color: var(--text-2); }
 
 /* Bots fill every field; people never see this one. */
 .start-trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
