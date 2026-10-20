@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
 // Tests for the demo's Hunter feed and chat. They read the story, so a change to
 // the story that breaks a claim here is a change to look at.
+// The caterer's facts are named here; hunter.agency.test.ts holds the agency's.
 
 import { beforeEach, describe, expect, it } from "vitest";
+import { MEMBER } from "../member";
 import { OPPORTUNITIES, FOR_YOU } from "../story/opportunities";
 import { PERSONA } from "../story/persona";
 import { daysUntil } from "../../lib/format";
@@ -19,6 +21,8 @@ import { handleHunterMessage } from "./chat/engine";
 import { CANON } from "./chat/intents";
 import type { ServerFilters } from "../../lib/discoverApi";
 import type { HunterFilterDelta, HunterTurnResponse } from "../../lib/hunterChat";
+
+const CATERER = MEMBER === "caterer";
 
 const BANNED_WORDS = /\b(win|wins|winning|guarantee\w*|no-bid|lean bid)\b/i;
 const OLD_PERSONA =
@@ -96,7 +100,7 @@ describe("feed rows", () => {
 describe("filters, sort and page", () => {
   const all = () => allRows();
 
-  it("filters by every facet", () => {
+  it.runIf(CATERER)("filters by every facet", () => {
     const cases: [ServerFilters, (r: ReturnType<typeof allRows>[number]) => boolean][] = [
       [{ setAsides: ["WOSB"] }, (r) => r.setAside === "WOSB"],
       [{ setAsides: ["SB"] }, (r) => r.setAside === "SBA"],
@@ -130,7 +134,7 @@ describe("filters, sort and page", () => {
     }
   });
 
-  it("searches titles, agency, place and codes", () => {
+  it.runIf(CATERER)("searches titles, agency, place and codes", () => {
     const find = (q: string) => applyFilters(all(), { search: q }).map((r) => r.id);
     expect(find("Fort Bragg dining")).toContain("W912EE-26-R-0066");
     expect(find("catering").length).toBeGreaterThan(3);
@@ -141,7 +145,7 @@ describe("filters, sort and page", () => {
     expect(find("zzzz")).toEqual([]);
   });
 
-  it("sorts by deadline, value, newest and match", () => {
+  it.runIf(CATERER)("sorts by deadline, value, newest and match", () => {
     const rows = all();
     const deadlines = sortRows(rows, { field: "deadline", order: "asc" }, "all").map(
       (r) => r.o.closesInDays,
@@ -174,7 +178,7 @@ describe("filters, sort and page", () => {
     expect(saved.map((r) => r.id)).toEqual(savedRows().map((r) => r.id));
   });
 
-  it("pages with totalPages = ceil(total / limit)", () => {
+  it.runIf(CATERER)("pages with totalPages = ceil(total / limit)", () => {
     const page = pageOf(all(), 2, 20);
     expect(page.data.length).toBe(20);
     expect(page.totalPages).toBe(Math.ceil(all().length / 20));
@@ -218,8 +222,9 @@ describe("filters, sort and page", () => {
   });
 
   it("leaves out a facet's own filter when it counts that facet", () => {
-    const counts = facetCounts({ location: { states: ["NC"] } }, "all");
-    expect(counts.states.VA).toBeGreaterThan(0);
+    // Filter on a state with no rows: the state counts still show NC, so the filter is left out.
+    const counts = facetCounts({ location: { states: ["ZZ"] } }, "all");
+    expect(counts.states.NC).toBeGreaterThan(0);
   });
 });
 
@@ -240,7 +245,7 @@ describe("Hunter's take", () => {
     for (const o of FOR_YOU) expect(hunterLine(rowById(o.id)!)).toBe(o.hunter.line);
   });
 
-  it("builds a true line from the facts where it has none", () => {
+  it.runIf(CATERER)("builds a true line from the facts where it has none", () => {
     const row = rowById("W912PM-26-Q-0102")!; // Meal delivery, Fort Bragg, 610K-890K, SBA
     const line = generatedLine(row);
     expect(line).toContain("Meal delivery to Fort Bragg legacy housing");
@@ -270,7 +275,7 @@ describe("NAICS and PSC lookups", () => {
     expect(got.sort()).toEqual([...codes].sort());
   });
 
-  it("finds food-service words and codes first", () => {
+  it.runIf(CATERER)("finds food-service words and codes first", () => {
     expect(searchNaics("catering")[0].code).toBe("722320");
     expect(searchNaics("food")[0].code).toBe("722310");
     expect(searchNaics("mobile food")[0].code).toBe("722330");
@@ -326,7 +331,7 @@ const STARTERS = [
   "Why does the Fort Bragg Sources Sought notice match me?",
 ];
 
-describe("Hunter chat on the Forecasts page", () => {
+describe.runIf(CATERER)("Hunter chat on the Forecasts page", () => {
   const visibleOpps = [
     {
       oppKey: "fc-1",
@@ -371,7 +376,7 @@ describe("Hunter chat on the Forecasts page", () => {
   });
 });
 
-describe("Hunter chat", () => {
+describe.runIf(CATERER)("Hunter chat", () => {
   it("answers every starter and opener with a specific reply, never the fallback", () => {
     for (const q of STARTERS) {
       const r = ask(q);

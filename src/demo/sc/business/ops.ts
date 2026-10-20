@@ -41,9 +41,10 @@ import { computeNaics } from "@sc/lib/naics/computeNaics";
 import { dcDomainMatch, dcOptOut, dcProvidedHref } from "@sc/lib/digitalCompliance";
 import { DIGITAL_COMPLIANCE_FIELDS } from "@sc/lib/roadmapV3/forms";
 import type { MyBusinessPayload } from "@sc/lib/businessProfile/payload";
-import { demoExtract } from "./demoTell";
-import { MEDIA_LOGO_URL, imageToDataUrl, initialsAvatar } from "./media";
+import { TELL_SAMPLE, demoExtract } from "./demoTell";
+import { imageToDataUrl, initialsAvatar } from "./media";
 import { buildPayload } from "./payload";
+import { startingLogo } from "./seed";
 import { readBusiness, updateBusiness, writeBusiness } from "./state";
 import type {
   DemoBusinessState,
@@ -365,10 +366,8 @@ export function tellHunter(body: unknown) {
 
 /** POST .../business-profile/tell/transcribe: the demo has no microphone model. */
 export function transcribe() {
-  return {
-    text:
-      "We cook and deliver up to 1,100 meals a day from our kitchen in Fayetteville. We have two refrigerated vans for same-day delivery. We can wait 30 days to be paid. We want to win our first prime contract in the next 90 days.",
-  };
+  // DEMO: the member's sample sentence (demoTell.ts), so the words fit her business.
+  return { text: TELL_SAMPLE };
 }
 
 // ── uploads ────────────────────────────────────────────────────────────────
@@ -430,7 +429,7 @@ export async function storeMedia(body: unknown) {
   if ((type !== "contact" && type !== "logo") || !file) return refuse(400, "Send an image.");
   const url = await imageToDataUrl(
     file,
-    type === "logo" ? MEDIA_LOGO_URL : initialsAvatar(`${PERSONA.ownerFirstName[0]}${PERSONA.ownerName.split(" ")[1]?.[0] ?? ""}`),
+    type === "logo" ? startingLogo() : initialsAvatar(`${PERSONA.ownerFirstName[0]}${PERSONA.ownerName.split(" ")[1]?.[0] ?? ""}`),
   );
   updateBusiness((s) => ({
     ...s,

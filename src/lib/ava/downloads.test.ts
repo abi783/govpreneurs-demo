@@ -4,6 +4,7 @@
 // approved answers printed as blanks. Run: bun test src/lib/ava
 
 import { describe, expect, test } from "vitest";
+import { PERSONA } from "../../demo/story/persona";
 import { CASES } from "./cases";
 import { effectiveBid } from "./derive";
 import { getAvaBid } from "./fixtures";
@@ -114,6 +115,8 @@ describe("forms", () => {
     }
     // The stored fact, never the question's sentence (round 2).
     const employees = approved.find((a) => a.id === "ask-employees");
-    if (employees) expect(answerOnForm(ctx.bid, ctx.s, employees, "")).toBe("5");
+    // DEMO: the count is the member on stage's (src/demo/member.ts).
+    if (employees)
+      expect(answerOnForm(ctx.bid, ctx.s, employees, "")).toBe(String(PERSONA.employeesW2));
   });
 });

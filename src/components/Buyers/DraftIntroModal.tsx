@@ -3,9 +3,21 @@ import { useMemo, useState } from "react";
 import { X, Mail, CheckCircle2, Copy } from "lucide-react";
 import type { GovBuyer, BuyerOfficer } from "@/lib/mock/governmentBuyers";
 import { logBuyerOutreach } from "@/lib/outreachLog";
-import { PERSONA } from "@/demo/story/persona";
+import { PERSONA, PAST_PERFORMANCE } from "@/demo/story/persona";
+import { byMember, own } from "@/demo/member";
 
-function defaultIntro(buyer: GovBuyer, officer: BuyerOfficer): string {
+const copy = own(
+  import.meta.glob<typeof import("../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
+// DEMO: each member's intro speaks for her own business.
+const defaultIntro = byMember({ pack: copy.buyerIntro, caterer: catererIntro });
+
+function k(n: number): string {
+  return `$${Math.round(n / 1000)}K`;
+}
+
+function catererIntro(buyer: GovBuyer, officer: BuyerOfficer): string {
   return `Subject: Introduction — ${PERSONA.businessName} (WOSB, ${PERSONA.hqCity})
 
 Dear ${officer.name},

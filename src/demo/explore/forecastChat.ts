@@ -1,14 +1,23 @@
 // Grant's words on the Forecasts pages: the one-line takes on the list cards and
 // the scripted answers in the chat on a forecast page. Everything here reads
 // the forecast record and Amira's facts, so the numbers are true for her.
+// DEMO: two members. The agency's story lines are in src/demo/members/agency/market/forecasts.ts.
 
 import { daysToDay } from "./dates";
-import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "@/demo/story/persona";
+import { byMember, MEMBER, own } from "@/demo/member";
+import { KEY_PARTNER, PAST_PERFORMANCE, findPastPerformance, PERSONA } from "@/demo/story/persona";
+import { holds, OWN, SET_ASIDES } from "@/demo/story/setAsides";
 import type { ForecastRecordDto } from "@/lib/forecastsApi";
 import { forecastRecord, FORECAST_MEMBER, scoredRow } from "./forecastData";
 import { FORT_BRAGG_FORECAST_KEY, POPE_FORECAST_KEY, SEYMOUR_FORECAST_KEY, CUMBERLAND_SUMMER_KEY } from "./forecastLocalSeeds";
 
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/forecasts")>("/src/demo/members/*/market/forecasts.ts", { eager: true }),
+);
+
 const BIGGEST = FORECAST_MEMBER.biggestPastJob ?? 0;
+/** Where the member works from. */
+const BASE = byMember({ pack: pack.CHAT.base, caterer: "kitchen" });
 
 function money(n: number): string {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
@@ -37,6 +46,7 @@ export function cardTakeLine(oppKey: string): string | null {
   const r = forecastRecord(oppKey);
   if (!r) return null;
   const when_ = expectedDays(r) == null ? "" : ` Expected ${weeksOrMonths(Math.max(expectedDays(r) as number, 0))}.`;
+  if (MEMBER !== "caterer") return pack.cardLine(oppKey, r, when_, BIGGEST);
   switch (oppKey) {
     case FORT_BRAGG_FORECAST_KEY:
       return `The Army's next dining program for Fort Bragg, planned after the two-hall contract it is bidding now. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} it is far above your ${money(BIGGEST)} largest job, so plan to team up.${when_}`;
@@ -60,12 +70,12 @@ export function cardTakeLine(oppKey: string): string | null {
 // ── The chat on a forecast page ───────────────────────────────────────────────
 
 const SUGGESTIONS =
-  "Try one of these: “When will the bid request come?”, “Can I bid as a woman-owned business?”, “Is it the right size for me?”, “Should I team up?” or “What should I do first?”";
+  `Try one of these: “When will the bid request come?”, “Can I bid as a ${SET_ASIDES[OWN].short} business?”, “Is it the right size for me?”, “Should I team up?” or “What should I do first?”`;
 
 function placeSentence(r: ForecastRecordDto): string {
   const city = r.popCity?.trim();
   const state = r.popState?.trim();
-  if (!state && !city) return "The forecast does not name a place yet, so I cannot say how far it is from your kitchen.";
+  if (!state && !city) return `The forecast does not name a place yet, so I cannot say how far it is from your ${BASE}.`;
   const where = [city, state].filter(Boolean).join(", ");
   if (state && FORECAST_MEMBER.states.includes(state)) {
     return `The work is in ${where}. ${state} is one of the states you serve (${FORECAST_MEMBER.states.join(", ")}).`;
@@ -89,13 +99,30 @@ function sizeSentence(r: ForecastRecordDto): string {
 function whoSentence(r: ForecastRecordDto): string {
   const code = r.setAsideCode?.trim().toUpperCase() ?? "";
   if (code === "WOSB" || code === "WOSBSS") {
-    return "The Army plans this for women-owned small businesses. You are certified as woman-owned, so you qualify to bid. Keep your certificate current.";
+    return holds("WOSB")
+      ? "The Army plans this for women-owned small businesses. You are certified as woman-owned, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for women-owned small businesses. You are not certified as woman-owned, so you cannot bid it as the prime. You can join a woman-owned prime's team as a subcontractor.";
+  }
+  if (code === "SDVOSBC" || code === "SDVOSBS") {
+    return holds("SDVOSBC")
+      ? "The buyer plans this for service-disabled veteran-owned small businesses. You are one, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for service-disabled veteran-owned small businesses. You are not one, so you cannot bid it as the prime. You can join a veteran-owned prime's team as a subcontractor.";
+  }
+  if (code === "HZC" || code === "HZS") {
+    return holds("HZC")
+      ? "The buyer plans this for HUBZone small businesses. You are HUBZone-certified, so you qualify to bid. Keep your certificate current."
+      : "The buyer plans this for HUBZone small businesses. You are not HUBZone-certified, so you cannot bid it as the prime. You can join a HUBZone prime's team as a subcontractor.";
+  }
+  if (code === "8A" || code === "8AN") {
+    return holds("8A")
+      ? "The buyer plans this for firms in the SBA's 8(a) program. You are in it, so you qualify to bid. Keep your 8(a) status current."
+      : "The buyer plans this for firms in the SBA's 8(a) program. You are not in it, so you cannot bid it as the prime. You can join an 8(a) prime's team as a subcontractor.";
   }
   if (code === "SBA" || code === "SBP") {
     return "The buyer plans this for small businesses. You are a small business, so you can bid.";
   }
   if (!code || code === "TBD") {
-    return "The buyer has not decided who may bid yet. A reply to the buyer's market study can help them choose a set-aside. Your woman-owned certificate would count if they pick that route.";
+    return `The buyer has not decided who may bid yet. A reply to the buyer's market study can help them choose a set-aside. ${OWN === "SBA" ? "Your small-business size" : `Your ${SET_ASIDES[OWN].short} certificate`} would count if they pick that route.`;
   }
   return "The record names a program set-aside that I cannot match to your certificates. Check the program rules before you plan a bid.";
 }
@@ -113,13 +140,17 @@ function samSentence(r: ForecastRecordDto): string {
 
 function teamSentence(r: ForecastRecordDto): string {
   if (r.oppKey === FORT_BRAGG_FORECAST_KEY) {
+    if (MEMBER !== "caterer") return pack.CHAT.teamUp;
     return `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) has held Fort Bragg dining since 2019 and is looking for woman-owned catering subcontractors. You worked for them as a subcontractor in 2024. Open Partners to see their card.`;
   }
   const high = r.valHigh ?? 0;
   if (high > BIGGEST * 5) {
-    return "Yes, this is bigger than a job you can prime alone. Look in Partners for a prime that wins work like this and wants a woman-owned subcontractor.";
+    return `Yes, this is bigger than a job you can prime alone. Look in Partners for a prime that wins work like this and wants a ${SET_ASIDES[OWN].short} subcontractor.`;
   }
-  return "You do not need a partner for the size of this one. A partner can still help if the buyer asks for more staff than five people.";
+  return byMember({
+    pack: pack.CHAT.smallTeam,
+    caterer: "You do not need a partner for the size of this one. A partner can still help if the buyer asks for more staff than five people.",
+  });
 }
 
 function firstStep(r: ForecastRecordDto): string {
@@ -157,10 +188,12 @@ export function forecastGrantReply(oppKey: string, message: string): string {
     return `${firstStep(r)} ${when(r)}.`;
   }
   if (has(/\b(mentor|sarah|review)\b/)) {
+    if (MEMBER !== "caterer") return pack.CHAT.mentor;
     return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
-    const best = PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub") ?? PAST_PERFORMANCE[0];
+    if (MEMBER !== "caterer") return pack.CHAT.past;
+    const best = findPastPerformance("pp-cdg-sub") ?? PAST_PERFORMANCE[0];
     return `Your closest past work is ${best.projectTitle} (${money(best.totalValue)}, ${best.periodStart.slice(0, 4)}). Your Womack contract ($126K) shows federal prime work, and Cumberland County Schools ($198K) shows daily volume.`;
   }
   if (has(/\b(compet|who wins|winner|incumbent|who has)\b/)) {

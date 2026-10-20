@@ -71,7 +71,7 @@ import { buyerPeople } from "../../../demo/ava/contacts";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import {
   KEY_PARTNER,
-  PAST_PERFORMANCE,
+  PAST_PERFORMANCE, findPastPerformance,
   PERSONA,
   type PastPerformanceId,
 } from "../../../demo/story/persona";
@@ -91,7 +91,7 @@ const { primary: CO, second: CS } = buyerPeople(NOTICE_ID);
 const POSTED_DAYS_AGO = STORY.postedDaysAgo;
 const CLOSES_IN_DAYS = STORY.closesInDays;
 
-const job = (id: PastPerformanceId) => PAST_PERFORMANCE.find((p) => p.id === id)!;
+const job = (id: PastPerformanceId) => findPastPerformance(id)!;
 const FORT_BRAGG_JOB = job("pp-cdg-sub");
 const SCHOOLS_JOB = job("pp-county-schools");
 const CHURCH_JOB = job("pp-church");
@@ -377,7 +377,7 @@ const P_SERVSAFE: Proof = profile(
   `Food safety training, entered ${D(-19)}`,
   `${PERSONA.foodHandlerCertified} of ${PERSONA.employeesW2} employees hold a current food-handler (ServSafe) certificate`,
 );
-const P_KITCHEN: Proof = profile("Your kitchen and vans", PERSONA.kitchen);
+const P_KITCHEN: Proof = profile("Your kitchen and vans", (PERSONA.kitchen ?? ""));
 const P_PP2_SCOPE: Proof = profile(PP2_AT, FORT_BRAGG_LINES[0]);
 const P_PP2_LINE: Proof = profile(PP2_AT, FORT_BRAGG_LINES[1]);
 const P_PP2_ROLE: Proof = profile(PP2_AT, `${FORT_BRAGG_JOB.customerName}. ${FORT_BRAGG_LINES[0]}`);
@@ -648,7 +648,7 @@ export const fortBraggReplyBid: AvaBid = {
     },
     {
       label: "Kitchen and vans",
-      value: PERSONA.kitchen,
+      value: (PERSONA.kitchen ?? ""),
       from: "Your GovPreneurs profile",
     },
     {

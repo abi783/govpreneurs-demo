@@ -7,6 +7,7 @@
 // Booking the quarterly targeting call on the Roadmap, or from here, ticks its task.
 
 import { avaSentAt, cumberlandCertificatesIn } from "@/demo/ava/progress";
+import { byMember } from "@/demo/member";
 import type {
   BookingStepView,
   MemberTaskSection,
@@ -17,7 +18,7 @@ import type {
 import { displaySource } from "@sc/lib/tasks/read";
 import { PROGRAM_TZ } from "@sc/lib/businessProfile/deadline";
 import { CALL_STEP_IDS } from "@sc/lib/callStepIds";
-import { OPPORTUNITIES } from "@/demo/story/opportunities";
+import { HERO_IDS, OPPORTUNITIES } from "@/demo/story/opportunities";
 import { KEY_PARTNER, MENTOR } from "@/demo/story/persona";
 import { MENTOR_REVIEWS, TASKS, type StoryTask } from "@/demo/story/workspace";
 import { isoDaysFromNow } from "@/demo/story/clock";
@@ -72,7 +73,65 @@ const DUE_REASON: Record<string, string> = {
   "task-send-reply": "before the notice closes",
   "task-contact-cdg": "so a team bid is still possible",
   "task-targeting-call": "before your next quarter starts",
+  // DEMO: the agency's tasks (members/agency/workspace.ts).
+  "task-ava-family-advocacy": "so Ava can finish the quote",
+  "task-app-question": "before questions close",
+  "task-bluestone": "so a team bid is still possible",
+  "task-print-quotes": "so you can price five years of print",
+  "task-rating": "before the Guard's next campaign",
+  // DEMO: the contractor's tasks (members/construction/workspace.ts).
+  "task-ava-training-building": "so Ava can finish the bid",
+  "task-surety": "so you can post the bid bond",
+  "task-blackjack-oak": "so a team bid is still possible",
+  "task-lead-times": "so you know the job fits 240 days",
+  "task-site-visit": "when the site visit is held",
+  "task-wage-class": "before questions close",
+  "task-va-sources-sought": "before the sources sought closes",
+  "task-hubzone-recert": "so your HUBZone status does not lapse",
+  // DEMO: the janitorial firm's tasks (members/janitorial/workspace.ts); it shares the two above.
+  "task-ava-pressure-washing": "so Ava can finish the quote",
+  "task-sarah-rest-area": "before the rest-area bid opens",
+  "task-ashepoo": "so a team bid is still possible",
+  "task-sandblasting-question": "before questions close",
+  "task-blasting-sub": "so sandblasting fits your price",
+  "task-cor-letter": "while the COR remembers the job",
+  // DEMO: the trucking company's tasks (members/trucking/workspace.ts).
+  "task-ava-va-routes": "so Ava can finish the quote",
+  "task-license-question": "before questions close",
+  "task-fuel-price": "so you can price five years of diesel",
+  "task-courier-notes": "so you can use her notes in your quote",
+  "task-brightwater": "so a team bid is still possible",
+  "task-interim-rating": "while the contracting officer remembers the job",
+  // DEMO: the IT services firm's tasks (members/it/workspace.ts).
+  "task-ava-help-desk": "so Ava can finish the quote",
+  "task-security-plus": "so all six techs hold it on day one",
+  "task-brackwater": "so a team bid is still possible",
+  "task-wage-floor": "so your price passes the first check",
+  "task-gear-question": "before questions close",
+  "task-seymour-cpars": "so it goes in with your quote",
+  "task-pope-sources-sought": "before the sources sought closes",
+  "task-cmmc-items": "before a job asks for your score",
+  // DEMO: the consulting firm's tasks (members/consulting/workspace.ts).
+  "task-ava-va-program": "so Ava can finish the quote",
+  "task-count-hours": "so your own staff carry half the work",
+  "task-halyard-point": "so a team bid is still possible",
+  "task-coach-question": "before Q&A closes",
+  "task-interim-cpars": "while the contracting officer remembers the job",
+  "task-sub-certificate": "so it goes in with your quote",
+  "task-vetcert-renewal": "so VA sees it active at award",
+  "task-gsa-offer": "because an offer takes months",
 };
+
+/** DEMO: tasks that Ava finishes when Tim does the step in Ava during a call. */
+function doneInAva(id: string): boolean {
+  return byMember({
+    caterer: () =>
+      (id === "task-send-reply" && !!avaSentAt("W912EE-27-S-0004")) ||
+      (id === "task-certificates" && cumberlandCertificatesIn()),
+    // A quote she has sent had its three questions answered.
+    pack: () => id === TASKS.find((t) => t.to === `/ava/${HERO_IDS.hero}`)?.id && !!avaSentAt(HERO_IDS.hero),
+  })();
+}
 
 function shortDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -82,9 +141,9 @@ function shortDate(iso: string): string {
   });
 }
 
-/** The opportunity a task's button opens, when it opens one. */
+/** The opportunity a task's button opens (in Ava or on its own page), when it opens one. */
 function opportunityFor(to: string) {
-  const id = /^\/ava\/([^/?#]+)/.exec(to)?.[1];
+  const id = /^\/(?:ava|opportunities)\/([^/?#]+)/.exec(to)?.[1];
   return id ? OPPORTUNITIES.find((o) => o.id === id) : undefined;
 }
 
@@ -122,12 +181,14 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
       occurredAt: ago(review?.lastMessageDaysAgo ?? 0),
     });
   } else if (t.source === "grant" || t.source === "partners") {
+    // DEMO: a Grant task about one opportunity names it; a team-up task names the partner.
+    const opp = t.to === "/partners" ? undefined : opportunityFor(t.to);
     out.push({
       ...base,
       kind: "SYSTEM",
       isPrimary: true,
       refId: `grant:${t.id}`,
-      label: `Grant · ${KEY_PARTNER.name}`,
+      label: `Grant · ${opp?.plainTitle ?? KEY_PARTNER.name}`,
       actorName: "Grant",
       occurredAt: ago(1),
     });
@@ -187,12 +248,9 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
 function viewFor(t: StoryTask, now: Date): TaskView {
   const change = getChanges()[t.id] ?? {};
   const booked = t.id === "task-targeting-call" && !!bookingForCall(CALL_STEP_IDS.targeting);
-  // DEMO: tasks that Ava finishes when Tim does the step in Ava during a call.
-  const doneInAva =
-    (t.id === "task-send-reply" && !!avaSentAt("W912EE-27-S-0004")) ||
-    (t.id === "task-certificates" && cumberlandCertificatesIn());
+  const finishedInAva = doneInAva(t.id);
 
-  const status: TaskView["status"] = change.status ?? (t.done || booked || doneInAva ? "done" : "open");
+  const status: TaskView["status"] = change.status ?? (t.done || booked || finishedInAva ? "done" : "open");
   const auto = t.source === "roadmap";
   const open = status === "open";
 
@@ -202,7 +260,7 @@ function viewFor(t: StoryTask, now: Date): TaskView {
     if (change.status === "done") {
       doneAt = change.doneAt ?? now.toISOString();
       doneBy = change.doneBy ?? "member";
-    } else if (doneInAva) {
+    } else if (finishedInAva) {
       doneAt = now.toISOString();
       doneBy = "auto:ava";
     } else if (booked) {

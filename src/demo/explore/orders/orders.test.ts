@@ -3,6 +3,7 @@
 // serves every order once, and that no real company or old-member word leaks in.
 
 import { describe, expect, it } from "vitest";
+import { MEMBER } from "@/demo/member";
 import { mayBid } from "@/lib/microPurchases/relevance";
 import { biddablePairsFromCensus, reasonGroupsFromCensus } from "@/lib/microPurchases/restrictedGroups";
 import { daysUntil } from "@/demo/story/clock";
@@ -13,10 +14,13 @@ import { orderPaperPdf } from "./paper";
 import { SUPPLIERS, supplierNames } from "./suppliers";
 import { acquisitionCodeDocuments } from "./acquisitionCodes";
 
+// DEMO: these hold the caterer's board. The agency's is held by agency.test.ts.
+const caterer = describe.runIf(MEMBER === "caterer");
+
 const open = ORDERS.filter((o) => mayBid(o));
 const closed = ORDERS.filter((o) => !mayBid(o));
 
-describe("the sample orders", () => {
+caterer("the sample orders", () => {
   it("holds 14 orders Amira may bid and 6 she may not", () => {
     expect(ORDERS).toHaveLength(20);
     expect(open).toHaveLength(14);
@@ -79,7 +83,7 @@ describe("the sample orders", () => {
   });
 });
 
-describe("the board's server rules", () => {
+caterer("the board's server rules", () => {
   it("lists the pairs she may bid, and four reasons for the rest", () => {
     const census = codeCensus();
     expect(census.total).toBe(20);
@@ -135,7 +139,7 @@ describe("the board's server rules", () => {
   });
 });
 
-describe("the sample files and tables", () => {
+caterer("the sample files and tables", () => {
   it("makes a real PDF for each order that has a paper", () => {
     for (const o of ORDERS) {
       const bytes = orderPaperPdf(o.id);

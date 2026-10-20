@@ -11,6 +11,25 @@
 
 import { extract, amountIn, daysIn, saidNumbers, sentences, type Extraction } from "@sc/lib/businessProfile/tellExtract";
 import { readTellReply } from "@sc/lib/businessProfile/tellModel";
+import { byMember, own } from "../../member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
+
+const { TELL_SAMPLE: PACK_SAMPLE } = own(
+  import.meta.glob<typeof import("../../members/agency/sc/business")>("/src/demo/members/*/sc/business.ts", { eager: true }),
+);
+
+/**
+ * The sentence "Say it out loud" types into the box (D56: no microphone). Each
+ * sentence lands on a different row, so the reply shows what it understood.
+ */
+export const TELL_SAMPLE = byMember({
+  caterer:
+    "We cook and deliver up to 1,100 meals a day from our kitchen in Fayetteville. We have two refrigerated vans for same-day delivery. We can wait 30 days to be paid. We want to win our first prime contract in the next 90 days.",
+  pack: PACK_SAMPLE,
+});
 
 interface Fact {
   field: string;
@@ -48,8 +67,16 @@ function phrases(sentence: string): string[] {
     .filter((p) => p !== "");
 }
 
-/** Rules that turn one sentence into one fact. The first rule that fits wins. */
-const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] = [
+type FactRule = { field: string; read: (s: string) => unknown | undefined };
+
+/** Things one member names when she says how many jobs she can run at once. */
+const JOB_WORDS = byMember({
+  caterer: /\b(jobs|contracts|events|orders)\b/i,
+  pack: copy.JOB_WORDS,
+});
+
+/** Rules every member's words go through, in this order. */
+const SHARED_FIRST: FactRule[] = [
   {
     field: "payment_terms_tolerance",
     read: (s) => (/\b(paid|payment|invoice)/i.test(s) ? (daysIn(s) ?? undefined) : undefined),
@@ -62,7 +89,7 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
   {
     field: "concurrent_contract_capacity",
     read: (s) => {
-      if (!/\b(jobs|contracts|events|orders)\b/i.test(s) || !/(at once|at the same time|at a time|concurrent)/i.test(s)) {
+      if (!JOB_WORDS.test(s) || !/(at once|at the same time|at a time|concurrent)/i.test(s)) {
         return undefined;
       }
       return saidNumbers(s)[0];
@@ -87,6 +114,10 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
         ? s.trim()
         : undefined,
   },
+];
+
+/** The caterer's own rules: vans and ovens, the kitchen, diets, "most of my work". */
+const CATERER_RULES: FactRule[] = [
   {
     field: "equipment",
     read: (s) =>
@@ -110,6 +141,24 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
       return found.length > 0 ? found : undefined;
     },
   },
+];
+
+/** A pack member's rules, from her pack's words (copy.TELL_RULES). */
+const PACK_RULES: FactRule[] = [
+  { field: "key_personnel", read: (s) => (copy.TELL_RULES.personnel.test(s) ? [clause(s)] : undefined) },
+  { field: "equipment", read: (s) => (copy.TELL_RULES.equipment.test(s) ? [clause(s)] : undefined) },
+  {
+    field: "search_keywords",
+    read: (s) => {
+      if (!copy.TELL_RULES.serviceVerbs.test(s)) return undefined;
+      const found = [...new Set([...s.matchAll(copy.TELL_RULES.services)].map((m) => m[0].toLowerCase()))];
+      return found.length > 0 ? found : undefined;
+    },
+  },
+  { field: "differentiators", read: (s) => (copy.TELL_RULES.differentiators.test(s) ? [clause(s)] : undefined) },
+];
+
+const SHARED_LAST: FactRule[] = [
   {
     field: "geographic_coverage",
     read: (s) => {
@@ -120,19 +169,39 @@ const FACT_RULES: { field: string; read: (s: string) => unknown | undefined }[] 
   },
 ];
 
+/** Rules that turn one sentence into one fact. The first rule that fits wins. */
+const FACT_RULES: FactRule[] = [
+  ...SHARED_FIRST,
+  ...byMember({ caterer: CATERER_RULES, pack: PACK_RULES }),
+  ...SHARED_LAST,
+];
+
 /** Rules that spot a row that only a document, or a pick from a list, can answer. */
-const UPLOAD_RULES: { field: string; test: RegExp }[] = [
+const SHARED_UPLOADS: { field: string; test: RegExp }[] = [
   { field: "insurance_coverage", test: /\binsurance\b/i },
-  { field: "health_permits", test: /\b(health (permit|department)|food (service )?permit)\b/i },
-  { field: "food_handler_cards", test: /\b(food[- ]handler|servsafe)\b/i },
   { field: "doc_w9", test: /\bw-?9\b/i },
   { field: "doc_tax_returns", test: /\btax returns?\b/i },
-  { field: "doc_haccp_plan", test: /\bhaccp\b/i },
   { field: "doc_capability_statement", test: /\bcapability statement\b/i },
   { field: "psc_codes", test: /\bPSC\b/ },
   { field: "commodity_codes", test: /\bNIGP\b/ },
-  { field: "max_daily_output", test: /\d[\d,]*\s*(meals|plates|trays|lunches|breakfasts)\b.*\b(a day|per day|daily|each day)\b/i },
 ];
+
+const UPLOAD_RULES: { field: string; test: RegExp }[] = byMember({
+  caterer: [
+    SHARED_UPLOADS[0]!,
+    { field: "health_permits", test: /\b(health (permit|department)|food (service )?permit)\b/i },
+    { field: "food_handler_cards", test: /\b(food[- ]handler|servsafe)\b/i },
+    SHARED_UPLOADS[1]!,
+    SHARED_UPLOADS[2]!,
+    { field: "doc_haccp_plan", test: /\bhaccp\b/i },
+    ...SHARED_UPLOADS.slice(3),
+    { field: "max_daily_output", test: /\d[\d,]*\s*(meals|plates|trays|lunches|breakfasts)\b.*\b(a day|per day|daily|each day)\b/i },
+  ],
+  pack: [
+    ...SHARED_UPLOADS,
+    ...copy.UPLOAD_EXTRAS,
+  ],
+});
 
 /** The scripted "model reply" for her words, in the JSON shape the real model returns. */
 export function scriptedReply(text: string): string {

@@ -18,6 +18,11 @@ import {
 } from "../../../demo/profile/pastPerformance";
 import { fmtMonthYear, fmtMoneyShort } from "../../../demo/profile/dates";
 import { saveTextFile } from "../../../demo/profile/downloads";
+import { byMember, own } from "../../../demo/member";
+
+const copy = own(
+  import.meta.glob<typeof import("../../../demo/members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 // DEMO: the projects come from the story (PAST_PERFORMANCE) and live in the demo store.
 function toCardEntry(e: PpEntry): CardEntry {
@@ -40,9 +45,15 @@ function toCardEntry(e: PpEntry): CardEntry {
   };
 }
 
+// DEMO: the example row fits the member's own work.
 const TEMPLATE = [
   "title,customer,value,start,end,naics,role,scope",
-  '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
+  byMember({
+    caterer:
+      '"Example: school lunch program","Example School District",50000,2024-01-08,2024-06-14,722310,Prime,"Cooked and delivered 400 lunches a day to four schools. Menus met the USDA meal pattern."',
+    pack:
+      copy.PAST_PERFORMANCE_EXAMPLE,
+  }),
 ].join("\n");
 
 /** Reads a CSV the visitor chose. Returns the projects it could read. */

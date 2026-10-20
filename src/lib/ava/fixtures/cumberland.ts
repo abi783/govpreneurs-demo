@@ -21,7 +21,7 @@
 import { buyerPeople } from "../../../demo/ava/contacts";
 import { getOpportunity } from "../../../demo/story/opportunities";
 import { getGrantBrief } from "../../../demo/story/grantBriefs";
-import { PAST_PERFORMANCE, PERSONA } from "../../../demo/story/persona";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../../../demo/story/persona";
 import { doc } from "../build";
 import type { BidState } from "../store";
 import type { AvaBid } from "../types";
@@ -49,11 +49,11 @@ const CLOSED = DUE - 2;
 
 // The member, from PERSONA.
 const COOKS = PERSONA.employeesW2;
-const COOKS_CERTIFIED = PERSONA.foodHandlerCertified;
+const COOKS_CERTIFIED = PERSONA.foodHandlerCertified ?? 0;
 const COOKS_MISSING = COOKS - COOKS_CERTIFIED;
 const BONDED_UP_TO = `$${PERSONA.largestBond.toLocaleString("en-US")}`;
 const pastJob = (id: (typeof PAST_PERFORMANCE)[number]["id"]) =>
-  PAST_PERFORMANCE.find((p) => p.id === id)!;
+  findPastPerformance(id)!;
 const SCHOOLS = pastJob("pp-county-schools");
 const FORT_BRAGG = pastJob("pp-cdg-sub");
 const WOMACK = pastJob("pp-womack");

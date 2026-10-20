@@ -1,13 +1,18 @@
-// DEMO: what each member-run check finds about Haddad Catering.
+// DEMO: what each member-run check finds about the member's business.
 //
 // Production sends the check to SAM.gov, the SBA directory or a document reader.
 // The demo answers from the story: every check passes, and the fields come from
 // the persona. `storyVerification` is the result she already has. `runVerification`
 // is what happens when she runs a check again in the demo.
 
+import { byMember, own } from "@/demo/member";
 import { PERSONA, PAST_PERFORMANCE } from "@/demo/story/persona";
 import type { DemoVerification } from "./state";
 import type { VerifyKey } from "./model";
+
+const copy = own(
+  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 /** "2027-04-15" → "April 15, 2027". */
 function longDate(iso: string): string {
@@ -97,7 +102,7 @@ function dataFor(key: VerifyKey, checkedAt: string, inputs?: Record<string, unkn
           day: "numeric",
           year: "numeric",
         }),
-        scope: "Kitchen and office systems",
+        scope: byMember({ caterer: "Kitchen and office systems", pack: copy.CMMC_SCOPE }),
         affirmingOfficial: PERSONA.ownerName,
       };
   }

@@ -3,7 +3,15 @@
 // in the shape of a Service Contract Act wage determination (the legal minimum pay on
 // federal service contracts), plus sample hourly benchmarks for professional services.
 
+// DEMO: two members. The agency's rates (all real: SCA wage determination, GSA CALC+)
+// are in src/demo/members/agency/market/laborRates.ts. The exports below pick one.
+
 import { dateDaysFromNow } from "@/demo/story/clock";
+import { byMember, own } from "@/demo/member";
+
+const pack = own(
+  import.meta.glob<typeof import("@/demo/members/agency/market/laborRates")>("/src/demo/members/*/market/laborRates.ts", { eager: true }),
+);
 
 export interface PrevailingWage {
   trade: string;
@@ -17,7 +25,7 @@ export interface PrevailingWage {
 // Health and welfare is the same for every title, as on a real determination.
 const HEALTH_AND_WELFARE = 5.36;
 
-export const PREVAILING_WAGES_CUMBERLAND_NC: PrevailingWage[] = [
+const CATERER_WAGES: PrevailingWage[] = [
   { trade: "Cook I", baseHourly: 15.12, fringeHourly: HEALTH_AND_WELFARE, notes: "Line cook, prep cook, short-order" },
   { trade: "Cook II", baseHourly: 17.4, fringeHourly: HEALTH_AND_WELFARE, notes: "Lead cook, diet kitchen, therapeutic menus" },
   { trade: "Food Service Worker", baseHourly: 12.8, fringeHourly: HEALTH_AND_WELFARE, notes: "Serving line, salad bar, tray assembly" },
@@ -27,7 +35,7 @@ export const PREVAILING_WAGES_CUMBERLAND_NC: PrevailingWage[] = [
   { trade: "Delivery Driver (Light Truck)", baseHourly: 14.95, fringeHourly: HEALTH_AND_WELFARE, notes: "Refrigerated van, same-day delivery" },
 ];
 
-export const PREVAILING_WAGE_META = {
+const CATERER_WAGE_META = {
   county: "Cumberland County, NC",
   determination: "2015-5213, Rev. 31 (sample)",
   effectiveDate: dateDaysFromNow(-200),
@@ -45,7 +53,7 @@ export interface ComparableAward {
   location: string;
 }
 
-export const COMPARABLE_FOOD_AWARDS: ComparableAward[] = [
+const CATERER_COMPARABLE_AWARDS: ComparableAward[] = [
   {
     awardId: "FA4800-26-P-0007",
     title: "Lodging breakfast service, Seymour Johnson AFB",
@@ -98,7 +106,7 @@ export interface LcatRate {
 }
 
 // Sample benchmark rates for the roles a food service contractor bills by the hour.
-export const LCAT_RATES: LcatRate[] = [
+const CATERER_LCAT_RATES: LcatRate[] = [
   { id: "lcat-site-mgr-sr", category: "Food Service Site Manager (Sr)", experience: "7–15 yrs", education: "Bachelor", location: "Fayetteville", low: 68, median: 82, high: 104 },
   { id: "lcat-site-mgr", category: "Food Service Site Manager", experience: "3–7 yrs", education: "Associate", location: "Fayetteville", low: 52, median: 64, high: 79 },
   { id: "lcat-exec-chef", category: "Executive Chef", experience: "7–15 yrs", education: "Associate", location: "Raleigh-Durham", low: 58, median: 71, high: 90 },
@@ -112,6 +120,19 @@ export const LCAT_RATES: LcatRate[] = [
   { id: "lcat-admin", category: "Administrative Assistant", experience: "3–7 yrs", education: "HS", location: "Nationwide", low: 38, median: 52, high: 68 },
   { id: "lcat-galley-mgr", category: "Galley / Dining Hall Manager", experience: "7–15 yrs", education: "Associate", location: "Norfolk", low: 60, median: 74, high: 93 },
 ];
+
+/** The wage floor table: the caterer's sample determination, or the agency's real one. */
+export const PREVAILING_WAGES_CUMBERLAND_NC: PrevailingWage[] = byMember({
+  pack: pack.PREVAILING_WAGES,
+  caterer: CATERER_WAGES,
+});
+export const PREVAILING_WAGE_META = byMember({ pack: pack.PREVAILING_WAGE_META, caterer: CATERER_WAGE_META });
+/** Comparable awarded jobs in the member's trade. Each links to an award on the Awards page. */
+export const COMPARABLE_FOOD_AWARDS: ComparableAward[] = byMember({
+  pack: pack.COMPARABLE_AWARDS,
+  caterer: CATERER_COMPARABLE_AWARDS,
+});
+export const LCAT_RATES: LcatRate[] = byMember({ pack: pack.LCAT_RATES, caterer: CATERER_LCAT_RATES });
 
 export function fmtRate(n: number): string {
   return `$${n.toFixed(2)}`;

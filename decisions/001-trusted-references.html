@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>decision · trusted references</title>
+<style>
+:root{
+  --bg:#f7f6f3; --surface:#ffffff; --ink:#1c1b19; --muted:#6b6862; --line:#e3e0da; --band:#efede8;
+  --accent:#b4441c; --accent-soft:#f6e6de; --on-accent:#ffffff; --ok:#2f6b3f; --ok-soft:#e3efe5;
+  --no:#9b2c2c; --no-soft:#f6e1e1; --node:#ffffff; --node-line:#cfcac2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151413; --surface:#1d1c1a; --ink:#ecebe7; --muted:#a19d95; --line:#33312d; --band:#232220;
+    --accent:#e2774f; --accent-soft:#3a2219; --on-accent:#1c1b19; --ok:#7cc08d; --ok-soft:#1e2e22;
+    --no:#e58a8a; --no-soft:#3a1f1f; --node:#1d1c1a; --node-line:#4a4741;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151413; --surface:#1d1c1a; --ink:#ecebe7; --muted:#a19d95; --line:#33312d; --band:#232220;
+  --accent:#e2774f; --accent-soft:#3a2219; --on-accent:#1c1b19; --ok:#7cc08d; --ok-soft:#1e2e22;
+  --no:#e58a8a; --no-soft:#3a1f1f; --node:#1d1c1a; --node-line:#4a4741;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+.sample{background:var(--accent-soft);color:var(--accent);font-size:13px;text-align:center;padding:6px 16px}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 0;font-size:14px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+h1{font-size:30px;line-height:1.2;margin:14px 0 18px;letter-spacing:-.015em;max-width:720px}
+.rec{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.rec .call{font-weight:700;color:var(--ok)}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-left:6px}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink)}
+.rec span{color:var(--muted);font-size:14px}
+section{padding:28px 0 0}
+.label{font-size:13px;color:var(--muted);font-weight:600;margin:0 0 10px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.compare{grid-template-columns:1fr} h1{font-size:24px}}
+.compare figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.compare figure.pick{border:2px solid var(--ok)}
+.compare figcaption{font-size:14px;margin-top:8px;display:flex;justify-content:space-between}
+.compare figcaption span{color:var(--muted)}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:inherit}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.trio{grid-template-columns:1fr}}
+.chipbox{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.chipbox small{display:block;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:4px}
+.matrix{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.matrix th,.matrix td{padding:9px 12px;text-align:center;border-top:1px solid var(--line)}
+.matrix th{font-size:12px;color:var(--muted);font-weight:600;border-top:0}
+.matrix td:first-child,.matrix th:first-child{text-align:left}
+.y{color:var(--ok);font-weight:700}.n{color:var(--muted)}.q{color:var(--accent)}
+.ev{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+ul.plain{list-style:none;margin:0;padding:0}
+ul.plain li{padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:3px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.chip.x{text-decoration:line-through;color:var(--muted)}
+.appendix{margin-top:32px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 18px}
+.appendix summary{cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:12px}
+.appendix summary span{color:var(--muted);font-weight:400;font-size:14px}
+.appendix summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.gallery{grid-template-columns:1fr 1fr}}
+.gallery figure{margin:0}
+.gallery svg{border:1px solid var(--line);border-radius:6px}
+.gallery figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+.gallery figcaption b{display:block;color:var(--ink);font-size:14px}
+.gallery figcaption small{display:block;font-size:12px;margin-top:2px}
+.note{font-size:13px;color:var(--muted);margin:16px 0 4px}
+.answer{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);margin-top:32px;padding:14px 0 18px}
+.answer .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.answer button{font:inherit;font-weight:600;padding:10px 22px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.answer button.yes[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.answer button.no[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:var(--bg)}
+.answer button.chg[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.answer button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.answer textarea{display:none;width:100%;margin-top:10px;min-height:64px;font:inherit;font-size:15px;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.answer textarea.show{display:block}
+.answer .copy{margin-left:auto;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.status{font-size:13px;color:var(--muted);width:100%}
+.compare img,.gallery img{display:block;width:100%;height:auto;border-radius:6px;border:1px solid var(--line)}
+.compare figcaption{display:block}
+.compare figcaption:first-child{margin-top:0}
+.olabel{font-weight:700}
+.ocap{color:var(--muted);margin-top:2px}
+.rules{margin-top:12px;font-size:14px}
+.rules label{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
+.preview{display:inline-block;margin-top:14px;font-size:14px;color:var(--accent)}
+.usage{font-size:13px;color:var(--muted);margin:14px 0 0}
+.pair{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:16px}
+.pair .side{display:flex;flex-direction:column;gap:8px}
+.pair .txt{padding:12px;background:var(--band);border-radius:6px;white-space:pre-wrap}
+.pair label.pk{display:flex;gap:8px;font-weight:600}
+.pair input[type=text]{width:100%;font:inherit;font-size:15px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="meta"><span><b>Decision 1 of 1</b> · Govpreneurs · trusted references</span><span>~60 sec</span></div>
+  <h1>Approve these trusted references?</h1>
+  <div class="rec">
+    <div>Claude recommends <span class="call">Yes</span></div>
+    <div>Confidence <span class="dots" aria-label="3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div>
+    <span>Two-way door: easy to undo</span>
+  </div>
+
+  <section>
+    <p class="label">Options</p>
+    <div class="compare">
+      <figure><figcaption><div class="olabel">TurboTax</div><div class="ocap">A scary government form becomes one plain question at a time</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Gusto</div><div class="ocap">Works out which registrations a small business needs, instead of asking</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Stripe</div><div class="ocap">Dashboard and Atlas: calm detail pages, status with source and date, why each sensitive field is asked</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Shopify admin</div><div class="ocap">A small owner&#39;s home that shows the next setup step</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Airbnb hosting</div><div class="ocap">Phone-first, step-by-step setup with photo uploads</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Wise</div><div class="ocap">Verification status and what happens next, in plain English for a global audience</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Granola</div><div class="ocap">You talk, it writes a clean draft you can edit</div></figcaption></figure>
+      <figure><figcaption><div class="olabel">Linear</div><div class="ocap">List-to-detail triage and a board, one primary action per view</div></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="two">
+    <div><p class="label">Risks</p><ul class="plain"><li>Linear and Stripe can pull in density Amira does not need</li><li>375 adds a gate pass that Tim&#39;s desktop demo never shows</li></ul></div>
+    <div><p class="label">Not doing</p><div class="chips"><span class="chip x">Superhuman, built for keyboard power users</span><span class="chip x">Notion</span><span class="chip x">Excepting side-tab, 46 findings stay</span><span class="chip x">Excepting small text</span></div></div>
+  </section>
+
+  <section><p class="label">Rules to add</p><div class="rules" id="rules"><label><input type="checkbox" value="0"> <span>Exception 1: Inter is the brand UI font (overused-font)</span></label><label><input type="checkbox" value="1"> <span>Exception 2: Instrument Serif is the brand editorial font (overused-font)</span></label><label><input type="checkbox" value="2"> <span>Exception 3: ignore src/sc/design-system/preview/** (static specimen pages)</span></label><label><input type="checkbox" value="3"> <span>Exception 4: ignore src/sc/design-system/ui_kits/** (static UI-kit mock)</span></label><label><input type="checkbox" value="4"> <span>Exception 5: forecast pages keep warn on hue 326 (ochre read as AI amber)</span></label><label><input type="checkbox" value="5"> <span>Viewport: add 375x812, because Amira is phone-first (adds a third gate pass)</span></label></div></section>
+  <p class="usage">Setup: not tracked</p>
+
+  <div class="answer">
+    <div class="row">
+      <button class="yes" aria-pressed="false">Yes</button>
+      <button class="no" aria-pressed="false">No</button>
+      <button class="chg" aria-pressed="false">Change</button>
+      <button class="copy" id="copy">Copy answer</button>
+    </div>
+    <textarea id="note" aria-label="What should change?" placeholder="What should change?"></textarea>
+    <div class="status" id="status" role="status"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var D={"kind":"decision","title":"trusted references","rules":["Exception 1: Inter is the brand UI font (overused-font)","Exception 2: Instrument Serif is the brand editorial font (overused-font)","Exception 3: ignore src/sc/design-system/preview/** (static specimen pages)","Exception 4: ignore src/sc/design-system/ui_kits/** (static UI-kit mock)","Exception 5: forecast pages keep warn on hue 326 (ochre read as AI amber)","Viewport: add 375x812, because Amira is phone-first (adds a third gate pass)"]};
+  var btns=[].slice.call(document.querySelectorAll('.answer .yes,.answer .no,.answer .chg')), pick='', note=document.getElementById('note');
+  btns.forEach(function(b){b.onclick=function(){pick=pick===b.textContent?'':b.textContent;
+    btns.forEach(function(x){x.setAttribute('aria-pressed',x.textContent===pick)});
+    note.classList.toggle('show',pick==='Change'||pick==='No');if(note.classList.contains('show'))note.focus()}});
+  document.getElementById('copy').onclick=function(){
+    var st=document.getElementById('status');
+    if(!pick){st.textContent='Pick Yes, No or Change first.';return}
+    var rules=[].slice.call(document.querySelectorAll('#rules input:checked')).map(function(c){return D.rules[c.value]});
+    var text=D.kind+' ('+D.title+'): '+pick+(note.value&&pick!=='Yes'?' — '+note.value:'')+(rules.length?' | add rules: '+rules.join('; '):'');
+    function done(){st.textContent='Copied. Paste it into Claude.'}
+    function fb(){var t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){st.textContent=text}t.remove()}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fb)}else{fb()}
+  };
+})();
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@
 
 import * as Popover from "@radix-ui/react-popover";
 import { useState, type ReactNode } from "react";
+import { VOCAB } from "../../demo/hunter/vocab";
 
 export function SaveSearchPopover({
   onSave,
@@ -55,7 +56,8 @@ export function SaveSearchPopover({
               className="ssp__input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Name it — e.g. Fort Bragg catering"
+              // DEMO: an example true for the sample member.
+              placeholder={VOCAB.ui.saveSearchPlaceholder}
               aria-label="Saved search name"
               autoFocus
             />

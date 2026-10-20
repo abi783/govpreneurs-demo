@@ -1,4 +1,4 @@
-// DEMO: the one signed-in member. Amira Haddad on the Elite plan.
+// DEMO: the one signed-in member (src/demo/member.ts), on the Elite plan.
 //
 // Fields that matter for gates:
 //   productId  Elite plan id. Pilot and Expert ids show upsell walls.
@@ -19,7 +19,7 @@ export function demoSession(): GhlUserSession {
     companyId: "demo-company",
     activeLocation: PERSONA.locationId,
     locationId: PERSONA.locationId,
-    contactId: "demo-contact-amira",
+    contactId: PERSONA.contactId,
     userName: PERSONA.ownerName,
     email: PERSONA.email,
     role: "admin",

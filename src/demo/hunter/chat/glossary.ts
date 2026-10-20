@@ -1,11 +1,16 @@
 // DEMO (Hunter chat): plain-English answers to "what is a ...?" questions.
-// Each answer ends with what the term means for Amira, from the story.
+// Each answer ends with what the term means for the member, from the story and
+// the member's own words (src/demo/members/<member>/hunter/vocab.ts).
 
 import { money } from "../../../lib/money";
-import { KEY_PARTNER, PAST_PERFORMANCE, PERSONA } from "../../story/persona";
+import { PAST_PERFORMANCE, PERSONA } from "../../story/persona";
+import { andList, HELD, HELD_TITLES, holds, PROGRAMS, SET_ASIDES, SHOW_OWN, WHAT_IS_OWN } from "../../story/setAsides";
+import { cap, RANGE_TEXT } from "../facts";
 import { allRows, forYouRows, type FeedRow } from "../data";
-import { RANGE_TEXT } from "../facts";
+import { VOCAB } from "../vocab";
 import type { Turn } from "./types";
+
+const G = VOCAB.glossary;
 
 interface Definition {
   id: string;
@@ -32,7 +37,7 @@ export const DEFINITIONS: Definition[] = [
           "A Sources Sought notice is an early notice. The agency asks which businesses could do the work. It is not a bid, and nobody awards a contract from it.\n" +
           "You reply with a short statement about your business. A good reply can put you on the buyer's list before the real bid opens.\n" +
           (n > 0
-            ? `You have ${n} on this list now: Fort Bragg asks which small caterers could run its dining program.`
+            ? `You have ${n} on this list now: ${G.sourcesSought}`
             : "None is on this list right now."),
         chips: ["Show only Sources Sought", "What's new this week?"],
       };
@@ -46,31 +51,40 @@ export const DEFINITIONS: Definition[] = [
       return {
         reply:
           "A WOSB set-aside is a contract that only woman-owned small businesses can compete for. WOSB means Women-Owned Small Business.\n" +
-          `You are woman-owned and small, and your WOSB status is on file. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
-          "Fewer firms can compete for these, so the field is smaller.",
-        chips: ["Show only woman-owned set-asides", "Do I qualify for these set-asides?"],
+          (holds("WOSB")
+            ? `You are woman-owned and small, and your WOSB status is on file. So you can compete for all ${n} of the WOSB set-asides on this list.\n` +
+              "Fewer firms can compete for these, so the field is smaller."
+            : `You are not certified as woman-owned, so those set-asides are not for you. Your set-asides are ${HELD_TITLES}.`),
+        chips: [SHOW_OWN, "Do I qualify for these set-asides?"],
       };
     },
   },
   {
     id: "define-sdvosb",
     test: /sdvosb|service.disabled|veteran.owned|\bvosb\b/,
-    answer: () => ({
+    answer: (rows) => ({
       reply:
         "SDVOSB means Service-Disabled Veteran-Owned Small Business. Only firms owned by a veteran with a service-connected disability can compete for these set-asides.\n" +
-        "You are not an SDVOSB, so those set-asides are not for you. Your set-asides are Small Business and Woman-Owned (WOSB).",
-      chips: ["What is a WOSB set-aside?", "Do I qualify for these set-asides?"],
+        (holds("SDVOSBC")
+          ? `You are service-disabled veteran-owned, and your SDVOSB status is on file. So you can compete for all ${count(rows, (r) => r.setAside === "SDVOSBC")} of them on this list.`
+          : `You are not an SDVOSB, so those set-asides are not for you. Your set-asides are ${HELD_TITLES}.`),
+      chips: [holds("SDVOSBC") ? SHOW_OWN : WHAT_IS_OWN, "Do I qualify for these set-asides?"],
     }),
   },
   {
     id: "define-8a-hubzone",
     test: /\b8\s?\(?a\)?\b|hubzone|hub zone|edwosb|native american|tribal/,
-    answer: () => ({
-      reply:
-        "8(a), HUBZone and tribal set-asides are programs for other kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
-        "You do not hold those, so I do not rank them for you. You qualify for Small Business and Woman-Owned (WOSB).",
-      chips: ["Do I qualify for these set-asides?", "Show only woman-owned set-asides"],
-    }),
+    answer: (rows) => {
+      const mine = (["8A", "HZC"] as const).filter((c) => holds(c));
+      return {
+        reply: mine.length
+          ? "8(a), HUBZone and tribal set-asides are programs for certain kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
+            `${cap(andList(mine.map((c) => SET_ASIDES[c].youAre)))}, so you can compete for the ${count(rows, (r) => (mine as string[]).includes(r.setAside))} on this list. Your set-asides are ${HELD_TITLES}.`
+          : "8(a), HUBZone and tribal set-asides are programs for other kinds of owners. 8(a) is for owners who face a social or economic disadvantage. HUBZone is for firms based in a designated area.\n" +
+            `You do not hold those, so I do not rank them for you. You qualify for ${HELD_TITLES}.`,
+        chips: ["Do I qualify for these set-asides?", SHOW_OWN],
+      };
+    },
   },
   {
     id: "define-small-business-set-aside",
@@ -81,7 +95,7 @@ export const DEFINITIONS: Definition[] = [
         reply:
           "A small business set-aside is a contract that only small businesses can compete for. The size limit depends on your NAICS code.\n" +
           `You are a small business. ${n} opportunit${n === 1 ? "y" : "ies"} on this list carry that label.`,
-        chips: ["Do I qualify for these set-asides?", "Show only woman-owned set-asides"],
+        chips: ["Do I qualify for these set-asides?", SHOW_OWN],
       };
     },
   },
@@ -89,14 +103,22 @@ export const DEFINITIONS: Definition[] = [
     id: "define-set-aside",
     test: /set.?aside/,
     answer: (rows) => {
-      const wosb = count(rows, (r) => r.setAside === "WOSB");
-      const sba = count(rows, (r) => r.setAside === "SBA");
+      const n = (c: string) => count(rows, (r) => r.setAside === c);
       const open = count(rows, (r) => !r.setAside);
+      // Her own programs first, plain small business last; then the ones she does not hold.
+      const mine = [...HELD.filter((c) => c !== "SBA"), ...HELD.filter((c) => c === "SBA")];
+      const notHers = PROGRAMS.filter((c) => !holds(c) && n(c) > 0);
+      const parts = [...mine, ...notHers].map((c) => `${n(c)} ${SET_ASIDES[c].counted}`).join(", ");
+      const qualify = notHers.length
+        ? `You qualify for all but the ${andList(notHers.map((c) => SET_ASIDES[c].counted))}.`
+        : mine.length === 1
+          ? `You qualify for the ${SET_ASIDES[mine[0]!].counted} ones.`
+          : `You qualify for the first ${["", "one", "two", "three", "four"][mine.length]}.`;
       return {
         reply:
           "A set-aside is a contract that the buyer keeps for one kind of business, such as small businesses or woman-owned firms. Other firms cannot compete for it.\n" +
-          `On this list: ${wosb} woman-owned (WOSB), ${sba} small business, and ${open} open to every business. You qualify for the first two.`,
-        chips: ["What is a WOSB set-aside?", "Show only woman-owned set-asides"],
+          `On this list: ${parts}, and ${open} open to every business. ${qualify}`,
+        chips: [WHAT_IS_OWN, SHOW_OWN],
       };
     },
   },
@@ -109,7 +131,7 @@ export const DEFINITIONS: Definition[] = [
         `Your main code is ${PERSONA.primaryNaics}, ${PERSONA.primaryNaicsLabel}. You also hold ${PERSONA.secondaryNaics
           .map((n) => `${n.code} (${n.label})`)
           .join(", ")}.`,
-      chips: ["How do you pick my matches?", "Show me Food Service Contractors work in NC"],
+      chips: ["How do you pick my matches?", `Show me ${PERSONA.primaryNaicsLabel} work in NC`],
     }),
   },
   {
@@ -118,7 +140,7 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A PSC is a Product and Service Code. It names what the government buys. NAICS names what you do; PSC names what the buyer wants.\n" +
-        "Food service work often uses S203, Housekeeping - Food.",
+        G.psc,
       chips: ["What is a NAICS code?", "How do you pick my matches?"],
     }),
   },
@@ -130,7 +152,7 @@ export const DEFINITIONS: Definition[] = [
       return {
         reply:
           "An RFQ is a Request for Quote. The buyer asks for a price. It is usually quicker and simpler than a full proposal.\n" +
-          `${n} opportunit${n === 1 ? "y" : "ies"} on this list ${n === 1 ? "is an RFQ" : "are RFQs"}. The Camp Mackall field meals job is one.`,
+          `${n} opportunit${n === 1 ? "y" : "ies"} on this list ${n === 1 ? "is an RFQ" : "are RFQs"}.${G.rfqExample}`,
         chips: ["Show only RFQs", "What is an RFP?"],
       };
     },
@@ -208,11 +230,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "The incumbent is the firm that holds the job now. A recompete is when the buyer opens that job to new offers.\n" +
-        `${KEY_PARTNER.name} is the incumbent for Fort Bragg dining. It has held the contract since 2019 and is looking for woman-owned subcontractors for the recompete. Grant can tell you what that means for you.`,
-      chips: [
-        "Why does the Run two Fort Bragg dining halls match me?",
-        "What is a prime and a sub?",
-      ],
+        G.incumbent.line,
+      chips: G.incumbent.chips,
     }),
   },
   {
@@ -221,8 +240,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A prime holds the contract with the government. A sub does part of the work for the prime and is paid by the prime.\n" +
-        "On a job that is too big to hold alone, a small firm can team up as a sub. That is how you worked on Fort Bragg dining halls with Carolina Dining Group.",
-      chips: ["Why does the Run two Fort Bragg dining halls match me?", "What is a recompete?"],
+        G.primeSub.line,
+      chips: G.primeSub.chips,
     }),
   },
   {
@@ -231,11 +250,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A bond is a promise from an insurer to pay the buyer if you do not finish the job. Some large jobs require one.\n" +
-        `Your largest bond so far is ${money(PERSONA.largestBond)}. The Fort Bragg dining halls need a bond of 100% of the yearly price, which is about $2M.`,
-      chips: [
-        "Am I ready to bid the Run two Fort Bragg dining halls?",
-        "What is a prime and a sub?",
-      ],
+        G.bond.line,
+      chips: G.bond.chips,
     }),
   },
   {
@@ -244,11 +260,8 @@ export const DEFINITIONS: Definition[] = [
     answer: () => ({
       reply:
         "A security clearance is a government check that lets a person work on a restricted site. It takes months, and the buyer often will not pay for it.\n" +
-        "Your team holds no clearances. So I mark any job that needs them, such as the restricted Camp Mackall site.",
-      chips: [
-        "Am I ready to bid the Dining support at a restricted Camp Mackall site?",
-        "What's out there for me right now?",
-      ],
+        G.clearance.line,
+      chips: G.clearance.chips,
     }),
   },
   {

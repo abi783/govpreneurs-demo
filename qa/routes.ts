@@ -52,5 +52,7 @@ export function allKnownRoutes(): string[] {
 
 export function crawlRoutes(): string[] {
   const only = process.env.QA_ROUTES?.split(",").map((r) => r.trim()).filter(Boolean);
-  return only && only.length > 0 ? only : [...MENU_ROUTES, ...DEEP_ROUTES];
+  // A route in both lists (the Know Your Market pages are) is crawled once:
+  // Playwright refuses two tests with one title.
+  return only && only.length > 0 ? only : [...new Set([...MENU_ROUTES, ...DEEP_ROUTES])];
 }

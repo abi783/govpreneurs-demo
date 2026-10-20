@@ -10,6 +10,7 @@ import { DEMO_TODAY, dateDaysFromNow } from "@/demo/story/clock";
 import { calendarDay } from "./calendar";
 import type { GrantBrief, ReadName } from "@/demo/story/grantBriefs";
 import { PERSONA } from "@/demo/story/persona";
+import { SET_ASIDES } from "@/demo/story/setAsides";
 import type {
   AmendmentInfo,
   CapturePath,
@@ -32,6 +33,7 @@ import type {
 import type { OppFacts } from "./facts";
 import { boldIn, firstSentence, rt } from "./rich";
 import { clauseOf, clausePin, type Solicitation } from "./solicitation";
+import { V } from "./vocab";
 
 // ── The shapes ───────────────────────────────────────────────────────────
 
@@ -107,6 +109,18 @@ export interface EncodeContext {
 
 // ── Small helpers ────────────────────────────────────────────────────────
 
+/** A brief's certification row for a set-aside other than WOSB, when the member's own rows don't name it. */
+const SET_ASIDE_ROWS: RowSpec[] = (["HZC", "8A", "SDVOSBC"] as const).map((code) => {
+  const { abbr } = SET_ASIDES[code];
+  return {
+    match: new RegExp(abbr.replace(/[()]/g, "\\$&")),
+    kind: "setAside",
+    category: "eligibility",
+    required: `${abbr} certified`,
+    closable: false,
+  };
+});
+
 /** Replace "26 days" in a story text with the live count, so every screen agrees on today's number. */
 export function localize(text: string, f: OppFacts): string {
   const story = f.opp.closesInDays;
@@ -138,7 +152,7 @@ export function gateInputsFor(f: OppFacts, clearance?: Extras["clearance"]): Gra
     },
     naics: {
       code: f.opp.naics,
-      sizeStandard: f.opp.naics === PERSONA.primaryNaics ? "$47.0M" : "",
+      sizeStandard: f.opp.naics === PERSONA.primaryNaics ? (V.sizeStandard?.short ?? "") : "",
       firmIsSmall: true,
     },
     sam: { activeThrough: PERSONA.samActiveUntil, awardWindowEnds: dateDaysFromNow(f.opp.closesInDays + 45) },
@@ -222,7 +236,7 @@ export function encodeBrief(
 
   // Compliance matrix: one row for each line of the brief.
   const complianceMatrix: ComplianceRow[] = brief.compliance.map((c) => {
-    const spec = ex.rows.find((r) => r.match.test(c.requirement));
+    const spec = ex.rows.find((r) => r.match.test(c.requirement)) ?? SET_ASIDE_ROWS.find((r) => r.match.test(c.requirement));
     if (!spec) throw new Error(`${f.id}: no row spec for "${c.requirement}"`);
     const status: ComplianceRow["status"] =
       c.status === "have" ? "have" : c.status === "missing" ? "missing" : "confirm";

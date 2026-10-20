@@ -6,10 +6,12 @@
 
 import { FOR_YOU, OPPORTUNITIES, type StoryOpportunity } from "../story/opportunities";
 import { PLACES } from "../story/places";
+import { SET_ASIDES } from "../story/setAsides";
 import { stateName } from "../../lib/vocab/usStates";
 import { getSavedOpps } from "../state/workspace";
 import { deadlineIso, postedIso } from "./dates";
 import { naicsDescription } from "./naicsData";
+import { VOCAB } from "./vocab";
 
 /** The three tabs of the feed. */
 export type FeedTabId = "for_you" | "all" | "saved";
@@ -25,7 +27,7 @@ export interface FeedRow {
   closesAt: string;
   low: number | null;
   high: number | null;
-  /** The SAM set-aside code the card shows: "WOSB", "SBA" or "". */
+  /** The SAM set-aside code the card shows (story/setAsides.ts), or "". */
   setAside: string;
   /** The ids the drawer's set-aside filter uses. */
   setAsideIds: string[];
@@ -71,12 +73,13 @@ const NOTICE_IDS: Record<string, string[]> = {
   Solicitation: ["solicitation"],
   "Combined Synopsis/Solicitation": ["combined", "solicitation"],
   "Sources Sought": ["sources_sought"],
+  "Special Notice": ["special"],
 };
 
-const SET_ASIDE_WORDS: Record<string, string> = {
-  WOSB: "wosb woman-owned women-owned woman owned set-aside",
-  SBA: "sba small business set-aside",
-};
+const SET_ASIDE_WORDS: Record<string, string> = Object.fromEntries(Object.entries(SET_ASIDES).map(([c, s]) => [c, s.words]));
+
+/** The drawer's set-aside ids for a SAM code. */
+const SET_ASIDE_IDS: Record<string, string[]> = Object.fromEntries(Object.entries(SET_ASIDES).map(([c, s]) => [c, s.filterIds]));
 
 const DOD = /army|navy|air force|marine/i;
 
@@ -107,17 +110,17 @@ function build(o: StoryOpportunity): FeedRow {
     id: o.id,
     city: place.city,
     state: place.state,
-    miles: place.milesFromKitchen,
+    miles: place.milesFromBase,
     zip: ZIPS[place.city],
     postedAt: postedIso(o.postedDaysAgo),
     closesAt: deadlineIso(o.closesInDays),
     low: o.valueLow,
     high: o.valueHigh,
     setAside,
-    setAsideIds: setAside === "WOSB" ? ["WOSB"] : setAside === "SBA" ? ["SB"] : ["FULL_OPEN"],
+    setAsideIds: SET_ASIDE_IDS[setAside] ?? ["FULL_OPEN"],
     noticeIds: NOTICE_IDS[o.noticeType] ?? ["solicitation"],
     naicsLabel,
-    psc: "S203",
+    psc: VOCAB.pscFor(o.naics),
     isDod: DOD.test(o.agency),
     haystack,
     words: new Set(haystack.split(/[^a-z0-9]+/).filter(Boolean)),

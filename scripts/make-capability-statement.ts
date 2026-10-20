@@ -1,10 +1,119 @@
-// Builds public/demo-files/haddad-catering-capability-statement.pdf from the story.
-// Run: bun scripts/make-capability-statement.ts
+// Builds the member's one-page capability statement PDF from the story, at the
+// path the persona points to (PERSONA.capabilityStatementFile, in public/).
+// Run: DEMO_MEMBER=<id> bun scripts/make-capability-statement.ts (a new member adds its lines to COPY)
+//      DEMO_MEMBER=agency bun scripts/make-capability-statement.ts   (Lantern Row Creative)
+//      DEMO_MEMBER=caterer bun scripts/make-capability-statement.ts  (Haddad Catering)
+//      DEMO_MEMBER=construction bun scripts/make-capability-statement.ts (Ninebark Builders)
+//      DEMO_MEMBER=it bun scripts/make-capability-statement.ts           (Gallberry Technology Group)
+//      DEMO_MEMBER=trucking bun scripts/make-capability-statement.ts     (Rockfish Run Freight)
+//      DEMO_MEMBER=janitorial bun scripts/make-capability-statement.ts   (Gray Owl Facility Services)
+//      DEMO_MEMBER=consulting bun scripts/make-capability-statement.ts   (Coppervale Advisory Group)
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { writeFileSync } from "node:fs";
-import { PAST_PERFORMANCE, PERSONA } from "../src/demo/story/persona";
+import { MEMBER } from "../src/demo/member";
+// The member's own persona file: story/persona.ts picks it with import.meta.glob, which only Vite runs.
+const { PAST_PERFORMANCE, PERSONA } = (await import(`../src/demo/members/${MEMBER}/persona.ts`)) as typeof import("../src/demo/members/agency/persona");
+
+/** What only one member's statement says. Everything else is read from the persona. */
+const COPY = {
+  caterer: {
+    who: `A woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, founded ${PERSONA.formedOn}. ${PERSONA.employeesW2} staff and one commercial kitchen. We cook, pack and deliver meals for government buyers across North Carolina, Virginia and South Carolina.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Event and ceremony catering from 50 to 600 guests",
+      "HACCP food-safety plan; USDA meal-pattern menus; daily temperature logs",
+    ],
+    extraRows: [] as [string, string][],
+  },
+  // The pack's line (marketing-agency-pack.md §1), then the facts behind it. The
+  // equipment and PSC lines are what My Business reads off this file (members/agency/sc/business.ts).
+  agency: {
+    who: `Woman-owned ad agency 12 miles from Fort Bragg: video, paid social and search, print buying, landing pages and lead routing for campaigns that reach military families. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff and three freelancers. We work across North Carolina, Virginia and South Carolina.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Studio and edit suite on Person Street. Two cinema cameras, a drone and location lighting",
+      "Weekly print buying in local papers, with rates locked in writing",
+    ],
+    extraRows: [
+      ["PSC", "PSC R701 · T006"],
+      ["Contract vehicles", "None yet (no GSA schedule)"],
+    ] as [string, string][],
+  },
+  // The pack's line (construction-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/construction/sc/business.ts).
+  construction: {
+    who: `HUBZone general contractor 12 miles from Fort Bragg. We self-perform electrical and HVAC work with two crews of each, and run building repairs from bid to closeout. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, within ${PERSONA.serviceRadiusMiles} miles of our shop.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Shop and yard on Grove Street. Two bucket trucks, a scissor lift and refrigerant recovery machines",
+      "Phased work in occupied buildings, with outages booked ahead",
+    ],
+    extraRows: [
+      ["PSC", "PSC Z2AA · Z2JZ"],
+      ["Bonding", `$${(PERSONA.bondLine?.single ?? 0) / 1_000_000}M a job · $${(PERSONA.bondLine?.aggregate ?? 0) / 1_000_000}M in total`],
+    ] as [string, string][],
+  },
+  // The pack's line (it-services-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/it/sc/business.ts).
+  it: {
+    who: `8(a) IT services firm 12 miles from Fort Bragg: help desk, desktop and video-conference support, Microsoft 365 and SharePoint admin, and network support, with Security+ techs who already work on Army and Air Force networks. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, South Carolina and Virginia.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office and repair bench on Raeford Rd. Four imaging stations, 40 loaner laptops and cable testers",
+      "Imaging and asset tracking, from one office to 4,800 devices in a summer",
+      "CMMC Level 1 (Self), affirmed in SPRS",
+    ],
+    extraRows: [
+      ["PSC", "PSC DE01 · DG01"],
+      ["Contract vehicles", "GSA MAS, SIN 54151S"],
+    ] as [string, string][],
+  },
+  // The pack's line (trucking-pack.md §1). The fleet and PSC lines are what
+  // My Business reads off this file (members/trucking/sc/business.ts).
+  trucking: {
+    who: `Service-disabled veteran-owned trucking company 12 miles from Fort Bragg: scheduled box-truck routes, dry-van and refrigerated truckload across NC, SC and VA, and on-call trailer and container moves, run by a former Army truck driver. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff, 12 of them drivers.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Truck yard and shop on Gillespie St. 7 tractors, 9 trailers, 4 box trucks with lift gates and a cargo van",
+      "Our own drivers in our own trucks; we don't broker loads",
+    ],
+    extraRows: [
+      ["PSC", "PSC V111 · V119"],
+      ["Authority", "USDOT and MC operating authority since 2017 · SCAC"],
+      ["Contract vehicles", "None yet (not in SDDC's carrier program)"],
+    ] as [string, string][],
+  },
+  // The pack's line (janitorial-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/janitorial/sc/business.ts).
+  janitorial: {
+    who: `HUBZone janitorial and facilities firm 12 miles from Fort Bragg: night custodial crews, floor care, and hot-water pressure washing with wash-water recovery. Crews badged for Fort Bragg and Seymour Johnson. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff. We work across North Carolina, within ${PERSONA.serviceRadiusMiles} miles of our yard.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office and equipment yard on Gillespie St. Two hot-water pressure-washing trailers (3,500 psi), a wash-water recovery kit, burnishers and carpet extractors",
+      "Wash water kept out of storm drains; child-safe chemicals where buildings need them",
+    ],
+    extraRows: [
+      ["PSC", "PSC S201 · S299"],
+      ["Contract vehicles", "Pressure-washing BPA, Seymour Johnson AFB (FA480924A0007)"],
+  // The pack's line (consulting-pack.md §1). The equipment and PSC lines are what
+  // My Business reads off this file (members/consulting/sc/business.ts).
+  consulting: {
+    who: `Service-disabled veteran-owned consulting firm in ${PERSONA.hqCity}: leadership programs, Lean process reviews, strategic plans and HR studies for Army, VA and NC public offices, led by a retired Army HR officer. Founded ${PERSONA.formedOn} in ${PERSONA.hqCity}, ${PERSONA.hqState}. ${PERSONA.employeesW2} staff and seven contract facilitators. We work across North Carolina, South Carolina and Virginia.`,
+    capabilities: [
+      ...PERSONA.differentiators,
+      "Office on Green St. A 30-seat training room, projectors and a 360 survey platform",
+      "PMP, Lean Six Sigma Black Belt and SHRM-SCP; ICF-credentialed coaches",
+    ],
+    extraRows: [
+      ["PSC", "PSC R408 · U008"],
+      ["Contract vehicles", "None yet (no GSA schedule)"],
+    ] as [string, string][],
+  },
+}[MEMBER];
 
 const doc = await PDFDocument.create();
+doc.setTitle(`${PERSONA.businessName} capability statement`);
+doc.setAuthor(PERSONA.businessName);
 const page = doc.addPage([612, 792]);
 const reg = await doc.embedFont(StandardFonts.Helvetica);
 const bold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -40,12 +149,10 @@ function para(t: string, size = 9.5, width = 532) {
 }
 
 heading("Who we are");
-para(`A woman-owned small business in ${PERSONA.hqCity}, ${PERSONA.hqState}, founded ${PERSONA.formedOn}. ${PERSONA.employeesW2} staff and one commercial kitchen. We cook, pack and deliver meals for government buyers across North Carolina, Virginia and South Carolina.`);
+para(COPY.who);
 y -= 6;
 heading("Core capabilities");
-for (const d of PERSONA.differentiators) para(`•  ${d}`);
-para("•  Event and ceremony catering from 50 to 600 guests");
-para("•  HACCP food-safety plan; USDA meal-pattern menus; daily temperature logs");
+for (const d of COPY.capabilities) para(`•  ${d}`);
 y -= 6;
 heading("Past performance");
 for (const p of PAST_PERFORMANCE) {
@@ -61,13 +168,27 @@ const rows: [string, string][] = [
   ["Primary NAICS", `${PERSONA.primaryNaics} ${PERSONA.primaryNaicsLabel}`],
   ["Other NAICS", PERSONA.secondaryNaics.map((n) => `${n.code} ${n.label}`).join(" · ")],
   ["Certifications", PERSONA.certifications.join(" · ")],
+  ...COPY.extraRows,
   ["SAM", "Active, renewed every year"],
 ];
 for (const [k, v] of rows) {
   page.drawText(k, { x: 40, y, size: 9, font: bold, color: navy });
-  page.drawText(v, { x: 150, y, size: 9, font: reg, color: grey });
+  // A long line wraps under its own column.
+  const words = v.split(" ");
+  let line = "";
+  for (const w of words) {
+    const next = line ? `${line} ${w}` : w;
+    if (reg.widthOfTextAtSize(next, 9) > 422) {
+      page.drawText(line, { x: 150, y, size: 9, font: reg, color: grey });
+      y -= 12;
+      line = w;
+    } else line = next;
+  }
+  page.drawText(line, { x: 150, y, size: 9, font: reg, color: grey });
   y -= 14;
 }
-page.drawText("Sample document for the GovPreneurs demo. Haddad Catering is a fictional business.", { x: 40, y: 30, size: 7.5, font: reg, color: grey });
-writeFileSync("public/demo-files/haddad-catering-capability-statement.pdf", await doc.save());
-console.log("written");
+page.drawText(`Sample document for the GovPreneurs demo. ${PERSONA.businessShortName} is a fictional business.`, { x: 40, y: 30, size: 7.5, font: reg, color: grey });
+const out = `public${PERSONA.capabilityStatementFile}`;
+const bytes = await doc.save();
+writeFileSync(out, bytes);
+console.log(`written ${out} (${bytes.length} bytes)`);

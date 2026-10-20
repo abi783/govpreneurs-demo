@@ -89,6 +89,9 @@ const KNOWN: AddressSuggestion[] = [
   { placeId: "p-fayetteville-st", text: "300 Fayetteville St, Raleigh, NC 27601", address: { line1: "300 Fayetteville St", city: "Raleigh", state: "NC", postalCode: "27601" } },
   { placeId: "p-main-ft", text: "2175 Reilly Rd, Fort Bragg, NC 28310", address: { line1: "2175 Reilly Rd", city: "Fort Bragg", state: "NC", postalCode: "28310" } },
   { placeId: "p-pobox", text: "PO Box 5512, Fayetteville, NC 28302", address: { line1: "PO Box 5512", city: "Fayetteville", state: "NC", postalCode: "28302" } },
+  // DEMO: the agency's studio and mailing address (members/agency/persona.ts).
+  { placeId: "p-person", text: "112 Person St, Fayetteville, NC 28301", address: { line1: "112 Person St", city: "Fayetteville", state: "NC", postalCode: "28301" } },
+  { placeId: "p-pobox-3307", text: "PO Box 3307, Fayetteville, NC 28302", address: { line1: "PO Box 3307", city: "Fayetteville", state: "NC", postalCode: "28302" } },
 ];
 
 /** Suggestions for what she typed. A typed street that matches nothing still gets one. */

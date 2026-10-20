@@ -6,10 +6,11 @@
 // uses, the codes of every trade in the Filters drawer, and the common codes
 // that a visitor may type, so a search always finds something real.
 //
-// The member's own four codes sit first in every result list. The list leaves out
+// The member's own codes sit first in every result list. The list leaves out
 // the trade code of the old sample member, because it is not this member's business.
 
 import { PERSONA } from "../story/persona";
+import { VOCAB } from "./vocab";
 
 export interface CodeRow {
   code: string;
@@ -42,6 +43,10 @@ const NAICS: CodeRow[] = [
   { code: "311423", description: "Dried and Dehydrated Food Manufacturing" },
   { code: "312111", description: "Soft Drink Manufacturing" },
   { code: "312112", description: "Bottled Water Manufacturing" },
+  {
+    code: "423430",
+    description: "Computer and Computer Peripheral Equipment and Software Merchant Wholesalers",
+  },
   { code: "424410", description: "General Line Grocery Merchant Wholesalers" },
   { code: "424420", description: "Packaged Frozen Food Merchant Wholesalers" },
   { code: "424430", description: "Dairy Product (except Dried or Canned) Merchant Wholesalers" },
@@ -69,7 +74,10 @@ const NAICS: CodeRow[] = [
   { code: "561740", description: "Carpet and Upholstery Cleaning Services" },
   { code: "561790", description: "Other Services to Buildings and Dwellings" },
   { code: "561920", description: "Convention and Trade Show Organizers" },
+  { code: "561990", description: "All Other Support Services" },
+  { code: "325612", description: "Polish and Other Sanitation Good Manufacturing" },
   { code: "562111", description: "Solid Waste Collection" },
+  { code: "562112", description: "Hazardous Waste Collection" },
   { code: "562119", description: "Other Waste Collection" },
   { code: "562211", description: "Hazardous Waste Treatment and Disposal" },
   { code: "562910", description: "Remediation Services" },
@@ -102,8 +110,24 @@ const NAICS: CodeRow[] = [
     code: "541715",
     description: "Research and Development in the Physical, Engineering, and Life Sciences",
   },
+  // Advertising, marketing and media: the agency's lane
   { code: "541810", description: "Advertising Agencies" },
   { code: "541820", description: "Public Relations Agencies" },
+  { code: "541613", description: "Marketing Consulting Services" },
+  { code: "541430", description: "Graphic Design Services" },
+  { code: "541490", description: "Other Specialized Design Services" },
+  { code: "541830", description: "Media Buying Agencies" },
+  { code: "541840", description: "Media Representatives" },
+  { code: "541850", description: "Indoor and Outdoor Display Advertising" },
+  { code: "541860", description: "Direct Mail Advertising" },
+  { code: "541870", description: "Advertising Material Distribution Services" },
+  { code: "541890", description: "Other Services Related to Advertising" },
+  { code: "541910", description: "Marketing Research and Public Opinion Polling" },
+  { code: "541921", description: "Photography Studios, Portrait" },
+  { code: "541922", description: "Commercial Photography" },
+  { code: "512110", description: "Motion Picture and Video Production" },
+  { code: "512191", description: "Teleproduction and Other Postproduction Services" },
+  { code: "323111", description: "Commercial Printing (except Screen and Books)" },
   { code: "541930", description: "Translation and Interpretation Services" },
   { code: "541990", description: "All Other Professional, Scientific, and Technical Services" },
   {
@@ -157,13 +181,19 @@ const NAICS: CodeRow[] = [
   // Transport, health, education and repair
   { code: "484110", description: "General Freight Trucking, Local" },
   { code: "484121", description: "General Freight Trucking, Long-Distance, Truckload" },
+  { code: "484210", description: "Used Household and Office Goods Moving" },
+  { code: "484220", description: "Specialized Freight (except Used Goods) Trucking, Local" },
   { code: "485410", description: "School and Employee Bus Transportation" },
   { code: "485991", description: "Special Needs Transportation" },
+  { code: "488490", description: "Other Support Activities for Road Transportation" },
   { code: "488510", description: "Freight Transportation Arrangement" },
+  { code: "488991", description: "Packing and Crating" },
   { code: "492110", description: "Couriers and Express Delivery Services" },
   { code: "492210", description: "Local Messengers and Local Delivery" },
   { code: "493110", description: "General Warehousing and Storage" },
+  { code: "532120", description: "Truck, Utility Trailer, and RV (Recreational Vehicle) Rental and Leasing" },
   { code: "621111", description: "Offices of Physicians (except Mental Health Specialists)" },
+  { code: "621330", description: "Offices of Mental Health Practitioners (except Physicians)" },
   { code: "621610", description: "Home Health Care Services" },
   { code: "622110", description: "General Medical and Surgical Hospitals" },
   { code: "623110", description: "Nursing Care Facilities (Skilled Nursing Facilities)" },
@@ -210,6 +240,14 @@ const PSC: CodeRow[] = [
   { code: "S208", description: "HOUSEKEEPING- LANDSCAPING/GROUNDSKEEPING" },
   { code: "S209", description: "HOUSEKEEPING- LAUNDRY/DRY CLEANING" },
   { code: "S216", description: "HOUSEKEEPING- FACILITIES OPERATIONS SUPPORT" },
+  // Transportation
+  { code: "V112", description: "TRANSPORTATION/TRAVEL/RELOCATION- TRANSPORTATION: MOTOR FREIGHT" },
+  { code: "V301", description: "TRANSPORTATION/TRAVEL/RELOCATION- RELOCATION: RELOCATION SERVICES" },
+  { code: "R602", description: "SUPPORT- ADMINISTRATIVE: COURIER/MESSENGER" },
+  // Advertising and media
+  { code: "R701", description: "SUPPORT- MANAGEMENT: ADVERTISING" },
+  { code: "R708", description: "SUPPORT- MANAGEMENT: PUBLIC RELATIONS" },
+  { code: "T001", description: "PHOTO/MAP/PRINT/PUBLICATION- ARTS/GRAPHICS" },
   // Professional and administrative support
   { code: "R408", description: "SUPPORT- PROFESSIONAL: PROGRAM MANAGEMENT/SUPPORT" },
   { code: "R499", description: "SUPPORT- PROFESSIONAL: OTHER" },
@@ -301,6 +339,23 @@ const ALIASES: Record<string, string[]> = {
   cyber: ["computer systems", "computer related"],
   lodging: ["hotels", "accommodation"],
   hotel: ["hotels"],
+  // Marketing words
+  ad: ["advertising"],
+  ads: ["advertising"],
+  marketing: ["marketing", "advertising"],
+  branding: ["advertising", "marketing", "design"],
+  campaign: ["advertising", "marketing"],
+  video: ["video", "teleproduction"],
+  film: ["motion picture", "video"],
+  pr: ["public relations"],
+  publicity: ["public relations"],
+  graphics: ["graphic design"],
+  logo: ["graphic design"],
+  social: ["advertising", "marketing", "media"],
+  media: ["media", "advertising", "marketing"],
+  digital: ["advertising", "marketing"],
+  billboard: ["outdoor display"],
+  photo: ["photography"],
 };
 
 /** A word cut to its root, so "catering" and "caterers" meet at "cater". */
@@ -324,7 +379,10 @@ function scoreRow(row: CodeRow, queryTokens: string[]): number {
   for (const t of queryTokens) {
     const s = stem(t);
     const alias = (ALIASES[t] ?? []).some((a) => row.description.toLowerCase().includes(a));
-    const prefix = words.some((w) => w.startsWith(t)) || wordStems.some((w) => w.startsWith(s));
+    // A two-letter word ("pr", "ad") is an abbreviation, not the start of every word.
+    const prefix =
+      t.length > 2 &&
+      (words.some((w) => w.startsWith(t)) || wordStems.some((w) => w.startsWith(s)));
     const inside = row.description.toLowerCase().includes(t);
     if (prefix) score += 3;
     else if (alias) score += 2;
@@ -365,9 +423,9 @@ export function searchNaics(q: string, limit = 20): CodeRow[] {
   );
 }
 
-/** PSC codes that match a code prefix or words. The food codes come first. */
+/** PSC codes that match a code prefix or words. The member's main code comes first. */
 export function searchPsc(q: string, limit = 20): CodeRow[] {
-  return search(PSC, q, limit, (r) => (r.code === "S203" ? 4 : 0));
+  return search(PSC, q, limit, (r) => (r.code === VOCAB.mainPsc ? 4 : 0));
 }
 
 /** Every NAICS code the demo holds. The tests read it. */

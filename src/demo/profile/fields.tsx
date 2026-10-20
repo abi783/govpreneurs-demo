@@ -5,12 +5,18 @@
 // demo store (store.ts) and laid over these starting values.
 
 import type { ReactNode } from "react";
-import { PAST_PERFORMANCE, PERSONA } from "../story/persona";
+import { MEMBER, byMember, own } from "../member";
+import { PAST_PERFORMANCE, findPastPerformance, PERSONA } from "../story/persona";
+import { OWN, SET_ASIDES } from "../story/setAsides";
 import { fmtLong, fmtShort, toIsoDay } from "./dates";
 import { daysFromNow, isoDaysFromNow } from "../story/clock";
 import { SAM_CHECKED_DAYS_AGO } from "../sc/timeline";
 import type { FieldOverride, FieldState, FieldValue } from "./store";
 import type { DfyServiceId } from "./dfy";
+
+const copy = own(
+  import.meta.glob<typeof import("../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
+);
 
 export type EditInputType =
   | "text"
@@ -97,12 +103,18 @@ const STATE_NAMES: Record<string, string> = { NC: "North Carolina", VA: "Virgini
 const SAM_DAYS = SAM_CHECKED_DAYS_AGO;
 const FORMED_ISO = toIsoDay(PERSONA.formedOn);
 const SECONDARY = PERSONA.secondaryNaics;
-const CORE_CAPABILITIES = [
-  "Contract meal service from one commercial kitchen",
-  "Therapeutic diets (renal, diabetic, pureed)",
-  "Halal and allergen-labeled menus",
-  "Event and ceremony catering",
-];
+// DEMO: the member's own words for her work, and the examples in the boxes.
+const CORE_CAPABILITIES = byMember({
+  caterer: [
+    "Contract meal service from one commercial kitchen",
+    "Therapeutic diets (renal, diabetic, pureed)",
+    "Halal and allergen-labeled menus",
+    "Event and ceremony catering",
+  ],
+  pack: copy.CORE_CAPABILITIES,
+});
+const NAICS_EXAMPLE = `${PERSONA.primaryNaics} ${PERSONA.primaryNaicsLabel}`;
+const PSC_EXAMPLE = byMember({ caterer: "S203, S206", pack: copy.PSC_EXAMPLE });
 
 // ── validation ───────────────────────────────────────────────────────────────
 
@@ -291,7 +303,7 @@ const DEFS: FieldDef[] = [
       source: `SAM.gov on ${ago(SAM_DAYS)}`,
       at: iso(SAM_DAYS),
     },
-    edit: { type: "text", placeholder: "722310 Food Service Contractors", validate: requiredCheck("a NAICS code") },
+    edit: { type: "text", placeholder: NAICS_EXAMPLE, validate: requiredCheck("a NAICS code") },
     show: (v) => {
       const t = String(v ?? "");
       const m = /^(\d{2,6})\s+(.*)$/.exec(t);
@@ -351,7 +363,7 @@ const DEFS: FieldDef[] = [
     label: "PSC Codes",
     helper: "Auto-derived from your NAICS. Refine if needed.",
     initial: { state: "missing" },
-    edit: { type: "text", placeholder: "S203, S206" },
+    edit: { type: "text", placeholder: PSC_EXAMPLE },
   },
   {
     id: "keywords",
@@ -438,11 +450,18 @@ const DEFS: FieldDef[] = [
     id: "wosb-doc",
     tab: "certifications",
     tier: "T2",
-    label: "WOSB/EDWOSB Certification",
-    helper: "Upload your SBA woman-owned small business certificate so buyers can check it.",
-    initial: { state: "attested", value: "WOSB certificate.pdf", source: `You uploaded WOSB certificate.pdf on ${ago(60)}`, at: iso(60) },
+    // DEMO: the member's own certificate (story/setAsides.ts). WOSB for the caterer and the agency.
+    label: OWN === "WOSB" || OWN === "SBA" ? "WOSB/EDWOSB Certification" : `${SET_ASIDES[OWN].title} Certification`,
+    helper: `Upload your ${SET_ASIDES[OWN === "SBA" ? "WOSB" : OWN].certificate} certificate so buyers can check it.`,
+    initial:
+      OWN === "SBA"
+        ? { state: "missing" }
+        : { state: "attested", value: `${SET_ASIDES[OWN].abbr} certificate.pdf`, source: `You uploaded ${SET_ASIDES[OWN].abbr} certificate.pdf on ${ago(60)}`, at: iso(60) },
     edit: { type: "file" },
-    whyItMatters: "Women-owned set-asides ask for proof of certification. Hunter flags these on matching bids.",
+    whyItMatters:
+      OWN === "WOSB" || OWN === "SBA"
+        ? "Women-owned set-asides ask for proof of certification. Hunter flags these on matching bids."
+        : `${SET_ASIDES[OWN].title} set-asides ask for proof of certification. Hunter flags these on matching bids.`,
   },
   {
     id: "8a",
@@ -589,7 +608,7 @@ const DEFS: FieldDef[] = [
     initial: { state: "attested", value: "Both, leaning set-aside", source: told(112), at: iso(112) },
     edit: { type: "select", options: ["Set-aside only", "Both, leaning set-aside", "Both, leaning open", "Full-and-open only"] },
     show: (v) =>
-      v === "Full-and-open only" ? String(v) : `${v} (you're a woman-owned small business)`,
+      v === "Full-and-open only" ? String(v) : `${v} (you're ${SET_ASIDES[OWN].aBusiness})`,
     chatEditable: true,
     whyItMatters:
       "Set-aside opportunities have less competition. Full-and-open are bigger but compete with everyone — this tells Hunter where to focus.",
@@ -684,7 +703,11 @@ const DEFS: FieldDef[] = [
     label: "Bonding Capability",
     initial: {
       state: "attested",
-      value: `Up to $${PERSONA.largestBond.toLocaleString("en-US")} (the largest bond you have carried)`,
+      // DEMO: the agency has never carried a bond (ad work is not bonded).
+      value:
+        PERSONA.largestBond > 0
+          ? `Up to $${PERSONA.largestBond.toLocaleString("en-US")} (the largest bond you have carried)`
+          : "None so far. Your work has never needed a bond.",
       source: told(80),
       at: iso(80),
     },
@@ -698,13 +721,17 @@ const DEFS: FieldDef[] = [
     tab: "bidder-profile",
     tier: "T3",
     label: "Teaming Partners",
-    initial: {
-      state: "attested",
-      value: `Subcontractor to Fort Bragg dining prime, ${new Date(
-        PAST_PERFORMANCE.find((p) => p.id === "pp-cdg-sub")!.periodStart,
-      ).getUTCFullYear()}`,
-      source: "From your past performance",
-    },
+    // DEMO: the caterer once worked under a dining prime; the agency has not teamed yet.
+    initial: byMember<FieldDef["initial"]>({
+      caterer: {
+        state: "attested",
+        value: `Subcontractor to Fort Bragg dining prime, ${new Date(
+          findPastPerformance("pp-cdg-sub")!.periodStart,
+        ).getUTCFullYear()}`,
+        source: "From your past performance",
+      },
+      pack: { state: "missing" },
+    }),
     edit: { type: "textarea" },
   },
   { id: "dealbreakers", tab: "bidder-profile", tier: "T3", label: "Bid/No-Bid Deal-Breakers", initial: { state: "missing" }, edit: { type: "textarea" } },
@@ -720,6 +747,8 @@ export function fieldsOnTab(tab: ProfileTab): FieldDef[] {
 }
 
 // ── the food-handler certificates: a count, shown on the Certifications tab ──
+// DEMO: the caterer's row only. The agency has no food handlers, so the row is
+// not on her tab (the capability statement builder still reads it by id).
 
 export const FOOD_HANDLER_DEF: FieldDef = {
   id: "food-handlers",
@@ -732,7 +761,7 @@ export const FOOD_HANDLER_DEF: FieldDef = {
   whyItMatters:
     "School and base dining buyers ask for a current certificate for everyone who handles food. Missing ones cost points.",
 };
-DEFS.push(FOOD_HANDLER_DEF);
+if (MEMBER === "caterer") DEFS.push(FOOD_HANDLER_DEF);
 FIELD_DEFS[FOOD_HANDLER_DEF.id] = FOOD_HANDLER_DEF;
 
 // ── effective values: the starting values with the visitor's changes on top ──

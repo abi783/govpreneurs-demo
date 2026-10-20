@@ -7,6 +7,9 @@
 // the live pipeline's own vocabulary.
 //
 // Layer: ENTITIES. This module imports nothing.
+// DEMO: except the sample member, to pick which list she is offered.
+
+import { MEMBER } from "@/demo/member";
 
 export type MicroCategory =
   // DEMO: three food-service categories for a caterer. Production has none.
@@ -32,7 +35,7 @@ export type MicroCategory =
   // board. Orders in it are excluded and COUNTED, never silently dropped.
   | "other";
 
-export const MICRO_CATEGORIES: { id: MicroCategory; label: string; hint: string }[] = [
+const ALL_CATEGORIES: { id: MicroCategory; label: string; hint: string }[] = [
   // DEMO: the sample member is a caterer, so her three kinds of food-service
   // buy come first. The hardware categories stay below, as in production.
   { id: "food-beverage", label: "Food and drink", hint: "Meal pouches, rice, pasta, coffee, water" },
@@ -73,6 +76,12 @@ export const MICRO_CATEGORIES: { id: MicroCategory; label: string; hint: string 
   { id: "fasteners", label: "Bolts, screws and fasteners", hint: "Bolts, screws, nuts, washers" },
 ];
 
+// DEMO: the agency is offered production's list, with no food-service categories.
+const FOOD_SERVICE: readonly MicroCategory[] = ["food-beverage", "food-service-supplies", "kitchen-equipment"];
+
+export const MICRO_CATEGORIES: { id: MicroCategory; label: string; hint: string }[] =
+  MEMBER === "caterer" ? ALL_CATEGORIES : ALL_CATEGORIES.filter((c) => !FOOD_SERVICE.includes(c.id));
+
 export const CATEGORY_LABEL: Record<MicroCategory, string> = Object.fromEntries(
-  MICRO_CATEGORIES.map((c) => [c.id, c.label]),
+  ALL_CATEGORIES.map((c) => [c.id, c.label]),
 ) as Record<MicroCategory, string>;

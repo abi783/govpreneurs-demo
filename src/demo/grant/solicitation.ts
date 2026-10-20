@@ -6,9 +6,10 @@
 
 import { PERSONA } from "@/demo/story/persona";
 import { questionsDate } from "./dates";
-import { domainFor, offerWord, type Domain } from "./domains";
+import { buyerShort, domainFor, offerWord, type Domain } from "./domains";
 import { longDate, type OppFacts, termText, usd } from "./facts";
 import { pinx } from "./rich";
+import { V } from "./vocab";
 import type { Pin } from "@/lib/grant/types";
 
 export interface Clause {
@@ -119,13 +120,13 @@ const LOCAL_LAYOUT: Layout = {
 
 export function naicsLabel(code: string): string {
   if (code === PERSONA.primaryNaics) return PERSONA.primaryNaicsLabel;
-  return PERSONA.secondaryNaics.find((n) => n.code === code)?.label ?? "Food service";
+  return PERSONA.secondaryNaics.find((n) => n.code === code)?.label ?? V.trade;
 }
 
 /** Small-business size standard text. Only the primary code carries a stated figure. */
 function sizeText(code: string): string {
-  return code === PERSONA.primaryNaics
-    ? "The small business size standard is $47.0 million in average annual receipts."
+  return code === PERSONA.primaryNaics && V.sizeStandard
+    ? `The small business size standard is ${V.sizeStandard.long} in average annual receipts.`
     : "The small business size standard for this code applies.";
 }
 
@@ -136,15 +137,16 @@ const DOC_TITLE: Record<string, string> = {
   Solicitation: "SOLICITATION",
   "Invitation for Bid": "INVITATION FOR BID",
   "Sources Sought": "SOURCES SOUGHT NOTICE",
+  "Special Notice": "SPECIAL NOTICE",
 };
 
 function defaultText(f: OppFacts, d: Domain): Record<string, string | null> {
   const opp = f.opp;
   const offer = offerWord(opp);
-  const closes = `${longDate(f.closes)}, 5:00 PM Eastern`;
+  const closes = `${longDate(f.closes)}, ${V.dueInClauses(opp)}`;
   const questionsBy = questionsDate(f);
   const wageApplies = f.isFederal && d.documents.includes("wage");
-  return {
+  const generic: Record<string, string | null> = {
     purpose: `${opp.agency}, ${opp.office}, requests ${offer === "bid" ? "sealed bids" : `${offer}s`} for ${opp.title}. The solicitation number is ${opp.id}. The notice was posted on ${longDate(f.posted)}.`,
     setAside:
       opp.setAside === "WOSB"
@@ -203,6 +205,7 @@ function defaultText(f: OppFacts, d: Domain): Record<string, string | null> {
         ? null
         : `Factors and weights: ${d.scoring.map((s) => `${s.factor} (${s.weight} percent)`).join("; ")}.`,
   };
+  return { ...generic, ...V.clauses(f, offer) };
 }
 
 const NOTICE_SECTIONS = [
@@ -214,23 +217,27 @@ const NOTICE_SECTIONS = [
 
 /** A sources sought notice is short. It has no price, no award and no set-aside yet. */
 function buildNotice(f: OppFacts, patches: ClausePatch[]): Solicitation {
-  const closes = `${longDate(f.closes)}, 5:00 PM Eastern`;
+  const closes = `${longDate(f.closes)}, ${V.dueInClauses(f.opp)}`;
+  const buyer = buyerShort(f.opp);
+  const Buyer = buyer.charAt(0).toUpperCase() + buyer.slice(1);
   const base: Clause[] = [
     { kind: "purpose", ref: "1.1", heading: "Purpose", text: `${f.opp.agency}, ${f.opp.office}, is doing market research. It wants to know which small businesses could provide ${domainFor(f.opp).service} before it writes the next contract. The notice number is ${f.id}. The notice was posted on ${longDate(f.posted)}.` },
-    { kind: "setAside", ref: "1.2", heading: "No set-aside yet", text: "This is not a solicitation. The Army has not decided on a set-aside. It uses the replies to decide whether to set the next contract aside for small businesses." },
+    { kind: "setAside", ref: "1.2", heading: "No set-aside yet", text: `This is not a solicitation. ${Buyer} has not decided on a set-aside. It uses the replies to decide whether to set the next contract aside for small businesses.` },
     { kind: "naics", ref: "1.3", heading: "Industry code", text: `The NAICS code for this work is ${f.opp.naics}, ${naicsLabel(f.opp.naics)}.` },
-    { kind: "sam", ref: "2.3", heading: "Registration", text: "A firm that replies should be registered in SAM. The Army uses SAM to confirm size and certifications." },
-    { kind: "ask", ref: "2.1", heading: "What the Army asks", text: "A firm that wants to reply sends two short parts: (1) what the firm does, with its NAICS codes, size and certifications; and (2) what it did for past customers, with a contact for each." },
-    { kind: "noprice", ref: "2.2", heading: "No price", text: "Do not send a price. The Army will not pay for a reply, and a reply is not an offer." },
+    { kind: "sam", ref: "2.3", heading: "Registration", text: `A firm that replies should be registered in SAM. ${Buyer} uses SAM to confirm size and certifications.` },
+    { kind: "ask", ref: "2.1", heading: `What ${buyer} asks`, text: "A firm that wants to reply sends two short parts: (1) what the firm does, with its NAICS codes, size and certifications; and (2) what it did for past customers, with a contact for each." },
+    { kind: "noprice", ref: "2.2", heading: "No price", text: `Do not send a price. ${Buyer} will not pay for a reply, and a reply is not an offer.` },
     { kind: "submit", ref: "3.1", heading: "How to reply", text: `Reply by email to ${f.contact.name}, ${f.contact.title}, at ${f.contact.email}, by ${closes}.` },
     { kind: "content", ref: "3.2", heading: "Format", text: "Put both parts in one PDF of up to four pages. Name the PDF with your firm name and the notice number." },
-    { kind: "disclaimer", ref: "4.1", heading: "No award", text: "The Army will not award a contract from this notice. A reply does not commit the firm or the Army to anything." },
+    { kind: "disclaimer", ref: "4.1", heading: "No award", text: `${Buyer} will not award a contract from this notice. A reply does not commit the firm or ${buyer} to anything.` },
   ];
   const byKind = new Map(base.map((c) => [c.kind, c]));
   for (const p of patches) {
     const hit = byKind.get(p.kind);
-    if (hit) hit.text = p.text;
-    else base.push({ kind: p.kind, ref: p.ref ?? `4.${base.length}`, heading: p.heading ?? p.kind, text: p.text });
+    if (hit) {
+      hit.text = p.text;
+      if (p.heading) hit.heading = p.heading;
+    } else base.push({ kind: p.kind, ref: p.ref ?? `4.${base.length}`, heading: p.heading ?? p.kind, text: p.text });
   }
   const sections = NOTICE_SECTIONS.map((s) => ({
     id: s.id,
@@ -241,8 +248,10 @@ function buildNotice(f: OppFacts, patches: ClausePatch[]): Solicitation {
 }
 
 /** Build the sample solicitation for one opportunity. */
-export function buildSolicitation(f: OppFacts, patches: ClausePatch[] = []): Solicitation {
-  if (f.isSourcesSought) return buildNotice(f, patches);
+export function buildSolicitation(f: OppFacts, own: ClausePatch[] = []): Solicitation {
+  if (f.isSourcesSought) return buildNotice(f, own);
+  // The trade's own clauses first; a notice's own patch of the same kind wins.
+  const patches = [...V.extraClauses(f).filter((x) => !own.some((p) => p.kind === x.kind)), ...own];
   const d = domainFor(f.opp);
   const layout = f.isFederal ? FED_LAYOUT : LOCAL_LAYOUT;
   const sectionDefs = f.isFederal ? FED_SECTIONS : LOCAL_SECTIONS;

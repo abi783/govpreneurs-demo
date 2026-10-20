@@ -12,10 +12,13 @@
 // here, and each states a fact that is true of the member in persona.ts.
 
 import { dayFromNow } from "../../lib/ava/dates";
+import { byMember } from "../member";
 import { getGrantBrief } from "../story/grantBriefs";
+import { getOpportunity } from "../story/opportunities";
 import { PERSONA } from "../story/persona";
 import { findOpportunity, type AvaOpportunity } from "./opportunity";
 import { KNOCKOUT_FACT, PROOF_FACT, type GrantFacts } from "./grantFacts";
+
 
 export type GrantRowStatus = "have" | "missing" | "confirm" | "unknown";
 
@@ -95,6 +98,18 @@ function row(
 ): GrantRow {
   return { id, requirement, ref, requiredValue, firmValue, status };
 }
+
+/** What a pack member's written read (members/<id>/ava/grantRead.ts) is built with. */
+export interface GrantReadKit {
+  row: typeof row;
+  active: string;
+  limits: typeof limits;
+}
+
+// Every pack member's written read for its hero bid, so any member can open it by its number.
+const PACK_READS = Object.values(
+  import.meta.glob<typeof import("../members/agency/ava/grantRead")>("/src/demo/members/*/ava/grantRead.ts", { eager: true }),
+);
 
 function limits(oppId: string, fallback: string[]): string[] {
   return getGrantBrief(oppId)?.limits ?? fallback;
@@ -313,7 +328,11 @@ function genericRows(opp: AvaOpportunity): GrantRow[] {
       "g-naics",
       "Industry code",
       "Notice",
-      "Food service",
+      // DEMO: the agency's bids span several codes, so its row names the notice's own.
+      byMember({
+        caterer: "Food service",
+        pack: getOpportunity(opp.noticeId)?.naics ?? "Notice",
+      }),
       `${PERSONA.primaryNaics} is your main code`,
       "have",
     ),
@@ -347,7 +366,8 @@ function genericRows(opp: AvaOpportunity): GrantRow[] {
 /** The sample for an opportunity: written for Ava's bids, generic elsewhere. */
 export function sampleFor(opp: AvaOpportunity): GrantSample {
   return (
-    SAMPLES[opp.noticeId] ?? {
+    SAMPLES[opp.noticeId] ??
+    PACK_READS.find((p) => p.HERO_ID === opp.noticeId)?.grantRead({ row, active, limits }) ?? {
       rows: genericRows(opp),
       warnings: [],
       deadline: { bondingLeadDays: 0, ppqTurnaroundDays: 3, subQuoteDays: 0, writingDays: 3 },
