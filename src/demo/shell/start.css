@@ -5,14 +5,64 @@
   background: var(--bg);
 }
 
-.start-card {
+/* The landing page: headline, then the form, then the reasons (phone);
+   pitch on the left and the form card on the right (desktop). */
+.start-landing {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--s-10) var(--s-4) var(--s-16);
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: "hero" "form" "why";
+  gap: var(--s-8);
+}
+.start-hero { grid-area: hero; }
+.start-why { grid-area: why; display: flex; flex-direction: column; gap: var(--s-6); }
+.start-landing .start-card {
+  grid-area: form;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-hover);
+  padding: var(--s-6);
+}
+.start-form-title { color: var(--text-ink); }
+.start-form-lead { color: var(--text-2); margin-top: var(--s-1); }
+.start-landing .start-form { margin-top: var(--s-5); }
+
+.start-benefits { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-4); }
+.start-benefits li { display: flex; gap: var(--s-3); align-items: flex-start; }
+.start-benefits svg { color: var(--accent); flex: none; margin-top: 2px; }
+.start-benefits span { display: flex; flex-direction: column; gap: 2px; color: var(--text-2); font-size: 14px; line-height: 1.45; }
+.start-benefits b { color: var(--text); font-size: 15px; font-weight: 600; }
+
+.start-shot { margin: 0; }
+.start-shot img { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: var(--r-md); box-shadow: var(--sh-rest); }
+.start-shot figcaption { color: var(--text-3); margin-top: var(--s-2); }
+
+.start-proof { color: var(--text-2); font-size: 14px; line-height: 1.5; border-left: 3px solid var(--accent); padding-left: var(--s-3); }
+.start-proof b { color: var(--text-ink); font-size: 16px; }
+.start-proof .t-caption { color: var(--text-3); }
+
+@media (min-width: 960px) {
+  .start-landing {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas: "hero form" "why form";
+    column-gap: var(--s-12);
+    padding-top: var(--s-16);
+  }
+  .start-landing .start-card { align-self: start; position: sticky; top: var(--s-6); }
+}
+
+/* The presenter sign-in (routes/admin.tsx). */
+.start-page > .start-card {
   max-width: 560px;
   margin: 0 auto;
   padding: var(--s-12) var(--s-6) var(--s-16);
 }
 .start-card--narrow { max-width: 420px; }
 
-.start-logo { height: 32px; width: auto; display: block; margin-bottom: var(--s-8); }
+.start-logo { height: 32px; width: auto; display: block; margin-bottom: var(--s-6); }
 .start-title { color: var(--text-ink); }
 .start-lead { color: var(--text-2); margin-top: var(--s-2); }
 

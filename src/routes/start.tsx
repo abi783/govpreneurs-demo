@@ -4,6 +4,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
+import { PenLine, Scale, Search } from "lucide-react";
 import { Button, Input } from "@/components/ui";
 import { MEMBER_KEY, MEMBERS } from "@/demo/member";
 import { NICHES, saveVisitor, sendLead, type Visitor } from "@/demo/visitor";
@@ -15,7 +16,7 @@ interface StartSearch {
 }
 
 export const Route = createFileRoute("/start")({
-  head: () => ({ meta: [{ title: "See GovPreneurs with a business like yours" }] }),
+  head: () => ({ meta: [{ title: "Try GovPreneurs free · win government contracts" }] }),
   validateSearch: (s: Record<string, unknown>): StartSearch => ({
     next: typeof s.next === "string" ? s.next : undefined,
     member: typeof s.member === "string" ? s.member : undefined,
@@ -72,13 +73,53 @@ function StartScreen() {
   return (
     <div className="start-page">
       <div className="brand-stripe" />
-      <main className="start-card">
-        <img src="/brand/govpreneurs-logo.svg" alt="GovPreneurs" className="start-logo" />
-        <h1 className="t-display-lg start-title">See a business like yours</h1>
-        <p className="t-body-lg start-lead">
-          Pick your trade. You will explore a sample business that does the same work.
-        </p>
+      <main className="start-landing">
+        <section className="start-hero">
+          <img src="/brand/govpreneurs-logo.svg" alt="GovPreneurs" className="start-logo" />
+          <h1 className="t-display-lg start-title">Win government contracts without the guesswork</h1>
+          <p className="t-body-lg start-lead">
+            GovPreneurs finds the contracts your small business can win, tells you which ones to bid, and writes
+            the bid with you. Try it free as a business in your trade. It takes two minutes.
+          </p>
+        </section>
 
+        <section className="start-why" aria-label="What you will try">
+          <ul className="start-benefits">
+            <li>
+              <Search size={18} aria-hidden />
+              <span>
+                <b>Hunter finds your matches every morning</b>
+                Federal, state and local notices, each with one line on why it fits you.
+              </span>
+            </li>
+            <li>
+              <Scale size={18} aria-hidden />
+              <span>
+                <b>Grant says bid or skip, and why</b>
+                He reads the fine print, so you stop chasing contracts you can't win.
+              </span>
+            </li>
+            <li>
+              <PenLine size={18} aria-hidden />
+              <span>
+                <b>Ava writes the bid with you</b>
+                She asks only what she can't find. A former contracting officer can check it.
+              </span>
+            </li>
+          </ul>
+          <figure className="start-shot">
+            <img src="/landing/hunter-match.jpg" alt="Hunter explains a match: an HVAC and electrical job at Fort Bragg that fits a contractor's code, set-aside, size and location." />
+            <figcaption className="t-caption">A real kind of match, explained in one line. This one is for a contractor.</figcaption>
+          </figure>
+          <p className="start-proof">
+            <b>$183 billion</b> in federal contracts went to small businesses in 2024. Most never find the ones that fit them.
+            <span className="t-caption"> Source: SBA small business procurement scorecard, FY2024.</span>
+          </p>
+        </section>
+
+        <section className="start-card" aria-labelledby="start-form-title">
+          <h2 id="start-form-title" className="t-heading start-form-title">Try the demo free</h2>
+          <p className="t-body-sm start-form-lead">Pick your trade. You'll see a sample business that does your kind of work.</p>
         <form onSubmit={submit} noValidate className="start-form">
           <div className="start-field">
             <Input label="Your name" name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!nameError} />
@@ -112,12 +153,13 @@ function StartScreen() {
           </fieldset>
 
           <Button type="submit" variant="primary" className="start-go">
-            Open my demo
+            Try the demo
           </Button>
           <p className="t-caption start-note">
-            We use these details only to follow up about GovPreneurs. Everything in the demo is sample data.
+            Free. No card, no setup. Everything in the demo is sample data. We use your details only to follow up about GovPreneurs.
           </p>
         </form>
+        </section>
       </main>
     </div>
   );
