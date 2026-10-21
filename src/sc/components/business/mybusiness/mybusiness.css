@@ -709,7 +709,7 @@ button.mb-row__box--empty:hover {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: var(--n-8);
+  color: var(--n-9);
 }
 
 .gpds .mb-prov__src {
@@ -2076,7 +2076,6 @@ button.mb-row__box--empty:hover {
   margin: 0 0 var(--s-6);
   padding: var(--s-4) var(--s-5);
   border: 1px solid var(--warn-3);
-  border-left: 4px solid var(--warn-7);
   border-radius: var(--r-md);
   background: var(--warn-2);
 }
@@ -2833,7 +2832,7 @@ button.mb-row__box--empty:hover {
   gap: 4px;
   margin: 0 0 var(--s-1);
   font-size: 11px;
-  color: var(--n-8);
+  color: var(--n-9);
 }
 
 .gpds .mb-prop__val {
