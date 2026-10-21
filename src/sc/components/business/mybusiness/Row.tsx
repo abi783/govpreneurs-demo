@@ -173,6 +173,8 @@ export function Row(props: RowProps): ReactElement {
   const lines = valueLines(field.fieldKey, field.value);
   /** This row is an invitation rather than a report — see the box below. */
   const prompting = contract.value === "prompt";
+  /** The one-tap confirm shows; it carries the source line itself. */
+  const asking = contract.action === "confirm" && props.onConfirm !== undefined && !change.editing;
 
   return (
     <>
@@ -205,9 +207,18 @@ export function Row(props: RowProps): ReactElement {
                 the value there and she has not yet agreed with it — never on a
                 row she typed herself, and never on an expiry, which agreeing
                 cannot fix. */}
-            {contract.action === "confirm" && props.onConfirm && !change.editing ? (
+            {asking ? (
               <p className="mb-row__ask">
                 <span className="mb-row__origin">{field.origin}</span>
+                {field.provenance ? (
+                  <>
+                    <span aria-hidden="true">{SEPARATOR}</span>
+                    <button type="button" className="mb-prov__src" onClick={() => setSourceOpen(true)}>
+                      {field.provenance.sourceLabel ?? field.provenance.type}
+                    </button>
+                    <span aria-hidden="true">{SEPARATOR}</span>
+                  </>
+                ) : null}
                 <button
                   type="button"
                   className="mb-row__yes"
@@ -219,7 +230,7 @@ export function Row(props: RowProps): ReactElement {
                 </button>
               </p>
             ) : null}
-            {contract.provenance && !props.asForm ? (
+            {contract.provenance && !asking ? (
               <ProvenanceLine field={field} onOpenSource={() => setSourceOpen(true)} />
             ) : null}
             {props.proposal ? (
@@ -410,9 +421,28 @@ function RowProposal({
   /** A yes she cannot complete is never offered: with a pick to make, the
    *  button waits until she has kept one. */
   const ready = picked ? canConfirm(picked) : true;
+  const [sourceOpen, setSourceOpen] = useState(false);
+  const source = proposal.provenance;
   return (
     <div className="mb-prop">
-      <p className="gpds-mono mb-prop__from">{proposal.origin}</p>
+      <p className="gpds-mono mb-prop__from">
+        <span>{proposal.origin}</span>
+        {source ? (
+          <>
+            <span aria-hidden="true">{SEPARATOR}</span>
+            <button type="button" className="mb-prov__src" onClick={() => setSourceOpen(true)}>
+              {source.sourceLabel ?? source.type}
+            </button>
+          </>
+        ) : null}
+      </p>
+      {sourceOpen && source ? (
+        <SourceSheet
+          provenance={forSheet(source)}
+          claim={lines.map((l) => l.text).join(SEPARATOR)}
+          onClose={() => setSourceOpen(false)}
+        />
+      ) : null}
       <div className="mb-prop__val">
         {choose ? (
           <ItemPicker choose={choose} kept={kept} onKept={setKept} busy={busy} />

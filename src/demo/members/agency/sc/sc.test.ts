@@ -26,10 +26,10 @@ describe.runIf(ONSTAGE)(`My Business seed (${MEMBER})`, () => {
   const payload = buildPayload(seed);
   const score = readyScore(payload.fields, undefined, payload.media);
 
-  it("starts at the story's score, with gaps and three suggestions", () => {
+  it("starts at the story's score, with gaps and open suggestions", () => {
     expect(`${score.settled} of ${score.total}`).toBe(byMember({ caterer: "47 of 55", pack: "44 of 51" }));
     expect(payload.counter).toEqual({ answered: 14, total: 14 });
-    expect(payload.proposals).toHaveLength(3);
+    expect(payload.proposals).toHaveLength(byMember({ caterer: 4, pack: 3 }));
   });
 
   it("every stored answer and suggestion passes the record's own check", () => {

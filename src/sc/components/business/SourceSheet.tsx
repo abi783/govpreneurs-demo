@@ -12,6 +12,8 @@ export function SourceSheet({ provenance, claim, onClose }: {
 }) {
   const p = provenance;
   const label = p.sourceLabel ?? (p.type === "profile" ? "Your record" : p.type);
+  const cited = p.conversation?.turns?.find((t) => t.id === p.conversation?.cited_turn_id);
+  const herWords = cited?.role === "member";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.45)" }} onClick={onClose}>
@@ -42,6 +44,9 @@ export function SourceSheet({ provenance, claim, onClose }: {
                   <p className="text-gray-900">{t.text}</p>
                 </div>
               ))}
+              {p.conversation.attested && herWords ? (
+                <p className="text-xs font-semibold text-green-700">You answered this directly</p>
+              ) : null}
             </div>
           ) : p.excerpt ? (
             <p className="text-sm leading-relaxed">
@@ -63,8 +68,12 @@ export function SourceSheet({ provenance, claim, onClose }: {
 
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50">
           <p className="font-mono text-[11px] text-gray-500">
-            {label}
-            {p.retrievedAt ? ` · ${p.retrievedAt}` : ""}
+            {herWords ? "You said this · verbatim, not paraphrased" : (
+              <>
+                {label}
+                {p.retrievedAt ? ` · ${p.retrievedAt}` : ""}
+              </>
+            )}
           </p>
         </div>
       </div>

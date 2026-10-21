@@ -204,6 +204,7 @@ function originKeyOf(stored: string): OriginKey | null {
   const keys: OriginKey[] = [
     "member.typed", "member.confirmed", "ghl.contact", "intake.migration",
     "hunter.warm_start", "hunter.learned", "member.told", "capability_statement", "sam.gov",
+    "mentor.call",
   ];
   return keys.find((k) => k === stored) ?? null;
 }

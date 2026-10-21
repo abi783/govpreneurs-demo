@@ -36,6 +36,7 @@ export const ORIGIN_KEYS = [
   "member.told",
   "capability_statement",
   "sam.gov",
+  "mentor.call",
 ] as const;
 
 export type OriginKey = (typeof ORIGIN_KEYS)[number];
@@ -66,6 +67,7 @@ export const ORIGIN_ROUTE: Record<OriginKey, "direct" | "queue" | "register"> = 
   "member.told": "queue",
   "capability_statement": "queue",
   "sam.gov": "register",
+  "mentor.call": "queue",
 };
 
 /**
@@ -103,7 +105,17 @@ export const ORIGIN_PROSE: Record<OriginKey, string> = {
   "member.told": "You told Hunter",
   "capability_statement": "From your capability statement",
   "sam.gov": "From SAM.gov",
+  "mentor.call": "You told your mentor on your call",
 };
+
+/** `mentor.call` names the mentor when we know her first name. */
+export function mentorCallOrigin(first: string | null): string {
+  return first ? `You told ${first} on your call` : ORIGIN_PROSE["mentor.call"];
+}
+
+export function mentorCallSourceLabel(first: string | null): string {
+  return first ? `Your call with ${first}` : "Your mentor call";
+}
 
 /**
  * THE MIGRATION BACKFILL WHITELIST. The migration backfills `originKey` from
@@ -131,7 +143,7 @@ export const PROSE_TO_ORIGIN_KEY: Record<string, OriginKey> = {
 /** The channels that must ask before they write. */
 export type QueueOriginKey = Extract<
   OriginKey,
-  "hunter.warm_start" | "hunter.learned" | "member.told" | "capability_statement"
+  "hunter.warm_start" | "hunter.learned" | "member.told" | "capability_statement" | "mentor.call"
 >;
 
 /**
@@ -147,6 +159,7 @@ export const CONFIRMED_STATE: Record<QueueOriginKey, ProfileFieldState> = {
   "hunter.learned": "attested",
   "member.told": "attested",
   "capability_statement": "attested",
+  "mentor.call": "attested",
 };
 
 /** Why a proposal never reached the queue. Dropping is an OUTCOME, not an

@@ -2828,6 +2828,9 @@ button.mb-row__box--empty:hover {
 
 /* Where it came from. Mono, like every other provenance line on this page. */
 .gpds .mb-prop__from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
   margin: 0 0 var(--s-1);
   font-size: 11px;
   color: var(--n-8);

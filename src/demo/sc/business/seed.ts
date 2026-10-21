@@ -18,7 +18,7 @@
 //   - the EIN, licenses, five-year receipts, key staff, owner citizenship and the
 //     state diversity programs are not answered yet;
 //   - two food-handler certificates are missing (3 of 5 cooks are certified);
-//   - three suggestions wait for a yes or a no;
+//   - four suggestions wait for a yes or a no, and SAM.gov's size answer waits for a check;
 //   - the health permit (21 days) and the woman-owned certification (48 days) run out
 //     soon, on the same dates as the Stay Ready page.
 
@@ -33,7 +33,13 @@ import {
   FRESHNESS_ON_FILE,
   FRESHNESS_TODAY,
 } from "@sc/lib/businessProfile/freshness";
-import { ORIGIN_PROSE, type OriginKey } from "@sc/lib/businessProfile/proposalPolicy";
+import {
+  ORIGIN_PROSE,
+  mentorCallOrigin,
+  mentorCallSourceLabel,
+  type OriginKey,
+} from "@sc/lib/businessProfile/proposalPolicy";
+import { TELL_SOURCE_LABEL, tellProvenance } from "@sc/lib/businessProfile/tell";
 import {
   choice,
   codes,
@@ -185,7 +191,61 @@ export function hunterChatSource(said: string, heard: string, daysAgo = 9): Prov
         { id: "t2", speaker: "Hunter", role: "assistant", text: heard },
       ],
       cited_turn_id: "t1",
+      attested: true,
     },
+    unavailable: null,
+  };
+}
+
+/** `724` seconds → `12:04`. */
+function callTime(seconds: number): string {
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+/** A fact she told her mentor on the positioning call: the question, then her answer. */
+export function mentorCallSource(
+  question: { text: string; at: number },
+  answer: { text: string; at: number },
+): ProvenancePayload {
+  const day = new Date(isoDaysFromNow(-POSITIONING_CALL_DAYS_AGO)).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const label = mentorCallSourceLabel(MENTOR.firstName);
+  return {
+    type: "transcript",
+    sourceLabel: label,
+    locator: `Call with ${MENTOR.firstName} · ${day} · ${callTime(answer.at)}`,
+    quote: null,
+    excerpt: null,
+    retrievedAt: null,
+    conversation: {
+      channel: "mentor-call",
+      title: label,
+      occurred_at: isoDaysFromNow(-POSITIONING_CALL_DAYS_AGO),
+      turns: [
+        { id: "q", speaker: MENTOR.firstName, role: "mentor", at: callTime(question.at), text: question.text },
+        { id: "a", speaker: "You", role: "member", at: callTime(answer.at), text: answer.text },
+      ],
+      cited_turn_id: "a",
+      attested: true,
+    },
+    unavailable: null,
+  };
+}
+
+/** What she said in "Tell Hunter everything", kept as the card's source. */
+export function toldHunterSource(said: string, daysAgo: number): ProvenancePayload {
+  const record = tellProvenance(said, new Date(isoDaysFromNow(-daysAgo)));
+  return {
+    type: record.type,
+    sourceLabel: TELL_SOURCE_LABEL,
+    locator: null,
+    quote: null,
+    excerpt: null,
+    retrievedAt: null,
+    conversation: record.conversation as unknown as Record<string, unknown>,
     unavailable: null,
   };
 }
@@ -325,7 +385,7 @@ function catererRows(): DemoFieldRow[] {
   add("email", text(PERSONA.email), contact);
   add("phone", text(PERSONA.phone), typed(JOINED_DAYS_AGO - 2));
   add("home_address", { kind: "address", address: mailingParts() }, typed(JOINED_DAYS_AGO - 2));
-  add("tshirt_size", choice("m", "M"), typed(JOINED_DAYS_AGO - 2));
+  add("tshirt_size", choice("m", "M"), { originKey: "intake.migration", daysAgo: JOINED_DAYS_AGO - 1 });
   add("primary_contact_title", text(PERSONA.ownerTitle), typed(JOINED_DAYS_AGO - 2));
   add(
     "legal_company_name",
@@ -380,11 +440,11 @@ function catererRows(): DemoFieldRow[] {
   );
   add("owners", list(`${PERSONA.ownerName}, 100%`), typed(JOINED_DAYS_AGO - 6));
   add("total_employees", count(PERSONA.employeesW2, "people"), typed(JOINED_DAYS_AGO - 6));
+  // SAM.gov's answer, waiting for her to check it (the one "Check this" row).
   add("size_status", text("Yes. A small business under the size standard for NAICS 722310."), {
     originKey: "sam.gov",
-    state: "verified",
+    state: "needs_review",
     daysAgo: 0,
-    verifiedAt: samCheckedOn(),
     provenance: samSource("Small Business", "Business types:", "Woman-Owned Small Business (WOSB)"),
   });
   add(
@@ -410,11 +470,15 @@ function catererRows(): DemoFieldRow[] {
   );
 
   // ── What you sell ──
-  add(
-    "primary_services",
-    list(...CORE_SERVICES),
-    typed(JOINED_DAYS_AGO - 3),
-  );
+  add("primary_services", list(...CORE_SERVICES), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO + 1,
+    provenance: capabilitySource(
+      "Therapeutic diets (renal, diabetic, pureed) to a dietitian's order",
+      "Core capabilities: Cooks and delivers 1,100 meals a day from one kitchen ·",
+      "· Event and ceremony catering from 50 to 600 guests",
+    ),
+  });
   add(
     "business_description",
     text(
@@ -441,11 +505,15 @@ function catererRows(): DemoFieldRow[] {
   add("service_delivery_mode", choice("onsite", "On site"), typed(JOINED_DAYS_AGO - 7));
   add("current_customer_types", pick("current_customer_types", "businesses", "government"), typed(JOINED_DAYS_AGO - 7));
   add("sectors_served", pick("sectors_served", "commercial", "government", "nonprofit"), typed(JOINED_DAYS_AGO - 7));
-  add(
-    "service_to_sell_to_government",
-    choice(CORE_SERVICES[0]),
-    typed(JOINED_DAYS_AGO - 3),
-  );
+  add("service_to_sell_to_government", choice(CORE_SERVICES[0]), {
+    originKey: "member.confirmed",
+    daysAgo: 40,
+    provenance: hunterChatSource(
+      "The main thing I want to sell is meals cooked in my own kitchen and delivered.",
+      "Got it. Contract meal service from one commercial kitchen.",
+      41,
+    ),
+  });
   add(
     "doc_llc_paperwork",
     { kind: "file", file: file("doc-llc", "haddad-catering-articles-of-organization.pdf", 184_320, INTAKE_SENT_DAYS_AGO + 3, 4) },
@@ -476,7 +544,14 @@ function catererRows(): DemoFieldRow[] {
     },
     typed(JOINED_DAYS_AGO - 3),
   );
-  add("concurrent_contract_capacity", count(Math.max(1, Math.floor(PERSONA.employeesW2 / 2)), "jobs at once"), typed(JOINED_DAYS_AGO - 8));
+  add("concurrent_contract_capacity", count(Math.max(1, Math.floor(PERSONA.employeesW2 / 2)), "jobs at once"), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "How many jobs can you run at the same time?", at: 21 * 60 + 50 },
+      { text: "Two at once is fine. A third one and we would need more staff.", at: 21 * 60 + 56 },
+    ),
+  });
   add("facilities", list(`Commercial kitchen at ${PERSONA.physicalAddress}`), typed(JOINED_DAYS_AGO - 8));
   add("payment_terms_tolerance", count(30, "days"), typed(JOINED_DAYS_AGO - 8));
   add("working_capital", money(75_000), typed(JOINED_DAYS_AGO - 8));
@@ -503,14 +578,16 @@ function catererRows(): DemoFieldRow[] {
     ),
     typed(JOINED_DAYS_AGO - 9),
   );
-  add(
-    "ninety_day_goal",
-    text(
-      "Send bids on Camp Mackall field meals and the Fayetteville cafe, and team up with Carolina Dining Group on the Fort Bragg dining recompete.",
-      true,
+  const goal =
+    "Send bids on Camp Mackall field meals and the Fayetteville cafe, and team up with Carolina Dining Group on the Fort Bragg dining recompete.";
+  add("ninety_day_goal", text(goal, true), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "What do you want to win in the next 90 days?", at: 33 * 60 + 12 },
+      { text: goal, at: 33 * 60 + 20 },
     ),
-    typed(JOINED_DAYS_AGO - 3),
-  );
+  });
   add(
     "best_first_opportunity",
     text(
@@ -625,15 +702,21 @@ function catererProposals(): DemoProposal[] {
       ),
       POSITIONING_CALL_DAYS_AGO + 1,
     ),
-    make(
-      "prop-daily-output",
-      "max_daily_output",
-      count(1100, "meals a day"),
-      "capability_statement",
-      null,
-      capabilitySource("Cooks and delivers 1,100 meals a day from one kitchen", "Core capabilities:"),
-      POSITIONING_CALL_DAYS_AGO + 1,
-    ),
+    {
+      ...make(
+        "prop-daily-output",
+        "max_daily_output",
+        count(1100, "meals a day"),
+        "mentor.call",
+        "On a big day we have done eleven hundred meals out of the one kitchen.",
+        mentorCallSource(
+          { text: "What is the most you have ever cooked in one day?", at: 12 * 60 + 1 },
+          { text: "On a big day we have done eleven hundred meals out of the one kitchen.", at: 12 * 60 + 4 },
+        ),
+        POSITIONING_CALL_DAYS_AGO,
+      ),
+      origin: mentorCallOrigin(MENTOR.firstName),
+    },
     make(
       "prop-keywords",
       "search_keywords",
@@ -645,6 +728,15 @@ function catererProposals(): DemoProposal[] {
         "Got it. Dining facility, school meals and therapeutic diets.",
       ),
       9,
+    ),
+    make(
+      "prop-background-checks",
+      "background_checks",
+      choice("yes", "We run them"),
+      "member.told",
+      "Every cook who goes into a school has a background check first.",
+      toldHunterSource("Every cook who goes into a school has a background check first.", 3),
+      3,
     ),
   ];
 }
