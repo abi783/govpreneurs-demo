@@ -16,8 +16,10 @@
 // Also open: her tax number, owner citizenship, five years of receipts, state
 // programs (North Carolina ended HUB certification in 2026) and the words buyers
 // search for ("Tell Hunter everything" fills the last one).
-// Three suggestions wait for a yes or a no: the fleet and PSC codes read off her
-// capability statement, and the credit line from her chat with Hunter.
+// Five suggestions wait for a yes or a no: the fleet and PSC codes read off her
+// capability statement, the credit line from her chat with Hunter, clearances from
+// her call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.
 
@@ -42,12 +44,15 @@ import {
   jobFor,
   llcSource,
   mailingParts,
+  mentorCallProposal,
+  mentorCallSource,
   pick,
   proposal,
   rowsFor,
   samActiveLabel,
   samCheckedOn,
   samSource,
+  toldHunterSource,
   type RowOptions,
 } from "../../../sc/business/seed";
 
@@ -105,7 +110,7 @@ export function businessRows(): DemoFieldRow[] {
   add("email", text(PERSONA.email), contact);
   add("phone", text(PERSONA.phone), typed(JOINED_DAYS_AGO - 2));
   add("home_address", { kind: "address", address: mailingParts() }, typed(JOINED_DAYS_AGO - 2));
-  add("tshirt_size", choice("l", "L"), typed(JOINED_DAYS_AGO - 2));
+  add("tshirt_size", choice("l", "L"), { originKey: "intake.migration", daysAgo: JOINED_DAYS_AGO - 1 });
   add("primary_contact_title", text(PERSONA.ownerTitle), typed(JOINED_DAYS_AGO - 2));
   add("legal_company_name", text(PERSONA.businessName), sam(PERSONA.businessName, "Legal business name:", `UEI: ${PERSONA.uei}`));
   add("company_email", text(PERSONA.email), typed(JOINED_DAYS_AGO - 5));
@@ -151,8 +156,10 @@ export function businessRows(): DemoFieldRow[] {
   );
   add("owners", list(`${PERSONA.ownerName}, 100%`), typed(JOINED_DAYS_AGO - 6));
   add("total_employees", count(PERSONA.employeesW2, "people"), typed(JOINED_DAYS_AGO - 6));
+  // SAM.gov's answer, waiting for a check (the one "Check this" row).
   add("size_status", text(`Yes. A small business under the size standard for NAICS ${PERSONA.primaryNaics}.`), {
     ...sam("Small Business", "Business types:", "Service-Disabled Veteran-Owned Business"),
+    state: "needs_review",
   });
   add(
     "socioeconomic_certifications",
@@ -173,7 +180,11 @@ export function businessRows(): DemoFieldRow[] {
   );
 
   // ── What you sell ──
-  add("primary_services", list(...CORE_SERVICES), typed(JOINED_DAYS_AGO - 3));
+  add("primary_services", list(...CORE_SERVICES), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO + 1,
+    provenance: capabilitySource(PERSONA.differentiators[1]!, "Core capabilities:", `· ${PERSONA.differentiators[2]}`),
+  });
   add(
     "business_description",
     text(
@@ -196,7 +207,15 @@ export function businessRows(): DemoFieldRow[] {
   add("service_delivery_mode", choice("onsite", "On site"), typed(JOINED_DAYS_AGO - 7));
   add("current_customer_types", pick("current_customer_types", "businesses", "government"), typed(JOINED_DAYS_AGO - 7));
   add("sectors_served", pick("sectors_served", "commercial", "government"), typed(JOINED_DAYS_AGO - 7));
-  add("service_to_sell_to_government", choice(CORE_SERVICES[0]), typed(JOINED_DAYS_AGO - 3));
+  add("service_to_sell_to_government", choice(CORE_SERVICES[0]), {
+    originKey: "member.confirmed",
+    daysAgo: 40,
+    provenance: hunterChatSource(
+      "What I want to sell first is scheduled box-truck routes. Our box trucks have lift gates.",
+      "Got it. Scheduled box-truck routes with lift gates.",
+      41,
+    ),
+  });
   add(
     "doc_llc_paperwork",
     { kind: "file", file: file("doc-llc", "rockfish-run-freight-articles-of-organization.pdf", 172_032, INTAKE_SENT_DAYS_AGO + 3, 4) },
@@ -230,7 +249,14 @@ export function businessRows(): DemoFieldRow[] {
     typed(JOINED_DAYS_AGO - 3),
   );
   // Two daily routes and two on-call jobs on top of the commercial work she runs now.
-  add("concurrent_contract_capacity", count(4, "routes at once"), typed(JOINED_DAYS_AGO - 8));
+  add("concurrent_contract_capacity", count(4, "routes at once"), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "How many routes can you run at the same time?", at: 21 * 60 + 50 },
+      { text: "Four routes at once with the trucks we have now.", at: 21 * 60 + 56 },
+    ),
+  });
   add("payment_terms_tolerance", count(30, "days"), typed(JOINED_DAYS_AGO - 8));
   add("working_capital", money(180_000), typed(JOINED_DAYS_AGO - 8));
   add(
@@ -253,11 +279,15 @@ export function businessRows(): DemoFieldRow[] {
     list(...PAST_PERFORMANCE.filter((p) => p.referenceName).map((p) => `${p.referenceName}, ${p.referenceTitle}`)),
     typed(JOINED_DAYS_AGO - 9),
   );
-  add(
-    "ninety_day_goal",
-    text("Win the Fayetteville VA supply and linen runs, and get into SDDC's carrier program.", true),
-    typed(JOINED_DAYS_AGO - 3),
-  );
+  const goal = "Win the Fayetteville VA supply and linen runs, and get into SDDC's carrier program.";
+  add("ninety_day_goal", text(goal, true), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "What do you want to win in the next 90 days?", at: 33 * 60 + 12 },
+      { text: goal, at: 33 * 60 + 20 },
+    ),
+  });
   add(
     "best_first_opportunity",
     text("A VA trucking job set aside for service-disabled veteran-owned firms, close to our yard.", true),
@@ -312,7 +342,7 @@ export function businessRows(): DemoFieldRow[] {
   add(
     "doc_w9",
     { kind: "file", file: file("doc-w9", "rockfish-run-freight-w9.pdf", 94_208, JOINED_DAYS_AGO - 14, 2) },
-    typed(JOINED_DAYS_AGO - 14),
+    { originKey: "intake.migration", daysAgo: JOINED_DAYS_AGO - 14 },
   );
 
   return out;
@@ -352,6 +382,22 @@ export function businessProposals(): DemoProposal[] {
         "Got it. A $150,000 line of credit covers diesel and payroll until you're paid.",
       ),
       9,
+    ),
+    mentorCallProposal(
+      "prop-clearances",
+      "security_clearances",
+      list("None"),
+      { text: "Does anyone on your team hold a security clearance?", at: 18 * 60 + 30 },
+      { text: "No. Nobody on the team holds one.", at: 18 * 60 + 36 },
+    ),
+    proposal(
+      "prop-citizenship",
+      "owner_citizenship",
+      choice("all", "All owners are US citizens"),
+      "member.told",
+      "I am the only owner. I am a US citizen and an Army veteran.",
+      toldHunterSource("I am the only owner. I am a US citizen and an Army veteran.", 3),
+      3,
     ),
   ];
 }

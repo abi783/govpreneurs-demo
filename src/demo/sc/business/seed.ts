@@ -687,6 +687,20 @@ export function proposal(
   };
 }
 
+/** A suggestion from her positioning call: Sarah's question, then her answer. */
+export function mentorCallProposal(
+  id: string,
+  fieldKey: string,
+  mb: MbValue,
+  question: { text: string; at: number },
+  answer: { text: string; at: number },
+): DemoProposal {
+  return {
+    ...proposal(id, fieldKey, mb, "mentor.call", answer.text, mentorCallSource(question, answer), POSITIONING_CALL_DAYS_AGO),
+    origin: mentorCallOrigin(MENTOR.firstName),
+  };
+}
+
 function catererProposals(): DemoProposal[] {
   const make = proposal;
   return [

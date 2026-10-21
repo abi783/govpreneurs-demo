@@ -17,8 +17,10 @@
 // Also open: his tax number, owner citizenship, five years of receipts, licenses,
 // state programs (North Carolina ended HUB certification in 2026) and the words
 // buyers search for ("Tell Hunter everything" fills the last one).
-// Three suggestions wait for a yes or a no: equipment and PSC codes read off his
-// capability statement, and the credit line from his chat with Hunter.
+// Five suggestions wait for a yes or a no: equipment and PSC codes read off his
+// capability statement, the credit line from his chat with Hunter, clearances from
+// his call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.
 
@@ -43,12 +45,15 @@ import {
   jobFor,
   llcSource,
   mailingParts,
+  mentorCallProposal,
+  mentorCallSource,
   pick,
   proposal,
   rowsFor,
   samActiveLabel,
   samCheckedOn,
   samSource,
+  toldHunterSource,
   type RowOptions,
 } from "../../../sc/business/seed";
 
@@ -112,7 +117,7 @@ export function businessRows(): DemoFieldRow[] {
   add("email", text(PERSONA.email), contact);
   add("phone", text(PERSONA.phone), typed(JOINED_DAYS_AGO - 2));
   add("home_address", { kind: "address", address: mailingParts() }, typed(JOINED_DAYS_AGO - 2));
-  add("tshirt_size", choice("l", "L"), typed(JOINED_DAYS_AGO - 2));
+  add("tshirt_size", choice("l", "L"), { originKey: "intake.migration", daysAgo: JOINED_DAYS_AGO - 1 });
   add("primary_contact_title", text(PERSONA.ownerTitle), typed(JOINED_DAYS_AGO - 2));
   add("legal_company_name", text(PERSONA.businessName), sam(PERSONA.businessName, "Legal business name:", `UEI: ${PERSONA.uei}`));
   add("company_email", text(PERSONA.email), typed(JOINED_DAYS_AGO - 5));
@@ -158,8 +163,10 @@ export function businessRows(): DemoFieldRow[] {
   );
   add("owners", list(`${PERSONA.ownerName}, 100%`), typed(JOINED_DAYS_AGO - 6));
   add("total_employees", count(PERSONA.employeesW2, "people"), typed(JOINED_DAYS_AGO - 6));
+  // SAM.gov's answer, waiting for a check (the one "Check this" row).
   add("size_status", text(`Yes. A small business under the size standard for NAICS ${PERSONA.primaryNaics}.`), {
     ...sam("Small Business", "Business types:", "HUBZone"),
+    state: "needs_review",
   });
   add(
     "socioeconomic_certifications",
@@ -179,7 +186,11 @@ export function businessRows(): DemoFieldRow[] {
   );
 
   // ── What you sell ──
-  add("primary_services", list(...CORE_SERVICES), typed(JOINED_DAYS_AGO - 3));
+  add("primary_services", list(...CORE_SERVICES), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO + 1,
+    provenance: capabilitySource(PERSONA.differentiators[2]!, "Core capabilities:", `· ${PERSONA.differentiators[1]}`),
+  });
   add(
     "business_description",
     text(
@@ -202,7 +213,15 @@ export function businessRows(): DemoFieldRow[] {
   add("service_delivery_mode", choice("onsite", "On site"), typed(JOINED_DAYS_AGO - 7));
   add("current_customer_types", pick("current_customer_types", "businesses", "gc", "government"), typed(JOINED_DAYS_AGO - 7));
   add("sectors_served", pick("sectors_served", "commercial", "government"), typed(JOINED_DAYS_AGO - 7));
-  add("service_to_sell_to_government", choice(CORE_SERVICES[2]), typed(JOINED_DAYS_AGO - 3));
+  add("service_to_sell_to_government", choice(CORE_SERVICES[2]), {
+    originKey: "member.confirmed",
+    daysAgo: 40,
+    provenance: hunterChatSource(
+      "Pressure washing is what I want to sell the government first. We recover the wash water.",
+      "Got it. Hot-water pressure washing with wash-water recovery.",
+      41,
+    ),
+  });
   add(
     "doc_llc_paperwork",
     { kind: "file", file: file("doc-llc", "gray-owl-facility-services-articles-of-organization.pdf", 172_032, INTAKE_SENT_DAYS_AGO + 3, 4) },
@@ -236,7 +255,14 @@ export function businessRows(): DemoFieldRow[] {
     typed(JOINED_DAYS_AGO - 3),
   );
   // Two supervisors, four floor techs and two exterior techs: about a dozen sites a night.
-  add("concurrent_contract_capacity", count(12, "sites at once"), typed(JOINED_DAYS_AGO - 8));
+  add("concurrent_contract_capacity", count(12, "sites at once"), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "How many sites can you run at the same time?", at: 21 * 60 + 50 },
+      { text: "Twelve sites a night with the crews we have now.", at: 21 * 60 + 56 },
+    ),
+  });
   add("payment_terms_tolerance", count(30, "days"), typed(JOINED_DAYS_AGO - 8));
   add("working_capital", money(90_000), typed(JOINED_DAYS_AGO - 8));
   add("bonding_capacity", text("None. Our cleaning contracts have never needed a bond."), typed(JOINED_DAYS_AGO - 8));
@@ -255,11 +281,15 @@ export function businessRows(): DemoFieldRow[] {
     list(...PAST_PERFORMANCE.filter((p) => p.referenceName).map((p) => `${p.referenceName}, ${p.referenceTitle}`)),
     typed(JOINED_DAYS_AGO - 9),
   );
-  add(
-    "ninety_day_goal",
-    text("Win our first Army prime, the Fort Bragg exterior-cleaning contract, and get a reference letter for the Seymour Johnson job.", true),
-    typed(JOINED_DAYS_AGO - 3),
-  );
+  const goal = "Win our first Army prime, the Fort Bragg exterior-cleaning contract, and get a reference letter for the Seymour Johnson job.";
+  add("ninety_day_goal", text(goal, true), {
+    originKey: "member.confirmed",
+    daysAgo: POSITIONING_CALL_DAYS_AGO - 1,
+    provenance: mentorCallSource(
+      { text: "What do you want to win in the next 90 days?", at: 33 * 60 + 12 },
+      { text: goal, at: 33 * 60 + 20 },
+    ),
+  });
   add(
     "best_first_opportunity",
     text("A HUBZone exterior-cleaning job at Fort Bragg. Our crews are already badged, and we are 12 miles away.", true),
@@ -300,7 +330,7 @@ export function businessRows(): DemoFieldRow[] {
   add(
     "doc_w9",
     { kind: "file", file: file("doc-w9", "gray-owl-facility-services-w9.pdf", 94_208, JOINED_DAYS_AGO - 14, 2) },
-    typed(JOINED_DAYS_AGO - 14),
+    { originKey: "intake.migration", daysAgo: JOINED_DAYS_AGO - 14 },
   );
 
   return out;
@@ -340,6 +370,22 @@ export function businessProposals(): DemoProposal[] {
         "Got it. No line of credit, so weekly payroll comes from your own cash until the government pays.",
       ),
       9,
+    ),
+    mentorCallProposal(
+      "prop-clearances",
+      "security_clearances",
+      list("None"),
+      { text: "Does anyone on your team hold a security clearance?", at: 18 * 60 + 30 },
+      { text: "No. Our crews are badged for Fort Bragg and Seymour Johnson, but nobody holds a clearance.", at: 18 * 60 + 36 },
+    ),
+    proposal(
+      "prop-citizenship",
+      "owner_citizenship",
+      choice("all", "All owners are US citizens"),
+      "member.told",
+      "I own all of the company, and I am a US citizen.",
+      toldHunterSource("I own all of the company, and I am a US citizen.", 3),
+      3,
     ),
   ];
 }

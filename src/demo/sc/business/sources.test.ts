@@ -1,4 +1,6 @@
-// Every kind of source shows up on My Business, and no part is only "You told us".
+// Every kind of source shows up on My Business, and no part is only "You told us",
+// for the member on stage. Run it once per member:
+//   for m in caterer agency construction consulting it trucking janitorial; do DEMO_MEMBER=$m bunx vitest run src/demo/sc/business/sources.test.ts; done
 import { describe, expect, it } from "vitest";
 import { BEFORE_FIRST_CALL, catalogFor } from "@sc/lib/businessProfile/catalog";
 import { buildSeed } from "./seed";
