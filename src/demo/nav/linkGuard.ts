@@ -15,7 +15,8 @@
 //      document download: ask the router for the answer, then save the body as a
 //      file. The handler returns a `Response` with a body and a content type.
 //   5. A link to a file on this origin (a PDF in /demo-files): leave the browser to it.
-//   6. DEMO: any other link (sam.gov, DIBBS, a mailto: or tel: address) never leaves the app. The
+//   6. The GovPreneurs course library (hub.govpreneurs.com) opens for real, in a new tab.
+//   7. DEMO: any other link (sam.gov, DIBBS, a mailto: or tel: address) never leaves the app. The
 //      guard shows a notice that says where the live product would go. It also stops a
 //      middle-click and a Ctrl- or Cmd-click, which would open the outside page in a new tab.
 //
@@ -69,6 +70,8 @@ function decide(href: string): Decision | null {
     return { outside: outsideNotice(url) };
   }
   if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+  // DEMO: the real GovPreneurs course library opens for real (feedback, 25 Oct 2026).
+  if (url.hostname === "hub.govpreneurs.com") return null;
 
   if (GHL_HOSTS.has(url.hostname)) {
     const id = menuLinkIdFromUrl(url.href);
