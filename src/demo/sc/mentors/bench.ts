@@ -4,8 +4,8 @@
 // (titles, prices and descriptions as members see them there, 26 Oct 2026). The
 // story mentor (persona.ts MENTOR) is Diana Potts, so her name and bio are not
 // typed here. Photos are in public/demo/people. No email or phone is shown.
-// Ernie Hansen is left out on purpose: he is the salesperson behind every
-// "Book a call" (SALES_ADVISOR, under a made-up name).
+// Every "Book a call" still books the sales advisor under a made-up name
+// (SALES_ADVISOR); Ernie's own card is listed like the others (Karthik, 26 Oct 2026).
 //
 // `hours` is the Eastern wall-clock window in which the mentor takes calls.
 // `busyShare` is the share of half-hour slots that the sample calendar marks
@@ -70,6 +70,21 @@ export const BENCH: BenchMentor[] = [
     busyShare: 0.55,
     calendarName: "Mentor consultation",
     avatarUrl: photo("tim-sabir"),
+  },
+  {
+    id: "mentor-ernie-hansen",
+    name: "Ernie Hansen",
+    title: "Mentor",
+    bio: "Ernie mentors and coaches members on federal, state, local and education contracting.",
+    consultationDescription:
+      "Book a call with me for assistance related to federal, state, local, and education contracting opportunities, including solicitation and proposal responses, market research, and SBA/State or other applicable government certifications.",
+    price: 97,
+    hours: { start: 9, end: 15 },
+    days: weekdays,
+    busyShare: 0.5,
+    calendarName: "Mentor consultation",
+    // The photo from govpreneurs.com, cropped to his face.
+    avatarUrl: photo("ernie-hansen"),
   },
   {
     id: "mentor-sinan-murat",
