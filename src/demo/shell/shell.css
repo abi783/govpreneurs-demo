@@ -658,7 +658,6 @@
   .demo-logo { justify-content: center; padding: 16px 0 12px; }
   .demo-logo__word,
   .demo-account > div:not(.demo-account__avatar),
-  .demo-search__label,
   .demo-search .demo-kbd,
   .demo-nav__title { display: none; }
   .demo-account { justify-content: center; padding: 6px 0; margin-left: 8px; margin-right: 8px; }
@@ -666,6 +665,7 @@
   .demo-nav__title + * { margin-top: 0; }
   .demo-nav > div + div { border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 6px; padding-top: 6px; }
   .demo-nav__item { justify-content: center; padding: 9px 0; margin-left: 8px; margin-right: 8px; }
+  .demo-search__label,
   .demo-nav__item > span {
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap;
