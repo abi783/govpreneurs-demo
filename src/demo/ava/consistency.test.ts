@@ -109,9 +109,9 @@ describe("what Ava answers to a question she was not asked", () => {
 
   test("a bid with a review points at the review", () => {
     const bid = getAvaBid("FAYNC-2026-R-08")!;
-    const review = { mentorName: "Sarah Mitchell" } as never;
-    expect(readerReply("can I talk to Sarah", bid, review)).toMatch(/Sarah's review/);
-    expect(readerReply("can I talk to Sarah", bid, null)).toMatch(/mentor button/);
+    const review = { mentorName: "Diana Potts" } as never;
+    expect(readerReply("can I talk to Diana", bid, review)).toMatch(/Diana's review/);
+    expect(readerReply("can I talk to Diana", bid, null)).toMatch(/mentor button/);
   });
 
   test("the answer about the win never promises", () => {

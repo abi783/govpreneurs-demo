@@ -976,7 +976,7 @@ export const familyAdvocacyBid: AvaBid = {
       kind: "answer",
       title: "How your quote meets the app line",
       source: S_APP,
-      why: "The work statement asks for ads on the contractor's own mobile app. Your profile lists no app. Grant and Sarah say to ask the Army whether a news partner's app counts.",
+      why: "The work statement asks for ads on the contractor's own mobile app. Your profile lists no app. Grant and Diana say to ask the Army whether a news partner's app counts.",
       owner: "you",
       leadDays: 0,
       minutes: 2,

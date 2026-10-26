@@ -1,14 +1,14 @@
 // DEMO: Ava's view of the mentor reviews.
 //
 // The prototype kept its own review list (lib/mentorReviews). The demo has one:
-// src/demo/state/mentorReviews.ts holds Sarah Mitchell's threads, and sending a
+// src/demo/state/mentorReviews.ts holds Diana Potts's threads, and sending a
 // review there charges the wallet (src/demo/state/wallet.ts, $97). This file
 // reads that list in the shape Ava was built on, and sends through it, so the
 // Mentor Reviews page, the wallet and Ava always agree.
 //
 // Three kinds of review can exist for one bid (the prototype's "subject"):
-//   · "opportunity": Sarah's read of the opportunity, sent from Grant's page;
-//   · "bid": Sarah's read of the bid Ava built, sent from Ava;
+//   · "opportunity": Diana's read of the opportunity, sent from Grant's page;
+//   · "bid": Diana's read of the bid Ava built, sent from Ava;
 //   · "paused": a question about a rule she cannot meet, sent from Ava.
 // The shared list holds one thread for each opportunity key. A bid or paused
 // review of Ava's is kept under the key `<noticeId>:bid` or `<noticeId>:paused`,
@@ -165,7 +165,7 @@ export function sendCheck(): { balance: number; cost: number; enough: boolean } 
   return { balance, cost: MENTOR_REVIEW_COST, enough: balance >= MENTOR_REVIEW_COST };
 }
 
-/** Sends a review to Sarah and charges the wallet once. A second send about
+/** Sends a review to Diana and charges the wallet once. A second send about
  *  the same thing finds the first and charges nothing. */
 export function createReview(input: {
   opportunityId: string;
@@ -189,10 +189,10 @@ export function createReview(input: {
     const message =
       input.note.trim() ||
       (subject === "bid"
-        ? "Sarah, I am sending you my whole bid. Ava built it and checked it. Could you read it before I send it?"
+        ? "Diana, I am sending you my whole bid. Ava built it and checked it. Could you read it before I send it?"
         : subject === "paused"
-          ? "Sarah, I cannot meet one rule on this bid, so Ava paused it. Should I still bid?"
-          : "Sarah, could you read this opportunity for me?");
+          ? "Diana, I cannot meet one rule on this bid, so Ava paused it. Should I still bid?"
+          : "Diana, could you read this opportunity for me?");
     createSharedReview({ oppKey, title, message });
     chargeWallet(`Mentor review — ${input.opportunityTitle}`, MENTOR_REVIEW_PRICE);
   }

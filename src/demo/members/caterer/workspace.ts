@@ -76,7 +76,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 38,
     lastMessageDaysAgo: 35,
     outcome:
-      "Email the contracting officer and ask for an interim CPARS rating. Sarah sent a template.",
+      "Email the contracting officer and ask for an interim CPARS rating. Diana sent a template.",
     price: 0,
   },
 ];
@@ -117,7 +117,7 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-read-sarah",
-    title: "Read Sarah's notes on your Fayetteville proposal",
+    title: "Read Diana's notes on your Fayetteville proposal",
     why: "She replied today. The proposal is due in 14 days.",
     dueInDays: 2,
     done: false,
@@ -144,7 +144,7 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-targeting-call",
-    title: "Book your quarterly targeting call with Sarah",
+    title: "Book your quarterly targeting call with Diana",
     why: "Plan your next quarter of bids around Fort Bragg and the VA.",
     dueInDays: 14,
     done: false,
@@ -162,8 +162,8 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-positioning-call",
-    title: "Positioning call with Sarah",
-    why: "Sarah set your targets: Fort Bragg, the VA and NC school districts.",
+    title: "Positioning call with Diana",
+    why: "Diana set your targets: Fort Bragg, the VA and NC school districts.",
     dueInDays: null,
     done: true,
     to: "/roadmap",
@@ -171,15 +171,15 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-fayetteville-proposal": [
-    { author: "member", daysAgo: 2, hour: 16, html: "<p>Hi Sarah — Ava finished my proposal for the Fayetteville Public Works cafe and events contract. It's due in two weeks. Could you read it before I send it? I'm most worried about section 2, our experience, because we have never run a daily cafe.</p>", attachments: ["Haddad-Catering-Fayetteville-proposal.docx"] },
-    { author: "mentor", daysAgo: 0, hour: 9, html: "<p>Amira, this is a strong draft. Three changes before you send it:</p><ol><li><strong>Move your event work to the top of section 2.</strong> The city scores approach at 40%. Your church and county events are your best evidence; right now they are on page 6.</li><li><strong>Call the county summer program what it is: daily service.</strong> 1,100 meals a day for 11 weeks answers the \"never run a cafe\" worry better than any sentence about it.</li><li><strong>Name Janet Reyes as your first reference.</strong> Purchasing officers call the first name on the list.</li></ol><p>Your price is in the right place. Don't lower it. — Sarah</p>" },
+    { author: "member", daysAgo: 2, hour: 16, html: "<p>Hi Diana — Ava finished my proposal for the Fayetteville Public Works cafe and events contract. It's due in two weeks. Could you read it before I send it? I'm most worried about section 2, our experience, because we have never run a daily cafe.</p>", attachments: ["Haddad-Catering-Fayetteville-proposal.docx"] },
+    { author: "mentor", daysAgo: 0, hour: 9, html: "<p>Amira, this is a strong draft. Three changes before you send it:</p><ol><li><strong>Move your event work to the top of section 2.</strong> The city scores approach at 40%. Your church and county events are your best evidence; right now they are on page 6.</li><li><strong>Call the county summer program what it is: daily service.</strong> 1,100 meals a day for 11 weeks answers the \"never run a cafe\" worry better than any sentence about it.</li><li><strong>Name Janet Reyes as your first reference.</strong> Purchasing officers call the first name on the list.</li></ol><p>Your price is in the right place. Don't lower it. — Diana</p>" },
   ],
   "rev-mackall-pursue": [
-    { author: "member", daysAgo: 3, hour: 11, html: "<p>Sarah, Hunter put the Camp Mackall field meals quote at the top of my list and Grant says bid. Before Ava starts — should I pursue it? It would be my biggest federal job as prime.</p>" },
-    { author: "mentor", daysAgo: 2, hour: 15, html: "<p><strong>Pursue it.</strong> It is woman-owned only, it has no incumbent, and it is sized for your kitchen. Two things this week:</p><ul><li>Get your last two cooks food-handler certified. The quote asks for proof for every cook.</li><li>Plan the 3:30 AM starts now, before you price it. Early starts cost overtime.</li></ul><p>Lead with your Carolina Dining Group work at Fort Bragg. Same base, same kind of work. — Sarah</p>" },
+    { author: "member", daysAgo: 3, hour: 11, html: "<p>Diana, Hunter put the Camp Mackall field meals quote at the top of my list and Grant says bid. Before Ava starts — should I pursue it? It would be my biggest federal job as prime.</p>" },
+    { author: "mentor", daysAgo: 2, hour: 15, html: "<p><strong>Pursue it.</strong> It is woman-owned only, it has no incumbent, and it is sized for your kitchen. Two things this week:</p><ul><li>Get your last two cooks food-handler certified. The quote asks for proof for every cook.</li><li>Plan the 3:30 AM starts now, before you price it. Early starts cost overtime.</li></ul><p>Lead with your Carolina Dining Group work at Fort Bragg. Same base, same kind of work. — Diana</p>" },
     { author: "member", daysAgo: 2, hour: 17, html: "<p>Thank you! Booking the food-handler course for Thursday.</p>" },
   ],
   "rev-womack-closeout": [
@@ -227,7 +227,7 @@ export function closedPursuitDetail(id: string, daysAgo: number): ClosedPursuitD
       lead: "You won this contract and delivered it. It was your first federal prime contract. The value was $126,000.",
       points: [
         "You made therapeutic diet trays for the inpatient wards while the kitchen was rebuilt.",
-        "The Army has not yet written your performance rating. Ask for an interim rating: Sarah sent you a template.",
+        "The Army has not yet written your performance rating. Ask for an interim rating: Diana sent you a template.",
         "Add the job to My Business, so Hunter and Grant can use it as past performance.",
       ],
       link: { label: "Add it to My Business", to: "/my-business" },

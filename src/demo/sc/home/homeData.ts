@@ -53,7 +53,7 @@ export interface HomeData {
   contact: { firstName: string; lastName: string; email: string; phone: string; photoUrl: string | null };
   company: { accountName: string; address: string; website: string; logoUrl: string | null };
   meta: { entityRenewal: string; uei: string; cage: string; primaryNaics: string };
-  programSpecialist: { name: string; title: string; avatarUrl: null; bio: string; calendarId: null };
+  programSpecialist: { name: string; title: string; avatarUrl: string | null; bio: string; calendarId: null };
   assignedMentor: ReturnType<typeof toPortalMentor> | null;
   freeRemaining: number;
   contactTimezone: string;
@@ -174,7 +174,7 @@ function activityFeed(): ActivityItem[] {
     });
   }
 
-  // DEMO: lines only one member's story has (the agency: Sarah's Pass on Visit NC
+  // DEMO: lines only one member's story has (the agency: Diana's Pass on Visit NC
   // and her answer on the NC Guard rating).
   items.push(...byMember({ caterer: () => [], pack: homeActivity })());
 
@@ -242,7 +242,7 @@ export function buildHomeData(): HomeData {
     programSpecialist: {
       name: PROGRAM_SPECIALIST.name,
       title: PROGRAM_SPECIALIST.title,
-      avatarUrl: null,
+      avatarUrl: PROGRAM_SPECIALIST.avatarUrl,
       bio: PROGRAM_SPECIALIST.bio,
       calendarId: null,
     },

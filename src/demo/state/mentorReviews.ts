@@ -1,4 +1,4 @@
-// DEMO: mentor reviews — the story's three threads with Sarah Mitchell, plus
+// DEMO: mentor reviews — the story's three threads with Diana Potts, plus
 // any review the visitor sends during the demo. One state for Mentor Reviews,
 // the Pipeline, the opportunity page and the forecast / small-order pages.
 
@@ -177,13 +177,13 @@ export function createReview(input: { oppKey: string; title: string; message: st
   return summary;
 }
 
-/** Reviews still waiting for Sarah, newest first. */
+/** Reviews still waiting for Diana, newest first. */
 export function pendingReviews(): MentorReviewSummary[] {
   return listMentorReviews().filter((r) => r.status === "pending");
 }
 
 /**
- * DEMO (presenter control C1): Sarah answers a pending review. The presenter
+ * DEMO (presenter control C1): Diana answers a pending review. The presenter
  * shows a "One business day later" card first; this writes her reply into the
  * thread, so Mentor Reviews, the opportunity page and the Pipeline all agree.
  */

@@ -175,7 +175,7 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
       if (/Distance/.test(text) || (f.miles > 60 && !V.wide(f)))
         return `Not by yourself: distance is a fact. A partner or a crew near ${f.place.city} can change it. Open Partners to see who looks for subcontractors.`;
       if (/Size|bond/i.test(text)) return V.sizeFix;
-      return `Most of it, yes. Start with the item that has the longest lead time, and ask Sarah to look at the draft before you send it.`;
+      return `Most of it, yes. Start with the item that has the longest lead time, and ask Diana to look at the draft before you send it.`;
     }
     case "draft":
       return verdict === "bid"
@@ -222,7 +222,7 @@ function genericAnswer(topic: Topic, f: OppFacts, a: GrantAnalysis): string {
         ? `${opp.clearanceRequired} None of your ${COOKS} staff holds one.`
         : `No clearance is needed for this one.`;
     case "mentor":
-      return `Sarah can read this with you. A review costs $97 from your wallet, and she replies in your Mentors inbox.`;
+      return `Diana can read this with you. A review costs $97 from your wallet, and she replies in your Mentors inbox.`;
     default:
       return mainLimit(a);
   }
@@ -287,7 +287,7 @@ export function railReply(oppKey: string, message: string, openQuestion?: string
       kind = "offscope";
       reply = "I can only help with this opportunity. Ask me about the call, the size, the distance, the price, the time, or who could help.";
     } else if (topic === "identity") {
-      reply = `I am Grant. I read one opportunity from start to end and tell you to bid, look closer, or pass. I do not know who else is bidding, and I do not decide for you. Sarah can read my take with you.`;
+      reply = `I am Grant. I read one opportunity from start to end and tell you to bid, look closer, or pass. I do not know who else is bidding, and I do not decide for you. Diana can read my take with you.`;
     } else if (topic === "hello") {
       reply = `${summaryLine(f, a)} Ask me anything about it.`;
     } else if (topic === "draft") {

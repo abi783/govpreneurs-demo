@@ -165,8 +165,8 @@ const tenBuildings: Maker = (f, sol) => {
     },
     {
       item: rt("A **mentor's read** on where else to grow"),
-      whyItMattered: rt("Most custodial work near Fort Bragg is AbilityOne, 8(a) or veteran-owned. Sarah knows which buyers still compete it."),
-      whatItTakes: rt("Ask Sarah for 20 minutes on the buyers that compete custodial work in your area."),
+      whyItMattered: rt("Most custodial work near Fort Bragg is AbilityOne, 8(a) or veteran-owned. Diana knows which buyers still compete it."),
+      whatItTakes: rt("Ask Diana for 20 minutes on the buyers that compete custodial work in your area."),
       cta: { kind: "mentor" },
     },
   ];

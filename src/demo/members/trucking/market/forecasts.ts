@@ -472,6 +472,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) wrote to you about Fort Bragg's logistics contract. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. Only EAGLE agreement holders can bid, so their team is your way in. Agree in writing which runs are yours before you sign. Open Partners to see their card.`,
   smallTeam: "You do not need a partner for the size of this one. A partner can still help if it lands in the same week as another job and your trucks are booked.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She is reading your quote for the Army hospital's lab courier, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She is reading your quote for the Army hospital's lab courier, so she knows your work.",
   past: `Your closest past work is ${bragg.projectTitle} (${money(bragg.totalValue)}, ${bragg.periodStart.slice(0, 4)}), your first federal prime. Your ${routes.customerName} routes (${money(routes.totalValue)} a year) show daily scheduled runs, and your ${money(storm.totalValue)} storm hauling for NCDOT shows on-call work.`,
 };

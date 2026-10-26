@@ -11,7 +11,7 @@ import { captureStatus } from "@/lib/forecasts/engine";
 
 // DEMO: a pack member's words must not show another member's (src/demo/members/words.ts).
 const BAD_WORDS = byMember({
-  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|HigherGov|\bDEMO-[A-Z]+-\d+/i,
+  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|HigherGov|\bDEMO-[A-Z]+-\d+/i,
   pack: withOtherMembersWords(/\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|HigherGov|\bDEMO-[A-Z]+-\d+/i),
 });
 const REAL_FIRMS = /sodexo|aramark|compass group|eurest/i;

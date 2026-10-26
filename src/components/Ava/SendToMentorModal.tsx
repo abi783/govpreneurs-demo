@@ -1,10 +1,10 @@
-// Send something from Ava to the mentor, Sarah Mitchell: her whole bid, the bid
+// Send something from Ava to the mentor, Diana Potts: her whole bid, the bid
 // so far, or a rule she cannot meet.
 //
 // DEMO: the prototype reused the opportunity page's dialog. The demo's version
 // of that dialog is a different, longer form, built for an opportunity. This
 // one is small and says only what Ava needs: what is sent, what it costs, what
-// the wallet holds and when Sarah replies. The review itself is sent through
+// the wallet holds and when Diana replies. The review itself is sent through
 // the shared mentor state, so the $97 charge and the Mentor Reviews page agree
 // (src/demo/ava/mentorReviews.ts).
 

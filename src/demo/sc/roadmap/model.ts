@@ -10,9 +10,9 @@
 // The story: Amira joined the program about six months ago. She finished the
 // Foundation (LLC, Digital Compliance, SAM.gov, SLED), Visibility & Credibility
 // (capability statement, SBA profile, CMMC Level 1) and Search, Save & Send
-// (positioning call with Sarah, the AI agents, Send to Mentor, prime
+// (positioning call with Diana, the AI agents, Send to Mentor, prime
 // registration). She is now in Execution: Ava is building her proposals, and
-// her next step is the quarterly targeting call with Sarah.
+// her next step is the quarterly targeting call with Diana.
 //
 // Every date is "days ago" from the demo clock (clock.ts).
 
@@ -171,7 +171,8 @@ export const SERVICES: Record<DfySlug, ServiceDef> = {
     sectionId: "sec-capability",
     stepId: "step-capability",
     title: "Capability Statement",
-    price: "$2,000",
+    // DEMO: production's price, 26 Oct 2026.
+    price: "$297",
     turnaround: "3 days",
   },
   "sled-enrollment": {
@@ -182,15 +183,16 @@ export const SERVICES: Record<DfySlug, ServiceDef> = {
     price: "$2,497",
     turnaround: "1–2 weeks",
   },
-  // DEMO: the prototype catalog has no price for these two. Sample prices.
   "cmmc-level-1": {
     slug: "cmmc-level-1",
     sectionId: "sec-cmmc",
     stepId: "step-cmmc",
     title: "CMMC 2.0 Level 1",
-    price: "$497",
+    // DEMO: production's price, 26 Oct 2026.
+    price: "$1,500",
     turnaround: "2 weeks",
   },
+  // DEMO: the prototype catalog has no price for this one. Sample price.
   "prime-contractor-registration": {
     slug: "prime-contractor-registration",
     sectionId: "sec-prime",
@@ -256,10 +258,13 @@ export const VERIFY_STEP: Record<VerifyKey, string> = {
   cmmc: "p2-cmmc-level-1",
 };
 
-/** True when the check has a passing result. The story starts with all six passing. */
+/** True when the check has a passing result. The story starts with four of six passing. */
+/** DEMO: the checks the story has not passed yet, so the Roadmap shows a mix (feedback, 25 Oct 2026). */
+const NOT_YET: ReadonlySet<VerifyKey> = new Set<VerifyKey>(["sled", "cmmc"]);
+
 export function verifyPasses(key: VerifyKey): boolean {
   const stored = getVerifications()[key];
-  if (stored === undefined) return true; // the story's own result
+  if (stored === undefined) return !NOT_YET.has(key); // the story's own result
   return stored?.status === "pass";
 }
 
@@ -330,9 +335,10 @@ export function computeRoadmap(): Roadmap {
     markDone(id, stored?.status === "pass" ? stored.checkedAt : undefined);
   }
 
-  // Digital Compliance, the positioning call: part of the story, no member-run check.
-  markDone("p1-digital-compliance");
+  // The positioning call: part of the story, no member-run check.
   markDone("p3-positioning-call");
+  // DEMO: Digital Compliance waits on her audit form, so not every step is green.
+  overrides["p1-digital-compliance"] = { state: "in_progress", awaiting: { who: "you" }, openedAt: ago(5) };
 
   // Steps the member ticks line by line.
   for (const id of SELF_TICK_IDS) {

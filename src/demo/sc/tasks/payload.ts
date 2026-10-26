@@ -61,7 +61,7 @@ const ago = (days: number) => isoDaysFromNow(-days, 10);
 
 /** The two lists that show a person's name: the Roadmap list and the Action Plan list. */
 function sectionFor(t: StoryTask): MemberTaskSection {
-  // Sarah is the person on the other end of these two. Everything else is program work.
+  // Diana is the person on the other end of these two. Everything else is program work.
   return t.source === "mentor" || t.id === "task-targeting-call" ? "mentor" : "govready";
 }
 
@@ -205,7 +205,7 @@ function sourcesFor(t: StoryTask, open: boolean): TaskSourceView[] {
         deepLink: `/roadmap?step=${TARGETING_STEP_ID}`,
         occurredAt: ago(0),
       });
-      // Where Sarah raised it: the positioning call. Opens as a quote sheet.
+      // Where Diana raised it: the positioning call. Opens as a quote sheet.
       out.push({
         ...base,
         kind: "MEETING",

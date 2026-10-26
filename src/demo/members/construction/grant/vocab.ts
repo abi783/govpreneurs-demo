@@ -133,7 +133,7 @@ export const CAVEATS: Record<string, Caveat> = {
       payoff: "A yes shows whether the **secure-site rules** are a real limit.",
       chip: "site",
       yes: { gist: "Your crews can work under secure-site rules, so the site is less of a limit.", ack: "Good. Price the slower days and it can work. I raised my confidence." },
-      no: { gist: "Your crews can't work under secure-site rules yet, so the site stays a real limit.", ack: "Then the site stays a real limit. Ask Sarah who has done state prison work. My confidence stays where it was." },
+      no: { gist: "Your crews can't work under secure-site rules yet, so the site stays a real limit.", ack: "Then the site stays a real limit. Ask Diana who has done state prison work. My confidence stays where it was." },
     },
   },
   "CC-27-06": {
@@ -170,7 +170,7 @@ export const CAVEATS: Record<string, Caveat> = {
       payoff: "A yes shows whether the **reply package** is ready.",
       chip: "package",
       yes: { gist: "You have three similar jobs and a surety letter, so the reply package is ready.", ack: "Good. Send the reply well before it closes; it is the way onto the MATOC. I raised my confidence." },
-      no: { gist: "You don't have the reply package together yet, so it stays the thing to fix.", ack: "Then start with the surety letter; it takes the longest. Sarah's checklist covers the rest. My confidence stays where it was." },
+      no: { gist: "You don't have the reply package together yet, so it stays the thing to fix.", ack: "Then start with the surety letter; it takes the longest. Diana's checklist covers the rest. My confidence stays where it was." },
     },
   },
   "36C24627B0009": {
@@ -208,7 +208,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A **subcontract** with the 8(a) firm",
       why: "Most Fort Bragg trade jobs go to 8(a) firms without competition. The firm that gets one often needs electrical and HVAC crews.",
-      takes: "Ask the 8(a) firm whether it needs your trades. Sarah can tell you how to make the call.",
+      takes: "Ask the 8(a) firm whether it needs your trades. Diana can tell you how to make the call.",
     },
   },
   "36C77627R0015": {

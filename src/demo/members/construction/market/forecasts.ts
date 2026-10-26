@@ -471,6 +471,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) wrote to you about the fan coils. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. The job is expected to be set aside for service-disabled veteran-owned firms, so their team is your way in. Agree on sub bonds before you sign. Open Partners to see their card.`,
   smallTeam: "You do not need a partner for the size of this one. A partner can still help if it lands in the same month as another job and your crews are booked.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She is reading your bid plan for the summer school HVAC job, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She is reading your bid plan for the summer school HVAC job, so she knows your work.",
   past: `Your closest past work is ${pope.projectTitle} (${money(pope.totalValue)}, ${pope.periodStart.slice(0, 4)}), rated Very Good. Your ${school.customerName} job (${money(school.totalValue)}) shows bonded HVAC work, and the ${money(turnrow.totalValue)} barracks electrical job for ${turnrow.customerName.replace(/ \(.*\)$/, "")} shows work on post.`,
 };

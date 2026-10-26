@@ -18,7 +18,7 @@ export const BAD_TEXT =
   /\bundefined\b|\bNaN\b|\[object Object\]|Invalid Date|something went wrong|\bnull\b/i;
 /** Text from the wrong business, the wrong mentor, or things the demo bans. */
 export const WRONG_STORY =
-  /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|238160|Diana|Potts|Amira's Kitchen|\bDEMO-|HigherGov|Sodexo|Aramark|Compass Group|Eurest|Hay Street (United )?Methodist/i;
+  /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|238160|Amira's Kitchen|\bDEMO-|HigherGov|Sodexo|Aramark|Compass Group|Eurest|Hay Street (United )?Methodist/i;
 /** A promise to win, or Ava sending a bid herself. */
 export const PROMISES =
   /\bwill win\b|guarantee[sd]?\b|you(?:'ll| will) (?:be )?awarded|sure to win|Ava (?:will )?(?:submit|send)s? (?:it|your|the bid)|submitted for you|I(?: will)? (?:submit|send) (?:it|your bid|the bid) for you/i;

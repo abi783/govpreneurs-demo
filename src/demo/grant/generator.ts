@@ -552,7 +552,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       : verdict === "review"
         ? [
             rt(`The work fits, but **${mainIssue}** needs a decision before you commit.`),
-            rt(subGo ? "A subcontract under a prime is the way in this year." : `Look at it with Sarah, or find a partner, before you spend time on the ${offer}.`),
+            rt(subGo ? "A subcontract under a prime is the way in this year." : `Look at it with Diana, or find a partner, before you spend time on the ${offer}.`),
           ]
         : [
             rt(`**${cap(mainIssue)}** puts this one out of reach today.`),
@@ -839,7 +839,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
         remedy:
           openQuestions.length > 0
             ? rt(`Answer my question about ${mainIssue} and I can call this properly.`)
-            : rt(verdict === "no-bid" ? "Nothing you tell me changes this call." : "Send the first draft to Sarah and I can call this with more confidence."),
+            : rt(verdict === "no-bid" ? "Nothing you tell me changes this call." : "Send the first draft to Diana and I can call this with more confidence."),
       },
     },
     reads,
@@ -849,7 +849,7 @@ export function generateAnalysis(f: OppFacts, sol: Solicitation): GrantAnalysis 
       secondaries:
         verdict === "no-bid"
           ? [{ label: "Add the gap to my Roadmap", target: "/roadmap" }]
-          : [{ label: "Send to Sarah for a second opinion", target: "mentor", price: 97 }],
+          : [{ label: "Send to Diana for a second opinion", target: "mentor", price: 97 }],
       rationale,
     },
     trail,

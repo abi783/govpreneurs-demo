@@ -171,6 +171,7 @@ export function DemoShell({ children }: { children: ReactNode }) {
                     to={item.to as "/"}
                     className={`demo-nav__item${active ? " is-active" : ""}`}
                     aria-current={active ? "page" : undefined}
+                    title={item.label}
                   >
                     <item.icon aria-hidden />
                     <span>{item.label}</span>

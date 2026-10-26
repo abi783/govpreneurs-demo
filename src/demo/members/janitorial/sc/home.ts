@@ -1,9 +1,9 @@
-// THE JANITORIAL FIRM: Reggie's Success Center home — Sarah's action plan, and the
+// THE JANITORIAL FIRM: Reggie's Success Center home — Diana's action plan, and the
 // lines "Recent activity" adds to the ones every member gets (src/demo/sc/home/).
 //
 // The hero (Fort Bragg pressure washing) has no mentor review yet: Tim sends it
 // live on the call. So the plan's review step is open, and the activity shows
-// Sarah's other answers instead: Discuss on the I-95 rest areas (today, from the
+// Diana's other answers instead: Discuss on the I-95 rest areas (today, from the
 // shared feed), Pass on the EPA campus, and her reference-letter how-to.
 
 import { getOpportunity } from "../../../story/opportunities";
@@ -104,7 +104,7 @@ export function homePlan(): PlanContent {
   };
 }
 
-/** Sarah's closed answers, which the shared feed (unread replies only) does not show. */
+/** Diana's closed answers, which the shared feed (unread replies only) does not show. */
 export function homeActivity(): ActivityItem[] {
   const out: ActivityItem[] = [];
   const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-epa-pass");

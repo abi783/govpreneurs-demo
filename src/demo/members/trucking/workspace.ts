@@ -3,7 +3,7 @@
 // Source: demo-storyboard/trucking-pack.md, sections 11 and 12.
 //
 // The hero (the Fayetteville VA supply and linen runs) starts with NO mentor
-// review: Tim sends it live on the call, and the presenter's "Sarah answers"
+// review: Tim sends it live on the call, and the presenter's "Diana answers"
 // control plays the day forward. The threads below show the other two
 // verdicts, Discuss and Pass, so all three are on screen.
 
@@ -86,7 +86,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 40,
     lastMessageDaysAgo: 37,
     outcome:
-      "Register in SDDC's Freight Carrier Registration Program: three straight years of DOT authority, a SCAC, a Syncada account, a DoD bond and cargo insurance. Sarah sent a checklist.",
+      "Register in SDDC's Freight Carrier Registration Program: three straight years of DOT authority, a SCAC, a Syncada account, a DoD bond and cargo insurance. Diana sent a checklist.",
     price: 0,
   },
 ];
@@ -131,7 +131,7 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-courier-notes",
-    title: "Read Sarah's notes on your lab courier quote",
+    title: "Read Diana's notes on your lab courier quote",
     why: "She wants to talk before you send it. The rush calls need more drivers than your night schedule has.",
     dueInDays: 2,
     done: false,
@@ -167,8 +167,8 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-positioning-call",
-    title: "Positioning call with Sarah",
-    why: "Sarah set your targets: the VA, Fort Bragg, Camp Lejeune and NCDOT.",
+    title: "Positioning call with Diana",
+    why: "Diana set your targets: the VA, Fort Bragg, Camp Lejeune and NCDOT.",
     dueInDays: null,
     done: true,
     to: "/roadmap",
@@ -176,21 +176,21 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-lab-courier": [
     {
       author: "member",
       daysAgo: 2,
       hour: 6,
-      html: "<p>Hi Sarah — Fort Bragg's Army hospital wants a lab specimen courier: twice-daily runs plus rush calls within 2 hours, day or night, about $125K a year. It's on post, 12 miles from my yard. Here's my quote. Am I missing anything?</p>",
+      html: "<p>Hi Diana — Fort Bragg's Army hospital wants a lab specimen courier: twice-daily runs plus rush calls within 2 hours, day or night, about $125K a year. It's on post, 12 miles from my yard. Here's my quote. Am I missing anything?</p>",
       attachments: ["Rockfish-Run-lab-courier-quote.pdf"],
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Tanya, the price is fair, but <strong>let's talk before you send it</strong>. One night driver can't cover two rush calls at once, and the work statement scores response time. If two clinics call at 2 AM, one of them waits past the 2 hours.</p><p>Book 20 minutes with me this week and bring your night schedule. — Sarah</p>",
+      html: "<p>Tanya, the price is fair, but <strong>let's talk before you send it</strong>. One night driver can't cover two rush calls at once, and the work statement scores response time. If two clinics call at 2 AM, one of them waits past the 2 hours.</p><p>Book 20 minutes with me this week and bring your night schedule. — Diana</p>",
     },
   ],
   "rev-tps-pass": [
@@ -198,13 +198,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 6,
-      html: "<p>Sarah, USTRANSCOM has the national secure-freight program on the All tab, about $200M a year shared across carriers. We haul DoD freight already. Is it worth a try?</p>",
+      html: "<p>Diana, USTRANSCOM has the national secure-freight program on the All tab, about $200M a year shared across carriers. We haul DoD freight already. Is it worth a try?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass.</strong> It's for carriers SDDC has already approved for secure cargo: a security clearance for the company, cleared drivers and satellite tracking. Build toward it instead. Join SDDC's carrier program, haul DoD freight for two years, then look again. — Sarah</p>",
+      html: "<p><strong>Pass.</strong> It's for carriers SDDC has already approved for secure cargo: a security clearance for the company, cleared drivers and satellite tracking. Build toward it instead. Join SDDC's carrier program, haul DoD freight for two years, then look again. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>Passing. I'll start the carrier paperwork.</p>" },
   ],

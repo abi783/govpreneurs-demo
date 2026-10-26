@@ -65,7 +65,7 @@ export const CAVEATS: Record<string, Caveat> = {
       question: "Is your **Seymour Johnson CPARS** ready to send with the reply?",
       payoff: "A yes shows whether **the reply** is ready.",
       chip: "reply",
-      yes: { gist: "Your Seymour Johnson rating is ready, so the reply can go this week.", ack: "Good. Send it with two similar jobs well before it closes. Sarah wants 20 minutes on it first. I raised my confidence." },
+      yes: { gist: "Your Seymour Johnson rating is ready, so the reply can go this week.", ack: "Good. Send it with two similar jobs well before it closes. Diana wants 20 minutes on it first. I raised my confidence." },
       no: { gist: "Your Seymour Johnson rating is not ready, so the reply stays the thing to fix.", ack: "Then ask the squadron for the interim rating this week. Without it your reply is weaker. My confidence stays where it was." },
     },
   },
@@ -208,7 +208,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A team for **ITES-4S**, the Army's next IT contract",
       why: "Most Fort Bragg IT support of this size is ordered through the Army's IT contracts. A seat on the next one is how you see these orders.",
-      takes: "A partner or a mentor-protégé joint venture before the ITES-4S proposals are due. Ask Sarah where to start.",
+      takes: "A partner or a mentor-protégé joint venture before the ITES-4S proposals are due. Ask Diana where to start.",
     },
   },
   M6785427R4902: {
@@ -227,7 +227,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A **subcontract** with the 8(a) firm",
       why: "A base network this size needs local techs. The firm that gets it may need a team near Camp Lejeune.",
-      takes: "A call to the firm once the award posts. Sarah can tell you how to make it.",
+      takes: "A call to the firm once the award posts. Diana can tell you how to make it.",
     },
   },
   "36C24627Q0187": {

@@ -106,7 +106,7 @@ export const PARTNERS: MemberPartners = {
       storyReasons: [
         {
           signal: "W5",
-          text: "They support the Army Reserve's headquarters at Fort Bragg, where the analyst contract you asked Sarah about will be.",
+          text: "They support the Army Reserve's headquarters at Fort Bragg, where the analyst contract you asked Diana about will be.",
           evidence: "award record: Army Reserve sustainment-reporting support, Fort Bragg",
         },
       ],

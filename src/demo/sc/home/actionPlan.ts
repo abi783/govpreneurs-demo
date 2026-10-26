@@ -2,7 +2,7 @@
 //
 // In production a mentor assigns a plan: a title, a description and steps, all
 // written in Markdown. The home shows each plan as a card that opens to its
-// steps. The member on stage has one, written by Sarah after the positioning
+// steps. The member on stage has one, written by Diana after the positioning
 // call. Every fact in the text comes from the story files; none is typed twice.
 // Amira's (the caterer's) plan is below; Dana's (the agency's) is in
 // src/demo/members/agency/sc/home.ts.

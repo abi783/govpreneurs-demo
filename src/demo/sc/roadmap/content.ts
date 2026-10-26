@@ -2,7 +2,7 @@
 // sc-main `prisma/roadmap-v3-content.yaml` (the file members' pages read in
 // production). Same ids, titles, weeks, checklist lines, "why" text, card
 // types and call keys. Nothing here is edited except where a line says DEMO.
-// `mentorName` is kept as written; the demo shows Sarah Mitchell on every call.
+// `mentorName` is kept as written; the demo shows Diana Potts on every call.
 
 export interface ContentSub {
   id: string;

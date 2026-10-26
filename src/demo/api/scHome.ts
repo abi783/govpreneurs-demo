@@ -92,7 +92,7 @@ export const routes: DemoRouteDef[] = [
       const mentor = getBenchMentor(String(body?.mentorId ?? ""));
       if (!mentor) return demoResponse(404, { error: "Mentor not found" });
       assignMentor(mentor.id);
-      return { ok: true, mentor: { id: mentor.id, name: mentor.name, title: mentor.title, avatarUrl: null } };
+      return { ok: true, mentor: { id: mentor.id, name: mentor.name, title: mentor.title, avatarUrl: mentor.avatarUrl } };
     },
   },
 
@@ -164,7 +164,7 @@ export const routes: DemoRouteDef[] = [
         name: m.name,
         title: m.title,
         bio: m.bio,
-        avatarUrl: null,
+        avatarUrl: m.avatarUrl,
         ghlUserId: null,
       })),
       bookingUseAssignedMentor: true,

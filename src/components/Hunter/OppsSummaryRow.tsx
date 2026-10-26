@@ -172,6 +172,7 @@ export function OppsSummaryRow({
   showNewThisWeek = true,
   summaryAction,
   sortKeys,
+  controls = true,
 }: {
   matchCount: number;
   newThisWeek: number;
@@ -193,6 +194,8 @@ export function OppsSummaryRow({
    *  "Go to Pipeline" link). */
   summaryAction?: ReactNode;
   sortKeys?: SortKey[];
+  /** DEMO: false hides Filters, sort and Save. */
+  controls?: boolean;
 }) {
   const [whyOpen, setWhyOpen] = useState(false);
   const { profile, loading: profileLoading } = useBusinessProfile();
@@ -233,7 +236,7 @@ export function OppsSummaryRow({
           {summaryAction}
         </div>
 
-        <div className="opps-summary__controls">
+        {controls && <div className="opps-summary__controls">
           <button
             type="button"
             className="opps-summary__btn opps-summary__btn--primary"
@@ -260,7 +263,7 @@ export function OppsSummaryRow({
               <span>Save</span>
             </button>
           </SaveSearchPopover>
-        </div>
+        </div>}
       </div>
 
       {sublineOverride && <p className="opps-summary__subline">{sublineOverride}</p>}

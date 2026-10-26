@@ -3,7 +3,7 @@ import { MentorSessionCard } from "../MentorSessionCard";
 import { useMentorSessions } from "../../../demo/profile/mentor";
 import { MENTOR } from "../../../demo/story/persona";
 
-// DEMO: the sessions come from the story's mentor reviews (Sarah Mitchell) and the
+// DEMO: the sessions come from the story's mentor reviews (Diana Potts) and the
 // takeaways the visitor writes are kept in the demo store.
 export function MentorHistoryTab() {
   const sessions = useMentorSessions();

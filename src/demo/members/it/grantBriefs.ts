@@ -65,7 +65,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/W91247-27-Q-0131",
       rationale: "26 days is enough. Ava needs your site lead, your staffing plan and how you price the techs.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: "SBA 8(a) certification", status: "have", note: "In the program since March 2021; the term ends March 2030." },

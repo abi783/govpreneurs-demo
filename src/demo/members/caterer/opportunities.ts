@@ -224,8 +224,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Ava finished the proposal. Sarah Mitchell replied with notes.",
-      next: { label: "Read Sarah's notes", to: "/mentors/rev-fayetteville-proposal" },
+      note: "Ava finished the proposal. Diana Potts replied with notes.",
+      next: { label: "Read Diana's notes", to: "/mentors/rev-fayetteville-proposal" },
       lastActivityDaysAgo: 0,
     },
     ava: {
@@ -233,7 +233,7 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       stage: "read",
       needsYou: true,
       paused: false,
-      statusLine: "Sarah Mitchell reviewed your proposal. Read her notes, then send it.",
+      statusLine: "Diana Potts reviewed your proposal. Read her notes, then send it.",
     },
     mentorReviewId: "rev-fayetteville-proposal",
   },

@@ -2,7 +2,7 @@
 // in progress — closed pursuits, mentor reviews, wallet and tasks.
 //
 // The hero (the Family Advocacy campaign) starts with NO mentor review: Tim
-// sends it live on the call, and the presenter's "Sarah answers" control plays
+// sends it live on the call, and the presenter's "Diana answers" control plays
 // the day forward. The threads below show the other two verdicts, Discuss and
 // Pass, so all three are on screen.
 
@@ -84,7 +84,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     unread: false,
     openedDaysAgo: 41,
     lastMessageDaysAgo: 38,
-    outcome: "Email the contracting officer and ask for an interim CPARS rating. Sarah sent a template.",
+    outcome: "Email the contracting officer and ask for an interim CPARS rating. Diana sent a template.",
     price: 0,
   },
 ];
@@ -120,7 +120,7 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-read-sarah",
-    title: "Read Sarah's notes on your FAST proposal",
+    title: "Read Diana's notes on your FAST proposal",
     why: "She replied today. The proposal is due in 14 days.",
     dueInDays: 2,
     done: false,
@@ -148,7 +148,7 @@ export const TASKS: StoryTask[] = [
   {
     id: "task-rating",
     title: "Ask for an interim rating on your NC Guard campaign",
-    why: "Grant uses it as past performance on the Guard's next campaign. Sarah sent a template.",
+    why: "Grant uses it as past performance on the Guard's next campaign. Diana sent a template.",
     dueInDays: 10,
     done: false,
     to: "/mentors/rev-ncng-rating",
@@ -165,8 +165,8 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-positioning-call",
-    title: "Positioning call with Sarah",
-    why: "Sarah set your targets: Fort Bragg, the NC Guard, the VA and NC state agencies.",
+    title: "Positioning call with Diana",
+    why: "Diana set your targets: Fort Bragg, the NC Guard, the VA and NC state agencies.",
     dueInDays: null,
     done: true,
     to: "/roadmap",
@@ -174,21 +174,21 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-fast-proposal": [
     {
       author: "member",
       daysAgo: 2,
       hour: 16,
-      html: "<p>Hi Sarah — Ava finished my proposal for the FAST bus ridership campaign. It's due in two weeks. Could you read it before I send it? I'm most worried about section 2, our experience, because we have never run a transit campaign.</p>",
+      html: "<p>Hi Diana — Ava finished my proposal for the FAST bus ridership campaign. It's due in two weeks. Could you read it before I send it? I'm most worried about section 2, our experience, because we have never run a transit campaign.</p>",
       attachments: ["Lantern-Row-FAST-ridership-proposal.docx"],
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Dana, this is a strong draft. Three changes before you send it:</p><ol><li><strong>Lead section 2 with your stormwater campaign for the city.</strong> Same buyer, a public-behavior campaign, measured results. Right now it is on page 5.</li><li><strong>Put the Spanish-language plan on page one.</strong> The city scores reach at 30%, and a third of FAST riders speak Spanish at home.</li><li><strong>Name Teresa Wynn as your first reference.</strong> Purchasing officers call the first name on the list.</li></ol><p>Your price is in the right place. Don't lower it. — Sarah</p>",
+      html: "<p>Dana, this is a strong draft. Three changes before you send it:</p><ol><li><strong>Lead section 2 with your stormwater campaign for the city.</strong> Same buyer, a public-behavior campaign, measured results. Right now it is on page 5.</li><li><strong>Put the Spanish-language plan on page one.</strong> The city scores reach at 30%, and a third of FAST riders speak Spanish at home.</li><li><strong>Name Teresa Wynn as your first reference.</strong> Purchasing officers call the first name on the list.</li></ol><p>Your price is in the right place. Don't lower it. — Diana</p>",
     },
   ],
   "rev-visitnc-pass": [
@@ -196,13 +196,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 10,
-      html: "<p>Sarah, Visit NC's national tourism campaign is on the All tab. It's huge, but it's our state. Is it worth a try?</p>",
+      html: "<p>Diana, Visit NC's national tourism campaign is on the All tab. It's huge, but it's our state. Is it worth a try?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass.</strong> It is a national media buy, and the state will score past tourism campaigns of that size. You have none yet, and the proposal alone would take your team three weeks. Build toward it instead: win the regional work in front of you, and ask Visit NC for its list of approved subcontractors. — Sarah</p>",
+      html: "<p><strong>Pass.</strong> It is a national media buy, and the state will score past tourism campaigns of that size. You have none yet, and the proposal alone would take your team three weeks. Build toward it instead: win the regional work in front of you, and ask Visit NC for its list of approved subcontractors. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>That makes sense. Passing, and I'll ask about their subcontractor list.</p>" },
   ],
@@ -262,7 +262,7 @@ export function closedPursuitDetail(id: string, daysAgo: number): ClosedPursuitD
       lead: "You won this contract and delivered it. It was your first federal prime contract. The value was $86,400.",
       points: [
         "Six 15-second videos, geofenced ads around 40 high schools and the State Fair, and leads routed to recruiters within 5 minutes.",
-        "The Army has not yet written your performance rating. Ask for an interim rating: Sarah sent you a template.",
+        "The Army has not yet written your performance rating. Ask for an interim rating: Diana sent you a template.",
         "Add the job to My Business, so Hunter and Grant can use it as past performance.",
       ],
       link: { label: "Add it to My Business", to: "/my-business" },

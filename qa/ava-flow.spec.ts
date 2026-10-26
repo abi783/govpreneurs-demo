@@ -15,7 +15,7 @@ import { expect, test, type Download, type Page } from "@playwright/test";
 
 const BAD_TEXT = /\bundefined\b|\bNaN\b|\[object Object\]|something went wrong/i;
 const OLD_TEXT =
-  /\broof(ing|er)?\b|\bMarcus\b|Diana Potts|\bDEMO-[A-Z]+-\d+|Hay Street (United )?Methodist/i;
+  /\broof(ing|er)?\b|\bMarcus\b|\bDEMO-[A-Z]+-\d+|Hay Street (United )?Methodist/i;
 const QUIET =
   /not sure|leave it|later|stop working|ask a mentor|i don't have|not yet|take my answer/i;
 
@@ -231,10 +231,10 @@ test.describe("Ava, one full flow per bid", () => {
     expect(w.problems).toEqual([]);
   });
 
-  test("Fayetteville cafe: Sarah's review, read, download, send", async ({ page }) => {
+  test("Fayetteville cafe: Diana's review, read, download, send", async ({ page }) => {
     const w = watch(page);
     await open(page, "FAYNC-2026-R-08");
-    const review = page.getByRole("link", { name: /Read Sarah Mitchell's review/ });
+    const review = page.getByRole("link", { name: /Read Diana Potts's review/ });
     await expect(review).toBeVisible();
     await expect(review).toHaveAttribute("href", /\/mentors\/rev-fayetteville-proposal/);
     await noBadText(page, "fayetteville start");

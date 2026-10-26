@@ -68,7 +68,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/36C24627Q0094",
       rationale: "23 days is enough. Ava needs your program leads, who teaches the cohorts and how you meet the coach line.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: "SBA VetCert service-disabled veteran-owned certification", status: "have", note: "Certified 14 Jan 2024. Eligibility ends 14 Jan 2027; VA checks it at award." },

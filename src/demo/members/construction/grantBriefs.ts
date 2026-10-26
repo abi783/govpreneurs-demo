@@ -65,7 +65,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/W912PM27B0004",
       rationale: "30 days is enough. Ava needs your quality and safety staff, your controls plan and how you keep the building cool.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: "HUBZone certification", status: "have", note: "Certified by SBA on 2 Dec 2023. Recertification is due in 44 days." },

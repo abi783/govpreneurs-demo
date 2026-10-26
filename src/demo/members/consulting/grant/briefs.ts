@@ -124,7 +124,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       "Why can't I bid this?":
         "The Army sends this request through GSA eBuy to holders of a GSA schedule under SIN 541611, and you aren't one. A schedule offer takes months, and the quote is due in 16 days.",
       "How do I get a GSA schedule?":
-        `Send an offer to GSA under the Professional Services and Human Capital categories. With ${YEARS} years in business you meet the two-year rule. You need two years of financials and three references, and GSA's review takes a few months. Start it now; Sarah can show you where.`,
+        `Send an offer to GSA under the Professional Services and Human Capital categories. With ${YEARS} years in business you meet the two-year rule. You need two years of financials and three references, and GSA's review takes a few months. Start it now; Diana can show you where.`,
       "What should I bid instead?":
         `The ${hero.plainTitle}. It is your work, your set-aside and 3 miles from your office, and it is due in ${hero.closesInDays} days.`,
       "Why not bid?":
@@ -193,7 +193,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/partners",
       rationale: `${HP} wants ${PARTNER.seeking.charAt(0).toLowerCase()}${PARTNER.seeking.slice(1)}. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the order is quoted.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "One of your codes." },

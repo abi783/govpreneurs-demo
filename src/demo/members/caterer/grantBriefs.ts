@@ -65,7 +65,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/SP4701-26-Q-0021",
       rationale: "26 days is enough. Ava needs your delivery plan, your menus and one price decision.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active until April 2027." },
       { requirement: "Woman-owned small business (WOSB) certification", status: "have", note: "Certified in SBA's MySBA Certifications." },
@@ -137,9 +137,9 @@ export const GRANT_BRIEFS: GrantBrief[] = [
     nextMove: {
       label: "Open the proposal Ava built",
       to: "/ava/FAYNC-2026-R-08",
-      rationale: "Ava finished it and Sarah reviewed it. Read her notes, then send.",
+      rationale: "Ava finished it and Diana reviewed it. Read her notes, then send.",
     },
-    secondaryMove: { label: "Read Sarah's notes", to: "/mentors/rev-fayetteville-proposal" },
+    secondaryMove: { label: "Read Diana's notes", to: "/mentors/rev-fayetteville-proposal" },
     compliance: [
       { requirement: "NC business registration", status: "have", note: "Active." },
       { requirement: "City vendor registration", status: "have", note: "Registered with the City of Fayetteville." },
@@ -162,7 +162,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
     railAnswers: {
       "Where am I weak?": "Daily cafe experience. Lead section 2 with the county summer program: 1,100 meals a day for 11 weeks is daily service.",
       "What should my response say?": "Approach first: a sample weekly cafe menu and how you staff 20 events. Then experience, then price.",
-      "Do I have enough time?": "Yes. The proposal is written; Sarah's notes take about an hour to apply.",
+      "Do I have enough time?": "Yes. The proposal is written; Diana's notes take about an hour to apply.",
     },
   },
 

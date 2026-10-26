@@ -1,9 +1,9 @@
-// THE TRUCKING COMPANY: Tanya's Success Center home — Sarah's action plan, and the
+// THE TRUCKING COMPANY: Tanya's Success Center home — Diana's action plan, and the
 // lines "Recent activity" adds to the ones every member gets (src/demo/sc/home/).
 //
 // The hero (the Fayetteville VA supply and linen runs) has no mentor review yet:
 // Tim sends it live on the call. So the plan's review step is open, and the
-// activity shows Sarah's other answers instead: Discuss on the lab courier quote
+// activity shows Diana's other answers instead: Discuss on the lab courier quote
 // (today, from the shared feed), Pass on the national secure-freight program, and
 // her how-to on SDDC's carrier program.
 
@@ -103,7 +103,7 @@ export function homePlan(): PlanContent {
   };
 }
 
-/** Sarah's closed answers, which the shared feed (unread replies only) does not show. */
+/** Diana's closed answers, which the shared feed (unread replies only) does not show. */
 export function homeActivity(): ActivityItem[] {
   const out: ActivityItem[] = [];
   const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-tps-pass");

@@ -23,7 +23,7 @@ const IDLE_TIMEOUT_MS = 12_000;
 const BAD_TEXT_PHRASES = /something went wrong|unable to sign in|failed to load|\bundefined\b|\[object Object\]/i;
 const BAD_TEXT_NAN = /\bNaN\b/; // case sensitive on purpose: "Finance" is not an error
 // Leftovers from production's old sample member (a roofer) or the prototype. The demo member is a caterer.
-const OLD_PERSONA_TEXT = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|\bDEMO-[A-Z]+-\d+/i;
+const OLD_PERSONA_TEXT = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|\bDEMO-[A-Z]+-\d+/i;
 const MIN_MAIN_CHARS = 80;
 const CLICKABLE_SELECTOR = [
   "a[href]",

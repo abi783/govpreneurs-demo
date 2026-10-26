@@ -1,9 +1,9 @@
-// THE AGENCY: Dana's Success Center home — Sarah's action plan, and the lines
+// THE AGENCY: Dana's Success Center home — Diana's action plan, and the lines
 // "Recent activity" adds to the ones every member gets (src/demo/sc/home/).
 //
 // The hero (the Family Advocacy campaign) has no mentor review yet: Tim sends it
 // live on the call. So the plan's review step is open, and the activity shows
-// Sarah's other two verdicts instead: Discuss on the FAST proposal (today, from the
+// Diana's other two verdicts instead: Discuss on the FAST proposal (today, from the
 // shared feed) and Pass on Visit NC, plus her answer on the NC Guard rating.
 
 import { getOpportunity } from "../../../story/opportunities";
@@ -102,7 +102,7 @@ export function homePlan(): PlanContent {
   };
 }
 
-/** Sarah's closed answers, which the shared feed (unread replies only) does not show. */
+/** Diana's closed answers, which the shared feed (unread replies only) does not show. */
 export function homeActivity(): ActivityItem[] {
   const out: ActivityItem[] = [];
   const pass = MENTOR_REVIEWS.find((r) => r.id === "rev-visitnc-pass");

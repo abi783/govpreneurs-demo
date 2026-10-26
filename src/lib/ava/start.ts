@@ -2,7 +2,7 @@
 // (src/demo/story/opportunities.ts), played out as real answers.
 //
 //   Camp Mackall field meals   "answer my questions": 3 questions wait on her.
-//   Fayetteville cafe          "read": phase 2, with Sarah Mitchell's review done.
+//   Fayetteville cafe          "read": phase 2, with Diana Potts's review done.
 //   Cumberland detention meals "check you can bid": paused, 2 of 5 cooks have no certificate.
 //   Fort Bragg reply           "ready": built, ready to read and send.
 //   Family Advocacy ads        the agency's hero: "answer my questions", 3 wait on Dana.

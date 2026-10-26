@@ -21,7 +21,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. Help desk for the Army Reserve's headquarters. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. Help desk for the Army Reserve's headquarters. */
   hero: "W91247-27-Q-0131",
   /** Grant: No-bid. Same office and customer, but only ITES-3S holders can quote. */
   twin: "W91247-27-Q-0137",
@@ -279,8 +279,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your question and wants to talk first.",
-      next: { label: "Read Sarah's reply", to: "/mentors/rev-pope-sources-sought" },
+      note: "Diana read your question and wants to talk first.",
+      next: { label: "Read Diana's reply", to: "/mentors/rev-pope-sources-sought" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-pope-sources-sought",

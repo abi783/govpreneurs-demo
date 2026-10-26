@@ -9,7 +9,7 @@
 
 import { DEMO_TODAY } from "@/demo/story/clock";
 
-/** The mentor's own time zone. Sarah works from Fayetteville. */
+/** The mentor's own time zone. Diana works from Fayetteville. */
 export const MENTOR_TIME_ZONE = "America/New_York";
 
 /** How many business days ahead the calendar is open. */

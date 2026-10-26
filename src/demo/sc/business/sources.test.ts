@@ -32,8 +32,8 @@ describe("My Business sources", () => {
   });
 
   it("covers every case", () => {
-    expect(has((r) => r.status === "waiting" && r.origin === "You told Sarah on your call" && r.source === "Your call with Sarah")).toBe(true);
-    expect(has((r) => r.status === "approved" && r.source === "Your call with Sarah")).toBe(true);
+    expect(has((r) => r.status === "waiting" && r.origin === "You told Diana on your call" && r.source === "Your call with Diana")).toBe(true);
+    expect(has((r) => r.status === "approved" && r.source === "Your call with Diana")).toBe(true);
     expect(has((r) => r.status === "waiting" && r.origin === "From what Hunter learned" && r.source === "Your chat with Hunter")).toBe(true);
     expect(has((r) => r.status === "approved" && r.source === "Your chat with Hunter")).toBe(true);
     expect(has((r) => r.status === "waiting" && r.origin === "From your capability statement")).toBe(true);
@@ -49,7 +49,7 @@ describe("My Business sources", () => {
 
   it("sells it on Basic Info", () => {
     const basic = all.filter((r) => BEFORE_FIRST_CALL.includes(r.field));
-    for (const source of ["Your call with Sarah", "Your chat with Hunter", "Your capability statement", "SAM.gov registration"]) {
+    for (const source of ["Your call with Diana", "Your chat with Hunter", "Your capability statement", "SAM.gov registration"]) {
       expect(basic.some((r) => r.source === source), source).toBe(true);
     }
     expect(basic.some((r) => r.origin === "You told us")).toBe(true);

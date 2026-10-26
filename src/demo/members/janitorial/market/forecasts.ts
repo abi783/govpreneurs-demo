@@ -470,6 +470,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) wrote to you about the Army Reserve centers. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. The work is expected to be for 8(a) firms, so their team is your way in, and your share is capped at half (13 CFR 125.6). Open Partners to see their card.`,
   smallTeam: "You don't need a partner for the size of this one. A partner can still help if it starts the same month as another job and your night crews are full.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She is reading your plan for the Fort Bragg pressure-washing bid, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She is reading your plan for the Fort Bragg pressure-washing bid, so she knows your work.",
   past: `Your closest federal work is ${dorms.projectTitle} (${money(dorms.totalValue)}, ${dorms.periodStart.slice(0, 4)}). Your floor care for ${redtail.customerName.replace(/ \(.*\)$/, "")} (${money(redtail.totalValue)}) shows work under a prime, and ${hopeMills.customerName} shows steady public custodial since ${hopeMills.periodStart.slice(0, 4)}.`,
 };

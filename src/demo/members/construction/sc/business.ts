@@ -5,7 +5,7 @@
 // or the approved pack (demo-storyboard/construction-pack.md, section 9). The
 // record is not complete, on purpose, with the pack's real gaps:
 //   - not on either Fort Bragg HUBZone MATOC, where most of the base's HUBZone
-//     work goes: he told Sarah so on the positioning call ("Anything else");
+//     work goes: he told Diana so on the positioning call ("Anything else");
 //   - the bond line is tight: $2.9M of a $4M aggregate is in use ("Bonding");
 //   - HUBZone residency at 36% (9 of 25): one hire from outside the zone drops
 //     him under 35% (the HUBZone certificate, and Stay Ready);
@@ -18,7 +18,7 @@
 // buyers search for ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: equipment and PSC codes read off his
 // capability statement, the credit line from his chat with Hunter, clearances from
-// his call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// his call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

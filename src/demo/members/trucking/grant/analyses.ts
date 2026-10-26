@@ -164,7 +164,7 @@ const secureFreight: Maker = (f, sol) => {
     {
       item: rt("A place in **SDDC's carrier program**"),
       whyItMattered: rt("DoD books its freight through carriers SDDC has registered. Every secure-cargo carrier started there."),
-      whatItTakes: rt("Three straight years of DOT authority (you have nine), a SCAC, a Syncada account, a DoD bond and cargo insurance. Sarah's checklist covers it."),
+      whatItTakes: rt("Three straight years of DOT authority (you have nine), a SCAC, a Syncada account, a DoD bond and cargo insurance. Diana's checklist covers it."),
       cta: { kind: "mentor" },
     },
     {

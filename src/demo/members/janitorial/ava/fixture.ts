@@ -1920,7 +1920,7 @@ export const janitorialAnswers: Record<string, AskAnswer> = {
   },
   // The three questions. His answers when he gives them: he is the PM with
   // Keisha as QC manager, a blasting sub at a signed rate, and rig 2 kept on
-  // post on weekdays (Grant's and Sarah's advice).
+  // post on weekdays (Grant's and Diana's advice).
   "go-ask-pm": { status: "done", at: AT(50), choiceId: "pm-owner" },
   "go-ask-blast": { status: "done", at: AT(51), choiceId: "blast-sub" },
   "go-ask-backup": { status: "done", at: AT(52), choiceId: "backup-post" },

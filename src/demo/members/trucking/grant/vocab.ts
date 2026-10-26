@@ -317,7 +317,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A place in **SDDC's carrier program**",
       why: "DoD books its freight through carriers SDDC has registered. Registration comes first; secure cargo comes years later.",
-      takes: "Three straight years of DOT authority (you have nine), a SCAC, a Syncada account, a DoD bond and cargo insurance. Sarah's checklist covers it.",
+      takes: "Three straight years of DOT authority (you have nine), a SCAC, a Syncada account, a DoD bond and cargo insurance. Diana's checklist covers it.",
     },
   },
   "36C24627Q0074": {

@@ -164,7 +164,7 @@ const barracksHoldersOnly: Maker = (f, sol) => {
     {
       item: rt("A reply to the **Minor Construction MATOC** sources sought"),
       whyItMattered: rt("Most of Fort Bragg's HUBZone repair work goes through its MATOCs. A seat on the next one is how you see orders like this."),
-      whatItTakes: rt("Three similar jobs from the last six years, a surety letter with your single and total limits, and your Pope rating. Sarah's checklist covers the rest."),
+      whatItTakes: rt("Three similar jobs from the last six years, a surety letter with your single and total limits, and your Pope rating. Diana's checklist covers the rest."),
       cta: { kind: "mentor" },
     },
     {

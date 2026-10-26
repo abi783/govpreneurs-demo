@@ -76,7 +76,7 @@ export const CAVEATS: Record<string, Caveat> = {
       payoff: "A yes shows whether the **hiring plan** is a real limit.",
       chip: "hiring",
       yes: { gist: "You can name the analysts you'd hire, so the hiring plan is less of a limit.", ack: "Good. Named people and a real wrap rate make the prime path workable. I raised my confidence." },
-      no: { gist: "You can't name the analysts yet, so the hiring plan stays a real limit.", ack: "Then the hiring plan stays a real limit. Talk it through with Sarah before you price it. My confidence stays where it was." },
+      no: { gist: "You can't name the analysts yet, so the hiring plan stays a real limit.", ack: "Then the hiring plan stays a real limit. Talk it through with Diana before you price it. My confidence stays where it was." },
     },
   },
   "W91247-27-Q-0158": {
@@ -95,7 +95,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A **licensed partner** for clinical assessments",
       why: "Army leader assessments that need a psychologist come up every few years. A licensed firm may want you for the coaching and the classes.",
-      takes: "Ask Sarah which licensed firms bid Fort Bragg assessments, and offer them your coaches.",
+      takes: "Ask Diana which licensed firms bid Fort Bragg assessments, and offer them your coaches.",
     },
   },
   "36C24627Q0118": {
@@ -203,7 +203,7 @@ export const CAVEATS: Record<string, Caveat> = {
       payoff: "A yes shows whether the **call-center data** is a real limit.",
       chip: "data",
       yes: { gist: "You know a call-center analyst to team with, so the data work is less of a limit.", ack: "Good. Your Lean method plus their data model is a strong team. I raised my confidence." },
-      no: { gist: "You don't have a call-center analyst, so the data work stays a real limit.", ack: "Then the data work stays a real limit. Ask Sarah who has done state call-center reviews. My confidence stays where it was." },
+      no: { gist: "You don't have a call-center analyst, so the data work stays a real limit.", ack: "Then the data work stays a real limit. Ask Diana who has done state call-center reviews. My confidence stays where it was." },
     },
   },
   "DURPS-SP-2027-03": {

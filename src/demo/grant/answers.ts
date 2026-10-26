@@ -55,7 +55,7 @@ function reaction(id: string, value: string): { gist: string; ack: string; dots:
     case "enough-time":
       return yes
         ? { gist: "You said you can finish in the time left, so the short window is less of a limit.", ack: "Good. Start with the references and the price: they take the longest. I raised my confidence.", dots: 1 }
-        : { gist: "You cannot finish in the time left, so the short window stays a real limit.", ack: "Then the short window stays a real limit. A second opinion from Sarah can help you decide fast. My confidence stays where it was.", dots: 0 };
+        : { gist: "You cannot finish in the time left, so the short window stays a real limit.", ack: "Then the short window stays a real limit. A second opinion from Diana can help you decide fast. My confidence stays where it was.", dots: 0 };
     default:
       return no
         ? { gist: "Noted.", ack: "Noted. My confidence stays where it was.", dots: 0 }

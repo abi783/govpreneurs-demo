@@ -687,7 +687,7 @@ export function proposal(
   };
 }
 
-/** A suggestion from her positioning call: Sarah's question, then her answer. */
+/** A suggestion from her positioning call: Diana's question, then her answer. */
 export function mentorCallProposal(
   id: string,
   fieldKey: string,

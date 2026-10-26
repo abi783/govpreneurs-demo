@@ -81,7 +81,7 @@ export const CAVEATS: Record<string, Caveat> = {
       question: "Have you built a **seven-day schedule** with its payroll cost?",
       payoff: "A yes shows whether the **seven-day staffing** is a real limit.",
       chip: "staffing",
-      yes: { gist: "You have a seven-day schedule and its payroll, so the staffing is less of a limit.", ack: "Good. Bring it to Sarah; if the payroll leaves a margin, this can work. I raised my confidence." },
+      yes: { gist: "You have a seven-day schedule and its payroll, so the staffing is less of a limit.", ack: "Good. Bring it to Diana; if the payroll leaves a margin, this can work. I raised my confidence." },
       no: { gist: "You haven't built a seven-day schedule yet, so the staffing stays a real limit.", ack: "Then build it before you price: 16 hours a day, 365 days, with holidays. My confidence stays where it was." },
     },
   },

@@ -357,8 +357,10 @@ function OpportunityDetailContent() {
     // DEMO: `?met=1` passes the introduction without remembering it. The QA crawl
     // uses it, because the crawl clears storage before every load and would
     // otherwise only ever see the introduction.
-    const skip = new URLSearchParams(window.location.search).get("met") === "1";
-    setMetGrant(skip || hasMetGrant(session?.locationId, noticeId));
+    // DEMO: the demo has no fetch latency to cover, so Grant's verdict shows at
+    // once (presenters found the introduction an extra click, 25 Oct 2026).
+    void hasMetGrant;
+    setMetGrant(true);
   }, [session?.locationId, noticeId]);
   // Stable "today" for the live deadline countdown — computed once so the
   // GrantCanvas deadline memo doesn't churn on every render (day-granularity, so

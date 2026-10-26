@@ -6,7 +6,7 @@
 // not complete, on purpose, with the pack's real gaps:
 //   - no seat on a closed IT contract (ITES-3S, 8(a) STARS III), where much of
 //     Fort Bragg's IT work is ordered, and a CMMC Level 2 self-assessment at 92
-//     of 110: he told Sarah both on the positioning call ("Anything else");
+//     of 110: he told Diana both on the positioning call ("Anything else");
 //   - no credit line: six new hires mean about $95K of payroll before the first
 //     payment. "Cash flow" limits him, and Hunter's suggestion waits for a yes;
 //   - no site lead and alternate on file: "Who does what on your team" is open,
@@ -18,7 +18,7 @@
 // buyers search for ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: equipment and PSC codes read off his
 // capability statement, the credit line from his chat with Hunter, clearances from
-// his call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// his call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

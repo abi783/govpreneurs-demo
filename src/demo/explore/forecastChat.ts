@@ -189,7 +189,7 @@ export function forecastGrantReply(oppKey: string, message: string): string {
   }
   if (has(/\b(mentor|sarah|review)\b/)) {
     if (MEMBER !== "caterer") return pack.CHAT.mentor;
-    return `Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
+    return `Diana Potts can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
   if (has(/\b(past|reference|experience|similar|worked|done before|womack|county)\b/)) {
     if (MEMBER !== "caterer") return pack.CHAT.past;

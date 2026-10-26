@@ -199,7 +199,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/partners",
       rationale: `${BLUE} wants a woman-owned video crew for VA medical center shoots in NC, VA and SC. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the RFP.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "One of your codes." },

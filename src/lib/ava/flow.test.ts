@@ -485,7 +485,7 @@ describe("what she is told", () => {
       const { bid, flow } = look(c.noticeId, s);
       const head = headlineOf(bid, s, flow, {
         mentor: null,
-        mentorName: "Sarah Mitchell",
+        mentorName: "Diana Potts",
         pending: false,
       });
       expect(`${head.s} ${head.sub}`).not.toMatch(/nothing (in it )?would get it rejected/i);
@@ -545,7 +545,7 @@ describe("what she is told", () => {
     const { bid, flow } = look(FAY, s);
     const head = headlineOf(bid, s, flow, {
       mentor: null,
-      mentorName: "Sarah Mitchell",
+      mentorName: "Diana Potts",
       pending: false,
     });
     const n = grantUnsure(bid);
@@ -748,7 +748,7 @@ describe("round 2 of the review panel (7 October 2026)", () => {
     const { bid, flow } = look(FAY, done);
     const head = headlineOf(bid, done, flow, {
       mentor: null,
-      mentorName: "Sarah Mitchell",
+      mentorName: "Diana Potts",
       pending: false,
     });
     expect(head.s).toContain(sendDay(bid));

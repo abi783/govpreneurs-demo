@@ -58,7 +58,7 @@ export const CAVEATS: Record<string, Caveat> = {
     roadmap: {
       item: "A **GSA schedule** of your own",
       why: "Some buyers, like this VA campaign, ask only schedule holders. With 7 years in business you meet GSA's two-year rule for an offer.",
-      takes: "An offer to GSA under the advertising services category, and a few months of review. Ask Sarah where to start.",
+      takes: "An offer to GSA under the advertising services category, and a few months of review. Ask Diana where to start.",
     },
   },
   "NCDOT-GHSP-2027-08": {

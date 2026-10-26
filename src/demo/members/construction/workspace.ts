@@ -3,7 +3,7 @@
 // Source: demo-storyboard/construction-pack.md, sections 11 and 12.
 //
 // The hero (the Fort Bragg training building) starts with NO mentor review: Tim
-// sends it live on the call, and the presenter's "Sarah answers" control plays
+// sends it live on the call, and the presenter's "Diana answers" control plays
 // the day forward. The threads below show the other two verdicts, Discuss and
 // Pass, so all three are on screen.
 
@@ -86,7 +86,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 41,
     lastMessageDaysAgo: 38,
     outcome:
-      "Watch for the sources sought. Have three similar jobs from the last six years, a surety letter with single and aggregate limits, and your CPARS. Sarah sent a checklist.",
+      "Watch for the sources sought. Have three similar jobs from the last six years, a surety letter with single and aggregate limits, and your CPARS. Diana sent a checklist.",
     price: 0,
   },
 ];
@@ -176,21 +176,21 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-school-summer": [
     {
       author: "member",
       daysAgo: 2,
       hour: 7,
-      html: "<p>Hi Sarah — Cumberland County Schools is bidding the summer HVAC job for a classroom wing: a chiller, air handlers and controls, about $1.05M. We did one of their schools in 2024 and finished early. Here's my bid plan. Am I missing anything?</p>",
+      html: "<p>Hi Diana — Cumberland County Schools is bidding the summer HVAC job for a classroom wing: a chiller, air handlers and controls, about $1.05M. We did one of their schools in 2024 and finished early. Here's my bid plan. Am I missing anything?</p>",
       attachments: ["Ninebark-CCS-summer-HVAC-bid-plan.pdf"],
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Derrick, the plan is sound, but <strong>let's talk first</strong>. The work has to fit between the last school day and the first teacher workday, and the chiller lead time decides if that's possible. If the chiller lands in August, you miss the window and the school opens without air.</p><p>Book 20 minutes with me this week and bring the supplier's written ship date. — Sarah</p>",
+      html: "<p>Derrick, the plan is sound, but <strong>let's talk first</strong>. The work has to fit between the last school day and the first teacher workday, and the chiller lead time decides if that's possible. If the chiller lands in August, you miss the window and the school opens without air.</p><p>Book 20 minutes with me this week and bring the supplier's written ship date. — Diana</p>",
     },
   ],
   "rev-barracks-pass": [
@@ -198,13 +198,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 6,
-      html: "<p>Sarah, USACE Savannah has a barracks repair at Fort Bragg on the All tab, $25M–$35M, small-business set-aside. It's right in our backyard. Is it worth a try?</p>",
+      html: "<p>Diana, USACE Savannah has a barracks repair at Fort Bragg on the All tab, $25M–$35M, small-business set-aside. It's right in our backyard. Is it worth a try?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass as prime.</strong> It's far past your bond line: your single limit is $1.5M, and this needs a surety to back more than $25M. No surety will stretch that far for a first USACE job. Ask the bidders for the electrical and HVAC package instead. That's real work at your size, and it puts your name in front of the firms that win these. — Sarah</p>",
+      html: "<p><strong>Pass as prime.</strong> It's far past your bond line: your single limit is $1.5M, and this needs a surety to back more than $25M. No surety will stretch that far for a first USACE job. Ask the bidders for the electrical and HVAC package instead. That's real work at your size, and it puts your name in front of the firms that win these. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>Understood. Passing, and I'll call the bidders when the plan holders' list posts.</p>" },
   ],

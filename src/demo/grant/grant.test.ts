@@ -18,9 +18,9 @@ import { buildOldTake } from "./takeOld";
 
 /** Words that must never reach a screen: production's old sample firm, the wrong mentor, and the other member's trade. */
 const FORBIDDEN = byMember({
-  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|DEMO-[A-Z]+-\d+|HigherGov/i,
+  caterer: /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|DEMO-[A-Z]+-\d+|HigherGov/i,
   // Every other member's words too (src/demo/members/words.ts), as demo-storyboard/tools/scan-member.mjs checks the pages.
-  pack: withOtherMembersWords(/\broof(ing|er|s)?\b|Williams Construction|\b238160\b|Diana|DEMO-[A-Z]+-\d+|HigherGov/i),
+  pack: withOtherMembersWords(/\broof(ing|er|s)?\b|Williams Construction|\b238160\b|DEMO-[A-Z]+-\d+|HigherGov/i),
 });
 
 /** Every string in a value, flattened. */

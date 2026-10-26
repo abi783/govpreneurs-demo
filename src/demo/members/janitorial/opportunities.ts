@@ -20,7 +20,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. Pressure washing and sandblasting at Fort Bragg. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. Pressure washing and sandblasting at Fort Bragg. */
   hero: "W9124727QA014",
   /** Grant: No-bid. Same office, same post, his primary code, but the work is headed to AbilityOne. */
   twin: "W9124727QA021",
@@ -454,13 +454,13 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
       prime: "go",
       sub: null,
       oneLine:
-        "Look closer. It's staffed 16 hours a day, every day, which is a staffing business more than a cleaning job. Talk to Sarah first.",
+        "Look closer. It's staffed 16 hours a day, every day, which is a staffing business more than a cleaning job. Talk to Diana first.",
     },
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your question and wants to talk first.",
-      next: { label: "Read Sarah's reply", to: "/mentors/rev-rest-area-discuss" },
+      note: "Diana read your question and wants to talk first.",
+      next: { label: "Read Diana's reply", to: "/mentors/rev-rest-area-discuss" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-rest-area-discuss",

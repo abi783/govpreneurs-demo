@@ -448,7 +448,7 @@ export function cardLine(oppKey: string, r: ForecastRecordDto, when: string, big
     case FORECAST_KEYS.wosb:
       return `Family Advocacy support at Fort Bragg ACS, set aside for service-disabled veteran-owned firms: your certificate and the office you delivered for.${when}`;
     case FORECAST_KEYS.usarAnalysts:
-      return `Full-time analysts at the Army Reserve's headquarters. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} over five years it is a staffing contract far above your ${money(biggest)} largest job. Sarah wants your hiring plan first.${when}`;
+      return `Full-time analysts at the Army Reserve's headquarters. At ${money(r.valLow ?? 0)} to ${money(r.valHigh ?? 0)} over five years it is a staffing contract far above your ${money(biggest)} largest job. Diana wants your hiring plan first.${when}`;
     case FORECAST_KEYS.manpower:
       return `Fort Bragg's next manpower order, the same lock as the one you passed on: only GSA schedule holders can quote. Start your schedule offer now.${when}`;
     case FORECAST_KEYS.supervisorReady:
@@ -470,6 +470,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) holds the Army's HR Solutions contract and wrote to you about this work. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. Only holders can bid, so their team is your way in. Open Partners to see their card.`,
   smallTeam: "You do not need a partner for the size of this one. A partner can still help if the buyer wants more classes at once than your W-2 staff can teach.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She is reading your Army Reserve analyst question now, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She is reading your Army Reserve analyst question now, so she knows your work.",
   past: `Your closest past work is ${acs.projectTitle} (${money(acs.totalValue)}, ${acs.periodStart.slice(0, 4)}), your first federal prime. The ${money(halyard.totalValue)} family readiness classes for ${halyard.customerName.replace(/, for .*$/, "")} show Army training, and your Hope Mills plan (${money(hopeMills.totalValue)}) shows public strategic planning.`,
 };

@@ -5,7 +5,7 @@
 // the approved pack (demo-storyboard/trucking-pack.md, section 9). The record is
 // not complete, on purpose, with the pack's real gaps:
 //   - not registered in SDDC's Freight Carrier Registration Program, so no DoD
-//     freight booked through SDDC: she told Sarah so on the positioning call
+//     freight booked through SDDC: she told Diana so on the positioning call
 //     ("Anything else"). She meets its three-year authority rule;
 //   - no performance rating (CPARS) for the Fort Bragg hauling job: the job says so;
 //   - no hazmat endorsements and no secure-cargo approval (the twin): "Licenses"
@@ -18,7 +18,7 @@
 // search for ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: the fleet and PSC codes read off her
 // capability statement, the credit line from her chat with Hunter, clearances from
-// her call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// her call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

@@ -26,7 +26,7 @@ const CATERER = MEMBER === "caterer";
 
 const BANNED_WORDS = /\b(win|wins|winning|guarantee\w*|no-bid|lean bid)\b/i;
 const OLD_PERSONA =
-  /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|Diana Potts|\bDEMO-[A-Z]+-\d+|HigherGov/i;
+  /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|Amira's Kitchen|\bDEMO-[A-Z]+-\d+|HigherGov/i;
 
 beforeEach(() => {
   clearDemoState("workspace.savedOpps");

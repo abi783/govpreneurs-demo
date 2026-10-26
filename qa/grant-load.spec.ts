@@ -11,7 +11,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { OPPORTUNITIES } from "../src/demo/story/opportunities";
 
 const BAD_TEXT = /something went wrong|unable to sign in|failed to load|error loading|not analyzed yet|\bundefined\b|\[object Object\]|\bNaN\b|\bnull\b/i;
-const OLD_PERSONA = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|Diana|\bDEMO-[A-Z]+-\d+|HigherGov/i;
+const OLD_PERSONA = /\broof(ing|er|s)?\b|\bMarcus\b|Williams Construction|\b238160\b|SDVOSB|Amira's Kitchen|\bDEMO-[A-Z]+-\d+|HigherGov/i;
 const CALL_WORD = { bid: "Bid", review: "Needs review", no_bid: "No-bid" } as const;
 
 test.setTimeout(60_000);

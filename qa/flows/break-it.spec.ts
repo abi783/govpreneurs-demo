@@ -303,7 +303,7 @@ test.describe("Tim's path", () => {
     await settle(page);
     // The open thread is the Fayetteville proposal. Camp Mackall is closed, so it has no reply box.
     await expect(page).toHaveURL(/\/mentors\/rev-fayetteville-proposal/);
-    await expect(main(page)).toContainText("Sarah");
+    await expect(main(page)).toContainText("Diana");
     await healthy(page, w, "a mentor thread");
 
     const file = tempFile("Haddad-delivery-plan.pdf", "%PDF-1.4 sample");
@@ -579,7 +579,7 @@ test.describe("Send to a mentor", () => {
     await page.getByRole("heading", { name: GRAB_AND_GO }).click();
     await settle(page);
     await passGrantIntro(page);
-    await expect(main(page)).toContainText(/Sarah|mentor/i);
+    await expect(main(page)).toContainText(/Diana|mentor/i);
     await expect(main(page).getByRole("button", { name: "Review with Mentor" })).toHaveCount(0);
     await healthy(page, w, "after sending to the mentor");
   });
@@ -617,7 +617,7 @@ test.describe("Book a call", () => {
     await open(page, "/");
     const homeAfter = await main(page).innerText();
     expect(homeAfter).not.toEqual(homeBefore);
-    expect(homeAfter).toMatch(/Targeting|Sarah/i);
+    expect(homeAfter).toMatch(/Targeting|Diana/i);
     expect(homeAfter.match(/10:00/g)?.length ?? 0, "the call shows once on home").toBeGreaterThan(0);
 
     // Tasks shows it, and a reload keeps it.
@@ -666,7 +666,7 @@ const DIALOGS: DialogCase[] = [
     route: `/opportunities/${CAMP_MACKALL}`,
     open: async (p) => {
       await passGrantIntro(p);
-      await p.getByRole("button", { name: /Send to Sarah for a second opinion|Review with Mentor/ }).first().click();
+      await p.getByRole("button", { name: /Send to Diana for a second opinion|Review with Mentor/ }).first().click();
     },
   },
   { name: "Command palette", route: "/", open: (p) => p.locator(".demo-search").click() },
@@ -2081,7 +2081,7 @@ test.describe("One message per send", () => {
     const mine = () => main(page).locator(".mentors-msg--member");
     const before = await mine().count();
     await page.locator(".reply-composer__editor").click();
-    await page.keyboard.insertText("Thank you, Sarah. I will move my event work to the top.");
+    await page.keyboard.insertText("Thank you, Diana. I will move my event work to the top.");
     await humanDoubleClick(page, page.getByRole("button", { name: "Send reply" }));
     await settle(page);
     await page.waitForTimeout(800);

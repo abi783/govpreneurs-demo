@@ -54,7 +54,7 @@ describe("each bid starts where the story says", () => {
     expect(flow.stage).toBe("answer");
     expect(flow.queue).toHaveLength(3);
   });
-  test("Fayetteville cafe: phase 2, read, with Sarah's review", () => {
+  test("Fayetteville cafe: phase 2, read, with Diana's review", () => {
     const { flow, s } = look("FAYNC-2026-R-08");
     expect(flow.stage).toBe("read");
     expect(s.readOpened).toBe(true);
@@ -156,8 +156,8 @@ describe("none of the words the demo must never show", () => {
 describe("the member's facts come from the story", () => {
   const text = (id: string) => JSON.stringify(getAvaBid(id));
   const ids = STORY_BIDS.map((o) => o.id);
-  test("the mentor is Sarah Mitchell and nobody else", () => {
-    expect(MENTOR.name).toBe("Sarah Mitchell");
+  test("the mentor is Diana Potts and nobody else", () => {
+    expect(MENTOR.name).toBe("Diana Potts");
   });
   test("her past jobs are the story's, one customer each", () => {
     // Each past job a bid names appears with the story's title or customer.

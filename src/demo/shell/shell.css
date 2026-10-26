@@ -648,3 +648,26 @@
   text-decoration: underline;
 }
 .demo-presenter__leave:hover { color: var(--n-3); }
+
+/* ── Tablet: the menu becomes an icon rail (feedback, 25 Oct 2026). ──
+   On an iPad mini the full menu took a third of the screen and squeezed the
+   page into one-word lines. Below 1180px it keeps only the icons, as GHL does;
+   each item's name shows on hover and to screen readers. */
+@media (max-width: 1180px) {
+  :root { --demo-menu-w: 64px; }
+  .demo-logo { justify-content: center; padding: 16px 0 12px; }
+  .demo-logo__word,
+  .demo-account > div:not(.demo-account__avatar),
+  .demo-search__label,
+  .demo-search .demo-kbd,
+  .demo-nav__title { display: none; }
+  .demo-account { justify-content: center; padding: 6px 0; margin-left: 8px; margin-right: 8px; }
+  .demo-search { justify-content: center; margin-left: 8px; margin-right: 8px; padding-left: 0; padding-right: 0; }
+  .demo-nav__title + * { margin-top: 0; }
+  .demo-nav > div + div { border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 6px; padding-top: 6px; }
+  .demo-nav__item { justify-content: center; padding: 9px 0; margin-left: 8px; margin-right: 8px; }
+  .demo-nav__item > span {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+}

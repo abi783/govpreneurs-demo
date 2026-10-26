@@ -3,7 +3,7 @@
 // Source: demo-storyboard/consulting-pack.md, sections 11 and 12.
 //
 // The hero (the Fayetteville VA supervisor program) starts with NO mentor
-// review: Tim sends it live on the call, and the presenter's "Sarah answers"
+// review: Tim sends it live on the call, and the presenter's "Diana answers"
 // control plays the day forward. The threads below show the other two
 // verdicts, Discuss and Pass, so all three are on screen.
 
@@ -86,7 +86,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 41,
     lastMessageDaysAgo: 38,
     outcome:
-      "Email the contracting officer, copy the COR, name the contract and dates, and ask for an interim evaluation. Sarah sent a template.",
+      "Email the contracting officer, copy the COR, name the contract and dates, and ask for an interim evaluation. Diana sent a template.",
     price: 0,
   },
 ];
@@ -176,21 +176,21 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-usar-prime": [
     {
       author: "member",
       daysAgo: 2,
       hour: 7,
-      html: "<p>Hi Sarah — MICC Fort Bragg has an analyst contract for the Army Reserve's headquarters, small-business set-aside, about $925K a year for five years. I know the headquarters and the work. Should I prime it?</p>",
+      html: "<p>Hi Diana — MICC Fort Bragg has an analyst contract for the Army Reserve's headquarters, small-business set-aside, about $925K a year for five years. I know the headquarters and the work. Should I prime it?</p>",
       attachments: ["Coppervale-USAR-analysts-first-look.pdf"],
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Simone, <strong>let's talk first</strong>. It's a staffing contract: full-time analysts at the Reserve's headquarters for five years. That's about 60% of your revenue in people you'd have to hire before day one.</p><p>Book 20 minutes with me and bring your hiring plan and your wrap rate. We'll see if prime is real. — Sarah</p>",
+      html: "<p>Simone, <strong>let's talk first</strong>. It's a staffing contract: full-time analysts at the Reserve's headquarters for five years. That's about 60% of your revenue in people you'd have to hire before day one.</p><p>Book 20 minutes with me and bring your hiring plan and your wrap rate. We'll see if prime is real. — Diana</p>",
     },
   ],
   "rev-oshr-pass": [
@@ -198,13 +198,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 6,
-      html: "<p>Sarah, the Office of State Human Resources wants its statewide supervisor curriculum redesigned, $250K–$350K. It's our kind of work. Worth a try?</p>",
+      html: "<p>Diana, the Office of State Human Resources wants its statewide supervisor curriculum redesigned, $250K–$350K. It's our kind of work. Worth a try?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass.</strong> Statewide work for Raleigh at $300K is a reach this year: about twice your usual job, and they'll want a state reference you don't have yet. Finish the VA program and use it as your reference next time. — Sarah</p>",
+      html: "<p><strong>Pass.</strong> Statewide work for Raleigh at $300K is a reach this year: about twice your usual job, and they'll want a state reference you don't have yet. Finish the VA program and use it as your reference next time. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>Understood. Passing, and I'll put the VA program first.</p>" },
   ],

@@ -957,7 +957,7 @@ export const truckingBid: AvaBid = {
       kind: "answer",
       title: "How your quote answers the license line",
       source: S_LICENSE,
-      why: "The price schedule asks for a hazardous material license number. None of your drivers holds a hazmat endorsement, and the work statement names no hazardous cargo. Grant and Sarah say to ask in Q&A.",
+      why: "The price schedule asks for a hazardous material license number. None of your drivers holds a hazmat endorsement, and the work statement names no hazardous cargo. Grant and Diana say to ask in Q&A.",
       owner: "you",
       leadDays: 0,
       minutes: 2,
@@ -2095,7 +2095,7 @@ export const truckingAnswers: Record<string, AskAnswer> = {
   },
   // The three questions. Her answers when she gives them: she is the PM with
   // her dispatcher as Alternate, two box trucks and the third as the spare,
-  // and the license line stated and asked in Q&A (Grant's and Sarah's advice).
+  // and the license line stated and asked in Q&A (Grant's and Diana's advice).
   "rr-ask-pm": { status: "done", at: AT(50), choiceId: "pm-owner" },
   "rr-ask-trucks": { status: "done", at: AT(51), choiceId: "trucks-spare" },
   "rr-ask-license": { status: "done", at: AT(52), choiceId: "lic-state" },

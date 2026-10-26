@@ -22,7 +22,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. Supervisor leadership program at the Fayetteville VA. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. Supervisor leadership program at the Fayetteville VA. */
   hero: "36C24627Q0094",
   /** Grant: Don't bid. Same set-aside, her code and her Army office, but only GSA schedule holders can quote. */
   twin: "W91247-27-Q-0171",
@@ -387,8 +387,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your question and wants to talk first.",
-      next: { label: "Read Sarah's reply", to: "/mentors/rev-usar-prime" },
+      note: "Diana read your question and wants to talk first.",
+      next: { label: "Read Diana's reply", to: "/mentors/rev-usar-prime" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-usar-prime",

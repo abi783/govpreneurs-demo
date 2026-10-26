@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // The presenter controls change only shared state, so every page agrees:
-// C1 (Sarah answers), C2 (award) and C3 (jump to a segment).
+// C1 (Diana answers), C2 (award) and C3 (jump to a segment).
 import { beforeEach, describe, expect, it } from "vitest";
 import { wipeDemoStorage } from "@/demo/runtime/store";
 import { answerReview, createReview, getMentorReviewThread, pendingReviews } from "@/demo/state/mentorReviews";
@@ -13,10 +13,10 @@ import { SEGMENTS } from "./segments";
 import { byMember, own } from "@/demo/member";
 
 const HERO = HERO_IDS.hero;
-/** An opportunity with Sarah's written reply, and a word from it, per member. */
+/** An opportunity with Diana's written reply, and a word from it, per member. */
 const LIVE_REVIEW = byMember({
   caterer: { oppKey: "VA247-26-R-0112", word: "Womack" },
-  // A pack member: the first opportunity with Sarah's written "pursue" reply, and a long word from it.
+  // A pack member: the first opportunity with Diana's written "pursue" reply, and a long word from it.
   pack: (() => {
     const { MENTOR_REPLIES } = own(
       import.meta.glob<typeof import("@/demo/members/agency/mentorReplies")>("/src/demo/members/*/mentorReplies.ts", { eager: true }),
@@ -29,7 +29,7 @@ const LIVE_REVIEW = byMember({
 
 beforeEach(() => wipeDemoStorage());
 
-describe("C1: Sarah answers", () => {
+describe("C1: Diana answers", () => {
   it("turns a pending review into her reply, with the verdict", () => {
     const sent = createReview({ oppKey: LIVE_REVIEW.oppKey, title: "A live review", message: "Should I bid?" });
     expect(pendingReviews().map((r) => r.id)).toContain(sent.id);

@@ -63,7 +63,7 @@ describe("free slots", () => {
     addMentorBooking({ mentor: renee, startTime: first, endTime: new Date(new Date(first).getTime() + 1_800_000).toISOString(), paid: renee.price });
     expect(takenStarts().has(new Date(first).getTime())).toBe(true);
     expect(isFreeSlot(calendarOf(renee), first)).toBe(false);
-    // The member cannot be on two calls at once, so Sarah's calendar loses that time too.
+    // The member cannot be on two calls at once, so Diana's calendar loses that time too.
     expect(isFreeSlot(calendarOf(sarah), first)).toBe(false);
   });
 

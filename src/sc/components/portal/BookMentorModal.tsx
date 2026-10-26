@@ -17,6 +17,7 @@ import { purchaseBreakdown } from "@sc/lib/billing/walletDisplay";
 import { CREDIT_COVERED_PURCHASE, WALLET_BALANCE_LABEL } from "@sc/lib/walletCopy";
 // DEMO: the Add funds dialog replaces the link to the GoHighLevel billing page.
 import { openAddFunds } from "@/demo/sc/home/addFunds";
+import { SALES_ADVISOR } from "@/demo/sc/home/people";
 
 export interface BookableMentor {
   id: string;
@@ -338,7 +339,13 @@ export function BookMentorModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <p className="text-base font-bold text-gray-900">Book with {mentor.name}</p>
+          {/* DEMO: the call is with the sales advisor, who sets up the mentor. */}
+          <div>
+            <p className="text-base font-bold text-gray-900">Book with {SALES_ADVISOR.name}</p>
+            <p className="text-sm text-gray-600">
+              {SALES_ADVISOR.title}. He sets up your call with {mentor.name}.
+            </p>
+          </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

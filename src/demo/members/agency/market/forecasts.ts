@@ -466,6 +466,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) holds the VA's hiring campaign now and wrote to you about it. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. The next one is expected to be set aside for service-disabled veteran-owned firms, so their team is your way in. Open Partners to see their card.`,
   smallTeam: "You do not need a partner for the size of this one. A partner can still help if the buyer asks for more people than your team of nine.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She has read your FAST ridership proposal, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She has read your FAST ridership proposal, so she knows your work.",
   past: `Your closest past work is ${ncng.projectTitle} (${money(ncng.totalValue)}, ${ncng.periodStart.slice(0, 4)}). Your ${longleaf.customerName} hiring campaign (${money(longleaf.totalValue)}) shows recruiting work, and your City of Fayetteville stormwater campaign (${money(stormwater.totalValue)}) shows public campaigns.`,
 };

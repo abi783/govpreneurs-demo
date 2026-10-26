@@ -96,7 +96,7 @@ const CATERER_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/partners",
       rationale: `${PARTNER.name} is looking for woman-owned subcontractors. Ask ${PARTNER.contact} for the sub quote deadline. A prime needs your quote about a week before the due date.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active until April 2027." },
       { requirement: "Small business under NAICS 722310", status: "have", note: `Your yearly revenue is ${usd(PERSONA.annualRevenue)}. The size standard is $47.0M.` },
@@ -290,7 +290,7 @@ const CATERER_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/ava/W912EE-27-S-0004",
       rationale: `Ava finished both parts. Read them, then send them by email. The reply is due in ${sought.closesInDays} days.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active until April 2027." },
       { requirement: "Woman-owned small business (WOSB) certification", status: "have", note: "Certified in SBA's MySBA Certifications." },

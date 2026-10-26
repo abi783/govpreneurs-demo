@@ -43,7 +43,7 @@ The agency (`agency/`, Lantern Row Creative) is the template.
 | `persona.ts` | The business, owner, codes, certifications, past jobs and their story roles, mentor, key partner |
 | `opportunities.ts` | `HERO_IDS` (hero, twin, team-up) and about 25 opportunities (12 For you, 13 All) |
 | `workspace.ts` | Closed pursuits, mentor reviews and threads, wallet, tasks |
-| `grantBriefs.ts`, `mentorReplies.ts` | Grant's hand-written briefs; Sarah's replies |
+| `grantBriefs.ts`, `mentorReplies.ts` | Grant's hand-written briefs; Diana's replies |
 | `grant/` | Grant's analyses, details, domains (`DEFAULT_DOMAIN`) and vocabulary |
 | `hunter/vocab.ts` | Hunter's words for the trade |
 | `market/` | Awards, buyers, firms, forecasts, labor rates, partners, vehicles |

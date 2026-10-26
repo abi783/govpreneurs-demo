@@ -19,7 +19,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. HVAC and electrical upgrade at a Fort Bragg training building. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. HVAC and electrical upgrade at a Fort Bragg training building. */
   hero: "W912PM27B0004",
   /** Grant: No-bid. Same base, same set-aside, but only holders of Fort Bragg's construction MATOC can offer. */
   twin: "W91247-27-R-0019",
@@ -222,8 +222,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "reviewing",
-      note: "Grant says answer it. Sarah's checklist from your MATOC question covers what to send.",
-      next: { label: "Read Sarah's checklist", to: "/mentors/rev-matoc-howto" },
+      note: "Grant says answer it. Diana's checklist from your MATOC question covers what to send.",
+      next: { label: "Read Diana's checklist", to: "/mentors/rev-matoc-howto" },
       lastActivityDaysAgo: 1,
     },
   },
@@ -471,8 +471,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your bid plan and wants to talk first.",
-      next: { label: "Read Sarah's reply", to: "/mentors/rev-school-summer" },
+      note: "Diana read your bid plan and wants to talk first.",
+      next: { label: "Read Diana's reply", to: "/mentors/rev-school-summer" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-school-summer",

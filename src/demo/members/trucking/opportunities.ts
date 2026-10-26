@@ -21,7 +21,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. Supply and linen runs for the Fayetteville VA. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. Supply and linen runs for the Fayetteville VA. */
   hero: "36C24627Q0088",
   /** Grant: No-bid. Her truckload code and a set-aside she holds, but only SDDC-approved secure carriers get the papers. */
   twin: "SP3300-27-R-5007",
@@ -354,8 +354,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your quote and wants to talk first.",
-      next: { label: "Read Sarah's reply", to: "/mentors/rev-lab-courier" },
+      note: "Diana read your quote and wants to talk first.",
+      next: { label: "Read Diana's reply", to: "/mentors/rev-lab-courier" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-lab-courier",

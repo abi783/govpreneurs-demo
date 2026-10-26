@@ -204,7 +204,7 @@ function cardLine(
   }
 }
 
-/** "pending|Sarah Mitchell" back to the mentor status the header reads. */
+/** "pending|Diana Potts" back to the mentor status the header reads. */
 function reviewOf(key: string): MentorStatus | null {
   if (!key) return null;
   const [status, name] = key.split("|");

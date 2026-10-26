@@ -12,7 +12,7 @@
 // question on staffing), and a second addendum that arrives mid-build.
 //
 // The story is in src/demo/story (opportunity FAYNC-2026-R-08, Grant's brief,
-// the Sarah Mitchell thread). The city, its staff and its files are invented.
+// the Diana Potts thread). The city, its staff and its files are invented.
 // Every fact about the member comes from the story's persona or is an Ask.
 // Values inside upload `extracts` and claim `resolvedText` are what the
 // prototype shows AFTER the member supplies the document or answer.
@@ -1990,7 +1990,7 @@ export const fayettevilleBid: AvaBid = {
       pages: 3,
       paragraphs: [
         // Events come first: the approach is worth 40 points, and events are the
-        // strongest evidence of it (Sarah Mitchell's first note).
+        // strongest evidence of it (Diana Potts's first note).
         [
           { text: `Events are our strongest work. In ${year(CHURCH)}, we ` },
           {
@@ -2070,7 +2070,7 @@ export const fayettevilleBid: AvaBid = {
           { text: "." },
         ],
         // One sentence names the three references, in the order of this section.
-        // Sarah Mitchell's third note puts Janet Reyes first.
+        // Diana Potts's third note puts Janet Reyes first.
         [
           { text: "Our three references are on Form 5. They are " },
           {

@@ -171,7 +171,7 @@ const sharePoint: Maker = (f, sol) => {
     {
       item: rt("A team for **ITES-4S**, the Army's next IT contract"),
       whyItMattered: rt("The Army Reserve orders this work through its IT contracts. A seat on the next one is how you see orders like this."),
-      whatItTakes: rt("A partner that is bidding ITES-4S, or a mentor-protégé joint venture. Sarah can tell you where to start."),
+      whatItTakes: rt("A partner that is bidding ITES-4S, or a mentor-protégé joint venture. Diana can tell you where to start."),
       cta: { kind: "mentor" },
     },
     {

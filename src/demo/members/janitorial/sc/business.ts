@@ -19,7 +19,7 @@
 // buyers search for ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: equipment and PSC codes read off his
 // capability statement, the credit line from his chat with Hunter, clearances from
-// his call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// his call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

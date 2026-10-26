@@ -3,7 +3,7 @@
 // Source: demo-storyboard/janitorial-pack.md, sections 11 and 12.
 //
 // The hero (Fort Bragg pressure washing) starts with NO mentor review: Tim sends
-// it live on the call, and the presenter's "Sarah answers" control plays the day
+// it live on the call, and the presenter's "Diana answers" control plays the day
 // forward. The threads below show the other two verdicts, Discuss and Pass, so
 // all three are on screen.
 
@@ -85,7 +85,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 41,
     lastMessageDaysAgo: 38,
     outcome:
-      "Ask the COR for a one-page letter now, while they remember the job, or send a past-performance questionnaire with your next quote. Sarah sent a template.",
+      "Ask the COR for a one-page letter now, while they remember the job, or send a past-performance questionnaire with your next quote. Diana sent a template.",
     price: 0,
   },
 ];
@@ -112,8 +112,8 @@ export const TASKS: StoryTask[] = [
   },
   {
     id: "task-sarah-rest-area",
-    title: "Book 20 minutes with Sarah on the I-95 rest areas",
-    why: "Sarah wants to see a seven-day schedule and its payroll cost before you decide.",
+    title: "Book 20 minutes with Diana on the I-95 rest areas",
+    why: "Diana wants to see a seven-day schedule and its payroll cost before you decide.",
     dueInDays: 4,
     done: false,
     to: "/mentors/rev-rest-area-discuss",
@@ -158,7 +158,7 @@ export const TASKS: StoryTask[] = [
   {
     id: "task-cor-letter",
     title: "Ask the Seymour Johnson COR for a reference letter",
-    why: "The dorm job was too small for a CPARS. A one-page letter is your federal reference; use Sarah's template.",
+    why: "The dorm job was too small for a CPARS. A one-page letter is your federal reference; use Diana's template.",
     dueInDays: 10,
     done: false,
     to: "/mentors/rev-reference-howto",
@@ -175,20 +175,20 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-rest-area-discuss": [
     {
       author: "member",
       daysAgo: 2,
       hour: 7,
-      html: "<p>Hi Sarah — NCDOT is bidding custodial for the I-95 rest areas in Cumberland County, about $400K a year. They're staffed 16 hours a day, every day, with a $14.48 wage floor. Should I bid it?</p>",
+      html: "<p>Hi Diana — NCDOT is bidding custodial for the I-95 rest areas in Cumberland County, about $400K a year. They're staffed 16 hours a day, every day, with a $14.48 wage floor. Should I bid it?</p>",
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Reggie, <strong>let's talk first</strong>. This is a seven-day staffing business, not a cleaning job: 365 days a year, holidays included, a supervisor within 50 miles, and 5% of each month held back in the first year.</p><p>Book 20 minutes with me and bring a seven-day schedule with its payroll cost. — Sarah</p>",
+      html: "<p>Reggie, <strong>let's talk first</strong>. This is a seven-day staffing business, not a cleaning job: 365 days a year, holidays included, a supervisor within 50 miles, and 5% of each month held back in the first year.</p><p>Book 20 minutes with me and bring a seven-day schedule with its payroll cost. — Diana</p>",
     },
   ],
   "rev-epa-pass": [
@@ -196,13 +196,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 6,
-      html: "<p>Sarah, the EPA campus in Research Triangle Park is a small-business set-aside, about $1.6M a year. Should we go after it?</p>",
+      html: "<p>Diana, the EPA campus in Research Triangle Park is a small-business set-aside, about $1.6M a year. Should we go after it?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass for now.</strong> It's nearly your whole revenue, 85 miles away, and 21 firms bid last time. Win the Fort Bragg exterior work first and build toward a job this size. — Sarah</p>",
+      html: "<p><strong>Pass for now.</strong> It's nearly your whole revenue, 85 miles away, and 21 firms bid last time. Win the Fort Bragg exterior work first and build toward a job this size. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>Understood. Passing, and putting the time into Fort Bragg.</p>" },
   ],

@@ -1,6 +1,6 @@
 // Mentor reviews — RETIRED mock store for the /mentors chat surface.
 // The real /mentors chat now runs on `lib/mentorReviewsApi.ts` (backend-backed
-// shared store). This file's seeded threads ("Sarah Mitchell" and the
+// shared store). This file's seeded threads ("Diana Potts" and the
 // old sample member) are intentionally emptied out so nothing fictional renders
 // anywhere. It is kept alive — types, functions, exports all still work —
 // purely for compile compatibility of the remaining mock-only consumers
@@ -42,7 +42,7 @@ export interface MentorReview {
   lastViewedAt?: string;
 }
 
-const MENTOR_NAME = "Sarah Mitchell";
+const MENTOR_NAME = "Diana Potts";
 const MENTOR_CRED = "GovCon mentor · 12 yrs federal contracting";
 const MEMBER_NAME = "Amira Haddad";
 

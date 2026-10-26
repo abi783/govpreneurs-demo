@@ -249,7 +249,7 @@ const cafe: Maker = (f, sol) => {
     ],
     coverage: coverageFor(sol, { "2": "reviewed_with_findings" }),
     briefingBold: [undefined, "strong local fit", undefined],
-    remedy: "Apply Sarah's three changes and I can call this with full confidence.",
+    remedy: "Apply Diana's three changes and I can call this with full confidence.",
     citations: [cp("factors"), cp("needs")],
   };
 };
@@ -391,24 +391,24 @@ const fortBraggDining: Maker = (f, sol) => {
     },
   });
   const mentorCall = (): Pin => ({
-    label: "Sarah's positioning call",
+    label: "Diana's positioning call",
     provenance: {
       type: "transcript",
       ref: "call.positioning",
       quote: "With a kitchen of five, go in as a subcontractor on the big dining contracts, build the federal record, and we look at prime in about a year.",
       conversation: {
         channel: "mentor-call",
-        title: "Positioning call with Sarah",
+        title: "Positioning call with Diana",
         occurredAt: isoDaysFromNow(-70, 10),
         citedTurnId: "t2",
         attested: true,
         playAt: "14:32",
         turns: [
-          { id: "t1", speaker: "Sarah Mitchell", role: "mentor", at: "14:11", text: "How far can your kitchen reach in a day, and how many of you are there?" },
-          { id: "t2", speaker: "Sarah Mitchell", role: "mentor", at: "14:32", text: "With a kitchen of five, go in as a subcontractor on the big dining contracts, build the federal record, and we look at prime in about a year." },
+          { id: "t1", speaker: "Diana Potts", role: "mentor", at: "14:11", text: "How far can your kitchen reach in a day, and how many of you are there?" },
+          { id: "t2", speaker: "Diana Potts", role: "mentor", at: "14:32", text: "With a kitchen of five, go in as a subcontractor on the big dining contracts, build the federal record, and we look at prime in about a year." },
           { id: "t3", speaker: "You", role: "member", at: "14:41", text: "That works for me. Fort Bragg is the one I know." },
         ],
-        learning: "Sarah set the strategy as subcontractor first on large dining work, with prime a year out.",
+        learning: "Diana set the strategy as subcontractor first on large dining work, with prime a year out.",
         learningBy: "Grant, from the recording",
       },
     },

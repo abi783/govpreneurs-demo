@@ -19,7 +19,7 @@ import type {
 import type { PlaceKey } from "../../story/places";
 
 export const HERO_IDS = {
-  /** Hunter → Grant "Bid" → Sarah → Ava builds it. Family Advocacy print and digital ads. */
+  /** Hunter → Grant "Bid" → Diana → Ava builds it. Family Advocacy print and digital ads. */
   hero: "W91247-27-Q-0108",
   /** Grant: No-bid. Same office and program, but written around one provider's app and crew. */
   twin: "W91247-27-Q-0112",
@@ -221,8 +221,8 @@ export const OPPORTUNITIES: StoryOpportunity[] = [
     saved: true,
     pursuit: {
       stage: "with_mentor",
-      note: "Sarah read your draft and replied with three changes.",
-      next: { label: "Read Sarah's notes", to: "/mentors/rev-fast-proposal" },
+      note: "Diana read your draft and replied with three changes.",
+      next: { label: "Read Diana's notes", to: "/mentors/rev-fast-proposal" },
       lastActivityDaysAgo: 0,
     },
     mentorReviewId: "rev-fast-proposal",

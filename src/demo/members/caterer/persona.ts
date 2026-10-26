@@ -141,10 +141,10 @@ export const PAST_PERFORMANCE_ROLES: PastPerformanceRoles = { county: "pp-county
 
 /** The one mentor in the story. Every screen uses this name. */
 export const MENTOR: MentorProfile = {
-  name: "Sarah Mitchell",
-  firstName: "Sarah",
-  title: "GovCon mentor · former Army contracting officer",
-  bio: "Sarah spent 14 years as an Army contracting officer at Fort Bragg and Fort Stewart before joining GovPreneurs. She reviews food-service and facilities bids.",
+  name: "Diana Potts",
+  firstName: "Diana",
+  title: "Mentor",
+  bio: "Diana helps members position their business and understand how government contracting works, including disaster-related opportunities.",
 };
 
 /** The incumbent and teaming partner at the center of the Fort Bragg story. */

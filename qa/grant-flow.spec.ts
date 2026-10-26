@@ -119,13 +119,13 @@ test("send to mentor charges $97, adds a pending review and updates the pill", a
   await settle(page);
   expect(await balance()).toBe(before - 97);
 
-  // It survives a reload, and the pill opens Sarah's thread.
+  // It survives a reload, and the pill opens Diana's thread.
   await page.reload();
   await page.getByRole("button", { name: "Show me the analysis" }).click().catch(() => undefined);
   await expect(page.locator(".mentor-status-pill--pending")).toContainText("Mentor reviewing");
   await page.locator(".mentor-status-pill--pending").click();
   await expect(page).toHaveURL(/\/mentors\/rev-/);
-  await expect(page.locator("body")).toContainText("Sarah Mitchell");
+  await expect(page.locator("body")).toContainText("Diana Potts");
 
   expect(await demoFailures(page)).toEqual([]);
   expect(errors).toEqual([]);

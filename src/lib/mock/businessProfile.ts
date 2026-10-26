@@ -318,7 +318,7 @@ export const businessProfile: BusinessProfile = {
       {
         id: "m1",
         dateTime: "2026-04-22T09:00:00Z",
-        mentorName: "Sarah Mitchell",
+        mentorName: "Diana Potts",
         status: "completed",
         takeaway:
           "Focus on USACE small business set-asides; capability statement needs more recent past performance.",

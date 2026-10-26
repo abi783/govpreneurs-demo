@@ -72,7 +72,7 @@ describe("the story, as Ava reads it", () => {
   test.runIf(CATERER)("the four bids are the story's four, soonest due first", () => {
     expect(STORY_BID_IDS).toEqual([FAYETTEVILLE, CUMBERLAND, MACKALL, REPLY]);
     expect(STORY_BIDS.map((b) => b.statusLine)).toEqual([
-      "Sarah Mitchell reviewed your proposal. Read her notes, then send it.",
+      "Diana Potts reviewed your proposal. Read her notes, then send it.",
       "Paused: the county asks for a food-handler certificate for every cook. You have 3 of 5.",
       "Ava has 3 questions for you about delivery times and staff.",
       "Your reply is ready. Read it, then send it by email.",
@@ -157,7 +157,7 @@ describe("Grant's read", () => {
 
 describe("the mentor reviews", () => {
   test.runIf(CATERER)(
-    "Sarah's review of the Fayetteville proposal is a finished review of her bid",
+    "Diana's review of the Fayetteville proposal is a finished review of her bid",
     () => {
       const r = getReviewByOpportunity(FAYETTEVILLE, "bid");
       expect(r?.id).toBe("rev-fayetteville-proposal");
@@ -169,7 +169,7 @@ describe("the mentor reviews", () => {
   );
 
   test.runIf(CATERER)(
-    "Sarah's read of the Camp Mackall opportunity says Pursue, and is not a review of her bid",
+    "Diana's read of the Camp Mackall opportunity says Pursue, and is not a review of her bid",
     () => {
       const r = getReviewByOpportunity(MACKALL);
       expect(r?.id).toBe("rev-mackall-pursue");
@@ -178,8 +178,8 @@ describe("the mentor reviews", () => {
     },
   );
 
-  test("the mentor is Sarah Mitchell", () => {
-    expect(ADAPTER_MENTOR.name).toBe("Sarah Mitchell");
+  test("the mentor is Diana Potts", () => {
+    expect(ADAPTER_MENTOR.name).toBe("Diana Potts");
   });
 
   test("sending her bid charges the wallet once, and a second send finds the first", () => {
@@ -206,7 +206,7 @@ describe("the mentor reviews", () => {
     });
     expect(again.id).toBe(r.id);
     expect(getWalletBalance()).toBe(before - 97);
-    // It never replaces Sarah's read of the opportunity.
+    // It never replaces Diana's read of the opportunity.
     expect(getReviewByOpportunity(hero)?.id).toBe(read);
   });
 });

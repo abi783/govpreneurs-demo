@@ -3,7 +3,7 @@
 // Source: demo-storyboard/it-services-pack.md, sections 11 and 12.
 //
 // The hero (the Army Reserve help desk) starts with NO mentor review: Tim sends
-// it live on the call, and the presenter's "Sarah answers" control plays the
+// it live on the call, and the presenter's "Diana answers" control plays the
 // day forward. The threads below show the other two verdicts, Discuss and Pass,
 // so all three are on screen.
 
@@ -85,7 +85,7 @@ export const MENTOR_REVIEWS: MentorReviewStory[] = [
     openedDaysAgo: 41,
     lastMessageDaysAgo: 38,
     outcome:
-      "Score the 110 controls, enter the score and your plan date in SPRS, and have an officer affirm it every year. Sarah sent a checklist.",
+      "Score the 110 controls, enter the score and your plan date in SPRS, and have an officer affirm it every year. Diana sent a checklist.",
     price: 0,
   },
 ];
@@ -175,20 +175,20 @@ export const TASKS: StoryTask[] = [
   },
 ];
 
-/** Sarah's written threads, keyed by review id (MENTOR_REVIEWS). */
+/** Diana's written threads, keyed by review id (MENTOR_REVIEWS). */
 export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
   "rev-pope-sources-sought": [
     {
       author: "member",
       daysAgo: 2,
       hour: 7,
-      html: "<p>Hi Sarah — Pope's 763 ESS posted a sources sought for the 43rd Communications Squadron's IT support, about $900K a year. The last two contracts went sole-source to a tribe-owned firm. Is it worth answering, or is it already decided?</p>",
+      html: "<p>Hi Diana — Pope's 763 ESS posted a sources sought for the 43rd Communications Squadron's IT support, about $900K a year. The last two contracts went sole-source to a tribe-owned firm. Is it worth answering, or is it already decided?</p>",
     },
     {
       author: "mentor",
       daysAgo: 0,
       hour: 9,
-      html: "<p>Hector, it's worth answering, but <strong>let's talk first</strong>. A sources sought is how the Air Force decides how to buy the next one. If two or more capable 8(a) firms answer, it can become an 8(a) competition instead of another sole source.</p><p>Book 20 minutes with me this week and bring your Seymour Johnson CPARS. — Sarah</p>",
+      html: "<p>Hector, it's worth answering, but <strong>let's talk first</strong>. A sources sought is how the Air Force decides how to buy the next one. If two or more capable 8(a) firms answer, it can become an 8(a) competition instead of another sole source.</p><p>Book 20 minutes with me this week and bring your Seymour Johnson CPARS. — Diana</p>",
     },
   ],
   "rev-hoke-chromebooks": [
@@ -196,13 +196,13 @@ export const MENTOR_THREADS: Record<string, ThreadMessageStory[]> = {
       author: "member",
       daysAgo: 9,
       hour: 6,
-      html: "<p>Sarah, Hoke County Schools wants 2,400 Chromebooks with setup, $700K–$800K. We re-imaged 4,800 for Cumberland County in 2023. Should I bid it?</p>",
+      html: "<p>Diana, Hoke County Schools wants 2,400 Chromebooks with setup, $700K–$800K. We re-imaged 4,800 for Cumberland County in 2023. Should I bid it?</p>",
     },
     {
       author: "mentor",
       daysAgo: 8,
       hour: 14,
-      html: "<p><strong>Pass.</strong> It's a device buy, and resellers win on device price. The setup is a small part of the money. Offer the district summer repair and imaging instead; that's the work your Cumberland County job proves. — Sarah</p>",
+      html: "<p><strong>Pass.</strong> It's a device buy, and resellers win on device price. The setup is a small part of the money. Offer the district summer repair and imaging instead; that's the work your Cumberland County job proves. — Diana</p>",
     },
     { author: "member", daysAgo: 8, hour: 16, html: "<p>Makes sense. Passing, and I'll write to their technology director about summer imaging.</p>" },
   ],

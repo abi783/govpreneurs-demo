@@ -2,7 +2,7 @@
 //
 // Production builds this on the server (src/lib/roadmapV3/payload.ts) from the
 // database, the wallet and a YAML file. The demo builds it here from the story
-// (Amira, Sarah Mitchell, the wallet) and from what the visitor has done since the
+// (Amira, Diana Potts, the wallet) and from what the visitor has done since the
 // page opened (bookings, purchases, ticks, checks) in the demo store.
 // The progress numbers come from model.ts, the same file Home reads.
 

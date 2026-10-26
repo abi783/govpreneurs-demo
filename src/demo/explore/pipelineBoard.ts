@@ -219,7 +219,7 @@ export function pickDemoNudge(
   const short = b.title.split(" — ")[0];
   const d = b.daysLeft as number;
   return {
-    message: `${short} is due in ${d} ${d === 1 ? "day" : "days"} and no mentor has read it yet. Want Sarah to look at it now?`,
+    message: `${short} is due in ${d} ${d === 1 ? "day" : "days"} and no mentor has read it yet. Want Diana to look at it now?`,
     cta: { label: "Send to a mentor", href: `/opportunities/${b.opportunityId}` },
   };
 }

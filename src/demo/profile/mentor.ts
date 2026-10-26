@@ -1,5 +1,5 @@
 // DEMO: the mentor sessions on the Business Profile. They come from the mentor
-// reviews in the story (MENTOR_REVIEWS), with Sarah Mitchell as the mentor.
+// reviews in the story (MENTOR_REVIEWS), with Diana Potts as the mentor.
 
 import { MENTOR } from "../story/persona";
 import { MENTOR_REVIEWS } from "../story/workspace";

@@ -71,6 +71,11 @@ function handleClick(e: MouseEvent<HTMLElement>): void {
   e.preventDefault();
   e.stopPropagation();
   const course = url.hostname === "hub.govpreneurs.com";
+  // DEMO: the real course library opens for real, in a new tab (feedback, 25 Oct 2026).
+  if (course) {
+    window.open(url.href, "_blank", "noopener");
+    return;
+  }
   showDemoNotice({
     title: course ? "GovPreneurs course library" : "Outside website",
     message: course

@@ -480,7 +480,8 @@ export function GrantCanvas({
               </span>
             </p>
           </div>
-          <div className="gt-conf">
+          {/* DEMO: no confidence dots; the verdict stands alone. */}
+          <div className="gt-conf" hidden>
             <span className="gt-kicker">Confidence</span>
             <span
               className="gt-conf__dots"
@@ -499,7 +500,8 @@ export function GrantCanvas({
           </div>
         </div>
 
-        {take.paths.length > 0 ? (
+        {/* DEMO: one verdict only. The path pills read as two more verdicts. */}
+        {false && take.paths.length > 0 ? (
         <div className="gt-paths">
           {take.paths.map((pth) => (
             <div key={pth.label} className={`gt-path gt-path--${pth.state}`}>
@@ -645,7 +647,7 @@ export function GrantCanvas({
             ) : null}
             {/* DEMO: the story's next move is the filled primary button. A mentor
                 review is the secondary beside it, worded as the brief words it
-                ("Send to Sarah for a second opinion"). Production made the mentor
+                ("Send to Diana for a second opinion"). Production made the mentor
                 review the filled primary on every verdict. */}
             <div className="gt-next__actions">
               {action.primary.label === START_BID_LABEL ? (

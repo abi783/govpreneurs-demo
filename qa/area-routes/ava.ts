@@ -7,7 +7,7 @@
 // reason first), and a number the story does not know.
 export const ROUTES: string[] = [
   "/ava/SP4701-26-Q-0021", // Camp Mackall field meals: answer my questions
-  "/ava/FAYNC-2026-R-08", // Fayetteville cafe: phase 2, Sarah's review is in
+  "/ava/FAYNC-2026-R-08", // Fayetteville cafe: phase 2, Diana's review is in
   "/ava/CUMCO-2026-014", // Cumberland detention meals: paused at check you can bid
   "/ava/W912EE-27-S-0004", // Fort Bragg sources-sought reply: ready to read and send
   "/ava/W912PM-26-Q-0017", // handoff, federal: Ava is reading the buyer's files

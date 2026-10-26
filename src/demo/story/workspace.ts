@@ -33,11 +33,11 @@ export interface MentorReviewStory {
   oppId: string | null;
   title: string;
   status: MentorReviewStatus;
-  /** True when Sarah's latest reply is unread. */
+  /** True when Diana's latest reply is unread. */
   unread: boolean;
   openedDaysAgo: number;
   lastMessageDaysAgo: number;
-  /** What Sarah concluded, in one line. The thread itself is written in
+  /** What Diana concluded, in one line. The thread itself is written in
    *  the Mentor Reviews page's data file. */
   outcome: string;
   /** Wallet charge for the review. */

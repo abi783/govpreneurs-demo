@@ -201,7 +201,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/partners",
       rationale: `${BLUE} wants a local service-disabled veteran-owned carrier for Fort Bragg's freight runs and trailer moves. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the RFP.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: `Registered under NAICS ${teamUp.naics}`, status: "partial", note: "Not one of your codes. The prime bids under it; your freight work is under 484110." },

@@ -154,7 +154,7 @@ const manpowerSchedule: Maker = (f, sol) => {
     {
       item: rt("A **GSA schedule** of your own"),
       whyItMattered: rt("MICC Fort Bragg buys most of its competed small-business consulting as GSA schedule orders. A schedule is how you see orders like this one."),
-      whatItTakes: rt(`An offer under the Professional Services and Human Capital categories: two years of financials and three references. With ${PERSONA.yearsInBusiness} years in business you meet the two-year rule. Sarah can show you where to start.`),
+      whatItTakes: rt(`An offer under the Professional Services and Human Capital categories: two years of financials and three references. With ${PERSONA.yearsInBusiness} years in business you meet the two-year rule. Diana can show you where to start.`),
       cta: { kind: "mentor" },
     },
     {

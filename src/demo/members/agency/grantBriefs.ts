@@ -65,7 +65,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/W91247-27-Q-0108",
       rationale: "24 days is enough. Ava needs your project manager, your video plan and one decision about the app line.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: "Woman-owned small business (WOSB) certification", status: "have", note: "Certified in SBA's MySBA Certifications." },

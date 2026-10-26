@@ -190,7 +190,7 @@ test.describe("My Business flows", () => {
     await setSent(null);
     await go(page, "/my-business");
     await page.getByRole("button", { name: /send/i }).first().click();
-    await expect(page.locator(".mb-main")).toContainText("Sarah Mitchell");
+    await expect(page.locator(".mb-main")).toContainText("Diana Potts");
 
     await setSent(null, true);
     await page.reload();

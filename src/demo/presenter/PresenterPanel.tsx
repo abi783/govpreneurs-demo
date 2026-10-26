@@ -3,7 +3,7 @@
 // How it stays out of the way (the practices it follows):
 //   - Hidden until called: a faint handle at the bottom of the dark menu, or Shift+Alt+P
 //     (the same family as Ava's Shift+Alt+A). Never over the page; the chat boxes are bottom-right.
-//   - Shows only what fits now: "Sarah answers" only when a review is waiting, "Award" only
+//   - Shows only what fits now: "Diana answers" only when a review is waiting, "Award" only
 //     when a bid was sent and not yet decided.
 //   - Keyboard-first: while open, 1–9, 0 and − jump to a segment, so Tim never hunts for a
 //     corner on a projector. Digits are ignored while the cursor is in a text box.
@@ -195,7 +195,7 @@ export function PresenterPanel() {
 
           {review && (
             <section className="demo-presenter__sec">
-              <div className="demo-presenter__label">Sarah answers</div>
+              <div className="demo-presenter__label">Diana answers</div>
               <div className="demo-presenter__what" title={review.title}>
                 {review.title}
               </div>

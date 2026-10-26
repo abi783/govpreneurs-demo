@@ -1,22 +1,16 @@
 // DEMO: the mentor bench on the Mentors page.
 //
-// Sarah Mitchell comes from the story (persona.ts MENTOR), so her name, title
-// and bio are never typed here. The other five mentors are fictional. They
-// have no photo: the Mentors page draws their initials. The same six people
-// serve both members; a few lines name the member's kind of work (byMember).
+// These are GovPreneurs' real mentors, copied from the production Success Center
+// (titles, prices and descriptions as members see them there, 26 Oct 2026). The
+// story mentor (persona.ts MENTOR) is Diana Potts, so her name and bio are not
+// typed here. Photos are in public/demo/people. No email or phone is shown.
 //
 // `hours` is the Eastern wall-clock window in which the mentor takes calls.
 // `busyShare` is the share of half-hour slots that the sample calendar marks
 // as taken, so that every mentor looks like a person with a real diary.
 
-import { byMember, own } from "@/demo/member";
 import { MENTOR } from "@/demo/story/persona";
-import { MENTOR_REVIEW_PRICE } from "@/demo/state/wallet";
 import { registerSearchEntries } from "@/demo/nav/searchIndex";
-
-const copy = own(
-  import.meta.glob<typeof import("../../members/agency/copy")>("/src/demo/members/*/copy.tsx", { eager: true }),
-);
 
 export interface BenchMentor {
   id: string;
@@ -34,107 +28,117 @@ export interface BenchMentor {
   busyShare: number;
   /** The name that calendar entries show. */
   calendarName: string;
+  /** The photo from the production Success Center, or null for initials. */
+  avatarUrl: string | null;
+  /** Listed, not bookable yet (production shows "Coming soon"). */
+  comingSoon?: boolean;
 }
 
-export const SARAH_ID = "mentor-sarah-mitchell";
+export const STORY_MENTOR_ID = "mentor-diana-potts";
+
+const photo = (slug: string) => `/demo/people/${slug}.jpg`;
+const weekdays = [1, 2, 3, 4, 5];
 
 export const BENCH: BenchMentor[] = [
   {
-    id: SARAH_ID,
+    id: STORY_MENTOR_ID,
     name: MENTOR.name,
     title: MENTOR.title,
     bio: MENTOR.bio,
     consultationDescription:
-      // DEMO: the line names the member's kind of work.
-      byMember({
-        caterer: "Pick the right bids, check your price, and read your proposal before you send it. Best for food-service and facilities bids.",
-        pack: copy.MENTOR_BENCH.sarah,
-      }),
-    price: MENTOR_REVIEW_PRICE,
+      "Book a call with me for guidance on positioning your business for disaster-related opportunities and understanding the overall framework of government contracting.",
+    price: 97,
     hours: { start: 9, end: 16, lunch: 12 },
-    days: [1, 2, 3, 4, 5],
+    days: weekdays,
     busyShare: 0.45,
     calendarName: "Mentor consultation",
+    avatarUrl: photo("diana-potts"),
   },
   {
-    id: "mentor-renee-calloway",
-    name: "Renee Calloway",
-    ...byMember({
-      caterer: {
-        title: "Proposal writing and capture · former proposal director",
-        bio: "Renee led proposal teams at a facilities-services contractor for 11 years. She has written or reviewed more than 200 federal proposals.",
-        consultationDescription:
-          "Write an approach section that scores. Bring a draft or a solicitation and Renee will mark what the evaluators will look for.",
-      },
-      pack: copy.MENTOR_BENCH.renee,
-    }),
-    price: 110,
-    hours: { start: 10, end: 17 },
-    days: [1, 2, 3, 4],
-    busyShare: 0.4,
-    calendarName: "Mentor consultation",
-  },
-  {
-    id: "mentor-tomas-delgado",
-    name: "Tomas Delgado",
-    title: "SBA certifications · former SBA business opportunity specialist",
-    bio: "Tomas helped small businesses through the SBA certification process for 9 years: woman-owned (WOSB), 8(a), HUBZone and veteran-owned.",
+    id: "mentor-tim-sabir",
+    name: "Tim Sabir",
+    title: "Mentor",
+    bio: "Tim founded GovPreneurs.",
     consultationDescription:
-      "Find out which set-asides you qualify for and what the SBA will ask you to prove. Good before you apply for a certification.",
-    price: 85,
+      "Book a call with me for marketing-related contracts, program and services questions, or partnership opportunities.",
+    price: 197,
+    hours: { start: 10, end: 16 },
+    days: [1, 2, 3, 4],
+    busyShare: 0.55,
+    calendarName: "Mentor consultation",
+    avatarUrl: photo("tim-sabir"),
+  },
+  {
+    id: "mentor-ernie-hansen",
+    name: "Ernie Hansen",
+    title: "Mentor",
+    bio: "Ernie mentors and coaches members on federal, state, local and education contracting.",
+    consultationDescription:
+      "Book a call with me for assistance related to federal, state, local, and education contracting opportunities, including solicitation and proposal responses, market research, and SBA/State or other applicable government certifications.",
+    price: 97,
     hours: { start: 9, end: 15 },
-    days: [2, 3, 4, 5],
+    days: weekdays,
     busyShare: 0.5,
     calendarName: "Mentor consultation",
+    // No photo: his picture stays off the public demo (feedback, 25 Oct 2026).
+    avatarUrl: null,
   },
   {
-    id: "mentor-priya-raman",
-    name: "Priya Raman",
-    title: "State, local and school purchasing · former county purchasing director",
-    bio: "Priya ran purchasing for a county school system and sat on bid committees for eight years. She knows how schools and cities score a quote.",
+    id: "mentor-sinan-murat",
+    name: "Sinan Murat",
+    title: "Digital Compliance Mentor",
+    bio: "Sinan reviews members' digital presence.",
     consultationDescription:
-      "Sell to state, city and school-district buyers. Learn how to register, where to find bids, and what buyers read first.",
-    price: 75,
+      "Reviews every member's digital presence, walks them through fixes on a 1:1 call, runs weekly office hours.",
+    price: 97,
     hours: { start: 9, end: 16 },
-    days: [1, 2, 3, 4, 5],
+    days: weekdays,
     busyShare: 0.35,
     calendarName: "Mentor consultation",
+    avatarUrl: photo("sinan-murat"),
   },
   {
-    id: "mentor-calvin-brooks",
-    name: "Calvin Brooks",
-    title: "Pricing and cost proposals · former Army contract price analyst",
-    ...byMember({
-      caterer: {
-        bio: "Calvin reviewed contractor prices for the Army for 13 years. He teaches small businesses to price labor, food cost and overhead without under-bidding.",
-        consultationDescription:
-          "Build a price that covers your costs and still pays you. Calvin checks your labor rates, overhead and margin line by line.",
-      },
-      pack: copy.MENTOR_BENCH.calvin,
-    }),
-    price: 120,
+    id: "mentor-jp-cervantes",
+    name: "JP Cervantes",
+    title: "Mentor",
+    bio: "JP is a defense contractor who specializes in security training and instruction.",
+    consultationDescription:
+      "Defense contractor specializing in security training and instruction, with deep expertise in protective intelligence and risk advisory. JP helps organizations prepare their teams, assess threats, and operate safely in high-stakes environments.",
+    price: 97,
     hours: { start: 11, end: 17 },
     days: [1, 3, 4, 5],
     busyShare: 0.45,
     calendarName: "Mentor consultation",
+    avatarUrl: photo("jp-cervantes"),
   },
   {
-    id: "mentor-angela-ruiz",
-    name: "Angela Ruiz",
-    title: "VA contracting and veteran set-asides · former VA contracting officer",
-    ...byMember({
-      caterer: {
-        bio: "Angela bought food and facility services for VA medical centers for 12 years. She explains how the VA buys and what its evaluators score.",
-        consultationDescription:
-          "Sell to VA medical centers. Learn the VA's forms, its veteran set-aside rules, and how a hospital kitchen contract is scored.",
-      },
-      pack: copy.MENTOR_BENCH.angela,
-    }),
-    price: 95,
+    id: "mentor-tiffany-lymon",
+    name: "Tiffany Lymon",
+    title: "Mentor",
+    bio: "Tiffany is a Business & Leadership Alignment Strategist.",
+    consultationDescription:
+      "Tiffany Lymon is a Business & Leadership Alignment Strategist who helps organizations turn scattered effort into a focused wheelhouse by aligning people, infrastructure, and message. With more than 20 years of experience and clients ranging from Prudential and Lockheed Martin to the City of Gaithersburg, she helps service providers stop chasing stretch bids and become the obvious choice for the projects and partnerships that fit.",
+    price: 97,
     hours: { start: 9, end: 14 },
     days: [1, 2, 3, 4],
     busyShare: 0.4,
     calendarName: "Mentor consultation",
+    avatarUrl: photo("tiffany-lymon"),
+  },
+  {
+    id: "mentor-alex-lazatin",
+    name: "Alex Lazatin",
+    title: "Mentor",
+    bio: "Retired U.S. Army Special Forces Lieutenant Colonel and government contracting expert specializing in defense, operations, and security cooperation.",
+    consultationDescription:
+      "Retired U.S. Army Special Forces Lieutenant Colonel and government contracting expert specializing in defense, operations, and security cooperation.",
+    price: 97,
+    hours: { start: 9, end: 15 },
+    days: weekdays,
+    busyShare: 0.4,
+    calendarName: "Mentor consultation",
+    avatarUrl: photo("alex-lazatin"),
+    comingSoon: true,
   },
 ];
 
@@ -150,13 +154,13 @@ export function toPortalMentor(m: BenchMentor) {
     title: m.title,
     email: null as string | null,
     phone: null as string | null,
-    avatarUrl: null as string | null,
+    avatarUrl: m.avatarUrl,
     bio: m.bio,
     consultationPrice: String(m.price),
     consultationDescription: m.consultationDescription,
     formEnabled: false,
     formDescription: null as string | null,
-    comingSoon: false,
+    comingSoon: m.comingSoon === true,
   };
 }
 

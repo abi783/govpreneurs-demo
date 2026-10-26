@@ -4,7 +4,7 @@
 // Every fact comes from the story (members/agency/persona.ts, workspace.ts) or the
 // approved pack (demo-storyboard/marketing-agency-pack.md, section 9). The record is
 // 44 of 51, on purpose, with the pack's real gaps:
-//   - no GSA schedule: she told Sarah so on the positioning call ("Anything else");
+//   - no GSA schedule: she told Diana so on the positioning call ("Anything else");
 //   - no performance rating (CPARS) for the NC Guard job: the job says so;
 //   - no project manager and alternate on file: "Who does what on your team" is open;
 //   - no line of credit to front ad buys while the government takes about 30 days
@@ -16,7 +16,7 @@
 // buyers search for ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: equipment and PSC codes read off her
 // capability statement, the credit line from her chat with Hunter, clearances from
-// her call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// her call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

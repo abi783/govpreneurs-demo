@@ -1,5 +1,5 @@
 // DEMO: the "One business day later" card the presenter controls show before
-// Sarah's reply (C1) or an award (C2). It says out loud that the demo moved the
+// Diana's reply (C1) or an award (C2). It says out loud that the demo moved the
 // clock, so nobody takes an instant reply for the product's real turnaround.
 
 import { useEffect, useState } from "react";

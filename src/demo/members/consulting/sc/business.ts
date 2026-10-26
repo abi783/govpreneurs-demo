@@ -5,7 +5,7 @@
 // the approved pack (demo-storyboard/consulting-pack.md, section 9). The record is
 // not complete, on purpose, with the pack's real gaps:
 //   - no GSA schedule, and not on OASIS+ or the Army's HR Solutions contract: she
-//     told Sarah so on the positioning call ("Anything else"). The twin shows the cost;
+//     told Diana so on the positioning call ("Anything else"). The twin shows the cost;
 //   - no performance rating (CPARS) for the Fort Bragg ACS job: the job says so;
 //   - 7 of her trainers are contract (1099) facilitators: "What limits you" names
 //     staffing, a 50%-rule risk on every set-aside;
@@ -19,7 +19,7 @@
 // ("Tell Hunter everything" fills the last one).
 // Five suggestions wait for a yes or a no: equipment and PSC codes read off her
 // capability statement, the credit line from her chat with Hunter, clearances from
-// her call with Sarah, and citizenship from "Tell Hunter everything". SAM.gov's size
+// her call with Diana, and citizenship from "Tell Hunter everything". SAM.gov's size
 // answer waits for a check. Every kind of source shows on Basic Info (sources.test.ts).
 //
 // Only functions read the helpers from seed.ts, because seed.ts imports this file.

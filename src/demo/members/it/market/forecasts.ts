@@ -472,6 +472,6 @@ export const CHAT = {
   teamUp: `Yes, I would team up. ${KEY_PARTNER.name} (${KEY_PARTNER.contact}, ${KEY_PARTNER.contactTitle}) wrote to you about the hospital's IT. They want ${KEY_PARTNER.seeking.charAt(0).toLowerCase()}${KEY_PARTNER.seeking.slice(1)}. Only STARS III holders can quote it, and they hold it. Agree on the number of techs and their pay before you sign. Open Partners to see their card.`,
   smallTeam: "You do not need a partner for the size of this one. A partner can still help if it starts in the same month as another job and your techs are booked.",
   mentor:
-    "Sarah Mitchell can review this with you. Use “Review with a Mentor” on this page. She is reading your question about the Pope sources sought, so she knows your work.",
+    "Diana Potts can review this with you. Use “Review with a Mentor” on this page. She is reading your question about the Pope sources sought, so she knows your work.",
   past: `Your closest past work is ${seymour.projectTitle} (${money(seymour.totalValue)}, ${seymour.periodStart.slice(0, 4)}), rated Very Good. Your ${money(seats.totalValue)} of help-desk seats on Fort Bragg show Army work on post, and the ${chromebooks.customerName.replace(/, .*$/, "")} job shows imaging at scale.`,
 };

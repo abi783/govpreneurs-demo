@@ -16,7 +16,7 @@ import { readDemoState, updateDemoState, writeDemoState } from "@/demo/runtime/s
 import { getRoadmapSummary } from "@/demo/sc/roadmap/summary";
 import { getBookings as getRoadmapBookings } from "@/demo/sc/roadmap/state";
 import { MENTOR } from "@/demo/story/persona";
-import { SARAH_ID, getBenchMentor, type BenchMentor } from "@/demo/sc/mentors/bench";
+import { STORY_MENTOR_ID, getBenchMentor, type BenchMentor } from "@/demo/sc/mentors/bench";
 import { chargeWallet } from "@/demo/state/wallet";
 import { easternInstant } from "./time";
 import type { GHLAppointment } from "./types";
@@ -66,7 +66,7 @@ function initialAppointments(): GHLAppointment[] {
       id: "appt-positioning",
       title: `Positioning call with ${MENTOR.name}`,
       ...slot(-POSITIONING_CALL_DAYS_AGO, 14, 0, 30),
-      calendarId: calendarIdFor(SARAH_ID),
+      calendarId: calendarIdFor(STORY_MENTOR_ID),
       calendarName: "Mentor consultation",
       assignedUserName: MENTOR.name,
       appointmentStatus: "showed",
@@ -86,7 +86,7 @@ export function getAppointments(): GHLAppointment[] {
       title: b.kind === "delivery" ? "Service kickoff call" : roadmapCallTitle(b.stepId),
       startTime: b.startTime,
       endTime: b.endTime,
-      calendarId: calendarIdFor(SARAH_ID),
+      calendarId: calendarIdFor(STORY_MENTOR_ID),
       calendarName: b.kind === "delivery" ? "Service kickoff" : "Mentor consultation",
       assignedUserName: MENTOR.name,
       appointmentStatus: "confirmed",
@@ -196,7 +196,7 @@ export function consumeFreeSession(): void {
 }
 
 export function assignedMentorId(): string {
-  return readDemoState<string>(MENTOR_KEY, SARAH_ID);
+  return readDemoState<string>(MENTOR_KEY, STORY_MENTOR_ID);
 }
 
 export function assignMentor(id: string): void {

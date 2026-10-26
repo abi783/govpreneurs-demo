@@ -125,7 +125,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       "Why can't I bid this?":
         "It will be competed as a task order under the Army's ITES-3S contract, and only small-business ITES-3S holders may submit. You are not one, and ITES-3S takes no new firms.",
       "How do I get on ITES-4S?":
-        "ITES-4S is the Army's next IT contract. Awards are not expected before late 2027. A partner that is bidding it, or a mentor-protégé joint venture, is the realistic way on. Ask Sarah where to start.",
+        "ITES-4S is the Army's next IT contract. Awards are not expected before late 2027. A partner that is bidding it, or a mentor-protégé joint venture, is the realistic way on. Ask Diana where to start.",
       "What should I bid instead?":
         "The Army Reserve help desk. Same office and same customer, and only 8(a) firms can quote. Open it from the button on this page.",
       "Why not bid?":
@@ -196,7 +196,7 @@ export const AUTHORED_BRIEFS: Record<string, AuthoredBrief> = {
       to: "/partners",
       rationale: `${BLUE} wants a local firm for nine desk-side techs. Reply to ${PARTNER.contact} this week and ask for a teaming agreement before the quote.`,
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: `Registered under NAICS ${teamUp.naics}`, status: "have", note: "One of your codes." },

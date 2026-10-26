@@ -1,13 +1,13 @@
 // Where the Fayetteville bid starts in the demo. See src/lib/ava/start.ts.
 //
 // The story (src/demo/story/opportunities.ts, FAYNC-2026-R-08) says: Ava
-// finished the proposal, Sarah Mitchell reviewed it, and the card reads
-// "Sarah Mitchell reviewed your proposal. Read her notes, then send it."
+// finished the proposal, Diana Potts reviewed it, and the card reads
+// "Diana Potts reviewed your proposal. Read her notes, then send it."
 // That is phase 2, stage "read".
 //
 // The state is built the way the product builds it. The member answers every
 // question Ava asks (the loop below does what play.ts does), Ava checks the
-// bid, the member opens it to read (`readOpened`), and Sarah's two edits arrive
+// bid, the member opens it to read (`readOpened`), and Diana's two edits arrive
 // from the mentor dashboard. The check ran on the final bid, so opening the
 // page writes nothing.
 //
@@ -36,7 +36,7 @@ const COUNTY = job("pp-county-schools");
 const BRAGG = job("pp-cdg-sub");
 const CHURCH = job("pp-church");
 
-/** She built the bid three days ago and sent it to Sarah two days ago. Every
+/** She built the bid three days ago and sent it to Diana two days ago. Every
  *  answer carries the day she gave it, so a proof says when she answered. */
 const BUILT_AT = ISO(-3, 15);
 
@@ -220,7 +220,7 @@ function playToReady(): BidState {
   );
 }
 
-// ─── What Sarah changed ──────────────────────────────────────────────────────
+// ─── What Diana changed ──────────────────────────────────────────────────────
 // Her review is in Mentor Reviews (src/demo/state/mentorReviews.ts). Three
 // notes: events first in part 2, the county program as daily service, Janet
 // Reyes as the first reference. The draft already puts events first. She wrote

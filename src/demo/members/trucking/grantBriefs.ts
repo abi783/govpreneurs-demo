@@ -67,7 +67,7 @@ export const GRANT_BRIEFS: GrantBrief[] = [
       to: "/ava/36C24627Q0088",
       rationale: "24 days is enough. Ava needs your PM and Alternate, which trucks run the routes and how you answer the license line.",
     },
-    secondaryMove: { label: "Send to Sarah for a second opinion", to: "/mentors" },
+    secondaryMove: { label: "Send to Diana for a second opinion", to: "/mentors" },
     compliance: [
       { requirement: "SAM registration active", status: "have", note: "Active for another 182 days." },
       { requirement: "SBA VetCert, service-disabled veteran-owned", status: "have", note: "Certified Dec 2023. Eligibility ends in 47 days; the renewal window is open." },
