@@ -140,7 +140,7 @@ describe("none of the words the demo must never show", () => {
     ["a DEMO- notice number", /\bDEMO-[A-Z]+-\d+/],
     ["the old sample member", /\bMarcus\b|Williams Construction|Amira's Kitchen/],
     ["roofing", /\broof(?:ing|er|s)?\b|\b238160\b/i],
-    ["the old mentor", /Diana|Potts/],
+    ["the old mentor", /Sarah|Mitchell/],
     ["a real company as a partner or bidder", /Sodexo|Aramark|Eurest|Compass Group/],
     ["the wrong church", /Hay Street (?:United )?Methodist|Methodist Church/],
     ["the wrong formation date", /3 March 2024|formed (?:on )?[A-Za-z0-9 ]*2024/],

@@ -14,14 +14,12 @@
 import { demoResponse, type DemoRouteDef } from "../runtime/router";
 import { getWalletBalance } from "../state/wallet";
 import { getBenchMentor } from "../sc/mentors/bench";
+import { SALES_ADVISOR } from "../sc/home/people";
 import { freeSlots, isFreeSlot } from "../sc/home/slots";
 import {
   addActivity,
   addMentorBooking,
   addSentMessage,
-  chargeForCall,
-  consumeFreeSession,
-  freeSessionsLeft,
 } from "../sc/home/store";
 import { CONTACT_TIMEZONE, formatSlot } from "../sc/home/time";
 import { calendarFor } from "./scHome";
@@ -57,19 +55,14 @@ export const routes: DemoRouteDef[] = [
       if (!isFreeSlot(calendarFor(`cal-${mentor.id}`)!, startTime)) {
         return demoResponse(409, { error: "That time was just taken. Pick another time." });
       }
-      const free = freeSessionsLeft() > 0;
-      const price = free ? 0 : mentor.price;
-      const balance = getWalletBalance();
-      if (price > balance) {
-        return demoResponse(402, { error: "Insufficient wallet balance", balance, total: price, currency: "USD" });
-      }
-      if (free) consumeFreeSession();
-      else chargeForCall(mentor, price);
+      // DEMO: every booking is a free call with the sales advisor, who sets up
+      // the mentor (feedback, 25 Oct 2026). Nothing comes out of the wallet.
+      const price = 0;
       const appt = addMentorBooking({ mentor, startTime, endTime, paid: price });
       addActivity({
         kind: "booking",
-        title: `You booked a call with ${mentor.name}`,
-        detail: `${formatSlot(startTime)}${price > 0 ? ` · $${price} from your wallet` : " · complimentary session"}`,
+        title: `You booked a call with ${SALES_ADVISOR.name}`,
+        detail: `${formatSlot(startTime)} · free · he sets up your call with ${mentor.name}`,
         to: "/",
       });
       return {

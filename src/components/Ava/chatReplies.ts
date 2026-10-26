@@ -28,7 +28,7 @@ export function readerReply(text: string, bid: AvaBid, review: MentorReview | nu
     return `After you download your ${noun}, How to send it shows your steps, in order. I never send anything for you.`;
   if (/due|deadline|when|date|late/.test(t))
     return `Your ${noun} is due ${dueWords(bid)}. Send it a day early.`;
-  if (/mentor|sarah|review|second opinion/.test(t)) return mentorReply(review, noun);
+  if (/mentor|diana|review|second opinion/.test(t)) return mentorReply(review, noun);
   if (/price|cost|total|how much/.test(t))
     return bid.price
       ? "Open the price part of your bid to see every line. If you change a cost, I ask you to approve the price again."
@@ -46,7 +46,7 @@ export function buildReply(text: string, bid: AvaBid, review: MentorReview | nul
   if (WINS.test(t)) return WIN_REPLY;
   if (/due|deadline|when|date|late/.test(t))
     return `Your ${noun} is due ${dueWords(bid)}. Send it a day early.`;
-  if (/mentor|sarah|second opinion/.test(t)) return mentorReply(review, noun);
+  if (/mentor|diana|second opinion/.test(t)) return mentorReply(review, noun);
   if (/price|cost|total|how much/.test(t))
     return bid.price
       ? "I build your price from your own costs. I ask you for them one at a time, and you approve the total at the end."

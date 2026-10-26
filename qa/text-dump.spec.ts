@@ -271,7 +271,7 @@ test("text: search palette", async ({ browser }) => {
       .filter(Boolean);
   await open();
   lines.push("", "## EMPTY QUERY", ...(await dialogText()));
-  for (const q of ["fort", "bragg", "mackall", "ava", "sarah", "mentor", "pipeline", "carolina", "womack", "va ", "cafe", "catering", "wosb", "wallet", "capability", "cumberland", "zzzz", "roof", "sam", "naics", "partner", "forecast", "award", "small order", "task", "roadmap"]) {
+  for (const q of ["fort", "bragg", "mackall", "ava", "diana", "mentor", "pipeline", "carolina", "womack", "va ", "cafe", "catering", "wosb", "wallet", "capability", "cumberland", "zzzz", "roof", "sam", "naics", "partner", "forecast", "award", "small order", "task", "roadmap"]) {
     const input = page.locator('[role=dialog] input, [cmdk-input], input[placeholder]').first();
     await input.fill(q);
     await page.waitForTimeout(350);

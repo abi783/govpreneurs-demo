@@ -38,9 +38,10 @@ import {
   type DemoUpload,
 } from "../sc/roadmap/state";
 
+import { STORY_MENTOR_ID } from "../sc/mentors/bench";
 const P = "/api/portal/:loc";
 
-const MENTOR_ID = "mentor-sarah-mitchell";
+const MENTOR_ID = STORY_MENTOR_ID;
 const VERIFY_KEYS: readonly VerifyKey[] = ["llc", "sam", "sbs", "capability", "sled", "cmmc"];
 const COUPONS: Record<string, { name: string; percent: number }> = {
   DEMO10: { name: "Sample 10% off", percent: 10 },
@@ -100,8 +101,8 @@ export const routes: DemoRouteDef[] = [
           name: MENTOR.name,
           title: MENTOR.title,
           bio: MENTOR.bio,
-          avatarUrl: null,
-          ghlUserId: "ghl-sarah-mitchell",
+          avatarUrl: "/demo/people/diana-potts.jpg",
+          ghlUserId: "ghl-diana-potts",
         },
       ],
       bookingUseAssignedMentor: true,

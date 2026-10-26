@@ -53,7 +53,7 @@ const TOPICS: { topic: Topic; test: RegExp }[] = [
   { topic: "offscope", test: /\b(weather|joke|poem|recipe|sports?|stocks?|president|capital of|lottery|movie|song|horoscope)\b/ },
   { topic: "identity", test: /\b(who are you|what are you|what can you do|your name|are you (an )?(ai|bot|human|real))\b/ },
   { topic: "hello", test: /^(hi|hello|hey|thanks|thank you|ok|okay|great|cool|good)\b/ },
-  { topic: "mentor", test: /\b(mentor|sarah|second opinion|talk to (a )?(person|human)|schedule a call)\b/ },
+  { topic: "mentor", test: /\b(mentor|diana|second opinion|talk to (a )?(person|human)|schedule a call)\b/ },
   { topic: "draft", test: /\b(write|draft|compose|response say|proposal say|quote say|reply say|bid say|cover letter|what should (i|my|the) (send|say|include|put))\b/ },
   { topic: "fix", test: /\b(fix|solve|close the gap|get certified|how do i (get|fix))\b/ },
   { topic: "weak", test: /\b(weak|weakness|risk|risks|worry|worried|problem|concern|gap|gaps|wrong|hole|bad)\b/ },

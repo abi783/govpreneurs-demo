@@ -19,6 +19,9 @@ import { CREDIT_COVERED_PURCHASE, WALLET_BALANCE_LABEL } from "@sc/lib/walletCop
 import { openAddFunds } from "@/demo/sc/home/addFunds";
 import { SALES_ADVISOR } from "@/demo/sc/home/people";
 
+/** DEMO: the call is with the sales advisor, and it is free. */
+const DEMO_ADVISOR_CALL_FREE: boolean = true;
+
 export interface BookableMentor {
   id: string;
   name: string;
@@ -113,7 +116,7 @@ export function BookMentorModal({
       .catch(() => {});
     return () => { cancelled = true; };
   }, [locationId, freeBooking]);
-  const isFreeCovered = freeBooking || fetchedFreeLeft > 0;
+  const isFreeCovered = DEMO_ADVISOR_CALL_FREE || freeBooking || fetchedFreeLeft > 0;
   const canAfford = isFreeCovered || balance >= price;
   // The two pools, read when the modal opens: the footer shows them apart.
   const fetchedAmounts = useWalletAmounts(locationId);

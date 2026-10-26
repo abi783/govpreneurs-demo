@@ -44,6 +44,9 @@ import { addDfyRequest } from "../../demo/grant/state";
 import { useDemoState } from "../../demo/runtime/store";
 import "./grant-demo.css";
 
+/** DEMO: hide the Prime path / Opportunity path pills (feedback, 25 Oct 2026). */
+const SHOW_PATHS: boolean = false;
+
 const EPISTEMIC_LABEL: Record<Read["epistemic"], string> = {
   verified: "confirmed",
   stated: "stated in the solicitation",
@@ -501,7 +504,7 @@ export function GrantCanvas({
         </div>
 
         {/* DEMO: one verdict only. The path pills read as two more verdicts. */}
-        {false && take.paths.length > 0 ? (
+        {SHOW_PATHS && take.paths.length > 0 ? (
         <div className="gt-paths">
           {take.paths.map((pth) => (
             <div key={pth.label} className={`gt-path gt-path--${pth.state}`}>

@@ -22,6 +22,6 @@ registerSearchEntries([
     label: r.title,
     hint: "Mentor review",
     to: `/mentors/${r.id}`,
-    keywords: ["mentor", "sarah", "review"],
+    keywords: ["mentor", "diana", "review"],
   })),
 ]);

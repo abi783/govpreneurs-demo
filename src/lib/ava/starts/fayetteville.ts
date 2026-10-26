@@ -237,7 +237,7 @@ const REFERENCES_IN_ORDER = [
   `The third is ${CHURCH.referenceName}, ${CHURCH.customerName}.`,
 ].join(" ");
 
-function withSarahsEdits(s: BidState): BidState {
+function withDianasEdits(s: BidState): BidState {
   const { bid } = look(s);
   const sentences = sentencesOf(bid, s, "sec-experience").flat();
   const notes: [RegExp, string][] = [
@@ -265,5 +265,5 @@ function withSarahsEdits(s: BidState): BidState {
 }
 
 export function fayettevilleStart(): Partial<BidState> {
-  return withSarahsEdits({ ...playToReady(), readOpened: true });
+  return withDianasEdits({ ...playToReady(), readOpened: true });
 }

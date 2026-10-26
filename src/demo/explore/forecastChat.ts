@@ -187,7 +187,7 @@ export function forecastGrantReply(oppKey: string, message: string): string {
   if (has(/\b(first|next|do now|prepare|get ready|start|steps?|plan)\b/)) {
     return `${firstStep(r)} ${when(r)}.`;
   }
-  if (has(/\b(mentor|sarah|review)\b/)) {
+  if (has(/\b(mentor|diana|review)\b/)) {
     if (MEMBER !== "caterer") return pack.CHAT.mentor;
     return `Diana Potts can review this with you. Use “Review with a Mentor” on this page. She reviewed your Camp Mackall and Fayetteville bids, so she knows your work.`;
   }
