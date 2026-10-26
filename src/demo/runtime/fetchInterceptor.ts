@@ -10,14 +10,12 @@
 //   2. A same-origin GET or HEAD for a static file (fonts, images, JSON) goes
 //      through.
 //   3. Google Fonts goes through.
-//   4. `data:` and `blob:` URLs go through, and so does the start screen's lead
-//      post to VITE_LEAD_WEBHOOK_URL (the only call that leaves the browser).
+//   4. `data:` and `blob:` URLs go through.
 //   5. Anything else is blocked. The call is recorded in `window.__DEMO_BLOCKED__`,
 //      logged with `console.error("[demo] blocked network call", url)`, and the
 //      promise rejects with a `TypeError`, the same as a real network failure.
 
 import { handleDemoRequest } from "./router";
-import { LEAD_URL } from "../visitor";
 
 export const DEMO_API_PREFIX = "/__demo_api";
 const SC_API_PREFIX = "/api";
@@ -34,8 +32,6 @@ export function classifyUrl(url: URL, method: string): RouteDecision {
   if (url.protocol === "data:" || url.protocol === "blob:") return { kind: "pass" };
   if (url.protocol !== "http:" && url.protocol !== "https:") return { kind: "block" };
   if (PASS_HOSTS.has(url.hostname)) return { kind: "pass" };
-  // The one outside call: the start screen's lead post (visitor.ts, D98).
-  if (LEAD_URL && url.href === LEAD_URL) return { kind: "pass" };
   if (url.origin !== window.location.origin) return { kind: "block" };
 
   const p = url.pathname;
