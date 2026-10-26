@@ -12,6 +12,7 @@
 // as taken, so that every mentor looks like a person with a real diary.
 
 import { MENTOR } from "@/demo/story/persona";
+import { PROGRAM_SPECIALIST } from "@/demo/sc/home/people";
 import { registerSearchEntries } from "@/demo/nav/searchIndex";
 
 export interface BenchMentor {
@@ -83,6 +84,21 @@ export const BENCH: BenchMentor[] = [
     busyShare: 0.35,
     calendarName: "Mentor consultation",
     avatarUrl: photo("sinan-murat"),
+  },
+  {
+    id: "mentor-maryam-abd",
+    name: PROGRAM_SPECIALIST.name,
+    title: PROGRAM_SPECIALIST.title,
+    bio: PROGRAM_SPECIALIST.bio,
+    // Her prod description (production lists her as Program Specialist, with no
+    // call price); the title is Karthik's, and the price matches the other mentors.
+    consultationDescription: PROGRAM_SPECIALIST.bio,
+    price: 97,
+    hours: { start: 9, end: 16 },
+    days: weekdays,
+    busyShare: 0.4,
+    calendarName: "Mentor consultation",
+    avatarUrl: PROGRAM_SPECIALIST.avatarUrl,
   },
   {
     id: "mentor-jp-cervantes",
