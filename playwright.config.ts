@@ -23,8 +23,8 @@ export default defineConfig({
   },
   webServer: {
     // Which sample member the build opens on (src/demo/member.ts). The flow specs are written for the caterer.
-    // The start screen is off, so the crawl reaches every page (src/demo/visitor.ts).
-    env: { VITE_DEMO_MEMBER: process.env.QA_MEMBER ?? "caterer", VITE_START_SCREEN: "off" },
+    // Presenter mode is on, so the crawl reaches every page (src/demo/visitor.ts).
+    env: { VITE_DEMO_MEMBER: process.env.QA_MEMBER ?? "caterer", VITE_PRESENTER: "on" },
     // The build goes to its own folder so a QA run never touches `dist/`.
     command: `bunx vite build --outDir .qa-dist/${PORT} --emptyOutDir && bunx vite preview --outDir .qa-dist/${PORT} --port ${PORT} --strictPort`,
     url: `http://127.0.0.1:${PORT}/`,

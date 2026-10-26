@@ -6799,7 +6799,7 @@ button.mode-badge { font: inherit; }
 }
 
 /* ============================================================
-   Demo (booth) framing — top bar, lead-form gate, sample chip
+   Demo (booth) framing — top bar, sample chip
    ============================================================ */
 
 .demo-bar {
@@ -6859,15 +6859,6 @@ button.mode-badge { font: inherit; }
   gap: 10px;
   flex-shrink: 0;
 }
-.demo-bar__visitor {
-  font-size: 11.5px;
-  color: var(--text-2);
-  font-weight: 500;
-  white-space: nowrap;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .demo-bar__logout {
   display: inline-flex;
   align-items: center;
@@ -6904,149 +6895,6 @@ button.mode-badge { font: inherit; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1;
-}
-
-/* ============================================================
-   Lead form / Admin login full-page gate
-   ============================================================ */
-
-.demo-gate {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--s-6);
-  background:
-    radial-gradient(1200px 600px at 12% -10%, color-mix(in oklab, var(--blue-7) 14%, transparent), transparent 60%),
-    radial-gradient(1000px 500px at 100% 110%, color-mix(in oklab, var(--blue-7) 10%, transparent), transparent 60%),
-    var(--bg);
-  overflow-y: auto;
-}
-.demo-gate__brandstripe {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--blue-7) 0%, var(--blue-9) 50%, var(--blue-7) 100%);
-}
-.demo-gate__card {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 32px 32px 24px;
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 24px 60px -20px rgba(15, 23, 42, 0.18);
-}
-.demo-gate__kicker { margin-bottom: 14px; }
-.demo-gate__pill {
-  display: inline-block;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--blue-9);
-  color: white;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-}
-.demo-gate__title {
-  font-family: 'Instrument Serif', Georgia, serif;
-  font-size: 36px;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  color: var(--text);
-  margin: 0 0 8px;
-  font-weight: 400;
-}
-.demo-gate__sub {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-2);
-  margin: 0 0 22px;
-}
-.demo-gate__form { display: flex; flex-direction: column; gap: 14px; }
-.demo-gate__row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.demo-gate__field { display: flex; flex-direction: column; gap: 4px; }
-.demo-gate__label {
-  font-size: 11.5px;
-  color: var(--text-2);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-.demo-gate__field input {
-  height: 38px;
-  padding: 0 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-strong);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-  font-family: inherit;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
-}
-.demo-gate__field input:focus {
-  outline: none;
-  border-color: var(--blue-7);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--blue-7) 18%, transparent);
-}
-.demo-gate__field.has-error input { border-color: var(--urg-7); }
-.demo-gate__error {
-  font-size: 11.5px;
-  color: var(--urg-9);
-}
-.demo-gate__formerror {
-  font-size: 12.5px;
-  color: var(--urg-9);
-  background: color-mix(in oklab, var(--urg-7) 8%, var(--surface));
-  border: 1px solid color-mix(in oklab, var(--urg-7) 25%, transparent);
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-.demo-gate__submit {
-  width: 100%;
-  justify-content: center;
-  height: 44px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 4px;
-  gap: 8px;
-}
-.demo-gate__legal {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  color: var(--text-3);
-  justify-content: center;
-  margin-top: 2px;
-}
-.demo-gate__footer {
-  margin-top: 22px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-.demo-gate__mono {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10.5px;
-  color: var(--text-3);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 520px) {
-  .demo-gate__card { padding: 24px 20px 18px; }
-  .demo-gate__title { font-size: 30px; }
-  .demo-gate__row { grid-template-columns: 1fr; }
 }
 
 /* ═══════════════════ Opportunity card v2 (two blocks) ═══════════════════ */

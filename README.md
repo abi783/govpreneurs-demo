@@ -45,18 +45,11 @@ return `dist/index.html` (an "SPA fallback"). Examples:
 The app is built for the root path (`/`). The domain is `demo.govpreneurs.com`,
 which today points at an older Lovable project.
 
-**One environment variable is required: `VITE_LEAD_WEBHOOK_URL`.** The start
-screen (`/start`) asks each visitor for a name, an email and a phone (optional),
-and posts them to this URL as a form post (for example a HighLevel inbound
-webhook). The build stops if it is not set, so the live site can't drop leads.
-Use `VITE_LEAD_WEBHOOK_URL=none` to build without sending leads, or
-`VITE_START_SCREEN=off` to build without the start screen. This post is the only
-call the demo makes outside the browser. Do not set `VITE_POSTHOG_KEY`: the demo
-should not send analytics.
+No environment variables are required. The demo makes no call outside the browser.
+Do not set `VITE_POSTHOG_KEY`: the demo should not send analytics.
 
 **Presenters:** open `/admin` and type the presenter password once per browser.
-That shows the presenter panel (Shift + Option/Alt + P) and skips the start
-screen. The password is checked in the browser, so it hides demo controls; it
+That shows the presenter panel (Shift + Option/Alt + P). The password is checked in the browser, so it hides demo controls; it
 does not protect anything. For real protection, put HTTP basic auth on the host.
 
 ## Check it before you deploy

@@ -13,7 +13,6 @@ import { Route as WhosWinningRouteImport } from './routes/whos-winning'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as VehiclesRouteImport } from './routes/vehicles'
 import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as StartRouteImport } from './routes/start'
 import { Route as SmallOrdersRouteImport } from './routes/small-orders'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PipelineRouteImport } from './routes/pipeline'
@@ -71,11 +70,6 @@ const VehiclesRoute = VehiclesRouteImport.update({
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StartRoute = StartRouteImport.update({
-  id: '/start',
-  path: '/start',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SmallOrdersRoute = SmallOrdersRouteImport.update({
@@ -290,7 +284,6 @@ export interface FileRoutesByFullPath {
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
-  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -328,7 +321,6 @@ export interface FileRoutesByTo {
   '/partners': typeof PartnersRoute
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
-  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -374,7 +366,6 @@ export interface FileRoutesById {
   '/pipeline': typeof PipelineRoute
   '/roadmap': typeof RoadmapRoute
   '/small-orders': typeof SmallOrdersRouteWithChildren
-  '/start': typeof StartRoute
   '/tasks': typeof TasksRoute
   '/vehicles': typeof VehiclesRoute
   '/wallet': typeof WalletRoute
@@ -421,7 +412,6 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/roadmap'
     | '/small-orders'
-    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -459,7 +449,6 @@ export interface FileRouteTypes {
     | '/partners'
     | '/pipeline'
     | '/roadmap'
-    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -504,7 +493,6 @@ export interface FileRouteTypes {
     | '/pipeline'
     | '/roadmap'
     | '/small-orders'
-    | '/start'
     | '/tasks'
     | '/vehicles'
     | '/wallet'
@@ -550,7 +538,6 @@ export interface RootRouteChildren {
   PipelineRoute: typeof PipelineRoute
   RoadmapRoute: typeof RoadmapRoute
   SmallOrdersRoute: typeof SmallOrdersRouteWithChildren
-  StartRoute: typeof StartRoute
   TasksRoute: typeof TasksRoute
   VehiclesRoute: typeof VehiclesRoute
   WalletRoute: typeof WalletRoute
@@ -588,13 +575,6 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/start': {
-      id: '/start'
-      path: '/start'
-      fullPath: '/start'
-      preLoaderRoute: typeof StartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/small-orders': {
@@ -984,7 +964,6 @@ const rootRouteChildren: RootRouteChildren = {
   PipelineRoute: PipelineRoute,
   RoadmapRoute: RoadmapRoute,
   SmallOrdersRoute: SmallOrdersRouteWithChildren,
-  StartRoute: StartRoute,
   TasksRoute: TasksRoute,
   VehiclesRoute: VehiclesRoute,
   WalletRoute: WalletRoute,

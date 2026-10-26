@@ -16,7 +16,7 @@
 //   - `data-qa-skip`: the QA crawl clicks every button, but not these.
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { setPresenter, START_SCREEN_ON } from "../visitor";
+import { setPresenter, PRESENTER_ALWAYS } from "../visitor";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useDemoState } from "@/demo/runtime/store";
 import { avaSentAt } from "@/demo/ava/progress";
@@ -269,7 +269,7 @@ export function PresenterPanel() {
           </label>
 
           <div className="demo-presenter__foot">1–9, 0, − jump · Esc closes</div>
-          {START_SCREEN_ON && (
+          {!PRESENTER_ALWAYS && (
             <button
               type="button"
               className="demo-presenter__leave"
