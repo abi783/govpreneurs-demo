@@ -39,7 +39,7 @@ import type { ForecastFacetOption, ForecastFacetsDto } from "../../lib/forecasts
 import type { ForecastFacetsState } from "../../lib/forecasts/useForecastList";
 import type { DrawerSectionId } from "../../lib/filterCounts";
 
-type SectionId = Exclude<DrawerSectionId, "advanced">;
+type SectionId = Extract<DrawerSectionId, "what" | "where" | "fit" | "timing">;
 const SECTIONS: SectionId[] = ["what", "where", "fit", "timing"];
 
 /** The control's value for "any posted date". */

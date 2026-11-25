@@ -27,6 +27,13 @@
 @import "./styles/tokens.css";
 @import "./styles/components.css";
 @import "./styles/small-orders.css";
+@import "./styles/search-multi-select.css";
+@import "./styles/partners-awards.css";
+@import "./styles/prime-detail.css";
+@import "./styles/partner-journey.css";
+@import "./styles/pursuing-step.css";
+@import "./styles/work-steps.css";
+@import "./styles/award-detail.css";
 
 /* =================================================================
    TOKEN DOCTRINE — read before editing styles in this file.
@@ -3054,6 +3061,30 @@ button.mode-badge { font: inherit; }
   text-decoration: none;
 }
 .mentors-empty__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Back link from Mentor Reviews to the mentor hub */
+.mentors-list__back {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: var(--s-3) var(--s-4) 0;
+  color: var(--blue-9); font-size: 13px; font-weight: 600;
+  text-decoration: none;
+}
+.mentors-list__back:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ─── Mentor hub: full width, two cards, one column on narrow screens ─── */
+.mentor-hub { padding: var(--s-8) var(--s-6); }
+.mentor-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-4);
+}
+@media (max-width: 600px) {
+  .mentor-hub-grid { grid-template-columns: 1fr; }
+}
+.mentor-hub-grid > * { height: 100%; }
+.mentor-hub-grid__link { display: block; text-decoration: none; }
+.mentor-hub-grid .ui-card { height: 100%; min-height: 160px; }
+.mentor-hub-grid [aria-disabled="true"] .ui-card { opacity: 0.6; cursor: default; }
 
 /* ─── Business Profile shell ─── */
 .bp-shell {
@@ -9677,6 +9708,16 @@ button.mode-badge { font: inherit; }
 }
 .feed-error__retry:hover { background: rgba(138,100,24,.12); }
 
+/* ─── Feed: full re-score notice ─────────────────────────────────── */
+.feed-rescore {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--blue-2); border: 1px solid var(--blue-7);
+  color: var(--blue-9);
+  padding: 8px 10px; border-radius: var(--r-sm);
+  margin-bottom: 10px;
+}
+.feed-rescore__text { margin: 0; color: inherit; }
+
 /* ── The profile ask, as one of Hunter's turns (#6, prototype parity) ─────────
    The enrichment question used to render as a tinted FORM boxed inside the
    thread — warm fill, a blue Save, "Skip". It is a turn: it sits in the same
@@ -10315,4 +10356,138 @@ button.mode-badge { font: inherit; }
 
 .hunter-update__note-label {
   font-weight: 600;
+}
+
+/* Staging-only test stage tag on saved opportunities (TD-408). Quiet, wraps at phone width, never a control. */
+.test-stage-tag {
+  display: inline-block;
+  max-width: 100%;
+  align-self: flex-start;
+  margin: 0 0 var(--s-2, 8px);
+  padding: 2px 8px;
+  border: 1px dashed var(--border-strong, #b9b3a4);
+  border-radius: 999px;
+  background: var(--surface-sunken, #f5f3ee);
+  color: var(--text-muted, #5f5a4e);
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+
+/* ── Opportunities filters: a large window in the middle of the page ──
+   FilterPanel variant="window". It overrides the right-hand sheet in
+   components.css (.fp-panel), which Partners and Awards keep. The window is
+   full screen on a phone. */
+.fp-panel--window {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: min(1000px, 94vw);
+  height: min(720px, 90vh);
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition:
+    opacity var(--d-base) var(--ease),
+    transform var(--d-base) var(--ease);
+}
+.fp-panel--window.is-hidden {
+  opacity: 0;
+  transform: translate(-50%, -48%) scale(0.98);
+  pointer-events: none;
+}
+.fp-panel--window .fp-foot {
+  justify-content: space-between;
+}
+.fp-panel--window .fp-applied .fp-chip {
+  border-radius: var(--r-pill);
+  padding: 6px 12px;
+}
+@media (max-width: 650px) {
+  .fp-panel--window {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .fp-panel--window.is-hidden {
+    transform: translateY(8px);
+  }
+}
+
+/* One scroll area: inside the window, the lists do not scroll on their own.
+   A list that scrolled on its own put Safari's scrollbar on top of the counts
+   at the right edge of each row. The search box stays at the top of the pane. */
+.fp-panel--window .fp-pane {
+  scrollbar-gutter: stable;
+}
+.fp-panel--window .fp-pane .of-ms__list,
+.fp-panel--window .fp-pane .of-ms__list--tall {
+  max-height: none;
+  overflow: visible;
+}
+.fp-panel--window .fp-pane .of-ms__search {
+  position: sticky;
+  top: calc(var(--s-2) - var(--s-8));
+  z-index: 1;
+  box-shadow: 0 0 0 var(--s-2) var(--surface);
+}
+
+/* Keyword, saved searches and footer buttons. */
+.fp-tools {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-8);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+/* With chips under it, the strip and the chips read as one block. */
+.fp-tools:has(+ .fp-applied) {
+  padding-bottom: var(--s-2);
+  border-bottom: 0;
+}
+.fp-tools + .fp-applied {
+  padding-top: var(--s-2);
+}
+.fp-tools .of-saved-filters {
+  margin: 0;
+}
+.fp-btn-quiet--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* A window with no category list (the smart list view). */
+.fp-middle.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Timing: one typed number of days. */
+.fp-range__row--single {
+  grid-template-columns: minmax(0, 220px);
+}
+.fp-pane .fp-field + .fp-field {
+  margin-top: var(--s-2);
+}
+
+/* Eight categories fit without scrolling on a short laptop screen.
+   A phone keeps the 44px rows (components.css). */
+@media (min-width: 651px) {
+  .fp-panel--window .fp-side {
+    padding-top: var(--s-4);
+  }
+  .fp-panel--window .fp-nav {
+    gap: 4px;
+  }
+  .fp-panel--window .fp-nav__item {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
 }

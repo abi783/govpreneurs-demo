@@ -28,7 +28,6 @@ function renderDrawer(onResetToProfile?: () => void) {
       filters={applyProfileDefaults(emptyFilters(), DEFAULTS)}
       onSetFilters={() => {}}
       keyword=""
-      onKeyword={() => {}}
       smartList={null}
       onSmartListApply={() => {}}
       onSmartListClear={() => {}}
@@ -52,6 +51,8 @@ let fetchSpy: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   cleanup();
+  // jsdom has no Element.scrollTo; FilterPanel scrolls a new category to its top.
+  Element.prototype.scrollTo = vi.fn();
   fetchSpy = vi.fn(() => new Promise<Response>(() => {}));
   vi.stubGlobal("fetch", fetchSpy);
 });

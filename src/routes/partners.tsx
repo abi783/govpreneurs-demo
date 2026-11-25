@@ -9,10 +9,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { FindPartnersView } from "../components/Partners/FindPartnersView";
-import { WhosWinningView } from "../components/Partners/WhosWinningView";
 import { MyPartnersView } from "../components/Partners/MyPartnersView";
+import { useMemberState } from "../lib/memberState";
+import {
+  NO_PARTNER_FILTERS,
+  readPartnerFilters,
+  type PartnerFilters,
+} from "../lib/filters/partnerFilters";
 
-type View = "market" | "find" | "mine";
+type View = "find" | "mine";
 
 interface PartnersSearch {
   /** Undefined until resolved — see resolveView. An explicit param always wins. */
@@ -23,6 +28,8 @@ interface PartnersSearch {
   from?: string;
   /** What the member reads after "← Back to". Specific: a company name, not "Partners". */
   fromLabel?: string;
+  /** The Find partners filters, so a reload, Back or a shared link keeps them. */
+  f?: PartnerFilters;
 }
 
 /** Legacy views map onto the real one that answers the same question. */
@@ -30,9 +37,9 @@ const LEGACY_VIEW: Record<string, View> = {
   matches: "find",
   browse: "find",
   list: "mine",
-  // The reference design names this tab `whos-winning`; ours is `market`. Both
-  // resolve, so a link written against either spelling lands in the right place.
-  "whos-winning": "market",
+  // Who's winning was removed. Its old links land on Find partners.
+  market: "find",
+  "whos-winning": "find",
 };
 
 /**
@@ -54,16 +61,21 @@ function param(value: unknown): string | undefined {
 function validateSearch(input: Record<string, unknown>): PartnersSearch {
   // `tab` is the reference design's param name, `view` is ours. Accept both.
   const raw = param(input.view) ?? param(input.tab) ?? "";
-  const known = raw === "market" || raw === "find" || raw === "mine";
+  const known = raw === "find" || raw === "mine";
   // undefined, NOT a default: an unasked-for view is resolved from where the
   // member actually is (see resolveView). An explicit param always wins.
   const view: View | undefined = known ? (raw as View) : LEGACY_VIEW[raw];
+  // A search of digits only ("722310") arrives as a number, so take that too.
+  const q =
+    typeof input.q === "number" ? String(input.q) : typeof input.q === "string" ? input.q : "";
+  const f = input.f === undefined ? undefined : readPartnerFilters(input.f);
   return {
     view,
-    q: typeof input.q === "string" ? input.q : "",
+    q,
     company: param(input.company),
     from: param(input.from),
     fromLabel: param(input.fromLabel),
+    f: f && JSON.stringify(f) !== JSON.stringify(NO_PARTNER_FILTERS) ? f : undefined,
   };
 }
 
@@ -71,7 +83,7 @@ export const Route = createFileRoute("/partners")({
   validateSearch,
   head: () => ({
     meta: [
-      { title: "Partners — Know your market · GovPreneurs" },
+      { title: "Partners · GovPreneurs" },
       {
         name: "description",
         content:
@@ -91,13 +103,21 @@ function PartnersPage() {
     navigate({ search: (prev: PartnersSearch) => ({ ...prev, ...p }), replace: opts?.replace });
   }
 
-  // Default landing tab is always "find" — Find partners is the point of the
-  // surface. An explicit ?view= / ?tab= always wins; a company deep-link
-  // (Awards -> winner -> drawer) also always means "find", same as before.
+  // An explicit ?view= / ?tab= always wins. A company deep-link
+  // (Awards -> winner -> drawer) always means "find".
   const openCompanyKey = s.company ? Number(s.company) : null;
   const hasCompanyDeepLink = openCompanyKey !== null && !Number.isNaN(openCompanyKey);
 
-  const view: View = s.view ?? "find";
+  // My partners opens first. Find partners is one tab to the right.
+  // A search link with no view (?q=722310) opens Find partners, where the search shows.
+  const view: View = s.view ?? (hasCompanyDeepLink || s.q ? "find" : "mine");
+
+  // Production ranks partners from her NAICS codes (her trades); with none, the
+  // API returns needsProfile (backend partners.controller.ts). States only narrow
+  // the list. So the one thing we must have is her trade, from My Business.
+  const { profile, loading: profileLoading } = useMemberState();
+  // While the profile loads, treat it as ready so the gate never flashes.
+  const profileReady = profileLoading || profile.trades.length > 0;
 
   const detailOpen = view === "find" && hasCompanyDeepLink;
 
@@ -107,19 +127,37 @@ function PartnersPage() {
   // but unusable — so the trail moves inside the panel instead of rendering twice.
   const backTo = cameFromElsewhere ? s.from : undefined;
 
+  // Presentation order only: My partners · Find partners.
+  // Find partners places the tabs under its search bar; the other views show them here.
+  const tabs = (
+    <nav className="partners-tabs" role="tablist" aria-label="Partners views">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={view === "mine"}
+        className={`partners-tab${view === "mine" ? " is-active" : ""}`}
+        onClick={() => patch({ view: "mine" })}
+      >
+        My partners
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={view === "find"}
+        className={`partners-tab${view === "find" ? " is-active" : ""}`}
+        onClick={() => patch({ view: "find" })}
+      >
+        Find partners
+      </button>
+    </nav>
+  );
+
   return (
     <div>
       <header style={{ marginBottom: "var(--s-4)" }}>
-        <div className="t-label" style={{ marginBottom: "var(--s-3)" }}>
-          Know your market
-        </div>
         <h1 className="t-display-lg">Partners</h1>
         <p className="t-body-sm" style={{ marginTop: "var(--s-2)", maxWidth: 720 }}>
           Companies winning the work you do — and how to reach them to team up.
-        </p>
-        <p className="exp-scan-scope">
-          Every prime we track in your space, ranked by how well they fit what you do — plus the
-          outreach list you&rsquo;re working through.
         </p>
       </header>
 
@@ -131,47 +169,29 @@ function PartnersPage() {
         </nav>
       )}
 
-      {/* Presentation order only: Find partners · Who's winning · My partners.
-          The `view` values, URL params and legacy redirect map are untouched —
-          only the rendered/tab order changed, so shared URLs keep working. */}
-      <nav className="partners-tabs" role="tablist" aria-label="Partners views">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={view === "find"}
-          className={`partners-tab${view === "find" ? " is-active" : ""}`}
-          onClick={() => patch({ view: "find" })}
-        >
-          Find partners
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={view === "market"}
-          className={`partners-tab${view === "market" ? " is-active" : ""}`}
-          onClick={() => patch({ view: "market" })}
-        >
-          Who&rsquo;s winning
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={view === "mine"}
-          className={`partners-tab${view === "mine" ? " is-active" : ""}`}
-          onClick={() => patch({ view: "mine" })}
-        >
-          My partners
-        </button>
-      </nav>
+      {view !== "find" && tabs}
 
-      {view === "market" && (
-        <WhosWinningView
-          onOpenCompany={(key) => patch({ view: "find", company: String(key) })}
-          onSwitchToFind={() => patch({ view: "find" })}
-        />
+      {view === "find" && !profileReady && (
+        <>
+          {tabs}
+          <div className="card card-padded pboard-empty">
+            <h2 className="t-heading">Fill out your My Business page first</h2>
+            <p className="t-body-sm">
+              We find partners from the kind of work you do. Add it on My Business, and we can find
+              the right partners for you.
+            </p>
+            <Link
+              to="/business-profile"
+              search={{ tab: "positioning" }}
+              className="pstep-btn pboard-empty__btn"
+            >
+              Go to My Business
+            </Link>
+          </div>
+        </>
       )}
 
-      {view === "find" && (
+      {view === "find" && profileReady && (
         <FindPartnersView
           openCompanyKey={detailOpen ? openCompanyKey : null}
           onOpenCompany={(awardeeKey) =>
@@ -179,15 +199,25 @@ function PartnersPage() {
           }
           backTo={backTo}
           backLabel={s.fromLabel}
-          // A trade-less member has no ranked feed to show here — send them to the
-          // market view instead, where "Tell us what you do" already renders with a
-          // route to fix it. Only when the view was journey-resolved (no explicit
-          // ?view=), so a member who asked for "find" by URL is never bounced.
-          onNeedsProfile={s.view ? undefined : () => patch({ view: "market" }, { replace: true })}
+          tabs={tabs}
+          q={s.q}
+          onSearch={(q) => patch({ q }, { replace: true })}
+          filters={s.f ?? NO_PARTNER_FILTERS}
+          onFiltersChange={(next) =>
+            patch(
+              { f: JSON.stringify(next) === JSON.stringify(NO_PARTNER_FILTERS) ? undefined : next },
+              { replace: true },
+            )
+          }
         />
       )}
 
-      {view === "mine" && <MyPartnersView onSwitchToFind={() => patch({ view: "find" })} />}
+      {view === "mine" && (
+        <MyPartnersView
+          onSwitchToFind={() => patch({ view: "find" })}
+          profileReady={profileReady}
+        />
+      )}
     </div>
   );
 }

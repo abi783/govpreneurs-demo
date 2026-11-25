@@ -1,36 +1,31 @@
-// Section-level active-filter counts for the filters drawer nav badges.
+// Category-level active-filter counts for the Opportunities Filters window.
 //
-// Ported from the reference (govpreneurs-v2/src/lib/filterCounts.ts) — only
-// the "how many filters are active in this section" logic, adapted to live's
-// OpportunityFilters model (Task 1). The reference's result-counting helpers
-// (facetOptionCounts, singleChoiceCounts, scopeSegmentCounts,
-// buyerTypeSegmentCounts, valueBucketCounts) are NOT ported: those tally
-// matches over a mock Opportunity[] array and will be replaced by a backend
-// endpoint (see discoverApi.ts `fetchFacetCounts`) in a later phase — porting
-// them now would just create dead code coupled to fictional mock data.
+// Only "how many filters are on in this category". The per-option result
+// counts come from the backend (see discoverApi.ts `fetchFacetCounts`).
 
 import type { OpportunityFilters } from "./opportunityFilters";
 
-export type DrawerSectionId = "what" | "where" | "fit" | "timing" | "advanced";
+/** The categories of the Opportunities Filters window, in display order. */
+export type DrawerSectionId =
+  | "what"
+  | "where"
+  | "fit"
+  | "timing"
+  | "setAsides"
+  | "agencies"
+  | "noticeTypes"
+  | "vehicles";
 
-/** Active-value counts per drawer section — feeds the section-nav badges. */
+/** Active-value counts per category — the badges in the window's category list. */
 export function sectionActiveCounts(f: OpportunityFilters): Record<DrawerSectionId, number> {
   return {
     what: f.workTypes.length,
     where: f.states.length + f.cities.length,
-    fit: f.setAsides.length + (f.valueRange.min !== null || f.valueRange.max !== null ? 1 : 0),
+    fit: f.valueRange.min !== null || f.valueRange.max !== null ? 1 : 0,
     timing: (f.dueWindow.some((v) => v !== "any") ? 1 : 0) + (f.postedWithin != null ? 1 : 0),
-    // Status renders as a SegmentedControl in Advanced, matching the
-    // reference's placement (govpreneurs-v2's FiltersDrawer puts its
-    // `status` ControlHead/SegmentedControl inside the Advanced group).
-    advanced:
-      f.psc.length +
-      f.agencies.length +
-      (f.toggles.dodOnly || f.toggles.civilianOnly ? 1 : 0) +
-      f.noticeTypes.length +
-      f.vehicles.length +
-      (f.status !== "active" ? 1 : 0) +
-      (f.toggles.excludeNoBid ? 1 : 0) +
-      (f.toggles.favoritesOnly ? 1 : 0),
+    setAsides: f.setAsides.length,
+    agencies: f.agencies.length,
+    noticeTypes: f.noticeTypes.length,
+    vehicles: f.vehicles.length,
   };
 }

@@ -744,6 +744,8 @@ Area file: `src/demo/api/partners.ts`. This area owns `/partners*`. The page is 
 - Errors the UI handles: the tab shows the error `message` in a card.
 - Notes: return `pending: false`, `stale: false`, `needsProfile: false`. Order the list: the page keeps the server order.
 
+Added 25 Nov 2026 (D102): `GET /partners?q=` returns only matching companies plus `matchedBecause` (by awardeeKey); every feed also returns `hidden` (the companies marked "Not right for me"). `PUT /partners/pipeline/:awardeeKey/journey` stores `{ journey }` on the saved company. Companies carry `recentJobs`, `buyers`, `buyerKinds`, `workTypes` and `economics.lastAwardAt`, built from the sample awards.
+
 ### GET /partners/company/:awardeeKey
 - Area file: partners
 - Called from: `fetchPartnerCompany` `src/lib/partnersApi.ts:128` (apiFetch at :132). Call site `src/components/Partners/FindPartnersView.tsx:170` `fetchPartnerCompany`. It runs when the URL holds `?company=<key>` and the loaded ranked feed does not contain that key (for example a link from an award winner).
@@ -825,6 +827,8 @@ Area file: `src/demo/api/partners.ts`. This area owns `/partners*`. The page is 
 ## awards
 
 Area file: `src/demo/api/awards.ts`. This area owns `/awards*`. The pages are `/awards` and `/awards/$awardId`.
+
+Added 25 Nov 2026 (D102): `POST /awards` also reads `panel` (production's `AwardPanelFilters`) and `interpreted`, reads a question-shaped `q` with simple rules, and returns `total`, `matchedBecause` and `interpreted`. `GET /awards/facets` returns the pick lists (`naics`, `psc`, `agencies`, `pricing`) with counts from the sample market.
 
 ### POST /awards
 - Area file: awards

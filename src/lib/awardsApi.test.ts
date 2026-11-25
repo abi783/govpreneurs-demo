@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   collapseAwardMoney,
+  fetchAwardFacets,
+  fetchAwards,
+  hasSubcontractingPlan,
   competitionSummary,
   isSoleSource,
   usd,
@@ -58,12 +61,18 @@ describe("usd — item 14", () => {
 
 describe("collapseAwardMoney", () => {
   it("collapses to one figure and explains no-growth when obligated equals ceiling", () => {
-    const result = collapseAwardMoney({ obligated: 4_200_000, currentValue: 4_200_000, ceiling: 4_200_000 });
+    const result = collapseAwardMoney({
+      obligated: 4_200_000,
+      currentValue: 4_200_000,
+      ceiling: 4_200_000,
+    });
     expect(result).toEqual({ figure: 4_200_000, explainNoGrowth: true });
   });
 
   it("stays uncollapsed (null) when the present figures differ", () => {
-    expect(collapseAwardMoney({ obligated: 1_000_000, currentValue: null, ceiling: 2_000_000 })).toBeNull();
+    expect(
+      collapseAwardMoney({ obligated: 1_000_000, currentValue: null, ceiling: 2_000_000 }),
+    ).toBeNull();
   });
 
   it("collapses a single present figure but makes no no-growth claim", () => {
@@ -72,7 +81,11 @@ describe("collapseAwardMoney", () => {
   });
 
   it("treats 0/null as absent, same as usd()", () => {
-    const result = collapseAwardMoney({ obligated: 1_000_000, currentValue: 0, ceiling: 1_000_000 });
+    const result = collapseAwardMoney({
+      obligated: 1_000_000,
+      currentValue: 0,
+      ceiling: 1_000_000,
+    });
     expect(result).toEqual({ figure: 1_000_000, explainNoGrowth: true });
   });
 
@@ -144,5 +157,50 @@ describe("whatHappensNext — fix #6, defense reporting lag", () => {
     });
     expect(whatHappensNext(a)).not.toContain("just won");
     expect(whatHappensNext(a)).toContain("Reach out and ask who is already on the team");
+  });
+});
+
+describe("Awards API wiring (filters, facets, new fields)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const ok = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+
+  it("GETs /awards/facets for the filter pick lists", async () => {
+    const facets = {
+      naics: [{ id: "238220", label: "Plumbing", count: 4 }],
+      psc: [],
+      agencies: [],
+      pricing: [],
+    };
+    const fetchMock = vi.fn().mockResolvedValue(ok(facets));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await fetchAwardFacets()).toEqual(facets);
+    expect(String(fetchMock.mock.calls[0][0])).toContain("/awards/facets");
+  });
+
+  it("throws when the facets call fails, so the panel can fall back", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 500 })));
+    await expect(fetchAwardFacets()).rejects.toThrow();
+  });
+
+  it("POSTs the new filter fields to /awards and passes matchedBecause and total through", async () => {
+    const result = { awards: [], matchedBecause: { a1: "Type of work: plumbing" }, total: 42 };
+    const fetchMock = vi.fn().mockResolvedValue(ok(result));
+    vi.stubGlobal("fetch", fetchMock);
+    const out = await fetchAwards({
+      q: "plumber",
+      panel: { naicsCodes: ["238220"], competed: "yes" },
+    } as never);
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/awards$/);
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({ q: "plumber" });
+    expect(out.matchedBecause).toEqual({ a1: "Type of work: plumbing" });
+    expect(out.total).toBe(42);
+  });
+
+  it("reads a subcontracting plan from the record's words, never by the word 'not'", () => {
+    expect(hasSubcontractingPlan("Individual Subcontract Plan")).toBe(true);
+    expect(hasSubcontractingPlan("Plan Required (Incentive Not Included)")).toBe(true);
+    expect(hasSubcontractingPlan("Plan Not Required")).toBe(false);
+    expect(hasSubcontractingPlan(null)).toBe(false);
   });
 });

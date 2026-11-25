@@ -22,7 +22,7 @@ export interface ServerFilters {
 }
 
 export interface ServerSort {
-  field: "match" | "deadline" | "value" | "newest" | "saved";
+  field: "relevance" | "match" | "deadline" | "value" | "newest" | "saved";
   order?: "asc" | "desc";
 }
 
@@ -36,6 +36,8 @@ export interface DiscoverV2ResponseDto {
   counts?: { all: number; bid: number; lean: number; pass: number };
   /** True when the user has no pre-computed matches yet — backend fell back to live scoring. */
   profileIndexing?: boolean;
+  /** True while a FULL re-score of the member's matches runs; the page shows a notice. */
+  fullRescore?: boolean;
 }
 
 export interface DiscoverV2DetailDto {

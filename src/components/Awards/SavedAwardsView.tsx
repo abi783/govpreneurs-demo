@@ -49,7 +49,8 @@ export function SavedAwardsView({
         }
       } catch (err) {
         if (cancelled || ctrl.signal.aborted) return;
-        setError(err instanceof Error ? err.message : "Could not load your saved awards.");
+        console.warn("saved awards load failed", err);
+        setError("Could not load your saved awards.");
       }
     })();
 
@@ -85,7 +86,7 @@ export function SavedAwardsView({
       <div className="card card-padded">
         <h2 className="t-heading">Nothing saved yet</h2>
         <p className="t-body-sm">
-          Tap the bookmark on any award and it shows up here, so you can come back to it later.
+          Tap the bookmark on an award to save it. Your saved awards show here.
         </p>
         <button type="button" className="btn btn-primary btn-sm" onClick={onBrowse}>
           Browse awards

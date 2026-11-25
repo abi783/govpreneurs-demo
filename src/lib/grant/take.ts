@@ -10,6 +10,7 @@ import type {
   ComplianceRow,
   GateStrip,
   GrantAnalysis,
+  OpenItem,
   Pin,
   RealDeadline,
   RichLine,
@@ -43,6 +44,21 @@ export interface ChangeLine {
   reason: RichLine;
 }
 
+/** Something Grant still has to ask — one tap opens it in the rail. */
+export interface TakeQuestion {
+  id: string;
+  text: RichLine;
+}
+
+/** A question the member already answered. One tap opens it in the rail to change. */
+export interface TakeAnswer {
+  id: string;
+  text: RichLine;
+  value: string;
+  /** Set when the answer came from another of the member's opportunities. */
+  reusedFrom?: { title: string | null; date: string };
+}
+
 export interface GrantTake {
   callWord: string;
   tone: "ok" | "warn" | "blocked";
@@ -51,7 +67,9 @@ export interface GrantTake {
   summary: RichLine | null;
   strengths: TakeItem[];
   limits: TakeItem[];
-  counts: { strengths: number; blockers: number; risks: number };
+  questions: TakeQuestion[];
+  answered: TakeAnswer[];
+  counts: { strengths: number; blockers: number; risks: number; questions: number };
   changes: ChangeLine[];
   thesis: RichLine[];
   /** DEMO: lines that say what would change the call. */
@@ -80,6 +98,63 @@ function plain(line: RichLine | undefined): string {
 /** Title-cases a read name into the card's small-caps item heading. */
 function itemTitle(s: string): string {
   return s.replace(/[?.]$/, "");
+}
+
+/** g45-items: the limit heading for each kind of open item. */
+const ITEM_TITLE: Record<OpenItem["kind"], string> = {
+  documents: "Missing documents",
+  eligibility: "Eligibility",
+  license: "License to confirm",
+  qualification: "Qualification to confirm",
+  bond: "Bond to confirm",
+  insurance: "Insurance to confirm",
+  experience: "Experience to confirm",
+  financial: "Financial records",
+  place: "Place of work",
+  scope: "Kind of work",
+  time: "Time",
+  meeting: "Mandatory meeting",
+};
+/** g45-items: how many open items the limits show. */
+const MAX_ITEM_LIMITS = 3;
+/** The "Can you win it?" read. */
+const WIN_READ_ID = 1;
+
+/**
+ * g45-items: the top open items as limits, in weight order. An item
+ * that a gate blocker above already states is left out.
+ */
+function itemLimits(
+  items: OpenItem[],
+  legalBlocked: boolean,
+  runwayBlocked: boolean,
+  slots = MAX_ITEM_LIMITS,
+): TakeItem[] {
+  return items
+    .filter((i) => !(legalBlocked && i.kind === "eligibility") && !(runwayBlocked && i.kind === "time"))
+    .slice(0, slots)
+    .map(itemLimit);
+}
+
+/** One open item as a limit. */
+function itemLimit(i: OpenItem): TakeItem {
+  return {
+    kind: i.weight === "blocker" ? "blocker" : "risk",
+    tone: i.weight === "blocker" ? "blocked" : "warn",
+    title: ITEM_TITLE[i.kind],
+    body: [t(i.sentence)],
+    evidence: [i.evidence],
+  };
+}
+
+/**
+ * The open item that states the reason for a No-bid (backend g-reason-first),
+ * when the limits must show it first. A set-aside reason
+ * is left out when the legal gate already states it.
+ */
+function callReasonLimit(items: OpenItem[] | undefined, legalBlocked: boolean): OpenItem | null {
+  const reason = items?.find((i) => i.callReason) ?? null;
+  return reason && !(legalBlocked && reason.kind === "eligibility") ? reason : null;
 }
 
 function moneyPairs(row: ComplianceRow): { label: string; value: string }[] | undefined {
@@ -140,13 +215,31 @@ export function buildTake(
         tone: "ok",
         title: itemTitle(plain(r.requirement)),
         // DEMO: say what meets it ("Active until April 2027"), not the same line seven times.
-        body: [t(r.firmValue && r.firmValue !== "—" ? `${r.firmValue.replace(/\s*✓\s*$/, "").replace(/\.$/, "")}.` : "You meet this requirement.")],
+        body: [t(r.selfReported ? "You told me you meet this." : r.firmValue && r.firmValue !== "—" ? `${r.firmValue.replace(/\s*✓\s*$/, "").replace(/\.$/, "")}.` : "You meet this requirement.")],
         evidence: r.sourceClause ? [r.sourceClause] : undefined,
       })),
   ];
 
-  // ── Blockers: the hard gate first, then anything the matrix marks missing.
+  // ── Every open question, the same list and order the rail asks from.
+  const questions: TakeQuestion[] = (analysis.rail.openQuestions ?? []).map((q) => ({
+    id: q.id,
+    text: q.display ?? q.question,
+  }));
+  const holdsReason = (fallback: string): RichLine =>
+    questions.length > 0
+      ? [
+          t(
+            questions.length === 1
+              ? "This stays a go unless you answer no to the open question."
+              : `This stays a go unless you answer no to one of the ${questions.length} open questions.`,
+          ),
+        ]
+      : [t(fallback)];
+
+  // ── Blockers: the reason for a No-bid first, then the hard gate, then anything the matrix marks missing.
   const limits: TakeItem[] = [];
+  const reason = callReasonLimit(analysis.openItems, gates.legal.tone === "blocked");
+  if (reason) limits.push(itemLimit(reason));
   if (gates.legal.tone === "blocked" && gates.legal.blocker) {
     limits.push({
       kind: "blocker",
@@ -164,7 +257,14 @@ export function buildTake(
       body: deadline.sentence,
     });
   }
-  for (const row of complianceMatrix.filter((r) => r.status === "missing")) {
+  const items = analysis.openItems;
+  if (items) {
+    const rest = reason ? items.filter((i) => i !== reason) : items;
+    limits.push(
+      ...itemLimits(rest, gates.legal.tone === "blocked", runwayBlocked, MAX_ITEM_LIMITS - (reason ? 1 : 0)),
+    );
+  }
+  for (const row of items ? [] : complianceMatrix.filter((r) => r.status === "missing")) {
     limits.push({
       kind: "risk",
       tone: "warn",
@@ -175,6 +275,8 @@ export function buildTake(
     });
   }
   for (const w of verdict.warnings ?? []) {
+    // "2 required items…" only counts what the question list names outright.
+    if (w.kind === "proposal-weakness" && questions.length > 0) continue;
     limits.push({
       kind: w.kind === "disqualifier" ? "blocker" : "risk",
       tone: w.kind === "disqualifier" ? "blocked" : "warn",
@@ -189,7 +291,9 @@ export function buildTake(
       body: w.summary,
     });
   }
-  if (verdict.competitiveRisk) {
+  // With the open items on, an open field is never both a strength and a limit.
+  const winIsStrength = reads.some((r) => r.id === WIN_READ_ID && r.status === "strong");
+  if (verdict.competitiveRisk && !(items && winIsStrength)) {
     limits.push({
       kind: "risk",
       tone: "warn",
@@ -202,6 +306,7 @@ export function buildTake(
     strengths: strengths.length,
     blockers: limits.filter((l) => l.kind === "blocker").length,
     risks: limits.filter((l) => l.kind === "risk").length,
+    questions: questions.length,
   };
 
   // ── What would move each path, stated per path rather than as one remedy line.
@@ -225,7 +330,7 @@ export function buildTake(
       reason: blockerUnrecoverable
         ? lockedReason
         : primeState === "go"
-          ? [t("No unresolved issue currently blocks bidding as the prime.")]
+          ? holdsReason("No unresolved issue currently blocks bidding as the prime.")
           : verdict.confidence.remedy,
     },
     {
@@ -241,7 +346,7 @@ export function buildTake(
       // that is still "go" never shows the reason that locks the other.
       reason:
         subState === "go"
-          ? [t("No unresolved issue currently prevents pursuing this as a sub.")]
+          ? holdsReason("No unresolved issue currently prevents pursuing this as a sub.")
           : blockerUnrecoverable
             ? lockedReason
             : verdict.confidence.remedy,
@@ -264,9 +369,18 @@ export function buildTake(
     summary: verdict.gist ?? null,
     strengths,
     limits,
+    questions,
+    answered: (analysis.rail.answeredQuestions ?? []).map((a) => ({
+      id: a.id,
+      text: a.display ?? a.question,
+      value: a.value,
+      ...(a.reusedFrom ? { reusedFrom: a.reusedFrom } : {}),
+    })),
     counts,
     changes: isNotice ? [] : changes,
-    thesis: verdict.headline ?? [],
+    // The live analysis builds its headline from the same sentence as the gist.
+    // Showing both prints the paragraph twice, so a repeat drops out.
+    thesis: (verdict.headline ?? []).filter((ln) => plain(ln) !== plain(verdict.gist)),
     wouldChange: verdict.wouldChange ?? [],
     competitiveRisk: verdict.competitiveRisk ?? null,
     next: action.primary ? { title: action.primary.label, body: action.rationale ?? null } : null,

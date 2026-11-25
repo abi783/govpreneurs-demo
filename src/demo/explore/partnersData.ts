@@ -365,6 +365,7 @@ function economicsOf(awards: AwardRecord[]): PrimeCandidate["economics"] {
     awardCount: awards.length,
     momentum: null,
     recompeteMonthsOut: soonest === null ? null : Math.max(1, Math.round(soonest / 30.44)),
+    lastAwardAt: null,
     numberOfOffersAvg: offers.length ? Math.round((offers.reduce((s, v) => s + v, 0) / offers.length) * 10) / 10 : null,
   };
 }

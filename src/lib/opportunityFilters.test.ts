@@ -235,9 +235,17 @@ describe("applyWorkPickerChange — keeps filters.naics in sync with workTypes/e
   });
 });
 
-describe("cityRowsToNodes — LocationPicker bare-city-id bridging", () => {
-  it("uses the bare city name as both id and label (no 'City, ST' composite)", () => {
-    expect(cityRowsToNodes([{ city: "Houston" }])).toEqual([{ id: "Houston", label: "Houston" }]);
+describe("cityRowsToNodes — LocationPicker city ids", () => {
+  it("ids a city 'City, ST' and labels it with the bare name", () => {
+    expect(cityRowsToNodes([{ city: "Houston" }], "TX")).toEqual([
+      { id: "Houston, TX", label: "Houston" },
+    ]);
+  });
+
+  it("gives one city name in two states two ids", () => {
+    const tx = cityRowsToNodes([{ city: "Houston" }], "TX")[0].id;
+    const mn = cityRowsToNodes([{ city: "Houston" }], "MN")[0].id;
+    expect(tx).not.toBe(mn);
   });
 
   it("maps every row from a fetchCities()-shaped response, ignoring extra fields like count", () => {
@@ -245,14 +253,13 @@ describe("cityRowsToNodes — LocationPicker bare-city-id bridging", () => {
       { city: "Austin", count: 12 },
       { city: "Dallas", count: 4 },
     ];
-    const nodes = cityRowsToNodes(rows);
-    expect(nodes).toEqual([
-      { id: "Austin", label: "Austin" },
-      { id: "Dallas", label: "Dallas" },
+    expect(cityRowsToNodes(rows, "TX")).toEqual([
+      { id: "Austin, TX", label: "Austin" },
+      { id: "Dallas, TX", label: "Dallas" },
     ]);
   });
 
   it("returns an empty array for an empty input (state with no cities on file)", () => {
-    expect(cityRowsToNodes([])).toEqual([]);
+    expect(cityRowsToNodes([], "TX")).toEqual([]);
   });
 });

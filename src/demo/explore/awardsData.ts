@@ -6,6 +6,7 @@
 // the demo opens. Two jobs are history, and their dates stay fixed: Carolina Dining
 // Group's 2019 Fort Bragg award and Amira's Womack award (persona.ts).
 
+import { pscDescription } from "../hunter/naicsData";
 import { anyFirmByKey, AMIRA_FIRM, CAROLINA_DINING } from "./firms";
 import { calendarDay, daysToDay } from "./dates";
 import { PAST_PERFORMANCE, findPastPerformance } from "@/demo/story/persona";
@@ -849,6 +850,11 @@ export function toAwardRecord(s: AnySeed): AwardRecord {
     subcontractingPlan: s.subPlan,
     bench: benchOf(s),
     sourceUrl: null,
+    // DEMO: fields the newer award window reads, taken from the same seed.
+    // The award id is the contract number, and the rebid date is when the work ends.
+    contractNumber: s.id,
+    workEndsAt: recompeteAt,
+    pscName: s.psc ? (pscDescription(s.psc) ?? null) : null,
   };
 }
 

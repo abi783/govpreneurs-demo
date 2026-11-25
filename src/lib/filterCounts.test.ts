@@ -9,7 +9,10 @@ describe("sectionActiveCounts", () => {
       where: 0,
       fit: 0,
       timing: 0,
-      advanced: 0,
+      setAsides: 0,
+      agencies: 0,
+      noticeTypes: 0,
+      vehicles: 0,
     });
   });
 
@@ -25,17 +28,18 @@ describe("sectionActiveCounts", () => {
     expect(sectionActiveCounts(f).where).toBe(2);
   });
 
-  it("counts setAsides and an active valueRange under 'fit'", () => {
+  it("counts an active valueRange under 'fit' and set-asides under their own category", () => {
     const f = {
       ...emptyFilters(),
       setAsides: ["SB", "8A"],
       valueRange: { min: 100_000, max: null },
     };
-    expect(sectionActiveCounts(f).fit).toBe(3);
+    expect(sectionActiveCounts(f).fit).toBe(1);
+    expect(sectionActiveCounts(f).setAsides).toBe(2);
   });
 
-  it("counts a non-'any' dueWindow and a set postedWithin under 'timing'", () => {
-    const f = { ...emptyFilters(), dueWindow: ["30_days"], postedWithin: 7 };
+  it("counts a closing window and a set postedWithin under 'timing'", () => {
+    const f = { ...emptyFilters(), dueWindow: ["within_20"], postedWithin: 7 };
     expect(sectionActiveCounts(f).timing).toBe(2);
   });
 
@@ -43,25 +47,16 @@ describe("sectionActiveCounts", () => {
     expect(sectionActiveCounts(emptyFilters()).timing).toBe(0);
   });
 
-  it("rolls psc/agencies/toggles/noticeTypes/vehicles/status into 'advanced'", () => {
+  it("gives agencies, notice types and vehicles their own categories", () => {
     const f = {
       ...emptyFilters(),
-      psc: ["Z2AA"],
-      agencies: ["dod.army"],
-      toggles: { ...emptyFilters().toggles, dodOnly: true },
-      noticeTypes: ["sources_sought"],
+      agencies: ["Department of the Army"],
+      noticeTypes: ["sources_sought", "presol"],
       vehicles: ["idiq"],
-      status: "all" as const,
     };
-    // psc(1) + agencies(1) + dodOnly(1) + noticeTypes(1) + vehicles(1) + status(1)
-    expect(sectionActiveCounts(f).advanced).toBe(6);
-  });
-
-  it("counts excludeNoBid and favoritesOnly toggles under 'advanced'", () => {
-    const f = {
-      ...emptyFilters(),
-      toggles: { ...emptyFilters().toggles, excludeNoBid: true, favoritesOnly: true },
-    };
-    expect(sectionActiveCounts(f).advanced).toBe(2);
+    const counts = sectionActiveCounts(f);
+    expect(counts.agencies).toBe(1);
+    expect(counts.noticeTypes).toBe(2);
+    expect(counts.vehicles).toBe(1);
   });
 });

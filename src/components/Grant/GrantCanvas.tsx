@@ -17,6 +17,7 @@ import {
   ChevronRight,
   FileClock,
   HelpCircle,
+  PencilLine,
   Scale,
   Search,
   Send,
@@ -36,7 +37,7 @@ import { AgentAvatar } from "../Companion/AgentAvatar";
 import { ComplianceMatrix } from "./ComplianceMatrix";
 import { GateStrip } from "./GateStrip";
 import { EvidencePin, RichLines, RichText, SkeletonRow } from "./primitives";
-import { lineText } from "../../lib/grant/richText";
+import { changeAnswerLabel, lineText, reusedNote } from "../../lib/grant/richText";
 import { dfyService } from "../../lib/grant/dfyServices";
 import { DFYServiceModal } from "../Opportunity/DFYServiceModal";
 // DEMO: a "Have us do it" request stays in the demo store, so it is still there after a reload.
@@ -57,6 +58,48 @@ const EPISTEMIC_LABEL: Record<Read["epistemic"], string> = {
 function plural(n: number, one: string, many: string): string {
   return n === 1 ? one : many;
 }
+
+/** How many cells each column of the take shows before its "Show N more" button. */
+const TAKE_CELLS_SHOWN = 3;
+
+/** A part of the take that the member can expand. */
+type TakeSection = "strengths" | "limits" | "more";
+
+/** Which parts of the take are expanded. The state resets when the opportunity changes. */
+function useExpandedSections(oppId: string) {
+  const [state, setState] = useState<{ opp: string; open: TakeSection[] }>({
+    opp: oppId,
+    open: [],
+  });
+  const open = state.opp === oppId ? state.open : [];
+  return {
+    isOpen: (s: TakeSection) => open.includes(s),
+    toggle: (s: TakeSection) =>
+      setState({ opp: oppId, open: open.includes(s) ? open.filter((x) => x !== s) : [...open, s] }),
+  };
+}
+
+/** The "Show N more" / "Show less" button under a column. No button when nothing is hidden. */
+function ColumnToggle({
+  hidden,
+  open,
+  onToggle,
+}: {
+  hidden: number;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  if (hidden <= 0) return null;
+  return (
+    <button type="button" className="gt-more" aria-expanded={open} onClick={onToggle}>
+      {open ? "Show less" : `Show ${hidden} more`}
+    </button>
+  );
+}
+
+/** The first cells of a column, or all of them when the column is expanded. */
+const shownCells = (items: TakeItem[], open: boolean) =>
+  open ? items : items.slice(0, TAKE_CELLS_SHOWN);
 
 function TakeCell({ item }: { item: TakeItem }) {
   return (
@@ -352,16 +395,28 @@ export function GrantCanvas({
   analysis,
   onReviewWithMentor,
   mentorDisabledReason,
+  mentorLabel: mentorLabelProp,
   onSaveForLater,
   saved = false,
   now,
   sourcePath,
+  onAnswerQuestion,
+  onEditAnswer,
+  answersDisabled = false,
 }: {
   analysis: GrantAnalysis;
+  /** A question in the limits column was tapped: open it in Grant's rail. */
+  onAnswerQuestion?: (id: string) => void;
+  /** Change was tapped on an answered question: open its edit card in Grant's rail. */
+  onEditAnswer?: (id: string) => void;
+  /** True while Grant's rail is sending: the Change buttons are disabled. */
+  answersDisabled?: boolean;
   onReviewWithMentor?: () => void;
   /** When set, the mentor-review CTA renders disabled with this as its `title`
    *  (e.g. the 3-day deadline gate — mirrors the header action button). */
   mentorDisabledReason?: string | null;
+  /** The mentor CTA's words: "Finish mentor request" while her request is paid, not sent. */
+  mentorLabel?: string;
   /** Toggles the opportunity in the user's saved-for-later workspace. Wired by the
    *  route so it shares state with the header Save button. */
   onSaveForLater?: () => void;
@@ -388,6 +443,7 @@ export function GrantCanvas({
   // offscreen remount, and this route is lazy-wrapped — the ref survived, the
   // timer did not, and nothing re-armed it.
   const [streaming, setStreaming] = useState(analysis.meta.stage === "complete");
+  const expanded = useExpandedSections(analysis.opportunityId);
   useEffect(() => {
     if (!streaming) return;
     if (REDUCED()) {
@@ -409,10 +465,13 @@ export function GrantCanvas({
   const reads = useMemo(() => [...analysis.reads].sort((a, b) => a.order - b.order), [analysis]);
   const { verdict, action } = analysis;
   // DEMO: the mentor button uses the brief's own wording when the analysis has it.
-  const mentorLabel = action.secondaries.find((x) => x.target === "mentor")?.label ?? "Review with mentor";
+  // A label the page passes (for example "Finish mentor request") wins.
+  const mentorLabel =
+    mentorLabelProp ?? action.secondaries.find((x) => x.target === "mentor")?.label ?? "Review with mentor";
 
   const take = useMemo(() => buildTake(analysis, gates, deadline), [analysis, gates, deadline]);
-  const [showAllStrengths, setShowAllStrengths] = useState(false);
+  const limitBlockers = take.limits.filter((it) => it.kind === "blocker");
+  const limitOthers = take.limits.filter((it) => it.kind !== "blocker");
 
   return (
     <section className="grant-canvas" aria-label="Grant's analysis">
@@ -542,6 +601,13 @@ export function GrantCanvas({
           {plural(take.counts.blockers, "blocker", "blockers")} ·{" "}
           <span className="mono">{take.counts.risks}</span>{" "}
           {plural(take.counts.risks, "risk", "risks")}
+          {take.counts.questions > 0 ? (
+            <>
+              {" "}
+              · <span className="mono">{take.counts.questions}</span>{" "}
+              {plural(take.counts.questions, "open question", "open questions")}
+            </>
+          ) : null}
         </p>
       </div>
 
@@ -552,72 +618,134 @@ export function GrantCanvas({
           {take.strengths.length === 0 ? (
             <p className="gt-empty">Nothing scored as a clear strength yet.</p>
           ) : (
-            (showAllStrengths ? take.strengths : take.strengths.slice(0, STRENGTH_LIMIT)).map((it, k) => (
+            shownCells(take.strengths, expanded.isOpen("strengths")).map((it, k) => (
               <TakeCell key={k} item={it} />
             ))
           )}
-          {/* DEMO: a long list of met requirements made this column three times the height of the
-              other. The first few stay open, and the rest are one tap away. */}
-          {take.strengths.length > STRENGTH_LIMIT ? (
-            <button
-              type="button"
-              className="gt-more"
-              aria-expanded={showAllStrengths}
-              onClick={() => setShowAllStrengths((v) => !v)}
-            >
-              {showAllStrengths ? "Show fewer" : `Show ${take.strengths.length - STRENGTH_LIMIT} more`}
-              <ChevronRight size={14} strokeWidth={2} className={showAllStrengths ? "gt-more__chev is-open" : "gt-more__chev"} aria-hidden />
-            </button>
-          ) : null}
+          <ColumnToggle
+            hidden={take.strengths.length - TAKE_CELLS_SHOWN}
+            open={expanded.isOpen("strengths")}
+            onToggle={() => expanded.toggle("strengths")}
+          />
         </section>
         <section className="gt-col gt-col--neg" aria-label="What limits the opportunity">
           <h3 className="gt-kicker gt-kicker--rule gt-col__h">What limits the opportunity</h3>
-          {take.limits.length === 0 ? (
+          {take.questions.length > 0 ? (
+            <div className="gt-cell gt-cell--warn">
+              <p className="gt-cell__title">
+                <AlertTriangle size={13} strokeWidth={2.5} aria-hidden />
+                Grant needs your answer
+              </p>
+              {take.questions.map((q) => (
+                <button
+                  key={q.id}
+                  type="button"
+                  className="gt-ask"
+                  onClick={() => onAnswerQuestion?.(q.id)}
+                >
+                  <span>
+                    <RichText line={q.text} />
+                  </span>
+                  <ChevronRight size={14} strokeWidth={2} aria-hidden />
+                </button>
+              ))}
+            </div>
+          ) : take.limits.length === 0 ? (
             <p className="gt-empty">Nothing is holding this one back.</p>
-          ) : (
-            take.limits.map((it, k) => <TakeCell key={k} item={it} />)
-          )}
+          ) : null}
+          {/* A blocker never folds; only the other limits count toward the fold. */}
+          {limitBlockers.map((it, k) => (
+            <TakeCell key={`b${k}`} item={it} />
+          ))}
+          {shownCells(limitOthers, expanded.isOpen("limits")).map((it, k) => (
+            <TakeCell key={k} item={it} />
+          ))}
+          <ColumnToggle
+            hidden={limitOthers.length - TAKE_CELLS_SHOWN}
+            open={expanded.isOpen("limits")}
+            onToggle={() => expanded.toggle("limits")}
+          />
+          {take.answered.length > 0 && onEditAnswer ? (
+            <div className="gt-cell gt-answers">
+              <p className="gt-cell__title">Your answers to Grant</p>
+              {take.answered.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  className="gt-answer"
+                  onClick={() => onEditAnswer(a.id)}
+                  disabled={answersDisabled}
+                  aria-label={`${changeAnswerLabel(a.text, a.value)}${a.reusedFrom ? ` ${reusedNote(a.reusedFrom)}` : ""}`}
+                >
+                  <span className="gt-answer__q">
+                    <RichText line={a.text} />
+                    {a.reusedFrom ? (
+                      <span className="grant-answered__from">{reusedNote(a.reusedFrom)}</span>
+                    ) : null}
+                  </span>
+                  <strong className="gt-answer__v">{a.value}</strong>
+                  <span className="grant-change" aria-hidden>
+                    <PencilLine size={14} strokeWidth={2} />
+                    Change
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </section>
       </div>
 
+      {take.changes.length > 0 || take.thesis.length > 0 ? (
+        <button
+          type="button"
+          className="gt-more gt-more--take"
+          aria-expanded={expanded.isOpen("more")}
+          onClick={() => expanded.toggle("more")}
+        >
+          {expanded.isOpen("more") ? "Show less of Grant's take" : "Show more of Grant's take"}
+        </button>
+      ) : null}
+
       {/* ── What would move the call ── */}
-      <section className="gt-change" aria-label="What would change Grant's call">
-        <h3 className="gt-kicker gt-kicker--rule">What would change Grant's call?</h3>
-        {take.changes.map((c) => (
-          <div key={c.path} className={`gt-change__row gt-change__row--${c.state}`}>
-            <span className="gt-change__path">{c.path}</span>
-            <span className="gt-change__state">
-              {c.state === "go" ? (
-                <Check size={14} strokeWidth={3} aria-hidden />
-              ) : (
-                <Ban size={14} strokeWidth={2.5} aria-hidden />
-              )}
-              {c.headline}
-            </span>
-            <p className="gt-change__reason">
-              <RichText line={c.reason} />
-            </p>
-          </div>
-        ))}
-        {/* DEMO: the conditions that would move the call, in Grant's words. */}
-        {take.wouldChange.length > 0 ? (
-          <div className="gt-change__ifs">
-            <span className="gt-change__ifslabel">
-              <Compass size={13} strokeWidth={2} aria-hidden /> I would change this call if
-            </span>
-            <ul>
-              {take.wouldChange.map((ln, k) => (
-                <li key={k}>
-                  <RichText line={ln} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </section>
+      {expanded.isOpen("more") ? (
+        <section className="gt-change" aria-label="What would change Grant's call">
+          <h3 className="gt-kicker gt-kicker--rule">What would change Grant's call?</h3>
+          {take.changes.map((c) => (
+            <div key={c.path} className={`gt-change__row gt-change__row--${c.state}`}>
+              <span className="gt-change__path">{c.path}</span>
+              <span className="gt-change__state">
+                {c.state === "go" ? (
+                  <Check size={14} strokeWidth={3} aria-hidden />
+                ) : (
+                  <Ban size={14} strokeWidth={2.5} aria-hidden />
+                )}
+                {c.headline}
+              </span>
+              <p className="gt-change__reason">
+                <RichText line={c.reason} />
+              </p>
+            </div>
+          ))}
+          {/* DEMO: the conditions that would move the call, in Grant's words. */}
+          {take.wouldChange.length > 0 ? (
+            <div className="gt-change__ifs">
+              <span className="gt-change__ifslabel">
+                <Compass size={13} strokeWidth={2} aria-hidden /> I would change this call if
+              </span>
+              <ul>
+                {take.wouldChange.map((ln, k) => (
+                  <li key={k}>
+                    <RichText line={ln} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {/* ── The thesis, in Grant's own words ── */}
-      {take.thesis.length > 0 ? (
+      {expanded.isOpen("more") && take.thesis.length > 0 ? (
         <section className="gt-thesis" aria-label="Grant's thesis">
           <h3 className="gt-kicker gt-kicker--rule">Grant's thesis</h3>
           {take.thesis.map((ln, k) => (
@@ -799,10 +927,10 @@ export function GrantCanvas({
                     </ul>
                   </div>
                 ))}
-                {verdict.headline.length > 0 ? (
+                {take.thesis.length > 0 ? (
                   <div className="grant-trail__group">
                     <div className="grant-trail__grouphead">The full read</div>
-                    <RichLines lines={verdict.headline} className="grant-trail__prose" />
+                    <RichLines lines={take.thesis} className="grant-trail__prose" />
                   </div>
                 ) : null}
               </div>

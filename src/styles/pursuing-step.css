@@ -1,0 +1,59 @@
+/* My partners — the Pursuing step: "Register me" or "Do it yourself". */
+.pursue-status { align-items: flex-start; font-weight: 500; line-height: 1.4; }
+.pursue-status svg { flex: none; margin-top: 2px; }
+
+/* The do-it-yourself checklist. Each row is at least 44px tall. */
+.pursue-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.pursue-check {
+  display: flex; align-items: flex-start; gap: var(--s-3);
+  min-height: 44px; padding: var(--s-2) 0;
+  font-size: 14px; line-height: 1.4; color: var(--text); cursor: pointer;
+}
+.pursue-check input {
+  flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--blue-7); cursor: pointer;
+}
+.pursue-check input:checked + span { color: var(--text-3); text-decoration: line-through; }
+
+/* The SAM contact, under step 3 of the checklist. Quiet, lined up with the step text. */
+.pursue-contact { margin: -4px 0 var(--s-2) 32px; font-size: 13px; line-height: 1.4; color: var(--text-2); }
+
+/* Before she pays: the company's SAM registration has ended. Caution, not an error. */
+.pursue-warn {
+  display: flex; align-items: flex-start; gap: var(--s-2); margin: 0;
+  padding: var(--s-3); border-radius: var(--r-sm);
+  background: var(--warn-2); color: var(--warn-9);
+  font-size: 13px; line-height: 1.4;
+}
+.pursue-warn svg { flex: none; margin-top: 1px; }
+
+.pursue-ask { display: flex; flex-direction: column; gap: var(--s-2); }
+.pursue-ask__q { margin: 0; font-size: 14px; font-weight: 600; }
+
+/* The way back to the two choices. A text button, 44px tall. */
+.pursue-link {
+  align-self: flex-start; min-height: 44px; padding: 0;
+  border: 0; background: none; color: var(--blue-7);
+  font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer;
+}
+.pursue-link:hover { color: var(--blue-8); }
+.pursue-link:focus-visible, .pursue-demo:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+
+/* PROTOTYPE ONLY. A quiet demo control, so nobody takes it for product UI. */
+.pursue-demo {
+  align-self: flex-start; padding: var(--s-1) var(--s-2);
+  border: 1px dashed var(--border-strong); border-radius: var(--r-sm);
+  background: none; color: var(--text-3);
+  font: inherit; font-size: 12px; cursor: pointer;
+}
+.pursue-demo:hover { color: var(--text-2); }
+
+/* Do it yourself: a back button and the title on one row, above the checklist. */
+.pursue-diy-head { display: flex; align-items: center; gap: var(--s-3); }
+.pursue-back {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 var(--s-2);
+  border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface);
+  color: var(--text-2); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.pursue-back:hover { color: var(--text); border-color: var(--border-strong); }
+.pursue-back:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.pursue-diy-title { font-size: 14px; font-weight: 650; color: var(--text); }

@@ -1,0 +1,467 @@
+/* ── Award detail dialog (adm = award detail modal) ──────────────────────────
+   One award, in full. This dialog copies the partner dialog (prime-detail.css):
+   the same size, header, body, footer and phone layout. The header and the
+   footer stay fixed. The body scrolls. On a phone, the dialog fills the screen.
+   Tokens only: no raw hex. */
+
+.adm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: color-mix(in oklab, var(--text-ink) 50%, transparent);
+  animation: adm-fade var(--d-fast) var(--ease);
+}
+.adm-overlay[data-state="closed"] {
+  animation: adm-fade-out var(--d-fast) var(--ease);
+}
+
+.adm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 81;
+  transform: translate(-50%, -50%);
+  /* A large window: about 80% of the screen. The height follows the content,
+     up to 85% of the screen, so a short award leaves no empty space. */
+  width: min(1120px, 80vw);
+  max-height: min(85vh, 960px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sheet);
+  outline: none;
+  overflow: hidden;
+  animation: adm-in var(--d-base) var(--ease);
+}
+.adm[data-state="closed"] {
+  animation: adm-out var(--d-fast) var(--ease-in);
+}
+
+@keyframes adm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes adm-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes adm-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes adm-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -48%) scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .adm,
+  .adm[data-state="closed"],
+  .adm-overlay,
+  .adm-overlay[data-state="closed"] { animation: none; }
+}
+
+/* ── Header ── */
+.adm-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--s-6);
+  border-bottom: 1px solid var(--border);
+}
+.adm-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.adm-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-ink);
+  overflow-wrap: anywhere;
+}
+.adm-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+}
+.adm-close:hover { background: var(--bg-subtle); color: var(--text); }
+.adm-close:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+
+/* ── Body ── */
+.adm-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s-6);
+}
+.adm-body__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+.adm-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.adm-h {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.adm-p {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.adm-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--s-3);
+}
+.adm-fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+}
+.adm-fact dt {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-3);
+}
+.adm-fact dd {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+}
+.adm-link {
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.adm-link:hover { text-decoration: underline; }
+.adm-link:focus-visible { outline: none; box-shadow: var(--ring-focus); border-radius: var(--r-sm); }
+
+/* ── Footer ──
+   The main action fills the row. Save sits at the bottom right, the same
+   height, with its word so that she knows what it does. */
+.adm-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-6) var(--s-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.adm-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+/* Two classes: the live .btn block in styles.css loads after this file. */
+.adm-actions .adm-cta {
+  flex: 1;
+  min-height: 52px;
+  padding: var(--s-2) var(--s-6);
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  white-space: normal;
+  border-radius: var(--r-md);
+  text-decoration: none;
+}
+.adm-save {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-width: 112px;
+  height: 52px;
+  padding: 0 var(--s-4);
+  margin-left: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+}
+.adm-save:hover { background: var(--bg-subtle); color: var(--accent); }
+.adm-save:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.adm-save.is-saved {
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-color: var(--blue-4);
+}
+.adm-footnote {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Phone: full screen ── */
+@media (max-width: 640px) {
+  .adm {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    animation: adm-fade var(--d-base) var(--ease);
+  }
+  .adm[data-state="closed"] { animation: adm-fade-out var(--d-fast) var(--ease); }
+  .adm-head { padding: var(--s-4); }
+  .adm-title { font-size: 19px; }
+  .adm-body { padding: var(--s-4); }
+  .adm-body__inner { gap: var(--s-6); }
+  /* One compact row on a phone: the main button and Save. */
+  .adm-foot { padding: var(--s-2) var(--s-3) var(--s-3); gap: var(--s-1); }
+  .adm-actions { gap: var(--s-2); }
+  .adm-actions .adm-cta { min-height: 48px; font-size: 15px; padding: var(--s-1) var(--s-3); }
+  .adm-save { min-width: 0; height: 48px; padding: 0 var(--s-3); }
+  .adm-footnote { font-size: 11px; }
+}
+
+/* ── Award additions ── */
+.adm-head__text .adm-flag { align-self: flex-start; }
+.adm-sub {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+/* `.adm-fact dd` sets Inter. A money figure must stay in the mono font. */
+.adm-fact dd.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+/* A winner name can be long. The tile lets it wrap. */
+.adm-fact dd { overflow-wrap: anywhere; }
+.adm-fact dd .adm-link { font-size: inherit; font-weight: inherit; }
+.adm-note {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.adm-subs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.adm-subs li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text);
+}
+.adm-subs li + li { border-top: 1px solid var(--border); }
+.adm-subs__name { min-width: 0; overflow-wrap: anywhere; }
+.adm-subs__count { flex: none; font-size: 13px; color: var(--text-2); }
+
+
+/* ── Loading and error ── */
+.adm-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.adm-skel {
+  width: 70%;
+  height: 16px;
+  border-radius: var(--r-sm);
+  background: var(--bg-subtle);
+  animation: adm-pulse 1.4s var(--ease) infinite alternate;
+}
+.adm-skel--wide { width: 100%; height: 64px; border-radius: var(--r-md); }
+.adm-skel--short { width: 40%; }
+@keyframes adm-pulse { from { opacity: 1; } to { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) {
+  .adm-skel { animation: none; }
+}
+
+/* ── The work: label and value rows, in the same box as the small-firm list ── */
+.adm-rows {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.adm-rows > div {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: baseline;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+}
+.adm-rows > div + div { border-top: 1px solid var(--border); }
+.adm-rows dt {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-3);
+}
+.adm-rows dd {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .adm-rows > div { grid-template-columns: 1fr; gap: var(--s-1); }
+}
+
+/* ── Codes and record numbers ── */
+.adm-rows dd.mono {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.adm-code {
+  font-size: 12px;
+  color: var(--text-3);
+}
+.adm-fact dd.adm-fact__sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.adm-subs__trade {
+  display: block;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.adm-term {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Sections that open on a tap ──
+   Native <details>: the keyboard and screen readers work with no script. */
+.adm-folds {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.adm-fold + .adm-fold { border-top: 1px solid var(--border); }
+.adm-fold__sum {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 48px;
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--r-md);
+}
+.adm-fold__sum::-webkit-details-marker { display: none; }
+.adm-fold__sum:hover { background: var(--bg-subtle); }
+.adm-fold__sum:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.adm-fold__title { flex: 1; min-width: 0; }
+.adm-fold__count {
+  min-width: 24px;
+  padding: 1px var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-2);
+}
+.adm-fold__chev {
+  flex: none;
+  color: var(--text-3);
+  transition: transform var(--d-fast) var(--ease);
+}
+.adm-fold[open] > .adm-fold__sum .adm-fold__chev { transform: rotate(180deg); }
+.adm-fold__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-1) var(--s-4) var(--s-4);
+}
+.adm-subs__count--stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .adm-fold__chev { transition: none; }
+}
+
+/* A firm's size, from SAM's size band. */
+.adm-subs__line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+.adm-tag {
+  padding: 1px var(--s-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.adm-tag--small {
+  border-color: var(--blue-4);
+  background: var(--accent-muted);
+  color: var(--accent);
+}

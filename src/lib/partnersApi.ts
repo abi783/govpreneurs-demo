@@ -82,6 +82,8 @@ export interface PrimeCandidate {
     momentum: number | null;
     recompeteMonthsOut: number | null;
     numberOfOffersAvg: number | null;
+    /** ISO date of the most recent award in the rollup. Null when not yet computed. */
+    lastAwardAt: string | null;
   };
   tier: PartnerTier;
   verdict: PartnerVerdict;
@@ -98,6 +100,89 @@ export interface PrimeCandidate {
   /** D10 — the largest scoreBreakdown delta vs. the next-ranked company, in plain
    *  English. Null for the last company (no next one to compare against). */
   whyAboveNext: string | null;
+  /** PROPOSED (search PRD): the kinds of work this company wins — its NAICS codes, named. */
+  workTypes?: { naics: string; name: string }[];
+  /**
+   * PROPOSED (search PRD, phase 2): the trades of the small firms it hires — each
+   * subcontractor's primary NAICS from hg_awardees, counted. `firms` is a floor.
+   */
+  tradesHired?: { naics: string; name: string; firms: number }[];
+  /**
+   * PROPOSED (search PRD): their latest awards, newest first, up to 10. From hg_awards by
+   * awardee key (indexed). `endsAt` is the work end date.
+   */
+  recentJobs?: {
+    awardId: string;
+    title: string;
+    description: string | null;
+    workType: string | null;
+    buyer: string;
+    office: string | null;
+    city: string | null;
+    state: string | null;
+    /** Dollars paid so far (`total_dollars_obligated`). */
+    value: number | null;
+    awardedAt: string | null;
+    endsAt: string | null;
+    contractNumber?: string | null;
+    solicitationId?: string | null;
+    naicsCode?: string | null;
+    pscCode?: string | null;
+  }[];
+  /** PROPOSED (search PRD): the agencies that buy from them, most jobs first. */
+  buyers?: { name: string; jobs: number }[];
+  /** Which kinds of agency buy from them, over all their agencies. From the nightly precompute. */
+  buyerKinds?: ("defense" | "civilian")[];
+  /**
+   * PROPOSED (search PRD, phase 2): the small firms they hired, by name, from
+   * hg_awardee_partnerships. `trade` is the firm's primary NAICS name. `jobs` is a floor.
+   */
+  subsHired?: {
+    name: string;
+    trade: string | null;
+    jobs: number;
+    /** `total_awards` on the partnership row: subcontract dollars from this prime. */
+    dollars?: number | null;
+    /** `most_recent_date` on the partnership row. Often only the year is exact. */
+    lastAt?: string | null;
+    /** The firm's `employee_count` band from hg_awardees, e.g. "<500". */
+    employeeBand?: string | null;
+  }[];
+  /** PROPOSED (search PRD): SBA certifications from hg_awardees, e.g. "8(a)". Often empty. */
+  certifications?: string[];
+  /**
+   * PROPOSED (decision 5): the business types in `certifications` that the SBA certified
+   * (bus_type_info[].cert_flag === true). The others the company only claims.
+   */
+  sbaCertified?: string[];
+  /** PROPOSED (filters PRD): true when the SBA lists them as a mentor in a mentor-protégé
+   *  program (hg_awardee_mp). */
+  runsMentorProgram?: boolean;
+  /**
+   * PROPOSED (data audit): SAM's government business point of contact
+   * (hg_awardees.govt_bus_poc_first_name, _last_name, _title). Name on 100% of feed primes,
+   * title on 68%. Usually the owner or a top manager. No email or phone in SAM.
+   */
+  samContact?: { name: string; title: string | null } | null;
+  /** PROPOSED (data audit): hg_awardees.registration_expiration_date. */
+  registrationExpiresAt?: string | null;
+  /** PROPOSED (data audit): hg_awardees.awardee_key_parent, when it is a different company. */
+  parent?: { name: string; awardeeKey: number | null } | null;
+  /** PROPOSED (data audit): hg_awardees.physical_address_city and _province_or_state. */
+  headquarters?: { city: string | null; state: string | null } | null;
+  /** PROPOSED (data audit): hg_awardees.employee_count, a band such as "<500" or ">1500". */
+  employeeBand?: string | null;
+  /** PROPOSED (data audit): contract vehicles they hold (hg_idvs by awardee_key), open ones first. */
+  vehicles?: {
+    name: string;
+    agency: string;
+    /** The last date the government can place orders. */
+    orderingEndsAt: string | null;
+    /** Who can place orders, e.g. "Only the issuing agency" or "Any federal agency". */
+    openTo: string | null;
+  }[];
+  /** PROPOSED (data audit): how many of their jobs carry a subcontracting plan. */
+  subPlanJobs?: number | null;
 }
 
 export interface PartnersFeedResponse {
@@ -109,11 +194,26 @@ export interface PartnersFeedResponse {
   stale: boolean;
   /** No trade on file, so there is no lane to rank against. */
   needsProfile: boolean;
+  /**
+   * PROPOSED (filters PRD): the companies that the member hid ("Not right for me"). They
+   * are not in `partners`. The filter "Show them again" lists them.
+   */
+  hidden?: PrimeCandidate[];
+  /** Only on a search: why each company matched, by awardeeKey. */
+  matchedBecause?: Record<string, string>;
 }
 
-/** GET /partners — the member's precomputed ranking. */
-export async function fetchPartners(signal?: AbortSignal): Promise<PartnersFeedResponse> {
-  const response = await apiFetch(`${API_BASE_URL}/partners`, { signal });
+/**
+ * GET /partners — the member's precomputed ranking. With `q`, the server search: it
+ * also reads the primes that win the searched kind of work outside the member's lane,
+ * and says why each matched (`matchedBecause`).
+ */
+export async function fetchPartners(
+  signal?: AbortSignal,
+  q?: string,
+): Promise<PartnersFeedResponse> {
+  const query = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : "";
+  const response = await apiFetch(`${API_BASE_URL}/partners${query}`, { signal });
   if (!response.ok) {
     return await buildApiError(response, "Failed to load partners");
   }
@@ -197,12 +297,16 @@ export function whereTheyWork(p: PrimeCandidate): string {
 
   if (topCity) {
     const place = titleCasePlace(topCity.city);
+    // "Most of it" only when that city really holds more than half of their jobs.
+    const most = topCity.count * 2 > (p.economics?.awardCount ?? 0);
     // Null = not measured (e.g. a nationwide member) — name the place without
     // a comparative "near you" claim we never actually computed.
     if (fraction === null) return `Their most common job site is ${place}.`;
     const share = Math.round(fraction * 100);
     if (share >= 80)
-      return `Almost all their work is in ${place} and nearby, in ${stateNames(states)}.`;
+      return most
+        ? `Almost all their work is near you. Most of it is in ${place}.`
+        : `Almost all their work is near you, in ${stateNames(states)}.`;
     if (fraction >= 0.4) return `A good share of their jobs are near you, including in ${place}.`;
     if (share > 0)
       return `Some of their jobs are near you. Their most common job site is ${place}.`;
@@ -276,6 +380,15 @@ export const STAGE_NEXT_ACTION: Partial<Record<PipelineStage, string>> = {
   active_partner: "I finished a job for them",
 };
 
+/** What she did with one company beyond its stage. Kept on the saved record. */
+export interface PartnerJourneyData {
+  path?: "dfy" | "diy";
+  diy?: { steps: boolean[]; registeredAt?: string };
+  job?: { what: string; startedOn?: string; value?: string };
+  finishedAt?: string;
+  pastPerformanceAdded?: boolean;
+}
+
 export interface PipelineEntry {
   awardeeKey: number;
   companyName: string;
@@ -283,6 +396,7 @@ export interface PipelineEntry {
   sourceTag: string;
   savedAt: string;
   updatedAt: string;
+  journey?: PartnerJourneyData;
 }
 
 // ── the market strip ────────────────────────────────────────────────────────
@@ -356,6 +470,21 @@ export async function setPipelineStage(awardeeKey: number, stage: PipelineStage)
   });
   if (!response.ok) {
     return await buildApiError(response, "Failed to update that company");
+  }
+}
+
+/** PUT /partners/pipeline/:awardeeKey/journey — replaces the journey on a saved company. */
+export async function setPipelineJourney(
+  awardeeKey: number,
+  journey: PartnerJourneyData,
+): Promise<void> {
+  const response = await apiFetch(`${API_BASE_URL}/partners/pipeline/${awardeeKey}/journey`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ journey }),
+  });
+  if (!response.ok) {
+    return await buildApiError(response, "Failed to save your notes on that company");
   }
 }
 

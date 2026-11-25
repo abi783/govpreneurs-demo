@@ -1,0 +1,155 @@
+/* SearchMultiSelect — the pick-list box the Partners and Awards filter windows use. */
+.sms {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sms-field {
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  background: var(--surface, #fff);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-height: 44px;
+  cursor: text;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+.sms-field:focus-within {
+  border-color: var(--blue-7);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+.sms-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.sms-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--blue-7);
+  color: #fff;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.sms-token.is-custom {
+  background: transparent;
+  color: inherit;
+  border: 1px dashed rgba(0, 0, 0, 0.28);
+  padding-left: 10px;
+}
+.sms-token-x {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 999px;
+  display: inline-flex;
+  opacity: 0.8;
+}
+.sms-token-x:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+.sms-token.is-custom .sms-token-x:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+.sms-input {
+  flex: 1;
+  min-width: 140px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 4px 2px;
+}
+.sms-pop {
+  background: var(--surface, #fff);
+  color: var(--fg, #111);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  max-height: 320px;
+  overflow: auto;
+  padding: 4px 0;
+  z-index: 8100;
+  font-family: inherit;
+}
+.sms-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sms-header {
+  position: sticky;
+  top: 0;
+  background: var(--surface, #fff);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  padding: 8px 14px 4px;
+}
+.sms-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.sms-opt.is-active {
+  background: rgba(37, 99, 235, 0.08);
+}
+.sms-opt.is-selected {
+  color: var(--blue-7);
+  font-weight: 500;
+}
+.sms-opt.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.sms-opt-check {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.sms-opt-custom {
+  font-style: italic;
+}
+.sms-mark {
+  background: rgba(250, 204, 21, 0.35);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+.sms-empty {
+  padding: 12px 14px;
+  font-size: 13px;
+  opacity: 0.65;
+}
+.sms-max-note {
+  padding: 8px 14px;
+  font-size: 12px;
+  opacity: 0.7;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+.sms-footer {
+  font-size: 12px;
+  opacity: 0.7;
+  min-height: 16px;
+}
+.sms-custom-note {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 2px 0 0;
+}
+
+/* Service-area rung cards (Step 2) */

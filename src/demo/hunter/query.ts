@@ -200,6 +200,10 @@ export function sortRows(rows: FeedRow[], sort: ServerSort | undefined, tab: Fee
     switch (s.field) {
       case "match":
         return matchKey(row, tab);
+      // DEMO: no search index here. The search already keeps only rows that hold
+      // every word, so "Most relevant" ranks those by Hunter's match.
+      case "relevance":
+        return matchKey(row, tab);
       case "newest":
         return -row.o.postedDaysAgo;
       case "deadline":
@@ -215,6 +219,7 @@ export function sortRows(rows: FeedRow[], sort: ServerSort | undefined, tab: Fee
   };
   const naturalDesc: Record<ServerSort["field"], boolean> = {
     match: true,
+    relevance: true,
     newest: true,
     deadline: false,
     value: true,

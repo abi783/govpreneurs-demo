@@ -344,6 +344,8 @@ export interface ComplianceRow {
   status: "have" | "missing" | "confirm" | "unknown"; // (computed for `resolve` rows)
   /** Drives the hard-gates-never-sell rule: an unclosable block offers only the exit (§3, §12.6). */
   closableInWindow?: boolean;
+  /** The status rests on the member's own answer, not on a verified record. */
+  selfReported?: boolean;
   /** When present, `firmValue` + `status` are computed against the live firm profile
    *  (the Gate Strip reads the profile, PRD 97 §S1/§4). Absent ⇒ authored directly. */
   resolve?:
@@ -501,10 +503,16 @@ export interface Finding {
 export interface OpenQuestion {
   id: string;
   question: RichLine; // "What's your bonding capacity?"
+  /** The plain-English wording a member reads. `question` stays the original,
+   *  and is what gets sent back: its text keys the stored answer. */
+  display?: RichLine;
   payoff: RichLine; // the VOI, stated: "Moves this from a maybe to a yes-or-no."
   verdictSwing: number; // 0..1 — ranks the queue
   input: { kind: "currency" | "yesno" | "date" | "text"; config?: unknown };
   status: "open" | "answered" | "skipped";
+  /** True when the member answered this yes/no question, but the answer was
+   *  neither a clear yes nor a clear no. The card asks her to tap Yes or No. */
+  unclear?: boolean;
   /** The plain noun the Improve chip names ("Answer the bonding question", §8.2). */
   chipNoun?: string;
 }
@@ -514,8 +522,15 @@ export interface OpenQuestion {
 export interface AnsweredQuestionCard {
   id: string;
   question: RichLine;
+  display?: RichLine;
   /** The member's current stored answer. */
   value: string;
+  /** Set when the answer came from another of the member's opportunities: its
+   *  title (null when unknown) and the date she gave it. */
+  reusedFrom?: { title: string | null; date: string };
+  /** The input kind of the question, so the edit card shows the same control.
+   *  Absent in older cached analyses: the edit card then uses free text. */
+  input?: OpenQuestion["input"];
 }
 
 // ─── Suggested chips (Doc 132) — the three questions under the rail thread, in
@@ -594,6 +609,33 @@ export interface AmendmentInfo {
 
 // ─── The published analysis ───
 
+/** g45-items (backend): one thing the member must settle, ranked by weight. Mirror of the backend type. */
+export interface OpenItem {
+  kind:
+    | "documents"
+    | "eligibility"
+    | "license"
+    | "qualification"
+    | "bond"
+    | "insurance"
+    | "experience"
+    | "financial"
+    | "place"
+    | "scope"
+    | "time"
+    | "meeting";
+  weight: "blocker" | "decides-call" | "risk";
+  /** One plain sentence that opens with what to do. */
+  sentence: string;
+  /** The rail questions that settle the item, in the order to ask them. */
+  questions: string[];
+  evidence: Pin;
+  /** The reason for a No-bid (backend g-reason-first): the limits show it first. */
+  callReason?: boolean;
+  /** The member answered no: the item is a confirmed shortfall ("You told me …"). */
+  confirmedNo?: boolean;
+}
+
 export interface GrantAnalysis {
   id: string;
   opportunityId: string;
@@ -633,6 +675,8 @@ export interface GrantAnalysis {
   /** The adversarial pass, shown in the full-analysis layer (§14 q2). */
   redTeam?: RedTeamObjection[];
   citations: Pin[]; // ⑦ anchors into the source doc
+  /** g45-items: the ranked open items. Absent on an analysis built before the backend sent it. */
+  openItems?: OpenItem[];
 
   // rail (Phase 7)
   rail: {

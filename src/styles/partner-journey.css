@@ -1,0 +1,55 @@
+/* My partners — the next step on each card, and the buttons every step shares.
+   The colours are the design system's, not new ones:
+     .pstep-btn            = .btn-primary (blue-7), like "Review with a Mentor"
+     .pstep-btn--dark      = the roadmap's .rm2-btn--dark ("Buy the done-for-you service")
+     .pstep-btn--secondary = the roadmap's .rm2-btn--blue-outline ("Do it yourself")
+   Buttons are full width and 44px tall, so they are easy to tap on a phone. */
+.pstep { display: flex; flex-direction: column; gap: var(--s-2); }
+.pstep__note { margin: 0; font-size: 13px; line-height: 1.4; color: var(--text-2); }
+.pstep__status {
+  display: flex; align-items: center; gap: var(--s-2); margin: 0;
+  padding: var(--s-2) var(--s-3); border-radius: var(--r-sm);
+  background: var(--pos-2); color: var(--pos-7); font-size: 13px; font-weight: 600;
+}
+.pstep__status--wait { background: var(--blue-1); color: var(--blue-7); }
+.pstep-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; min-height: 44px; padding: 10px var(--s-4);
+  border: 1px solid var(--blue-7); border-radius: var(--r-sm);
+  background: var(--blue-7); color: var(--text-inverse);
+  font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: background 120ms var(--ease, ease);
+}
+.pstep-btn:hover {
+  background: color-mix(in oklab, var(--blue-7) 88%, black);
+  border-color: color-mix(in oklab, var(--blue-7) 88%, black);
+}
+.pstep-btn:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.pstep-btn--dark { background: var(--n-12); border-color: var(--n-12); color: var(--text-inverse); }
+.pstep-btn--dark:hover { background: var(--n-11); border-color: var(--n-11); }
+.pstep-btn--secondary { background: var(--surface); color: var(--blue-7); border-color: var(--blue-3); }
+.pstep-btn--secondary:hover { background: var(--blue-1); border-color: var(--blue-3); }
+.pstep-btn:disabled { opacity: .5; cursor: default; }
+
+/* The done-for-you checkout as a window in the middle of the page. Same content
+   as the roadmap's side panel (.dfyd); only the frame changes. */
+.dfyd.dfyd--center {
+  top: 50%; left: 50%; right: auto; bottom: auto;
+  transform: translate(-50%, -50%);
+  width: min(820px, 92vw); max-height: 88vh;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  overflow: hidden;
+  animation: dfyd-fade var(--d-base) var(--ease);
+}
+@media (max-width: 700px) {
+  .dfyd.dfyd--center { width: 100vw; max-height: 100vh; height: 100vh; border-radius: 0; }
+}
+
+/* The checkout's caution line, e.g. the company's SAM registration has ended. Caution, not an error. */
+.dfyd__warn {
+  display: flex; align-items: flex-start; gap: var(--s-2); margin: 0 0 var(--s-3);
+  padding: var(--s-3); border-radius: var(--r-sm);
+  background: var(--warn-2); color: var(--warn-9);
+  font-size: 13px; line-height: 1.4;
+}
+.dfyd__warn svg { flex: none; margin-top: 1px; }

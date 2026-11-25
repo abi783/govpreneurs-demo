@@ -1,20 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Search, X } from "lucide-react";
 import { usePageMeta } from "../components/Layout/page-meta";
 import { AwardCard } from "../components/Awards/AwardCard";
+import { AwardsFilterPanel } from "../components/Awards/AwardsFilterPanel";
+import { AwardDetailDialog } from "../components/Awards/AwardDetailDialog";
+import { SavedPartnerAwards } from "../components/Awards/SavedPartnerAwards";
+import { makeHighlighter } from "../components/Search/Highlight";
+import { SearchHead } from "../components/Search/SearchHead";
 import { SavedAwardsView } from "../components/Awards/SavedAwardsView";
+import { AppliedChips, FilterButton } from "../components/Filters/FilterPanel";
 import { SuccessCenterLink } from "../components/Partners/SuccessCenterLink";
 import {
   AWARD_FILTERS,
   AWARD_SORTS,
-  DEFAULT_AWARD_FILTERS,
+  awardFiltersToRequest,
+  fetchAwardFacets,
   fetchAwards,
-  type AwardFilterId,
+  type AwardFacets,
+  type AwardInterpretation,
   type AwardListResult,
   type AwardRecord,
   type AwardSort,
 } from "../lib/awardsApi";
+import {
+  NO_AWARD_FILTERS,
+  awardChips,
+  facetLabels,
+  readAwardFilters,
+  type AwardFilters,
+} from "../lib/filters/awardFilters";
+import { interpretationChips } from "../lib/awards/interpretation";
+import { useMemberState } from "../lib/memberState";
+import { serviceStates } from "../lib/awards/relevance";
 import { useSavedAwards } from "../lib/useSavedAwards";
 
 /**
@@ -26,7 +44,11 @@ import { useSavedAwards } from "../lib/useSavedAwards";
 interface AwardsSearch {
   /** `saved` shows the bookmark shelf; anything else shows the feed. */
   view?: "saved";
-  filters?: AwardFilterId[];
+  /**
+   * The filter panel, so a reload, the Back button and a shared link keep it. Absent
+   * means a new visit: her own kind of work in her own states.
+   */
+  f?: AwardFilters;
   sort?: AwardSort;
   q?: string;
   page?: number;
@@ -34,36 +56,33 @@ interface AwardsSearch {
   from?: string;
   /** What the member reads after "← Back to". Specific: a company name, not "Awards". */
   fromLabel?: string;
+  /** The award open in the detail window, if any. */
+  award?: string;
 }
-
-const FILTER_IDS = AWARD_FILTERS.map((f) => f.id);
 
 /** Parses and bounds the URL state; unknown values fall back to the defaults. */
 function validateSearch(input: Record<string, unknown>): AwardsSearch {
-  const raw = Array.isArray(input.filters)
-    ? input.filters
-    : typeof input.filters === "string"
-      ? input.filters.split(",")
-      : undefined;
-  const filters = raw
-    ? (raw.filter((f): f is AwardFilterId =>
-        FILTER_IDS.includes(f as AwardFilterId),
-      ) as AwardFilterId[])
-    : DEFAULT_AWARD_FILTERS;
-
   const sort = input.sort === "recent" || input.sort === "largest" ? input.sort : "relevant";
 
   const page = Number(input.page);
 
   return {
     view: input.view === "saved" ? "saved" : undefined,
-    filters,
+    f: readAwardFilters(input.f),
     sort,
-    q: typeof input.q === "string" ? input.q : "",
+    // The router reads "?q=722310" as a number, so a code search must be turned back
+    // into text, or the box opens empty.
+    q: typeof input.q === "string" ? input.q : typeof input.q === "number" ? String(input.q) : "",
     // Bounded to match the API: deep paging is a collection scan, not a cheap offset.
     page: Number.isFinite(page) && page >= 1 ? Math.min(page, 200) : 1,
     from: typeof input.from === "string" && input.from ? input.from : undefined,
     fromLabel: typeof input.fromLabel === "string" && input.fromLabel ? input.fromLabel : undefined,
+    award:
+      typeof input.award === "string" && input.award
+        ? input.award.replace(/^"(.*)"$/s, "$1")
+        : typeof input.award === "number"
+          ? String(input.award)
+          : undefined,
   };
 }
 
@@ -71,7 +90,7 @@ export const Route = createFileRoute("/awards/")({
   validateSearch,
   head: () => ({
     meta: [
-      { title: "Awards — Know your market · GovPreneurs" },
+      { title: "Awards · GovPreneurs" },
       {
         name: "description",
         content: "Who buys the work you sell, who won it, and what comes up for bid again.",
@@ -90,7 +109,6 @@ function AwardsPage() {
   // bare; defaults land here instead of in the type.
   const search = {
     view: raw.view,
-    filters: raw.filters ?? DEFAULT_AWARD_FILTERS,
     sort: raw.sort ?? ("relevant" as AwardSort),
     q: raw.q ?? "",
     page: raw.page ?? 1,
@@ -99,11 +117,44 @@ function AwardsPage() {
   // The trail only makes sense when the member came from somewhere that is not here.
   const cameFromElsewhere = Boolean(raw.from && raw.fromLabel && !raw.from.startsWith("/awards"));
 
+  const [panelOpen, setPanelOpen] = useState(false);
+  // The filters live in the URL. A new visit (no "f") starts with no filter on: every kind
+  // of work, all of the US. The "Best match" sort still puts her kind of work first.
+  // (Decided 19 Nov 2026: no filter is on before she picks one.)
+  const { profile } = useMemberState();
+  const areas = serviceStates(profile);
+  const filtersKey = raw.f ? JSON.stringify(raw.f) : "";
+  const panelFilters = useMemo<AwardFilters>(
+    () => (filtersKey ? readAwardFilters(JSON.parse(filtersKey)) : undefined) ?? NO_AWARD_FILTERS,
+    [filtersKey],
+  );
+
   const [result, setResult] = useState<AwardListResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [needle, setNeedle] = useState(search.q);
+  // The last (trimmed) term we put in the URL, so its echo never rewrites the box.
+  const lastPushed = useRef(search.q);
+  // A chip she removed from "Understood as": her edited reading, sent back so the server
+  // does not ask the model again. It belongs to one question, so a new search drops it.
+  const [edited, setEdited] = useState<{ q: string; value: AwardInterpretation } | null>(null);
+  const override = edited && edited.q === search.q ? edited.value : undefined;
   const { isSaved, toggle, saved } = useSavedAwards();
+  const [facets, setFacets] = useState<AwardFacets | undefined>(undefined);
+
+  // The pick lists in the filter panel. If they fail, the lists stay empty.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetchAwardFacets(ctrl.signal)
+      .then(setFacets)
+      .catch(() => undefined);
+    return () => ctrl.abort();
+  }, []);
+
+  // Every filter applies while she searches, so every chip stays on screen.
+  const hl = makeHighlighter(search.q);
+  const chips = awardChips(panelFilters, facets && facetLabels(facets));
+  const request = awardFiltersToRequest(panelFilters);
 
   // Provenance travels with the save, so the shelf can say where it came from.
   const onToggleSaved = (a: AwardRecord) =>
@@ -111,33 +162,43 @@ function AwardsPage() {
 
   // Keep the box in step when the URL changes underneath us (back button, a shared
   // link), without fighting the user's typing.
-  useEffect(() => setNeedle(search.q), [search.q]);
+  useEffect(() => {
+    if (search.q !== lastPushed.current) {
+      lastPushed.current = search.q;
+      setNeedle(search.q);
+    }
+  }, [search.q]);
 
   useEffect(() => {
     const ctrl = new AbortController();
     setLoading(true);
     setError(null);
+    const { filters, panel } = awardFiltersToRequest(panelFilters);
     fetchAwards(
       {
-        filters: search.filters,
+        filters,
+        panel,
         sort: search.sort,
         q: search.q,
         page: search.page,
+        interpreted: override,
       },
       ctrl.signal,
     )
       .then(setResult)
       .catch((err: unknown) => {
         if (ctrl.signal.aborted) return;
-        setError(err instanceof Error ? err.message : "Something went wrong loading awards.");
+        setResult(null); // never leave the last good count on screen next to an error
+        console.warn("awards load failed", err);
+        setError("Could not load awards.");
       })
       .finally(() => {
         if (!ctrl.signal.aborted) setLoading(false);
       });
     return () => ctrl.abort();
-  }, [search.filters, search.sort, search.q, search.page]);
+  }, [panelFilters, search.sort, search.q, search.page, override]);
 
-  const patch = (next: Partial<AwardsSearch>) =>
+  const patch = (next: Partial<AwardsSearch>, replace = false) =>
     // Any change other than paging returns to page 1 — staying on page 7 of a
     // different result set shows a member an empty page for no reason.
     navigate({
@@ -146,19 +207,56 @@ function AwardsPage() {
         ...next,
         page: next.page ?? 1,
       }),
+      replace,
     });
 
-  const toggleFilter = (id: AwardFilterId) =>
-    patch({
-      filters: search.filters.includes(id)
-        ? search.filters.filter((f) => f !== id)
-        : [...search.filters, id],
+  // Typing replaces the entry (Back leaves the page, not one letter at a time), and
+  // waits for a pause so each keystroke is not a server search.
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      const term = needle.trim();
+      if (term === lastPushed.current) return;
+      lastPushed.current = term;
+      patch({ q: term }, true);
+    }, 300);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needle]);
+
+  // A filter change replaces the URL entry, so the Back button leaves the page and does
+  // not step through every tick. The new-visit filters keep the URL short.
+  const setPanelFilters = (next: AwardFilters) => {
+    const isDefault = JSON.stringify(next) === JSON.stringify(NO_AWARD_FILTERS);
+    navigate({
+      search: (prev: AwardsSearch) => ({ ...prev, f: isDefault ? undefined : next, page: 1 }),
+      replace: true,
     });
+  };
+
+  // One handler for the "Clear all" chip and the empty state's "Clear filters".
+  const clearFilters = () => setPanelFilters(NO_AWARD_FILTERS);
+
+  // When the award window closes, the focus goes back to the card that opened it. The
+  // window does this too. This is the fallback, for when the list drew the card again.
+  const lastOpened = useRef<string | null>(null);
+  useEffect(() => {
+    if (raw.award) {
+      lastOpened.current = raw.award;
+      return;
+    }
+    const id = lastOpened.current;
+    lastOpened.current = null;
+    if (!id) return;
+    const timer = window.setTimeout(() => {
+      if (document.activeElement && document.activeElement !== document.body) return;
+      document.querySelector<HTMLElement>(`[data-award-id="${CSS.escape(id)}"]`)?.focus();
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [raw.award]);
 
   return (
     <div className="awards-page">
       <header className="awards-head">
-        <div className="t-label">Know your market</div>
         <h1 className="t-display-lg">Awards</h1>
         <p className="t-body-sm awards-head__lede">
           Who buys the work you sell, who won it, and what comes up for bid again.
@@ -171,6 +269,58 @@ function AwardsPage() {
             ← Back to {raw.fromLabel}
           </Link>
         </nav>
+      )}
+
+      {/* Same order as Partners: search and Filters, the filters that are on, then the tabs. */}
+      {search.view !== "saved" && (
+        <div className="partners-toolbar">
+          <div className="partners-toolbar__row">
+            <label className="partners-toolbar__search">
+              <Search size={16} aria-hidden />
+              <input
+                type="search"
+                value={needle}
+                maxLength={100}
+                placeholder="Search awards or kind of work"
+                aria-label="Search awards by company, kind of work, place or number"
+                onChange={(e) => {
+                  setNeedle(e.target.value);
+                }}
+              />
+            </label>
+            <FilterButton count={chips.length} onOpen={() => setPanelOpen(true)} />
+          </div>
+          <AppliedChips
+            chips={chips}
+            onRemove={(key) => {
+              const c = chips.find((x) => x.key === key);
+              if (c) setPanelFilters(c.remove(panelFilters));
+            }}
+            onClear={clearFilters}
+          />
+          {result?.interpreted && search.q && (
+            <div className="fp-chips" role="group" aria-label="Understood as">
+              <span className="t-body-sm">Understood as:</span>
+              {interpretationChips(result.interpreted).map((c) => (
+                <button
+                  key={c.key}
+                  type="button"
+                  className="fp-chip"
+                  aria-label={`Remove: ${c.label}`}
+                  onClick={() => setEdited({ q: search.q, value: c.remove(result.interpreted!) })}
+                >
+                  {c.label}
+                  <X size={13} strokeWidth={2} aria-hidden />
+                </button>
+              ))}
+              {result.interpreted.unsupported && (
+                <p className="t-body-sm" style={{ opacity: 0.7, margin: 0, flexBasis: "100%" }}>
+                  {result.interpreted.unsupported}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       <nav className="partners-tabs" role="tablist" aria-label="Awards views">
@@ -204,61 +354,55 @@ function AwardsPage() {
 
       {search.view !== "saved" && (
         <>
-          {/* Filters are named questions, not filter primitives — and they are shown
-          rather than hidden, so a member can always see why a job is in front of
-          them and remove the reason. */}
-          <div className="awards-controls">
-            <div className="awards-filters" role="group" aria-label="Narrow these awards">
-              {AWARD_FILTERS.map((f) => {
-                const on = search.filters.includes(f.id);
-                return (
-                  <button
-                    key={f.id}
-                    type="button"
-                    aria-pressed={on}
-                    title={f.hint}
-                    className={`award-chip${on ? " is-on" : ""}`}
-                    onClick={() => toggleFilter(f.id)}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Her saved partners first, on the first page. The same filters and search apply. */}
+          {search.page === 1 && (
+            <SavedPartnerAwards
+              isSaved={isSaved}
+              onToggleSaved={onToggleSaved}
+              filters={request.filters}
+              panel={request.panel}
+              q={search.q}
+            />
+          )}
 
-            <div className="awards-tools">
-              <form
-                className="awards-search"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  patch({ q: needle.trim() });
-                }}
+          <div className="awards-sortrow">
+            {search.q && error ? null : search.q ? (
+              <SearchHead
+                count={result ? (result.total ?? result.awards.length) : 0}
+                more={result?.total === undefined && Boolean(result?.hasMore)}
+                noun="award"
+                nouns="awards"
+                q={search.q}
+              />
+            ) : (
+              <h2 className="t-heading awards-all__h">
+                {/* "All awards" only when nothing narrows the list. Else the count. */}
+                {chips.length === 0 ? (
+                  "All awards"
+                ) : result ? (
+                  <>
+                    <span className="mono">{result.total ?? result.awards.length}</span>
+                    {result.total === undefined && result.hasMore ? "+" : ""}{" "}
+                    {(result.total ?? result.awards.length) === 1 ? "award" : "awards"}
+                  </>
+                ) : (
+                  "Awards"
+                )}
+              </h2>
+            )}
+            <label className="awards-sort">
+              <span className="t-label">Sort</span>
+              <select
+                value={search.sort}
+                onChange={(e) => patch({ sort: e.target.value as AwardSort })}
               >
-                <Search size={14} aria-hidden />
-                <input
-                  type="search"
-                  value={needle}
-                  maxLength={100}
-                  placeholder="Search a company name"
-                  aria-label="Search awards"
-                  onChange={(e) => setNeedle(e.target.value)}
-                />
-              </form>
-
-              <label className="awards-sort">
-                <span className="t-label">Sort</span>
-                <select
-                  value={search.sort}
-                  onChange={(e) => patch({ sort: e.target.value as AwardSort })}
-                >
-                  {AWARD_SORTS.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+                {AWARD_SORTS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           {loading && <p className="awards-note">Finding awards in your lane…</p>}
@@ -300,12 +444,56 @@ function AwardsPage() {
             </p>
           ) : null}
 
+          <AwardsFilterPanel
+            open={panelOpen}
+            onClose={() => setPanelOpen(false)}
+            filters={panelFilters}
+            onChange={setPanelFilters}
+            memberStates={areas}
+            resultCount={result ? (result.total ?? result.awards.length) : null}
+            moreResults={result?.total === undefined && Boolean(result?.hasMore)}
+            facets={facets}
+          />
+
           {!loading && !error && result && !result.needsProfile && (
             <>
               {result.awards.length === 0 ? (
-                <div className="card card-padded">
-                  <h2 className="t-heading">Nothing matched</h2>
-                  <p className="t-body-sm">Try removing a filter above to widen the search.</p>
+                <div className="card card-padded awards-empty">
+                  <h2 className="t-heading">
+                    {search.q ? (
+                      <>
+                        No awards match <q>{search.q}</q>
+                        {chips.length > 0 ? " with these filters" : ""}.
+                      </>
+                    ) : chips.length > 0 ? (
+                      "No awards match these filters."
+                    ) : (
+                      "There are no awards to show."
+                    )}
+                  </h2>
+                  <div className="awards-empty__acts">
+                    {chips.length > 0 && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={clearFilters}
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                    {search.q && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => {
+                          setNeedle("");
+                          patch({ q: "" }, true);
+                        }}
+                      >
+                        Clear search
+                      </button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="awards-list">
@@ -315,12 +503,14 @@ function AwardsPage() {
                       award={a}
                       saved={isSaved(a.awardId)}
                       onToggleSaved={onToggleSaved}
+                      matchedBecause={search.q ? result.matchedBecause?.[a.awardId] : undefined}
+                      hl={hl}
                     />
                   ))}
                 </div>
               )}
 
-              {/* No total: counting 33M rows to render a number is not worth the scan. */}
+              {/* Paging: "More" stays until the last page. */}
               {(search.page > 1 || result.hasMore) && (
                 <nav className="awards-pager" aria-label="More awards">
                   <button
@@ -346,6 +536,16 @@ function AwardsPage() {
           )}
         </>
       )}
+
+      <AwardDetailDialog
+        awardId={raw.award ?? null}
+        q={search.q}
+        onClose={() =>
+          navigate({ search: (p: AwardsSearch) => ({ ...p, award: undefined }), replace: true })
+        }
+        isSaved={isSaved}
+        onToggleSaved={onToggleSaved}
+      />
     </div>
   );
 }

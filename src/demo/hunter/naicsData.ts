@@ -306,6 +306,13 @@ export function naicsDescription(code: string): string | undefined {
   return NAICS_BY_CODE.get(code);
 }
 
+const PSC_BY_CODE = new Map(PSC.map((r) => [r.code, r.description]));
+
+/** The taxonomy's words for a PSC code, or undefined for a code the list does not hold. */
+export function pscDescription(code: string): string | undefined {
+  return PSC_BY_CODE.get(code);
+}
+
 /** The rows for these codes. A code the list does not hold is left out. */
 export function naicsDescriptions(codes: string[]): CodeRow[] {
   const rows: CodeRow[] = [];

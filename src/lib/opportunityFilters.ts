@@ -31,11 +31,11 @@ export type OpportunityFilters = {
   /** NAICS codes excluded from a selected work type (advanced trim). Subtractive — never counted as an active filter. */
   excludedNaics: string[];
   states: string[]; // 2-letter state codes
-  cities: string[]; // free-text city names (e.g. "Houston"), casing preserved
+  cities: string[]; // "City, ST" (e.g. "Houston, TX"); a bare name from an older search means any state
   radius: { city: string; miles: number } | null;
   setAsides: string[]; // ids: "VOSB","SB","8A","WOSB","HUBZone","FULL_OPEN"
   valueRange: { min: number | null; max: number | null };
-  dueWindow: string[]; // ids: "this_week","2_weeks","30_days","60_plus","any"
+  dueWindow: string[]; // "any" or "within_N"; the older "this_week","2_weeks","30_days","60_plus" still work
   status: Status;
 
   // ADVANCED tier
@@ -189,21 +189,23 @@ export function applyWorkPickerChange(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LocationPicker city-id bridging — bare popCity strings only
+// LocationPicker city ids — "City, ST"
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Maps the backend city gazetteer's `{ city, count }` rows (from
- * `GET /opportunities/filters/cities`) into LocationPicker's `CityNode[]`,
- * using the BARE city name as both `id` and `label`. This is the bridging
- * point that keeps `filters.cities` a flat array of bare popCity strings end
- * to end: the live backend's popCity filter matches bare names (e.g.
- * "Houston"), never "City, ST" composites — so no composite id is
- * constructed here or anywhere downstream (onChange → onSetFilters →
- * toServerFilters's `location.cities`).
+ * Maps the backend city list's `{ city, count }` rows for one state (from
+ * `GET /opportunities/filters/cities`) into LocationPicker's `CityNode[]`.
+ * The id is "City, ST", so Houston, TX and Houston, MN are two choices; the
+ * label is the bare city name, because the picker shows it under its state.
+ * The server reads a "City, ST" value as that city in that state, and the
+ * facet counts are keyed the same way. A bare name (an old saved search, a
+ * profile city) still means that name in any state.
  */
-export function cityRowsToNodes(rows: { city: string }[]): { id: string; label: string }[] {
-  return rows.map((r) => ({ id: r.city, label: r.city }));
+export function cityRowsToNodes(
+  rows: { city: string }[],
+  state: string,
+): { id: string; label: string }[] {
+  return rows.map((r) => ({ id: `${r.city}, ${state}`, label: r.city }));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -505,8 +507,7 @@ export function evaluateFilters<T extends EvaluableOpp>(f: OpportunityFilters, o
     // daysUntilClose; mock opps carry an ISO closesAt.
     if (f.dueWindow.length && !f.dueWindow.includes("any")) {
       const daysOut = o.daysUntilClose ?? (o.closesAt ? daysUntil(o.closesAt) : NaN);
-      const buckets = dueBucket(daysOut);
-      const hit = f.dueWindow.some((id) => buckets.includes(id));
+      const hit = f.dueWindow.some((id) => inDueWindow(id, daysOut));
       if (!hit) return false;
     }
 
@@ -605,6 +606,7 @@ export function toServerFilters(
 /** The server field and direction for each sort key. 'newest' is sorted
  *  server-side on both the ranked and preview paths. */
 const SERVER_SORTS: Record<SortKey, ServerSort> = {
+  relevance: { field: "relevance", order: "desc" },
   match: { field: "match", order: "desc" },
   newest: { field: "newest", order: "desc" },
   deadline: { field: "deadline", order: "asc" },
@@ -665,68 +667,43 @@ export function computeAvailableFacets(opps: FacetSourceOpp[]): AvailableFacets 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SegmentedControl bridging helpers — dueWindow and postedWithin are modeled
-// as an array / a number respectively (see the `OpportunityFilters` type
-// above), but the drawer now represents each as a single-value
-// <SegmentedControl>. These pure helpers translate between the segmented
-// control's one selected id and the model's underlying shape, so
-// toServerFilters and the rest of the model never change.
+// Timing helpers — the Filters window asks for a number of days. Closing is
+// stored in `dueWindow` as "within_N" (closes in the next N days); the older
+// ids "this_week", "2_weeks", "30_days" and "60_plus" still work, so saved
+// searches keep working. Posted is already a number of days (`postedWithin`).
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Segment ids for the due-window SegmentedControl, in display order
- *  ("any" first/leftmost, then ascending windows). */
-export const DUE_WINDOW_SEGMENT_IDS = [
-  "any",
-  "this_week",
-  "2_weeks",
-  "30_days",
-  "60_plus",
-] as const;
+const WITHIN_PREFIX = "within_";
+const LEGACY_DUE_DAYS: Record<string, number> = { this_week: 7, "2_weeks": 14, "30_days": 30 };
 
-/**
- * Maps a due-window SegmentedControl selection to `filters.dueWindow`:
- * "any" → [] (matches everything, same as the empty/omitted state
- * toServerFilters already handles), any specific id → a one-element array.
- */
-export function dueWindowSegmentToArray(segmentId: string): string[] {
-  return segmentId === "any" ? [] : [segmentId];
+/** The days in one closing id ("within_15" → 15, "30_days" → 30). Null for "any", "60_plus" or junk. */
+export function dueIdDays(id: string): number | null {
+  const m = id.match(/^within_(\d+)$/);
+  if (m) return Number(m[1]);
+  return LEGACY_DUE_DAYS[id] ?? null;
 }
 
-/**
- * Inverse of `dueWindowSegmentToArray` — reads the current segment id back
- * out of `filters.dueWindow` for the SegmentedControl's `value` prop. An
- * empty array or an array whose only entry is "any" both read as "any".
- */
-export function dueWindowArrayToSegment(dueWindow: string[]): string {
-  const specific = dueWindow.filter((w) => w !== "any");
-  return specific[0] ?? "any";
+/** "Closes in the next N days", or null for any closing date. */
+export function dueWithinDays(f: OpportunityFilters): number | null {
+  for (const id of f.dueWindow) {
+    const days = dueIdDays(id);
+    if (days !== null) return days;
+  }
+  return null;
 }
 
-/** Segment ids for the posted-within SegmentedControl, in display order
- *  ("any" first/leftmost, then ascending day counts). */
-export const POSTED_WITHIN_SEGMENT_IDS = ["any", "1", "3", "7", "30"] as const;
-
-/**
- * Maps a posted-within SegmentedControl selection (a day-number string, or
- * "any") to `filters.postedWithin`: "any" → null, otherwise the parsed
- * number of days — the same shape toServerFilters already emits verbatim.
- */
-export function postedWithinSegmentToDays(segmentId: string): number | null {
-  if (segmentId === "any") return null;
-  const n = Number(segmentId);
-  return Number.isFinite(n) && n > 0 ? n : null;
+/** The `dueWindow` value for "closes in the next N days" (null → any date). */
+export function dueWindowForDays(days: number | null): string[] {
+  return days === null ? ["any"] : [`${WITHIN_PREFIX}${days}`];
 }
 
-/**
- * Inverse of `postedWithinSegmentToDays` — reads the current segment id back
- * out of `filters.postedWithin` for the SegmentedControl's `value` prop.
- * A day count that doesn't match one of the fixed presets (e.g. a value set
- * by an older control) falls back to "any" rather than showing a false match.
- */
-export function postedWithinDaysToSegment(postedWithin: number | null): string {
-  if (postedWithin == null) return "any";
-  const s = String(postedWithin);
-  return (POSTED_WITHIN_SEGMENT_IDS as readonly string[]).includes(s) ? s : "any";
+/** True when a record that closes `daysOut` days from now is inside the closing id. */
+export function inDueWindow(id: string, daysOut: number): boolean {
+  if (id.startsWith(WITHIN_PREFIX)) {
+    const days = dueIdDays(id);
+    return days !== null && daysOut >= 0 && daysOut <= days;
+  }
+  return dueBucket(daysOut).includes(id);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

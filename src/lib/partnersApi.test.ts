@@ -3,6 +3,7 @@ import {
   PIPELINE_STAGES,
   STAGE_LABEL,
   STAGE_TERM,
+  fetchPartners,
   suppressPartner,
   unsuppressPartner,
   whereTheyWork,
@@ -109,13 +110,18 @@ describe("whereTheyWork — Karthik feedback, real places instead of vague 'near
     );
   });
 
-  it("names almost-all-in-one-place with the city and the full state name together", () => {
-    const p = withGeography({
+  it('says "most of it" only when that city holds more than half of their jobs', () => {
+    const geo = {
       statesPerformed: ["TX"],
       topCitiesByCount: [{ city: "AUSTIN", count: 20 }],
       inStateAwardShare: 0.9,
-    });
-    expect(whereTheyWork(p)).toBe("Almost all their work is in Austin and nearby, in Texas.");
+    };
+    const many = (awardCount: number) =>
+      ({ ...withGeography(geo), economics: { awardCount } }) as PrimeCandidate;
+    expect(whereTheyWork(many(30))).toBe(
+      "Almost all their work is near you. Most of it is in Austin.",
+    );
+    expect(whereTheyWork(many(100))).toBe("Almost all their work is near you, in Texas.");
   });
 });
 
@@ -155,5 +161,27 @@ describe('suppress / unsuppress — D11 "not right for me"', () => {
       vi.fn().mockResolvedValue(new Response(JSON.stringify({}), { status: 500 })),
     );
     await expect(suppressPartner(123)).rejects.toThrow();
+  });
+});
+
+// Prod 2026-11-20: Find partners never sent the search to the server, so a
+// kind-of-work search ("catering", "561710") only matched the stored lane.
+describe("fetchPartners", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const ok = () =>
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ partners: [] }), { status: 200 }));
+
+  it("sends the search to GET /partners as q", async () => {
+    const fetchMock = ok();
+    vi.stubGlobal("fetch", fetchMock);
+    await fetchPartners(undefined, "food service");
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/partners\?q=food%20service$/);
+  });
+
+  it("no search, no q", async () => {
+    const fetchMock = ok();
+    vi.stubGlobal("fetch", fetchMock);
+    await fetchPartners();
+    expect(String(fetchMock.mock.calls[0][0])).toMatch(/\/partners$/);
   });
 });

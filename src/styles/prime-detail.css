@@ -1,0 +1,642 @@
+/* ── Prime detail dialog (pdm = prime detail modal) ─────────────────────────
+   One company, in full. A centred dialog over a dimmed page. Radix Dialog
+   supplies the focus trap, Escape and focus return. This file owns layout only.
+   The header and the footer stay fixed. The body scrolls. On a phone, the
+   dialog fills the screen. Tokens only: no raw hex. */
+
+.pdm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: color-mix(in oklab, var(--text-ink) 50%, transparent);
+  animation: pdm-fade var(--d-fast) var(--ease);
+}
+.pdm-overlay[data-state="closed"] {
+  animation: pdm-fade-out var(--d-fast) var(--ease);
+}
+
+.pdm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 81;
+  transform: translate(-50%, -50%);
+  /* A large window: about 80% of the screen. The height follows the content,
+     up to 85% of the screen, so a short company leaves no empty space. */
+  width: min(1120px, 80vw);
+  max-height: min(85vh, 960px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sheet);
+  outline: none;
+  overflow: hidden;
+  animation: pdm-in var(--d-base) var(--ease);
+}
+.pdm[data-state="closed"] {
+  animation: pdm-out var(--d-fast) var(--ease-in);
+}
+
+@keyframes pdm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pdm-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pdm-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes pdm-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -48%) scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pdm,
+  .pdm[data-state="closed"],
+  .pdm-overlay,
+  .pdm-overlay[data-state="closed"] { animation: none; }
+}
+
+/* ── Header ── */
+.pdm-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--s-6);
+  border-bottom: 1px solid var(--border);
+}
+.pdm-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+.pdm-back {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.pdm-back:hover { text-decoration: underline; }
+.pdm-back:focus-visible { outline: none; box-shadow: var(--ring-focus); border-radius: var(--r-sm); }
+.pdm-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-ink);
+  overflow-wrap: anywhere;
+}
+.pdm-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+}
+.pdm-close:hover { background: var(--bg-subtle); color: var(--text); }
+.pdm-close:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+
+/* ── Body ── */
+.pdm-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s-6);
+}
+.pdm-body__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+}
+.pdm-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+.pdm-notice {
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}
+.pdm-h {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.pdm-p {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.pdm-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.pdm-list li {
+  display: flex;
+  gap: var(--s-2);
+}
+.pdm-list li::before {
+  content: "•";
+  flex: none;
+  color: var(--text-3);
+}
+
+.pdm-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--s-3);
+}
+.pdm-fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+}
+.pdm-fact dt {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-3);
+}
+.pdm-fact dd {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+}
+.pdm-fact dd.pdm-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.pdm-link {
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.pdm-link:hover { text-decoration: underline; }
+.pdm-link:focus-visible { outline: none; box-shadow: var(--ring-focus); border-radius: var(--r-sm); }
+
+/* Kinds of work: oval pills, like the partner chips. Facts, not controls, so neutral. */
+.pdm-pills {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.pdm-pills li {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+/* Trades they hire: name and firm count, in the same box as the award small-firm list. */
+.pdm-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.pdm-rows li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text);
+}
+.pdm-rows li + li { border-top: 1px solid var(--border); }
+.pdm-rows__name { min-width: 0; overflow-wrap: anywhere; }
+.pdm-rows__count { flex: none; font-size: 13px; color: var(--text-2); }
+
+/* ── Footer ──
+   "Visit their website" is the main action: it fills the row. Save sits at the
+   bottom right, the same height, with its word so that she knows what it does. */
+.pdm-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-6) var(--s-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.pdm-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+/* Two classes: the live .btn block in styles.css loads after this file. */
+.pdm-actions .pdm-cta {
+  flex: 1;
+  min-height: 52px;
+  padding: 0 var(--s-6);
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 600;
+  border-radius: var(--r-md);
+  text-decoration: none;
+}
+.pdm-nosite {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-2);
+}
+.pdm-save {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-width: 112px;
+  height: 52px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-2);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--d-fast) var(--ease), color var(--d-fast) var(--ease);
+}
+.pdm-save:hover { background: var(--bg-subtle); color: var(--accent); }
+.pdm-save:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.pdm-save.is-saved {
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-color: var(--blue-4);
+}
+.pdm-footnote {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Phone: full screen ── */
+@media (max-width: 640px) {
+  .pdm {
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    animation: pdm-fade var(--d-base) var(--ease);
+  }
+  .pdm[data-state="closed"] { animation: pdm-fade-out var(--d-fast) var(--ease); }
+  .pdm-head { padding: var(--s-4); }
+  .pdm-title { font-size: 19px; }
+  .pdm-body { padding: var(--s-4); }
+  .pdm-body__inner { gap: var(--s-6); }
+  /* One compact row on a phone: the website button and Save. */
+  .pdm-foot { padding: var(--s-2) var(--s-3) var(--s-3); gap: var(--s-1); }
+  .pdm-actions { gap: var(--s-2); }
+  .pdm-actions .pdm-cta { min-height: 48px; font-size: 16px; padding: 0 var(--s-3); }
+  .pdm-save { min-width: 0; height: 48px; padding: 0 var(--s-3); }
+  .pdm-footnote { font-size: 11px; }
+}
+
+/* ── Full data: recent jobs, two columns, IDs ── */
+.pdm-h-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+.pdm-code {
+  font-size: 12px;
+  color: var(--text-3);
+}
+.pdm-small { font-size: 14px; }
+.pdm-rows__sub {
+  display: block;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* Recent jobs: one row for each job, so she can scan down a column. */
+.pdm-jobs-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow-x: auto;
+}
+.pdm-jobs {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+}
+.pdm-jobs th {
+  padding: var(--s-2) var(--s-3);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-align: left;
+  white-space: nowrap;
+}
+.pdm-jobs td {
+  padding: var(--s-3);
+  vertical-align: top;
+  line-height: 1.4;
+}
+.pdm-jobs tbody tr + tr td { border-top: 1px solid var(--border); }
+.pdm-jobs td:nth-child(n + 3) { white-space: nowrap; }
+.pdm-jobs .pdm-jobs__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.pdm-jobs__title {
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+}
+.pdm-jobs__title:hover { text-decoration: underline; }
+.pdm-jobs__title:focus-visible { outline: none; box-shadow: var(--ring-focus); border-radius: var(--r-sm); }
+.pdm-jobs__sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.pdm-ids {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.pdm-ids > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-3);
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+.pdm-ids dt { color: var(--text-2); }
+.pdm-ids dd { margin: 0; color: var(--text); }
+
+/* Narrow screens: one column, and each job becomes a small labelled block. */
+@media (max-width: 900px) {
+  .pdm-jobs,
+  .pdm-jobs tbody,
+  .pdm-jobs tr,
+  .pdm-jobs td { display: block; }
+  .pdm-jobs thead { display: none; }
+  .pdm-jobs tr { padding: var(--s-3); }
+  .pdm-jobs tbody tr + tr { border-top: 1px solid var(--border); }
+  .pdm-jobs tbody tr + tr td { border-top: none; }
+  .pdm-jobs td { padding: 2px 0; white-space: normal; }
+  .pdm-jobs td:nth-child(n + 2)::before {
+    content: attr(data-label) ": ";
+    color: var(--text-3);
+  }
+  .pdm-jobs .pdm-jobs__num { text-align: left; }
+}
+.pdm-term {
+  margin-left: var(--s-1);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Header line, warning, contact ── */
+.pdm-sub {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-2);
+}
+/* A registration that has ended. A caution, not an error, so warning tokens, not red. */
+.pdm-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin: 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--warn-3);
+  border-radius: var(--r-md);
+  background: var(--warn-2);
+  color: var(--warn-11);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pdm-warn svg { flex: none; margin-top: 3px; color: var(--warn-9); }
+.pdm-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pdm-p--ink { color: var(--text); }
+.pdm-source {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Sections that open on a tap ──
+   Native <details>: the keyboard and screen readers work with no script. */
+.pdm-folds {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.pdm-fold + .pdm-fold { border-top: 1px solid var(--border); }
+.pdm-fold__sum {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 48px;
+  padding: var(--s-2) var(--s-4);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--r-md);
+}
+.pdm-fold__sum::-webkit-details-marker { display: none; }
+.pdm-fold__sum:hover { background: var(--bg-subtle); }
+.pdm-fold__sum:focus-visible { outline: none; box-shadow: var(--ring-focus); }
+.pdm-fold__title { flex: 1; min-width: 0; }
+.pdm-fold__count {
+  min-width: 24px;
+  padding: 1px var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-2);
+}
+.pdm-fold__chev {
+  flex: none;
+  color: var(--text-3);
+  transition: transform var(--d-fast) var(--ease);
+}
+.pdm-fold[open] > .pdm-fold__sum .pdm-fold__chev { transform: rotate(180deg); }
+.pdm-fold__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-1) var(--s-4) var(--s-4);
+}
+.pdm-fold__tools { display: flex; justify-content: flex-end; }
+@media (prefers-reduced-motion: reduce) {
+  .pdm-fold__chev { transition: none; }
+}
+
+/* ── Firms they hired: name, size tag, trade; jobs, dollars and year on the right ── */
+.pdm-rows__line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+.pdm-tag {
+  padding: 1px var(--s-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.pdm-tag--small {
+  border-color: var(--blue-4);
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+.pdm-rows__count--stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+@media (max-width: 640px) {
+  .pdm-rows li { flex-wrap: wrap; }
+  .pdm-rows__count--stack { align-items: flex-start; text-align: left; }
+}
+
+/* ── Type and weight by purpose (19 Nov 2026) ──
+   Name: the loudest. Section headings: clear and dark. Facts: big numbers, quiet labels.
+   Reasons: body size, key facts in bold. Sources and codes: small and quiet. */
+.pdm-title { font-size: 24px; font-weight: 700; }
+.pdm-h { font-size: 17px; font-weight: 700; color: var(--text-ink); }
+.pdm-fact { background: var(--surface); }
+.pdm-fact dt { font-size: 13px; font-weight: 500; color: var(--text-2); }
+.pdm-fact dd { font-size: 22px; font-weight: 650; color: var(--text-ink); }
+.pdm-list { font-size: 16px; color: var(--text); }
+.pdm-list strong { font-weight: 650; color: var(--text-ink); }
+
+/* How to get on their vendor list: three numbered steps. */
+.pdm-steps {
+  margin: 0;
+  padding: var(--s-4);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-subtle);
+}
+.pdm-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+}
+.pdm-steps__n {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--text-ink);
+  color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+.pdm-steps__t {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--text-ink);
+}
+.pdm-steps__d {
+  margin: 2px 0 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+.pdm-steps__contact {
+  margin: var(--s-2) 0 0;
+  display: inline-block;
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-2);
+}
+.pdm-steps__contact strong { color: var(--text-ink); font-weight: 650; }

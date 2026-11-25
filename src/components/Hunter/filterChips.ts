@@ -1,8 +1,10 @@
 import {
   type OpportunityFilters,
   type MultiFacet,
+  dueIdDays,
   removeValue,
 } from "../../lib/opportunityFilters";
+import { daysText } from "../../lib/format";
 import {
   agencyLabel,
   dueWindowLabel,
@@ -65,7 +67,9 @@ export function buildActiveChips(
     .forEach((id) =>
       out.push({
         key: `dw:${id}`,
-        label: dueWindowLabel(id),
+        label: id.startsWith("within_")
+          ? `Closes within ${daysText(dueIdDays(id) ?? 0)}`
+          : dueWindowLabel(id),
         onRemove: removeVal("dueWindow", id),
       }),
     );
@@ -95,7 +99,7 @@ export function buildActiveChips(
   if (f.postedWithin != null)
     out.push({
       key: "pw",
-      label: `Posted ≤ ${f.postedWithin}d`,
+      label: `Posted in the last ${daysText(f.postedWithin)}`,
       onRemove: () => set({ ...f, postedWithin: null }),
     });
   f.vehicles.forEach((id) =>

@@ -31,6 +31,7 @@ import {
   resetRailSession,
   type RailReply,
 } from "../../lib/grant/rail";
+import { changeAnswerLabel, lineText, reusedNote } from "../../lib/grant/richText";
 import { internalRouteTarget } from "../../lib/sourceLink";
 
 /** Reply kinds that mean the open question was actually ACCEPTED. `offscope` is
@@ -38,7 +39,6 @@ import { internalRouteTarget } from "../../lib/sourceLink";
 const LANDED = new Set<RailReply["kind"]>(["interrogate", "supply"]);
 
 /** Plain text of a rich line (for sending an open-question answer with context). */
-const flatten = (line: RichLine): string => line.map((s) => s.text).join("");
 
 // Interrogative openers — mirror the backend rail's `looksLikeQuestion`. Used so a
 // member can ASK their own question from the open-question card without it being
@@ -108,11 +108,16 @@ function OpenQuestionCard({
   return (
     <div className="grant-oq" role="group">
       <p className="grant-oq__q">
-        <RichText line={q.question} />
+        <RichText line={q.display ?? q.question} />
       </p>
       <p className="grant-oq__payoff">
         <RichText line={q.payoff} />
       </p>
+      {q.unclear ? (
+        <p className="grant-oq__unclear">
+          I couldn't tell if that was a yes or a no. Tap Yes or No.
+        </p>
+      ) : null}
       <form
         className="grant-oq__input"
         onSubmit={(e) => {
@@ -170,6 +175,16 @@ function OpenQuestionCard({
   );
 }
 
+/** The edit card's line for an answer reused from another opportunity. */
+function reusedPayoff(from: { title: string | null; date: string }, value: string): RichLine {
+  const where = from.title ? `On “${from.title}”` : "On another opportunity";
+  return [
+    { text: `${where} (${from.date}) you said ` },
+    { text: `“${value}”`, bold: true },
+    { text: ". A new answer applies only to this opportunity and refreshes the take." },
+  ];
+}
+
 export function GrantRail({
   analysis,
   open,
@@ -178,6 +193,9 @@ export function GrantRail({
   onAnswered,
   onReviewWithMentor,
   mentorDisabledReason,
+  askRequest,
+  editRequest,
+  onSendingChange,
 }: {
   analysis: GrantAnalysis;
   open: boolean;
@@ -196,6 +214,14 @@ export function GrantRail({
    *  `title` (e.g. the 3-day deadline gate — mirrors the header action button
    *  and GrantCanvas's mentor CTA). */
   mentorDisabledReason?: string | null;
+  /** The member tapped a question on the canvas: bring that one to the card. The
+   *  nonce re-fires it when they tap the same question twice. */
+  askRequest?: { id: string; nonce: number } | null;
+  /** The member tapped Change on an answered question on the canvas: open the
+   *  edit card for it. The nonce re-fires it on a second tap. */
+  editRequest?: { id: string; nonce: number } | null;
+  /** Fired when a send starts and ends, so the canvas can disable its Change buttons. */
+  onSendingChange?: (sending: boolean) => void;
 }) {
   const oppKey = analysis.opportunityId;
   const [draft, setDraft] = useState("");
@@ -219,18 +245,22 @@ export function GrantRail({
   // Start-over in flight — the thread is about to be wiped, so the control
   // disables rather than letting a second press race the first.
   const [resetting, setResetting] = useState(false);
+  // The question the member picked from the canvas — served ahead of the ranking
+  // until the next regen, so the count of what is left stays true.
+  const [askedId, setAskedId] = useState<string | null>(null);
   const queue = useMemo(() => {
     const budget: Record<string, number> = { ...skipped };
     // Defensive `?? []`: a degraded/older payload without the array must not
     // blank the whole rail (it is the member's only way to reach Grant).
-    return (analysis.rail.openQuestions ?? []).filter((q) => {
+    const open = (analysis.rail.openQuestions ?? []).filter((q) => {
       if ((budget[q.id] ?? 0) > 0) {
         budget[q.id] -= 1;
         return false;
       }
       return true;
     });
-  }, [analysis, skipped]);
+    return [...open.filter((q) => q.id === askedId), ...open.filter((q) => q.id !== askedId)];
+  }, [analysis, skipped, askedId]);
   const openQuestion = queue[qIndex];
   const needCount = Math.max(0, queue.length - qIndex);
 
@@ -240,20 +270,23 @@ export function GrantRail({
   const answered = analysis.rail.answeredQuestions ?? [];
   // An OpenQuestion-shaped card for the revision, so the whole existing
   // answer path (looksLikeQuestion routing, the composer, send-with-anchor,
-  // regen-on-landed) is reused verbatim. Free-text input on purpose: the
-  // original input kind is not carried on the answered card, and text accepts
-  // every kind's value.
+  // regen-on-landed) is reused verbatim. The edit card uses the question's own
+  // input kind (Yes/No buttons for a yes/no question). An older cached card
+  // without it uses free text, which accepts every kind's value.
   const editingQuestion: OpenQuestion | null = editing
     ? {
         id: editing.id,
         question: editing.question,
-        payoff: [
-          { text: "You said: " },
-          { text: `“${editing.value}”`, bold: true },
-          { text: ". A new answer replaces it and refreshes the take." },
-        ],
+        display: editing.display,
+        payoff: editing.reusedFrom
+          ? reusedPayoff(editing.reusedFrom, editing.value)
+          : [
+              { text: "You said: " },
+              { text: `“${editing.value}”`, bold: true },
+              { text: ". A new answer replaces it and refreshes the take." },
+            ],
         verdictSwing: 0,
-        input: { kind: "text" },
+        input: editing.input ?? { kind: "text" },
         status: "open",
       }
     : null;
@@ -262,7 +295,7 @@ export function GrantRail({
     if (!editing || sending) return;
     const card = editing;
     setEditing(null); // optimistic: close the edit card
-    void send(value, flatten(card.question)).then((r) => {
+    void send(value, lineText(card.question)).then((r) => {
       // The revision didn't land — reopen the card instead of silently
       // pretending the stored answer changed.
       if (!r || !LANDED.has(r.kind)) setEditing(card);
@@ -277,10 +310,14 @@ export function GrantRail({
   // one revision of the take.
   useEffect(() => {
     setQIndex(0);
+    setAskedId(null);
     setRegenerating(false);
-    // A fresh analysis re-lists the answered cards with their CURRENT values —
-    // an edit card left open would show a stale "You said" against them.
-    setEditing(null);
+    // A fresh analysis re-lists the answered cards with their CURRENT values. An
+    // open edit card takes the fresh card, so "You said" is never stale; it
+    // closes only when its answer is gone.
+    setEditing((e) =>
+      e ? ((analysis.rail.answeredQuestions ?? []).find((a) => a.id === e.id) ?? null) : null,
+    );
   }, [analysis]);
 
   // Safety net: if the parent's re-fetch never returns a new analysis (e.g. it
@@ -334,6 +371,35 @@ export function GrantRail({
   const threadRef = useRef<HTMLDivElement>(null);
   // The open-question card — the Improve chip scrolls here and focuses it.
   const cardWrapRef = useRef<HTMLDivElement>(null);
+  const focusCard = () =>
+    requestAnimationFrame(() => {
+      const el = cardWrapRef.current;
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      el.querySelector<HTMLElement>("input, button")?.focus();
+    });
+
+  // A tap on the canvas outranks an earlier skip: they came back for this one.
+  useEffect(() => {
+    if (!askRequest) return;
+    setEditing(null);
+    setSkipped(({ [askRequest.id]: _dropped, ...rest }) => rest);
+    setAskedId(askRequest.id);
+    setQIndex(0);
+    focusCard();
+  }, [askRequest]);
+  useEffect(() => {
+    onSendingChange?.(sending);
+  }, [sending, onSendingChange]);
+  // A Change tap on the canvas opens the edit card for that answer.
+  useEffect(() => {
+    const card = answered.find((a) => a.id === editRequest?.id);
+    if (!card) return;
+    setEditing(card);
+    focusCard();
+    // Only a new request opens the card; a rebuilt answer list must not reopen it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editRequest]);
   useEffect(() => {
     const el = threadRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -397,7 +463,7 @@ export function GrantRail({
     if (!openQuestion || sending) return;
     const answered = openQuestion;
     setQIndex((i) => i + 1); // optimistic: slide the next question in
-    void send(value, flatten(answered.question)).then((r) => {
+    void send(value, lineText(answered.question)).then((r) => {
       // The answer didn't land — restore the question instead of silently
       // skipping it (the regen won't fire to bring it back on a failed reply).
       // `offscope` counts as not-landed: Grant told the member the message was
@@ -442,6 +508,7 @@ export function GrantRail({
     setSkipped({});
     setDraft("");
     setQIndex(0);
+    setAskedId(null);
   }
 
   // Suggested chips dispatch on their kind (Doc 132 AD-6): an `ask` chip is sent
@@ -473,12 +540,7 @@ export function GrantRail({
         setQIndex(idx);
       }
       // Let the card re-render at the new index, then bring it into view + focus.
-      requestAnimationFrame(() => {
-        const el = cardWrapRef.current;
-        if (!el) return;
-        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        el.querySelector<HTMLElement>("input, button")?.focus();
-      });
+      focusCard();
       return;
     }
     if (chip.kind === "route") {
@@ -498,6 +560,21 @@ export function GrantRail({
     // so what Grant answers can't drift from the answerable question (PR #25).
     void send(chip.query ?? chip.label);
   }
+
+  // Grant's own voice above the question card, so clarifying reads as him leading
+  // the conversation rather than a form parked under it.
+  const openCount = (analysis.rail.openQuestions ?? []).length;
+  const untouched = answered.length === 0 && Object.keys(skipped).length === 0;
+  const askLeadIn =
+    askedId && openQuestion?.id === askedId
+      ? "Let's answer this one."
+      : needCount === 1
+        ? untouched
+          ? "I have one question for you before you decide on this."
+          : "Last one."
+        : untouched
+          ? `I have ${needCount} questions for you before you decide on this. First:`
+          : `${needCount} left. Next:`;
 
   if (!open) {
     return (
@@ -657,6 +734,40 @@ export function GrantRail({
           </div>
         ) : null}
 
+        {/* What the member already told Grant, each row a doorway back into its
+            question. Hidden while an edit is in progress — one revision at a
+            time, in the same slot the questions use. */}
+        {answered.length > 0 && !editingQuestion ? (
+          <div className="grant-answered" role="group" aria-label="Your answers">
+            <p className="grant-answered__kicker">Your answers to Grant</p>
+            <p className="grant-answered__hint">
+              Select Change to update an answer. Grant then updates his take.
+            </p>
+            {answered.map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                className="grant-answered__row"
+                onClick={() => setEditing(a)}
+                disabled={sending}
+                aria-label={`${changeAnswerLabel(a.display ?? a.question, a.value)}${a.reusedFrom ? ` ${reusedNote(a.reusedFrom)}` : ""}`}
+              >
+                <span className="grant-answered__q">
+                  <RichText line={a.display ?? a.question} />
+                  {a.reusedFrom ? (
+                    <span className="grant-answered__from">{reusedNote(a.reusedFrom)}</span>
+                  ) : null}
+                </span>
+                <span className="grant-answered__v">{a.value}</span>
+                <span className="grant-change" aria-hidden>
+                  <PencilLine size={14} strokeWidth={2} />
+                  Change
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         {editingQuestion ? (
           <div ref={cardWrapRef}>
             <OpenQuestionCard
@@ -670,40 +781,31 @@ export function GrantRail({
             />
           </div>
         ) : openQuestion ? (
-          <div ref={cardWrapRef}>
-            <OpenQuestionCard
-              key={openQuestion.id}
-              q={openQuestion}
-              onAnswer={answerOpenQuestion}
-              onAsk={(t) => void send(t)}
-              onSkip={skipOpenQuestion}
-              disabled={sending}
-            />
-          </div>
-        ) : null}
-
-        {/* What the member already told Grant, each row a doorway back into its
-            question. Hidden while an edit is in progress — one revision at a
-            time, in the same slot the questions use. */}
-        {answered.length > 0 && !editingQuestion ? (
-          <div className="grant-answered" role="group" aria-label="Your answers">
-            <p className="grant-answered__kicker">You told me</p>
-            {answered.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                className="grant-answered__row"
-                onClick={() => setEditing(a)}
+          <>
+            {!sending ? (
+              <div className="grant-msg grant-msg--lead">
+                <p>{askLeadIn}</p>
+              </div>
+            ) : null}
+            <div ref={cardWrapRef}>
+              <OpenQuestionCard
+                key={openQuestion.id}
+                q={openQuestion}
+                onAnswer={answerOpenQuestion}
+                onAsk={(t) => void send(t)}
+                onSkip={skipOpenQuestion}
                 disabled={sending}
-                aria-label={`Edit answer: ${flatten(a.question)}`}
-              >
-                <span className="grant-answered__q">
-                  <RichText line={a.question} />
-                </span>
-                <span className="grant-answered__v">{a.value}</span>
-                <PencilLine size={12} strokeWidth={2} aria-hidden />
-              </button>
-            ))}
+              />
+            </div>
+          </>
+        ) : answered.length > 0 && !sending && !regenerating ? (
+          <div className="grant-msg grant-msg--lead">
+            <p>
+              That's all I needed. I've updated my take with your answers.
+              {openCount > 0
+                ? ` You skipped ${openCount}. They're still listed under what limits the opportunity.`
+                : ""}
+            </p>
           </div>
         ) : null}
       </div>

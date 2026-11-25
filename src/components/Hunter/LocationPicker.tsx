@@ -1,8 +1,9 @@
 // Two-level location filter: state → city, with cascade selection.
 // Checking a state includes all its cities (the default — "apply everything").
-// Expand a state to narrow to specific cities; unchecking one city converts a
-// whole-state selection into "everywhere except that city". An empty selection
-// means no location filter at all.
+// Expand a state to narrow to specific cities; clicking a city while its whole
+// state is ticked narrows the selection to JUST that city (the state is
+// unticked and only the clicked city stays selected). An empty selection means
+// no location filter at all.
 //
 // Ported from govpreneurs-v2/src/components/Hunter/LocationPicker.tsx, adapted
 // to live data: the state catalog is lib/vocab/usStates' STATES, and each
@@ -10,12 +11,10 @@
 // first time that state is expanded (city gazetteer is per-state, so we don't
 // fetch every state's cities upfront).
 //
-// CITY-ID CONTRACT: city ids/labels here are BARE city names (e.g. "Houston"),
-// never "City, ST" composites — this matches what fetchCities() returns as
-// each city's `city` field, and what the live backend's popCity filter (and
-// toServerFilters' location.cities) expect. Two different states sharing a
-// bare city name (e.g. "Springfield" in IL and MO) is a pre-existing ambiguity
-// in the filter model, not something introduced here.
+// CITY-ID CONTRACT: a city id is "City, ST" (e.g. "Houston, TX"), built by
+// cityRowsToNodes from the state's fetchCities() rows; the label is the bare
+// name. So Houston, TX and Houston, MN are separate choices, and the server
+// and the facet counts read the same "City, ST" key.
 
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, ChevronRight, Minus, Search, X } from "lucide-react";
@@ -97,10 +96,12 @@ export function LocationPicker({
   const onCityClick = (g: StateCityGroup, cityId: string) => {
     const full = fullGroupOf(g.state);
     if (statusOf(full) === "all") {
-      // Whole state → everywhere except the unchecked city.
+      // Whole state ticked, member clicks one of its cities: they mean "just
+      // this city", so drop the state and keep only the clicked city. Works
+      // even if the state's cities are not loaded yet (nothing to clear).
       onChange({
         states: states.filter((s) => s !== full.state),
-        cities: [...cities, ...cityIdsOf(full).filter((id) => id !== cityId)],
+        cities: [...clearGroupCities(full, cities), cityId],
       });
       return;
     }
@@ -128,7 +129,7 @@ export function LocationPicker({
     fetchCities(state)
       .then((groupsForState) => {
         const match = groupsForState.find((g) => g.state === state);
-        const nodes: CityNode[] = cityRowsToNodes(match?.cities ?? []);
+        const nodes: CityNode[] = cityRowsToNodes(match?.cities ?? [], state);
         setLoadedCities((prev) => ({ ...prev, [state]: nodes }));
       })
       .catch(() => {

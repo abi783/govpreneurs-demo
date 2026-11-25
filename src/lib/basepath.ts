@@ -25,3 +25,9 @@ export function appHref(path: string): string {
   const base = basepath === "/" ? "" : basepath;
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/** Inverse of appHref: a full browser pathname back to a router-relative one. */
+export function stripBasepath(pathname: string): string {
+  if (basepath === "/") return pathname;
+  return pathname === basepath ? "/" : pathname.startsWith(`${basepath}/`) ? pathname.slice(basepath.length) : pathname;
+}

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup, waitFor } from "@testing-library/react";
+import { useState } from "react";
 import { LocationPicker } from "./LocationPicker";
 import type { StateCityGroup } from "../../lib/mock/govTaxonomy";
 
@@ -128,5 +129,141 @@ describe("LocationPicker cascade bug (full group vs search-filtered group)", () 
 
     // All 3 NC cities now selected → collapses to whole-state.
     expect(onChange).toHaveBeenCalledWith({ states: ["NC"], cities: [] });
+  });
+});
+
+// Click-semantics when a whole state is ticked: narrow to just the clicked city.
+const city = (id: string) => ({ id, label: id });
+const TX_GROUP: StateCityGroup = {
+  state: "TX",
+  cities: ["Austin", "Houston", "Dallas", "Midlothian"].map(city),
+};
+
+function Stateful({
+  groups,
+  initial,
+  onState,
+}: {
+  groups: StateCityGroup[];
+  initial: { states: string[]; cities: string[] };
+  onState: (s: { states: string[]; cities: string[] }) => void;
+}) {
+  const [sel, setSel] = useState(initial);
+  onState(sel);
+  return (
+    <LocationPicker groups={groups} states={sel.states} cities={sel.cities} onChange={setSel} />
+  );
+}
+
+describe("LocationPicker: clicking a city under a ticked state narrows to that city", () => {
+  it("ticket flow: TX ticked, click Austin -> only Austin; other states untouched", () => {
+    const { onChange } = renderPicker({
+      groups: [TX_GROUP, NC_GROUP],
+      states: ["TX", "NC"],
+      cities: [],
+    });
+    fireEvent.click(screen.getAllByRole("button", { name: "Show cities" })[0]);
+    fireEvent.click(screen.getByText("Austin"));
+    expect(onChange).toHaveBeenCalledWith({ states: ["NC"], cities: ["Austin"] });
+  });
+
+  it("keeps unrelated city selections from other states", () => {
+    const { onChange } = renderPicker({
+      groups: [TX_GROUP, NC_GROUP],
+      states: ["TX"],
+      cities: ["Raleigh"],
+    });
+    fireEvent.click(screen.getAllByRole("button", { name: "Show cities" })[0]);
+    fireEvent.click(screen.getByText("Austin"));
+    expect(onChange).toHaveBeenCalledWith({ states: [], cities: ["Raleigh", "Austin"] });
+  });
+
+  it("clicking the narrowed city again unticks it -> nothing selected for TX", () => {
+    let latest = { states: [] as string[], cities: [] as string[] };
+    render(
+      <Stateful
+        groups={[TX_GROUP]}
+        initial={{ states: ["TX"], cities: [] }}
+        onState={(s) => (latest = s)}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Show cities" }));
+    fireEvent.click(screen.getByText("Austin"));
+    expect(latest).toEqual({ states: [], cities: ["Austin"] });
+    fireEvent.click(screen.getByText("Austin"));
+    expect(latest).toEqual({ states: [], cities: [] });
+  });
+
+  it("ticking cities one by one in a partial state still collapses to the whole state", () => {
+    let latest = { states: [] as string[], cities: [] as string[] };
+    render(
+      <Stateful
+        groups={[TX_GROUP]}
+        initial={{ states: [], cities: [] }}
+        onState={(s) => (latest = s)}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Show cities" }));
+    for (const c of ["Austin", "Houston", "Dallas"]) fireEvent.click(screen.getByText(c));
+    expect(latest).toEqual({ states: [], cities: ["Austin", "Houston", "Dallas"] });
+    fireEvent.click(screen.getByText("Midlothian"));
+    expect(latest).toEqual({ states: ["TX"], cities: [] });
+  });
+
+  it("ticked state whose cities load lazily: narrowing yields just the city, no collapse", async () => {
+    const { fetchCities } = await import("../../lib/discoverApi");
+    vi.mocked(fetchCities).mockResolvedValueOnce([
+      { state: "TX", cities: ["Austin", "Houston"].map((c) => ({ city: c, count: 1 })) },
+    ] as never);
+    const { onChange } = renderPicker({
+      groups: [{ state: "TX", cities: [] }],
+      states: ["TX"],
+      cities: [],
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Show cities" }));
+    await waitFor(() => screen.getByText("Austin"));
+    fireEvent.click(screen.getByText("Austin"));
+    expect(onChange).toHaveBeenCalledWith({ states: [], cities: ["Austin, TX"] });
+  });
+
+  it("two states' cities of one name are two choices: picking Houston, TX leaves Houston, MN", async () => {
+    const { fetchCities } = await import("../../lib/discoverApi");
+    vi.mocked(fetchCities)
+      .mockResolvedValueOnce([{ state: "MN", cities: [{ city: "Houston", count: 2 }] }] as never)
+      .mockResolvedValueOnce([{ state: "TX", cities: [{ city: "Houston", count: 9 }] }] as never);
+    const { onChange } = renderPicker({
+      groups: [
+        { state: "MN", cities: [] },
+        { state: "TX", cities: [] },
+      ],
+      states: [],
+      cities: ["Houston, TX"],
+    });
+    for (const b of screen.getAllByRole("button", { name: "Show cities" })) fireEvent.click(b);
+    await waitFor(() => expect(screen.getAllByText("Houston")).toHaveLength(2));
+
+    const [mn, tx] = screen.getAllByText("Houston").map((el) => el.closest("button")!);
+    expect(mn.getAttribute("aria-selected")).toBe("false");
+    expect(tx.getAttribute("aria-selected")).toBe("true");
+
+    fireEvent.click(screen.getAllByText("Houston")[0]);
+    expect(onChange).toHaveBeenLastCalledWith({
+      states: ["MN"],
+      cities: ["Houston, TX"],
+    });
+  });
+
+  it("search-truncated group: narrowing resolves against the full group and clears hidden cities", () => {
+    const { onChange } = renderPicker({
+      groups: [TX_GROUP],
+      states: ["TX"],
+      cities: ["Houston"], // stale/hidden selection inside the ticked state
+    });
+    fireEvent.change(screen.getByPlaceholderText("Search a state or city…"), {
+      target: { value: "aus" },
+    });
+    expect(screen.queryByText("Houston")).toBeNull();
+    fireEvent.click(screen.getByText("Austin"));
+    expect(onChange).toHaveBeenCalledWith({ states: [], cities: ["Austin"] });
   });
 });

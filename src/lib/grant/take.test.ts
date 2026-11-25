@@ -148,7 +148,7 @@ describe("buildTake — the unanalyzed take degrades cleanly", () => {
   const t = take(analysis);
 
   it("never throws and reports zero strengths/blockers/risks", () => {
-    expect(t.counts).toEqual({ strengths: 0, blockers: 0, risks: 0 });
+    expect(t.counts).toEqual({ strengths: 0, blockers: 0, risks: 0, questions: 0 });
     expect(t.strengths).toHaveLength(0);
     expect(t.limits).toHaveLength(0);
   });
@@ -156,5 +156,176 @@ describe("buildTake — the unanalyzed take degrades cleanly", () => {
   it("still carries a call word and a next move", () => {
     expect(t.callWord).toBe("Needs review");
     expect(t.next?.title).toBe("Back to your matches");
+  });
+});
+
+describe("buildTake — open questions are listed, not counted", () => {
+  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+  const q = (id: string, text: string) => ({
+    id,
+    question: [{ text }],
+    payoff: [],
+    verdictSwing: 0.6,
+    input: { kind: "yesno" as const },
+    status: "open" as const,
+  });
+  const withQuestions: GrantAnalysis = {
+    ...base,
+    verdict: {
+      ...base.verdict,
+      warnings: [{ kind: "proposal-weakness", summary: [{ text: "2 required items" }] }],
+    },
+    rail: { ...base.rail, openQuestions: [q("a", "License?"), q("b", "Dealer?")] },
+  };
+
+  it("names each question in the rail's order, replacing the bare count", () => {
+    const t = take(withQuestions);
+    expect(t.questions.map((x) => x.id)).toEqual(["a", "b"]);
+    expect(t.counts.questions).toBe(2);
+    expect(t.limits.some((l) => l.title === "Proposal weakness")).toBe(false);
+  });
+
+  it("keeps the count line when there is nothing to ask instead", () => {
+    const t = take({ ...withQuestions, rail: { ...base.rail, openQuestions: [] } });
+    expect(t.limits.some((l) => l.title === "Proposal weakness")).toBe(true);
+  });
+});
+
+describe("buildTake — answered questions stay on the card", () => {
+  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+
+  it("lists each answered question with the member's answer, in the rail's order", () => {
+    const t = take({
+      ...base,
+      rail: {
+        ...base.rail,
+        answeredQuestions: [
+          { id: "a", question: [{ text: "License?" }], value: "Yes" },
+          {
+            id: "b",
+            question: [{ text: "Dealer?" }],
+            display: [{ text: "Are you a dealer?" }],
+            value: "No",
+          },
+        ],
+      },
+    });
+    expect(t.answered).toEqual([
+      { id: "a", text: [{ text: "License?" }], value: "Yes" },
+      { id: "b", text: [{ text: "Are you a dealer?" }], value: "No" },
+    ]);
+  });
+
+  it("is empty when nothing is answered", () => {
+    expect(take(base).answered).toEqual([]);
+  });
+});
+
+describe("buildTake — the thesis never repeats the summary", () => {
+  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+  const SAME = [{ text: "This fits your work. " }, { text: "You must renew licenses." }];
+
+  it("drops a thesis that says the same thing as the summary", () => {
+    const t = take({ ...base, verdict: { ...base.verdict, gist: SAME, headline: [SAME] } });
+    expect(t.summary).toEqual(SAME);
+    expect(t.thesis).toEqual([]);
+  });
+
+  it("keeps a thesis that adds something", () => {
+    const other = [{ text: "A different point." }];
+    const t = take({ ...base, verdict: { ...base.verdict, gist: SAME, headline: [other] } });
+    expect(t.thesis).toEqual([other]);
+  });
+});
+
+// g45-items: the panel limits come from the ranked open items.
+describe("buildTake — open items (g45-items)", () => {
+  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+  const pin = { label: "RFP", provenance: { type: "solicitation" as const, ref: "Solicitation" } };
+  const item = (
+    kind: NonNullable<GrantAnalysis["openItems"]>[number]["kind"],
+    weight: NonNullable<GrantAnalysis["openItems"]>[number]["weight"],
+    sentence: string,
+  ) => ({ kind, weight, sentence, questions: [], evidence: pin });
+  const items = [
+    item("license", "decides-call", "Confirm you hold this license: Florida CAC."),
+    item("place", "decides-call", "Confirm you can work on site in Mount Ida, AR."),
+    item("scope", "risk", "Confirm this is work you do."),
+    item("time", "risk", "Plan your time: the notice closes in 4 days."),
+  ];
+  const plainBody = (l: { body: { text: string }[] }) => l.body.map((s) => s.text).join("");
+
+  it("shows the top three items in weight order, with the deciding item first", () => {
+    const t = take({ ...base, openItems: items });
+    const fromItems = t.limits.filter((l) =>
+      ["License to confirm", "Place of work", "Kind of work", "Time"].includes(l.title),
+    );
+    expect(fromItems.map(plainBody)).toEqual([
+      "Confirm you hold this license: Florida CAC.",
+      "Confirm you can work on site in Mount Ida, AR.",
+      "Confirm this is work you do.",
+    ]);
+    const firstNonGate = t.limits.find((l) => l.title !== "Hard blocker" && l.title !== "No runway left");
+    expect(firstNonGate?.title).toBe("License to confirm");
+  });
+
+  it("drops the matrix's missing rows, because the items carry them", () => {
+    const withMissing = GRANT_FIXTURES["SP4701-26-R-0078"](noBidOpp);
+    expect(take(withMissing).limits.some((l) => l.title === "Capacity constraint")).toBe(true);
+    const t = take({ ...withMissing, openItems: [] });
+    expect(t.limits.some((l) => l.title === "Capacity constraint")).toBe(false);
+  });
+
+  it("an open field is never both a strength and a limit", () => {
+    const winStrong = base.reads.map((r) => (r.id === 1 ? { ...r, status: "strong" as const } : r));
+    const analysis: GrantAnalysis = {
+      ...base,
+      reads: winStrong,
+      verdict: { ...base.verdict, competitiveRisk: [{ text: "No clear incumbent, but a competitive field." }] },
+    };
+    const off = take(analysis);
+    expect(off.limits.some((l) => l.title === "Competitive weakness")).toBe(true);
+    const on = take({ ...analysis, openItems: items });
+    expect(on.strengths.some((s) => s.title === itemTitleOf(winStrong))).toBe(true);
+    expect(on.limits.some((l) => l.title === "Competitive weakness")).toBe(false);
+  });
+
+  it("without open items, the limits are unchanged", () => {
+    expect(take({ ...base }).limits).toEqual(take(base).limits);
+    expect("openItems" in base).toBe(false);
+  });
+});
+
+function itemTitleOf(reads: GrantAnalysis["reads"]): string {
+  return reads.find((r) => r.id === 1)!.name.replace(/[?.]$/, "");
+}
+
+// g-reason-first (backend): the reason for a No-bid is the first limit.
+describe("buildTake — the reason for a No-bid first (g-reason-first)", () => {
+  const base = GRANT_FIXTURES["W912EE-26-R-0066"](bidOpp);
+  const pin = { label: "RFP", provenance: { type: "solicitation" as const, ref: "Solicitation" } };
+  const license = { kind: "license" as const, weight: "decides-call" as const, sentence: "Confirm you hold this license: Florida CAC.", questions: [], evidence: pin };
+  const docs = { kind: "documents" as const, weight: "decides-call" as const, sentence: "Get the full solicitation documents.", questions: [], evidence: pin };
+  const qual = { kind: "qualification" as const, weight: "decides-call" as const, sentence: "Confirm the plan.", questions: [], evidence: pin };
+  const reason = {
+    kind: "scope" as const,
+    weight: "blocker" as const,
+    sentence: "This is not your kind of work: the RFP asks for janitorial work.",
+    questions: [],
+    evidence: pin,
+    callReason: true,
+  };
+  const body = (l: { body: { text: string }[] }) => l.body.map((s) => s.text).join("");
+
+  it("puts the reason before every other limit, and keeps three item slots in all", () => {
+    const t = take({ ...base, openItems: [docs, license, qual, reason] });
+    expect(body(t.limits[0])).toBe(reason.sentence);
+    const fromItems = t.limits.filter((l) => ["Kind of work", "Missing documents", "License to confirm", "Qualification to confirm"].includes(l.title));
+    expect(fromItems).toHaveLength(3);
+  });
+
+  it("leaves the order as before without a reason item", () => {
+    const t = take({ ...base, openItems: [docs, license] });
+    expect(t.limits.some((l) => body(l) === reason.sentence)).toBe(false);
   });
 });

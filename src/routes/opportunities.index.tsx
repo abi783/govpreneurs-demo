@@ -12,7 +12,7 @@ import { AlertTriangle, FolderKanban, X } from "lucide-react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { isEmbeddedInGhl, requestCrossPageNav } from "../lib/ghlNav";
 import { usePageMeta } from "../components/Layout/page-meta";
-import { type SortKey, OppsSummaryRow } from "../components/Hunter/OppsSummaryRow";
+import { type SortKey, DEFAULT_SORT_KEYS, OppsSummaryRow } from "../components/Hunter/OppsSummaryRow";
 import { OpportunityCard } from "../components/Hunter/OpportunityCard";
 import { FiltersDrawer } from "../components/Hunter/FiltersDrawer";
 import { HeroSearchField } from "../components/Hunter/HeroSearchField";
@@ -249,6 +249,26 @@ function defaultTabSlice(tab: OppTab): TabScopedState {
   };
 }
 
+/** The search text plus the sort it implies. Starting a search on a tab still
+ *  in its default order switches to "Most relevant" (the order the search index
+ *  ranked the results in); clearing the search puts the tab default back. A
+ *  sort the member picked themselves is never overridden. */
+function withSearch(state: State, value: string): Pick<State, "searchValue" | "sort"> {
+  const had = state.searchValue.trim() !== "";
+  const has = value.trim() !== "";
+  const tabDefault = defaultTabSlice(state.tab).sort;
+  let sort = state.sort;
+  if (has && !had && sort === tabDefault) sort = "relevance";
+  else if (!has && sort === "relevance") sort = tabDefault;
+  return { searchValue: value, sort };
+}
+
+/** The sort menu: "Most relevant" leads it while a search is active. */
+function sortKeysFor(base: SortKey[], searching: boolean): SortKey[] {
+  const keys = base.filter((k) => k !== "relevance");
+  return searching ? ["relevance", ...keys] : keys;
+}
+
 type Action =
   | { type: "set-filters"; filters: OpportunityFilters }
   | { type: "clear-all-filters" }
@@ -310,7 +330,7 @@ export function reducer(state: State, action: Action): State {
       // but every "Clear all" entry point (chip row, empty state, drawer footer)
       // should still drop an active search — mirrors HunterChatOverlay's onReset,
       // which already dispatches clear-all-filters + set-search("") together.
-      return { ...state, filters: emptyFilters(), searchValue: "" };
+      return { ...state, filters: emptyFilters(), ...withSearch(state, "") };
     case "clear-other-tabs":
       return { ...state, tabStash: {} };
     case "set-sort":
@@ -350,7 +370,7 @@ export function reducer(state: State, action: Action): State {
     case "toggle-explore":
       return { ...state, exploreOpen: !state.exploreOpen };
     case "set-search":
-      return { ...state, searchValue: action.value };
+      return { ...state, ...withSearch(state, action.value) };
     case "submit-start":
       return { ...state, parsing: true };
     case "submit-complete":
@@ -421,6 +441,7 @@ const PAGE = 50;
 const SAVED_SORT_KEYS: SortKey[] = ["deadline", "timeLeft", "value", "smallest", "match", "saved"];
 /** The first sentence of the Saved lede, which says what the list is ordered by. */
 const SAVED_SORT_LEDES: Record<SortKey, string> = {
+  relevance: "Most relevant to your search first.",
   deadline: "Soonest closing date first.",
   timeLeft: "Latest closing date first.",
   value: "Biggest estimated value first.",
@@ -1679,13 +1700,14 @@ export function OpportunitiesFeed() {
                 ) : undefined
               }
               controls={false}
-              sortKeys={
+              sortKeys={sortKeysFor(
                 savedTab
                   ? SAVED_SORT_KEYS
                   : allTab
                     ? (["newest", "deadline"] as SortKey[])
-                    : undefined
-              }
+                    : DEFAULT_SORT_KEYS,
+                state.searchValue.trim() !== "",
+              )}
             />
           </div>
         )}
@@ -1906,7 +1928,6 @@ export function OpportunitiesFeed() {
         filters={state.filters}
         onSetFilters={(f) => dispatch({ type: "set-filters", filters: f })}
         keyword={state.searchValue}
-        onKeyword={(v) => dispatch({ type: "set-search", value: v })}
         smartList={state.smartList}
         onSmartListApply={(list) => dispatch({ type: "smartlist-apply", list })}
         onSmartListClear={() => dispatch({ type: "smartlist-clear" })}

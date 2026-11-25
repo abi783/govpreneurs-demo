@@ -98,7 +98,7 @@ function legalLight(matrix: ComplianceRow[]): GateLight {
     tone: "ok",
     word: "Clear",
     glyph: "check",
-    reason: [{ text: "You clear every eligibility gate on this one." }],
+    reason: [{ text: "Nothing we checked blocks you. Read the RFP's own requirements before you bid." }],
     evidence: rows.slice(0, 2).map((r) => r.sourceClause),
   };
 }
@@ -157,7 +157,7 @@ function submittableLight(
       tone: "warn",
       word: `Tight — ${dayWord(Math.max(deadline.realRunwayDays, 0))}`,
       glyph: "alert-triangle",
-      reason: [{ text: "Bonding and reference lead times eat into your window." }],
+      reason: [{ text: "Preparation lead times eat into your window." }],
       evidence: [],
     };
   }

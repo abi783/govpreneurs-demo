@@ -11,9 +11,12 @@ import { CountTicker } from "./CountTicker";
 import { SaveSearchPopover } from "./SaveSearchPopover";
 import { PAST_PERFORMANCE, PERSONA } from "../../demo/story/persona";
 
-export type SortKey = "match" | "newest" | "deadline" | "timeLeft" | "value" | "smallest" | "saved";
+/** `relevance` is offered only while a search is active: the order the search
+ *  index ranked the results in. */
+export type SortKey = "relevance" | "match" | "newest" | "deadline" | "timeLeft" | "value" | "smallest" | "saved";
 
 const SORT_LABELS: Record<SortKey, string> = {
+  relevance: "Most relevant",
   match: "Best match",
   newest: "Newly posted",
   deadline: "Closing soonest",
@@ -24,7 +27,7 @@ const SORT_LABELS: Record<SortKey, string> = {
 };
 
 /** The keys that a feed offers when it does not pass its own `sortKeys`. */
-const DEFAULT_SORT_KEYS: SortKey[] = ["match", "newest", "deadline", "value", "saved"];
+export const DEFAULT_SORT_KEYS: SortKey[] = ["match", "newest", "deadline", "value", "saved"];
 
 function SortDropdown({
   sort,

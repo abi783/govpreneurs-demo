@@ -4,6 +4,11 @@ The member app that Tim shows on sales calls, running on sample data. It is a
 copy of the production frontend (`frontend-v2` from `abi783/govpreneures` at
 commit `fddbf283`, 16 Oct 2026), plus:
 
+- Partners, Awards, Hunter's filter window and Grant's take card brought up to
+  production `c880b2b2` (25 Nov 2026): search and filters on Partners and Awards,
+  the award and company windows, the partner journey steps, the new filter
+  window, and Grant's answered-question changes (D102);
+
 - the Success Center pages members reach from the GoHighLevel menu (Success
   Center, Roadmap, Tasks, My Business, Mentors), lifted from
   `msjose14/GovPreneurs-Success-Center`;

@@ -32,6 +32,19 @@ describe("GrantCanvas — mentor CTA deadline gate", () => {
     fireEvent.click(btn);
     expect(onMentor).not.toHaveBeenCalled();
   });
+
+  it("says 'Finish mentor request' while her request is paid, not sent", () => {
+    const onMentor = vi.fn();
+    render(
+      <GrantCanvas
+        analysis={analysis}
+        onReviewWithMentor={onMentor}
+        mentorLabel="Finish mentor request"
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Finish mentor request" }));
+    expect(onMentor).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("GrantCanvas — next-move link", () => {
