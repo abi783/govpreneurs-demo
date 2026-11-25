@@ -84,6 +84,7 @@ import { isPilotPlan } from "../lib/plans";
 import { PilotUpsellGate } from "../components/Hunter/PilotUpsellGate";
 import { LockedOpportunitiesBackdrop } from "../components/Hunter/LockedOpportunitiesBackdrop";
 import { OpportunitiesTabs, type OppTab } from "../components/Hunter/OpportunitiesTabs";
+import { BuyerLaneSwitch } from "../components/Hunter/BuyerLaneSwitch";
 import { laneFromScope, laneOnlyFilters, withLane, type BuyerLane } from "../lib/buyerLane";
 import { daysUntil } from "../lib/format";
 import { FACET_DEBOUNCE_MS, SEARCH_DEBOUNCE_MS } from "../lib/feedDebounce";
@@ -1642,7 +1643,10 @@ export function OpportunitiesFeed() {
             // types and dead keys the list does not show.
             savedCount={savedTotal}
           />
-          {/* DEMO: no buyer switch, sorting or filters — too much for a demo. */}
+          <BuyerLaneSwitch
+            lane={state.lane}
+            onChange={(lane) => dispatch({ type: "set-lane", lane })}
+          />
         </div>
 
         {showFeed && (
@@ -1699,7 +1703,6 @@ export function OpportunitiesFeed() {
                   </Link>
                 ) : undefined
               }
-              controls={false}
               sortKeys={sortKeysFor(
                 savedTab
                   ? SAVED_SORT_KEYS
